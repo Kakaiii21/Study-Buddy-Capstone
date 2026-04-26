@@ -82,20 +82,20 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-50 to-primary-100">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 
       {/* FORM */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 order-2 lg:order-1">
-        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-500">
+        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
 
           {/* TABS */}
           <div className="flex justify-center space-x-12 mb-5">
             <button
               onClick={() => setActiveTab('signup')}
-              className={`text-md font-bold border-2 border-primary-500 py-4 rounded-md w-[190px] ${
+              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
                 activeTab === 'signup'
-                  ? 'bg-primary-500 text-primary-100'
-                  : 'bg-white text-primary-500'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white text-primary-600'
               }`}
             >
               SIGN UP
@@ -106,10 +106,10 @@ function App() {
                 setActiveTab('login')
                 navigate('/login')
               }}
-              className={`text-md font-bold border-2 border-primary-500 py-4 rounded-md w-[190px] ${
+              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
                 activeTab === 'login'
                   ? 'bg-primary-500 text-primary-100'
-                  : 'bg-white text-primary-500'
+                  : 'bg-white text-primary-600'
               }`}
             >
               LOG IN
@@ -131,7 +131,7 @@ function App() {
           )}
 
           {/* FORM FIELDS */}
-          <p className="text-primary-500 font-bold p-2">FIRST NAME</p>
+          <p className="text-primary-600 font-bold p-2">FIRST NAME</p>
           <input
             type="text"
             value={firstName}
@@ -140,7 +140,7 @@ function App() {
             placeholder="ex. Juan"
           />
 
-          <p className="text-primary-500 font-bold p-2">LAST NAME</p>
+          <p className="text-primary-600 font-bold p-2">LAST NAME</p>
           <input
             type="text"
             value={lastName}
@@ -149,7 +149,7 @@ function App() {
             placeholder="ex. Dela Cruz"
           />
 
-          <p className="text-primary-500 font-bold p-2">EMAIL</p>
+          <p className="text-primary-600 font-bold p-2">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -158,7 +158,7 @@ function App() {
             placeholder="juandelacruz@gmail.com"
           />
 
-          <p className="text-primary-500 font-bold p-2">PASSWORD</p>
+          <p className="text-primary-600 font-bold p-2">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -167,7 +167,7 @@ function App() {
             placeholder="ex. Ju1an_delaCruz"
           />
 
-          <p className="text-primary-500 font-bold p-2">CONFIRM PASSWORD</p>
+          <p className="text-primary-600 font-bold p-2">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
@@ -179,10 +179,19 @@ function App() {
           <button
             onClick={handleSignup}
             disabled={loading}
-            className="w-full bg-primary-500 font-bold text-white p-6 border rounded-xl disabled:opacity-50"
+            className="w-full bg-primary-600 font-bold text-white p-6 border rounded-xl disabled:opacity-50"
           >
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
+
+          <div className="flex justify-center">
+            <button className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600">
+              <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
+              Google
+            </button>
+          </div>
+
+
 
         </div>
       </div>

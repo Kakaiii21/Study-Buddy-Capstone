@@ -40,23 +40,23 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-50 to-primary-100">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 
       {/* FORM */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 order-2 lg:order-1">
-        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-500">
+        <div className="w-full max-w-md h-[600px] bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
 
           {/* TABS */}
           <div className="flex justify-center space-x-12 mb-5">
             <button
               onClick={() => navigate('/')}
-              className="text-md font-bold border-2 border-primary-500 py-4 rounded-md w-[190px] bg-white text-primary-500"
+              className="text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] bg-white text-primary-600"
             >
               SIGN UP
             </button>
 
             <button
-              className="text-md font-bold border-2 border-primary-500 py-4 rounded-md w-[190px] bg-primary-500 text-primary-100"
+              className="text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] bg-primary-600 text-white"
             >
               LOG IN
             </button>
@@ -70,7 +70,7 @@ function Login() {
           )}
 
           {/* FORM FIELDS */}
-          <p className="text-primary-500 font-bold p-2">EMAIL</p>
+          <p className="text-primary-600 font-bold p-2">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -79,7 +79,7 @@ function Login() {
             placeholder="juandelacruz@gmail.com"
           />
 
-          <p className="text-primary-500 font-bold p-2">PASSWORD</p>
+          <p className="text-primary-600 font-bold p-2">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -89,16 +89,23 @@ function Login() {
           />
 
           <div className='flex justify-end'>
-            <button className='mb-10 text-sm text-primary-500 font-bold hover:underline'>FORGOT PASSWORD</button>
+            <button className='mb-8 text-sm text-primary-600 font-bold hover:underline'>FORGOT PASSWORD</button>
           </div>
 
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-primary-500 font-bold text-white p-6 border rounded-xl disabled:opacity-50"
+            className="w-full bg-primary-600 font-bold text-white p-6 border rounded-xl disabled:opacity-50"
           >
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
+
+          <div className="flex justify-center">
+            <button className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600">
+              <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
+              Google
+            </button>
+          </div>
 
           
 

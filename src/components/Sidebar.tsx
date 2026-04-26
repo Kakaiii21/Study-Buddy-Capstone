@@ -1,0 +1,171 @@
+import { useState } from 'react'
+import { logout } from '../services/authService'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const handleLogout = async () => {
+    await logout()
+    setShowLogoutModal(false)
+    navigate('/')
+  }
+
+  const navSections = [
+    {
+      heading: 'Home',
+      items: [
+        { label: 'Dashboard', path: '/dashboard' },
+      ]
+    },
+    {
+      heading: 'Activities',
+      items: [
+        { label: 'To Do List', path: '/todolist' },
+        { label: 'Notes', path: '/notes' },
+        { label: 'Class Schedule', path: '/schedule' },
+        { label: 'Course', path: '/courses' },
+        { label: 'Study Generator', path: '/studyGenerator' },
+        { label: 'Generated History', path: '/history' },
+        { label: 'Recently Deleted', path: '/delete' },
+      ]
+    },
+    {
+      heading: 'More',
+      items: [
+        { label: 'Account', path: '/account' },
+      ]
+    },
+  ]
+
+  return (
+    <>
+      {/* BURGER BUTTON */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white text-primary-600 p-3 rounded-lg shadow-lg"
+      >
+        {isOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
+
+      {/* OVERLAY */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* SIDEBAR */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full w-64 bg-primary-50 z-40
+          flex flex-col shadow-lg
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:flex
+        `}
+      >
+
+        {/* LOGO */}
+        <div className="p-6 flex justify-center items-center">
+          <img src="/logo.png" alt="Study Buddy" className="w-40" />
+        </div>
+
+        {/* NAV SECTIONS */}
+        <nav className="flex-1 overflow-y-auto pb-4">
+
+          {navSections.map((section) => (
+            <div key={section.heading} className="mb-4">
+
+              {/* SECTION HEADER */}
+              <div className="flex items-center gap-2 px-4 mb-2">
+                <span className="text-primary-600 font-bold text-lg uppercase tracking-wide">
+                  {section.heading}
+                </span>
+                <div className="flex-1 h-px bg-primary-100" />
+              </div>
+
+              {/* SECTION ITEMS */}
+              {section.items.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    navigate(item.path)
+                    setIsOpen(false)
+                  }}
+                  className={`
+                    w-full text-left py-2 px-4 pl-10 mb-1
+                    font-medium text-lg
+                    transition-colors duration-200
+                    ${location.pathname === item.path
+                      ? 'bg-primary-100 text-primary-600 font-semibold'
+                      : 'text-primary-600 hover:bg-primary-100'
+                    }
+                  `}
+                >
+                  {item.label}
+                </button>
+              ))}
+
+            </div>
+          ))}
+
+          {/* LOGOUT */}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full text-left py-2 pl-10 px-4 mb-1 font-medium text-lg text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+          >
+            Logout
+          </button>
+
+        </nav>
+      </aside>
+
+      {/* LOGOUT MODAL */}
+      {showLogoutModal && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-xl p-8 w-80 text-center">
+              <h2 className="text-xl font-bold text-primary-600 mb-2">
+                Logout
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to logout?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 border-2 border-primary-600 text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 bg-primary-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+    </>
+  )
+}
+
+export default Sidebar

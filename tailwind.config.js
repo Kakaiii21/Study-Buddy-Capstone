@@ -5,9 +5,10 @@ export default {
     extend: {
       colors: {
         primary: {
-          50:'#195791',//dark blue
-          100:'#EFF3FB', //light
-          500:"#132442"//dark almost balck
+          50: '#EFF3FB', // light (correct)
+          100: '#929CB7', // medium/dark
+          500: '#195791', // main brand color
+          600: '#132442', // darkest
         },
       },
     },

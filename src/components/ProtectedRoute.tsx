@@ -20,17 +20,17 @@ function ProtectedRoute({ children }: Props) {
     return () => unsubscribe()
   }, [])
 
-  // ⏳ wait for Firebase to check session
+  // wait for Firebase to check session
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>
   }
 
-  // ❌ not logged in → redirect
+  // not logged in → redirect
   if (!user) {
     return <Navigate to="/login" replace />
   }
 
-  // ✅ logged in → allow access
+  // logged in → allow access
   return children
 }
 
