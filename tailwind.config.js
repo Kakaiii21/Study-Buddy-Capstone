@@ -11,6 +11,10 @@ export default {
           600: '#132442', // darkest
         },
       },
+      fontFamily:{
+        roboto: ['Roboto', 'sans-serif'],
+        orbitron:['Orbitron', 'sans-serif']
+      }
     },
   },
   plugins: [],

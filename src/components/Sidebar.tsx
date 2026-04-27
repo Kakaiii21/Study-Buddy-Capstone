@@ -43,20 +43,18 @@ function Sidebar() {
 
   return (
     <>
-      {/* BURGER BUTTON */}
+            {/* BURGER BUTTON */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-white text-primary-600 p-3 rounded-lg shadow-lg"
+        className="lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center"
       >
-        {isOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        )}
+        <img
+          src="/menu.png"
+          alt="menu"
+          className="w-10 h-8"
+        />
+        <span className="text-xs text-primary-600 mt-1">
+        </span>
       </button>
 
       {/* OVERLAY */}
@@ -91,7 +89,7 @@ function Sidebar() {
 
               {/* SECTION HEADER */}
               <div className="flex items-center gap-2 px-4 mb-2">
-                <span className="text-primary-600 font-bold text-lg uppercase tracking-wide">
+                <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
                   {section.heading}
                 </span>
                 <div className="flex-1 h-px bg-primary-100" />
@@ -125,7 +123,7 @@ function Sidebar() {
           {/* LOGOUT */}
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="w-full text-left py-2 pl-10 px-4 mb-1 font-medium text-lg text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left py-2 pl-10 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
@@ -139,7 +137,7 @@ function Sidebar() {
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="bg-white rounded-xl shadow-xl p-8 w-80 text-center">
-              <h2 className="text-xl font-bold text-primary-600 mb-2">
+              <h2 className="text-xl font-bold text-primary-600 font-roboto mb-2">
                 Logout
               </h2>
               <p className="text-gray-600 mb-6">
@@ -148,13 +146,13 @@ function Sidebar() {
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 border-2 border-primary-600 text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex-1 bg-primary-600 text-white font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
+                  className="flex-1 bg-primary-600 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
                 >
                   Logout
                 </button>
