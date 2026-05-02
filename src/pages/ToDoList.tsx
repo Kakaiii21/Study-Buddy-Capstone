@@ -3,6 +3,10 @@ import {
   DndContext,
   useDroppable,
   useDraggable,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
   type DragEndEvent,
 } from '@dnd-kit/core'
 import Sidebar from '../components/Sidebar'
@@ -67,6 +71,12 @@ function isValidDate(display: string): boolean {
   ) return false
   return true
 }
+// Add this helper near the other date helpers:
+function getTomorrow(): string {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().split('T')[0]
+}
 
 // ── TaskCard ──────────────────────────────────
 
@@ -109,41 +119,42 @@ function TaskCard({
       }
     : {}
 
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`
-        rounded-xl p-4 mb-3 sm:mx-20
-        cursor-grab active:cursor-grabbing hover:shadow-md
-        w-full select-none relative
-        ${getCardStyle(task, today)}
-      `}
-    >
-      <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
-        <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
-          month: '2-digit',
-          day: '2-digit',
-          year: 'numeric',
-        })}</p>
-      </div>
-      <div className="flex justify-between items-start">
-        <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
-          {task.name}
+return (
+  <div
+    ref={setNodeRef}
+    style={style}
+    {...attributes}
+    {...listeners}
+    className={`
+      rounded-xl p-4 mb-3
+      hover:shadow-md
+      w-full select-none relative
+      cursor-grab active:cursor-grabbing
+      ${getCardStyle(task, today)}
+    `}
+  >
+    <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
+      <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      })}</p>
+    </div>
+    <div className="flex justify-between items-start">
+      <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+        {task.name}
+      </p>
+    </div>
+
+    <div className="flex justify-between">
+      {task.deadline && (
+        <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
+          {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
+          {toDisplayFormat(task.deadline)}
         </p>
-      </div>
+      )}
 
-      <div className="flex justify-between">
-        {task.deadline && (
-          <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
-            {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
-            {toDisplayFormat(task.deadline)}
-          </p>
-        )}
-
-        {/* 3-dot button */}
+      <div className="relative">
         <button
           onPointerDown={(e) => e.stopPropagation()}
           onClick={() => setShowMenu((prev) => !prev)}
@@ -152,7 +163,6 @@ function TaskCard({
           ⋮
         </button>
 
-        {/* Dropdown menu */}
         {showMenu && (
           <div ref={menuRef} className="absolute right-0 mt-2 w-28 bg-white border rounded-md shadow-md z-50">
             <button
@@ -179,9 +189,9 @@ function TaskCard({
         )}
       </div>
     </div>
-  )
+  </div>
+)
 }
-
 // ── Column ────────────────────────────────────
 
 function Column({
@@ -198,8 +208,13 @@ function Column({
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-h-full flex flex-col items-center p-10 transition-colors duration-200
-        ${isOver ? 'bg-primary-50' : ''}`}
+      className={`
+        w-full lg:flex-1
+        min-h-[300px]
+        flex flex-col items-center p-4 sm:p-6 lg:p-10
+        transition-colors duration-200
+        ${isOver ? 'bg-primary-50' : ''}
+      `}
     >
       <div className="bg-primary-600 max-w-64 w-full p-3">
         <p className="text-white text-xl text-center font-semibold">{label}</p>
@@ -259,7 +274,7 @@ function TaskModal({
         return
       }
       const storage = toStorageFormat(formatted)
-      if (storage < today) {
+      if (storage <= today) {
         setDateError('Deadline cannot be in the past')
       }
     }
@@ -268,10 +283,10 @@ function TaskModal({
   function handleCalendarChange(value: string) {
     if (!value) return
     setTaskDeadline(toDisplayFormat(value))
-    setDateError(value < today ? 'Deadline cannot be in the past' : '')
+    setDateError(value <= today ? 'Deadline cannot be in the past' : '')
   }
 
-  const deadlineIsValid = isValidDate(taskDeadline) && toStorageFormat(taskDeadline) >= today
+  const deadlineIsValid = isValidDate(taskDeadline) && toStorageFormat(taskDeadline) > today
 
   const canSave =
     taskName.trim() !== '' &&
@@ -360,7 +375,7 @@ function TaskModal({
           <input
             ref={calendarRef}
             type="date"
-            min={today}
+            min={getTomorrow()}
             value={calendarValue}
             onChange={(e) => handleCalendarChange(e.target.value)}
             className="absolute right-0 bottom-0 opacity-0 w-0 h-0 pointer-events-none"
@@ -372,7 +387,6 @@ function TaskModal({
         {dateError && (
           <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>
         )}
-
 
         <div className="flex flex-row justify-between gap-10">
           <button
@@ -403,6 +417,16 @@ function ToDoList() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
 
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  )
+
   async function handleAddSave(name: string, deadline: string) {
     await addTask(name, deadline)
     setIsAddModalOpen(false)
@@ -430,11 +454,11 @@ function ToDoList() {
       <main className="flex-1 overflow-auto p-8 mt-16 lg:mt-0">
         <div className="min-h-screen flex flex-col">
 
-          <div className="min-w-screen flex flex-row justify-between items-center p-2">
-            <p className="text-5xl font-bold text-primary-600 font-roboto">TO DO LIST</p>
+          <div className="w-full flex flex-col lg:flex-row justify-center lg:justify-between lg:items-start sm:items-center gap-4 p-2">
+            <p className="text-2xl lg:text-4xl lg:pt-2 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-500 text-white font-roboto font-bold text-md py-3 px-9 rounded-md"
+              className="bg-green-500 text-white font-roboto font-bold mx-10 text-md py-3 px-9 rounded-md"
             >
               + New Task
             </button>
@@ -467,8 +491,18 @@ function ToDoList() {
               Loading your tasks...
             </div>
           ) : (
-            <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
-              <div className="min-w-screen flex flex-row h-screen justify-start items-start mt-10 border-primary-600 border-2 rounded-3xl">
+          <DndContext
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+            autoScroll={{
+              enabled: true,
+              threshold: { x: 0, y: 0.2 },  // only scroll vertically, disable horizontal
+            }}
+          >              
+          <div className="w-full flex flex-col lg:flex-row
+                h-auto lg:min-h-screen
+                mt-6 lg:mt-10
+                border-primary-600 border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}
