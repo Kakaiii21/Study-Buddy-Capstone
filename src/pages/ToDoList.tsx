@@ -130,7 +130,7 @@ function TaskCard({
         })}</p>
       </div>
       <div className="flex justify-between items-start">
-        <p className={`font-semibold font-roboto ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+        <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
           {task.name}
         </p>
       </div>
@@ -305,6 +305,7 @@ function TaskModal({
           type="text"
           placeholder="Enter Task Name"
           autoFocus
+          maxLength={40}
         />
 
         <div className="flex flex-col gap-1">
@@ -466,7 +467,7 @@ function ToDoList() {
               Loading your tasks...
             </div>
           ) : (
-            <DndContext onDragEnd={handleDragEnd}>
+            <DndContext onDragEnd={handleDragEnd} autoScroll={false}>
               <div className="min-w-screen flex flex-row h-screen justify-start items-start mt-10 border-primary-600 border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
