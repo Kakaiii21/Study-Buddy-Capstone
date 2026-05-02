@@ -9,6 +9,7 @@ export default {
           100: '#929CB7', // medium/dark
           500: '#195791', // main brand color
           600: '#132442', // darkest
+          700: '#D9D9D9'
         },
       },
       fontFamily:{

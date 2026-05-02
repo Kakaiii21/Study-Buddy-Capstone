@@ -28,10 +28,7 @@ export function useTasks(user: User | null) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // No user — nothing to listen to, return early
-    // But don't call setState here synchronously
     if (!user) {
-      // Use a microtask so React doesn't see this as synchronous
       const timer = setTimeout(() => {
         setTasks([])
         setLoading(false)
@@ -42,7 +39,6 @@ export function useTasks(user: User | null) {
     const tasksRef = collection(db, 'users', user.uid, 'tasks')
     const q = query(tasksRef, orderBy('createdAt', 'asc'))
 
-    // onSnapshot callback is async — setState here is always safe ✅
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetched: Task[] = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -57,7 +53,6 @@ export function useTasks(user: User | null) {
 
   async function addTask(name: string, deadline: string) {
     if (!user || !name.trim()) return
-
     await addDoc(collection(db, 'users', user.uid, 'tasks'), {
       name: name.trim(),
       deadline,
@@ -65,6 +60,12 @@ export function useTasks(user: User | null) {
       uid: user.uid,
       createdAt: Date.now(),
     })
+  }
+
+  async function updateTask(taskId: string, fields: Partial<Pick<Task, 'name' | 'deadline'>>) {
+    if (!user) return
+    const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
+    await updateDoc(taskRef, fields)
   }
 
   async function updateTaskStatus(taskId: string, newStatus: Status) {
@@ -79,5 +80,5 @@ export function useTasks(user: User | null) {
     await deleteDoc(taskRef)
   }
 
-  return { tasks, loading, addTask, updateTaskStatus, deleteTask }
+  return { tasks, loading, addTask, updateTask, updateTaskStatus, deleteTask }
 }
