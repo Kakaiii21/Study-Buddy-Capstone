@@ -17,6 +17,8 @@ function Dashboard() {
   ]
 
   return (
+    <body className='bg-gray-500'>
+      
     <div className='flex h-screen'>
       <Sidebar />
 
@@ -41,7 +43,7 @@ function Dashboard() {
         <main className='flex flex-1 overflow-y-auto mt-14 lg:mt-0'>
 
           {/* Main Col */}
-          <div className='flex-[3] bg-white p-2 mt-2'>
+          <div className='flex-[3] bg-white p-2  px-12'>
 
             {/* Welcome Banner */}
             <div className='lg:px-20 mt-4 mb-6 mx-8 bg-primary-600 p-6 rounded-xl'>
@@ -166,6 +168,8 @@ function Dashboard() {
         </main>
       </div>
     </div>
+        </body>
+
   )
 }
 

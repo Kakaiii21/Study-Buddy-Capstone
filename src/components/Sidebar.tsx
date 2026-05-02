@@ -13,7 +13,7 @@ function Sidebar() {
     setShowLogoutModal(false)
     navigate('/')
   }
-
+  
   const navSections = [
     {
       heading: 'Home',
@@ -60,7 +60,7 @@ function Sidebar() {
       {/* OVERLAY */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="lg:hidden fixed inset-0 bg-black  bg-opacity-50 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -68,8 +68,8 @@ function Sidebar() {
       {/* SIDEBAR */}
       <aside
         className={`
-          fixed top-0 left-0 h-full w-64 bg-primary-50 z-40
-          flex flex-col shadow-lg
+          fixed top-0 left-0 h-full w-72 bg-primary-50 z-40
+          flex flex-col shadow-lg 
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:flex
@@ -88,7 +88,7 @@ function Sidebar() {
             <div key={section.heading} className="mb-4">
 
               {/* SECTION HEADER */}
-              <div className="flex items-center gap-2 px-4 mb-2">
+              <div className="flex items-center gap-2 px-10 mb-2">
                 <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
                   {section.heading}
                 </span>
@@ -104,7 +104,7 @@ function Sidebar() {
                     setIsOpen(false)
                   }}
                   className={`
-                    w-full text-left py-2 px-4 pl-10 mb-1
+                    w-full text-left py-2 px-4 pl-20 mb-1
                     font-medium text-lg
                     transition-colors duration-200
                     ${location.pathname === item.path
@@ -123,7 +123,7 @@ function Sidebar() {
           {/* LOGOUT */}
           <button
             onClick={() => setShowLogoutModal(true)}
-            className="w-full text-left py-2 pl-10 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left py-2 pl-20 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
