@@ -102,7 +102,7 @@ useEffect(() => {
 
   // ── Note CRUD handlers ──
   async function handleNoteSave() {
-    if (noteTitle.trim() === '') return
+    if (noteTitle.trim() === '' || noteContent.trim() === '') return
     await addNote(noteTitle, noteSubject, noteContent)
     setNoteTitle('')
     setNoteSubject('All Subject')
@@ -145,6 +145,7 @@ useEffect(() => {
 
   // ── Filtered notes ──
   const filteredNotes = notes
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .filter((n) => selectedSubject === 'All Subject' || n.subject === selectedSubject)
     .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
@@ -421,20 +422,23 @@ useEffect(() => {
               >
 
                 {/* ── MOBILE layout ── */}
-                <div className='lg:hidden flex flex-col flex-1 p-6'>
+                <div className='lg:hidden flex flex-col flex-1 p-6 '>
 
+                {isReadOnly ? (
+                  <p className='w-32 ml-auto text-2xl text-right  text-primary-600 font-bold '>{displaySubject}</p>
+                ) : (
                   <select
                     aria-label='Select subject'
                     value={displaySubject}
                     onChange={(e) => setNoteSubject(e.target.value)}
-                    disabled={isReadOnly}
-                    className='w-64 ml-auto border-2 border-primary-600 rounded-md px-3 py-2 mb-4 text-primary-600 font-semibold disabled:opacity-70 disabled:cursor-default'
+                    className='w-64 ml-auto border-2 border-primary-600 rounded-md px-3 py-2 mb-4 text-primary-600 font-semibold'
                   >
                     <option value='All Subject'>All Subject</option>
                     {allSubjects.map((subject, index) => (
                       <option key={index} value={subject}>{subject}</option>
                     ))}
                   </select>
+                )}
 
                   <input
                     className='w-full text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 px-1 py-2 mb-2 focus:outline-none read-only:cursor-default'
@@ -449,7 +453,7 @@ useEffect(() => {
                   <p className='text-sm text-gray-400 mb-4'>{modalTime.date} — {modalTime.time}</p>
 
                   <textarea
-                    className='w-full flex-1 min-h-[300px] px-3 py-2 mb-4 resize-none read-only:cursor-default'
+                    className='w-full flex-1 min-h-[300px] px-3 py-2 mb-4 pb-16 resize-none read-only:cursor-default'
                     placeholder='Write your notes here...'
                     value={displayContent}
                     onChange={(e) => setNoteContent(e.target.value)}
@@ -457,14 +461,23 @@ useEffect(() => {
                   />
 
                   <div className='flex gap-4 mt-auto'>
-                    {modalMode === 'view' && (
+                  {modalMode === 'view' && (
+                    <>
                       <button
                         onClick={closeNoteModal}
-                        className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                       >
                         CLOSE
                       </button>
-                    )}
+
+                      <button
+                        onClick={() => { if (selectedNote) openEditModal(selectedNote)} }
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                      >
+                        EDIT
+                      </button>
+                      </>
+                  )}
                     {modalMode === 'edit' && (
                       <>
                         <button
@@ -476,7 +489,7 @@ useEffect(() => {
                         <button
                           onClick={handleNoteUpdate}
                           disabled={noteTitle.trim() === ''}
-                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           UPDATE
                         </button>
@@ -492,8 +505,9 @@ useEffect(() => {
                         </button>
                         <button
                           onClick={handleNoteSave}
-                          disabled={noteTitle.trim() === ''}
-                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                          disabled={noteTitle.trim() === '' || noteContent.trim() === ''
+                          }
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           SAVE
                         </button>
@@ -503,9 +517,9 @@ useEffect(() => {
                 </div>
 
                 {/* ── DESKTOP layout ── */}
-                <div className='hidden lg:flex flex-col flex-1 py-10 px-5'>
+                <div className='hidden lg:flex flex-col flex-1 py-10 px-5 relative'>
 
-                  <div className='flex items-center gap-1 mb-2'>
+                  <div className='flex items-center gap-1 mb-2 '>
                     <input
                       className='flex-1 py-2 text-primary-600 text-2xl font-bold placeholder:text-primary-600 focus:outline-none read-only:cursor-default'
                       type='text'
@@ -515,25 +529,28 @@ useEffect(() => {
                       readOnly={isReadOnly}
                       autoFocus={!isReadOnly}
                     />
+                    {isReadOnly ? (
+                    <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
+                  ) : (
                     <select
                       aria-label='Select subject'
                       value={displaySubject}
                       onChange={(e) => setNoteSubject(e.target.value)}
-                      disabled={isReadOnly}
-                      className='border-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold disabled:opacity-70 disabled:cursor-default'
+                      className='border-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
                     >
                       <option value='All Subject'>All Subject</option>
                       {allSubjects.map((subject, index) => (
                         <option key={index} value={subject}>{subject}</option>
                       ))}
                     </select>
+                  )}
                   </div>
 
-                  <p className='text-sm text-primary-600 mb-4'>{modalTime.date} — {modalTime.time}</p>
+                  <p className='text-sm text-primary-600 mb-2'>{modalTime.date} — {modalTime.time}</p>
                   <hr className='w-full border-t border-primary-600 mb-6' />
 
                   <textarea
-                    className='w-full flex-1 min-h-[400px] rounded-md px-3 py-2 mb-4 resize-none read-only:cursor-default'
+                    className='w-full flex-1 min-h-[400px] rounded-md px-3 py-2 pb-16 mb-4 resize-none read-only:cursor-default'
                     placeholder='Write your notes here...'
                     value={displayContent}
                     onChange={(e) => setNoteContent(e.target.value)}
@@ -541,47 +558,56 @@ useEffect(() => {
                   />
 
                   <div className='flex gap-4 mt-auto'>
-                    {modalMode === 'view' && (
+                  {modalMode === 'view' && (
+                    <div className=' bottom-4 right-4 flex gap-2 ml-auto'>
                       <button
                         onClick={closeNoteModal}
-                        className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                       >
                         CLOSE
                       </button>
-                    )}
+
+                      <button
+                        onClick={() => { if (selectedNote) openEditModal(selectedNote)} }
+                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
+                      >
+                        EDIT
+                      </button>
+                    </div>
+                  )}
                     {modalMode === 'edit' && (
-                      <>
+                      <div className='bottom-4 right-4 flex gap-2 ml-auto'>
                         <button
                           onClick={closeNoteModal}
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
                         <button
                           onClick={handleNoteUpdate}
                           disabled={noteTitle.trim() === ''}
-                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
                         >
-                          UPDATE
+                          save
                         </button>
-                      </>
+                      </div>
                     )}
                     {modalMode === 'create' && (
-                      <>
+                      <div className='bottom-4 right-4 flex gap-2 ml-auto'>
                         <button
                           onClick={closeNoteModal}
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
                         <button
                           onClick={handleNoteSave}
                           disabled={noteTitle.trim() === ''}
-                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
                         >
                           SAVE
                         </button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>

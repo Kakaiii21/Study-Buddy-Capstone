@@ -216,7 +216,7 @@ function Column({
     >
       {/* Header with toggle button (only visible on small screens) */}
       <div className="bg-primary-600 max-w-full w-full p-3 flex items-center justify-between">
-        <p className="text-white text-xl text-center font-semibold flex-1">{label}</p>
+        <p className="text-white pl-5 text-xl  text-start font-semibold flex-1">{label}</p>
 
         {/* Only show toggle on mobile */}
         <button
@@ -224,7 +224,7 @@ function Column({
           className="lg:hidden text-white ml-2 text-xl font-bold"
           aria-label={collapsed ? 'Expand column' : 'Collapse column'}
         >
-          {collapsed ? '▼' : '▲'}
+          {collapsed ? <img className='w-5 h-5' src="arrowDown.png" alt="" /> : <img className='h-5 w-5' src='arrowUp.png' alt='' />}
         </button>
       </div>
 
