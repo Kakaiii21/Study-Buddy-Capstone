@@ -84,6 +84,7 @@ function TaskCard({
   task,
   onDelete,
   onEdit,
+  
 }: {
   task: Task
   onDelete: (id: string) => void
@@ -459,11 +460,11 @@ function ToDoList() {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-auto p-8 mt-16 lg:mt-0">
+      <main className="flex-1 overflow-auto p-8 ">
         <div className="min-h-screen flex flex-col">
 
           <div className="w-full flex flex-col lg:flex-row justify-center lg:justify-between lg:items-start sm:items-center gap-4 p-2">
-            <p className="text-2xl lg:text-4xl lg:pt-2 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
+            <p className="text-3xl lg:text-4xl lg:pt-2 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
             <button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-green-500 text-white font-roboto font-bold mx-10 text-md py-3 px-9 rounded-md"

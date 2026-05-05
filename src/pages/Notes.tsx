@@ -1,13 +1,595 @@
-import React from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
+import { useAuth } from '../hooks/useAuth'
+import { useNotes, type Note } from '../hooks/useNotes'
 
 function Notes() {
+  const { user } = useAuth()
+  const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
+
+  const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
+
+  // ── Subject & filter state ──
+  const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
+  const [subjectName, setSubjectName] = useState('')
+  const [subjects, setSubjects] = useState<string[]>([])
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [selectedSubject, setSelectedSubject] = useState('All Subject')
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // ── Note modal state ──
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<'create' | 'view' | 'edit'>('create')
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
+  const [noteTitle, setNoteTitle] = useState('')
+  const [noteSubject, setNoteSubject] = useState('All Subject')
+  const [noteContent, setNoteContent] = useState('')
+  const [modalTime, setModalTime] = useState({ date: '', time: '' })
+
+// ── 3-dot menu state ──
+const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+
+// ── Close dropdowns on outside click ──
+useEffect(() => {
+  function handleOutsideClick(e: MouseEvent) {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      setIsDropdownOpen(false)
+    }
+    // ✅ Only close the menu if clicking OUTSIDE all note menus
+    const clickedInsideMenu = Array.from(
+      document.querySelectorAll('[data-note-menu]')
+    ).some((el) => el.contains(e.target as Node))
+    if (!clickedInsideMenu) {
+      setOpenMenuId(null)
+    }
+  }
+  document.addEventListener('mousedown', handleOutsideClick)
+  return () => document.removeEventListener('mousedown', handleOutsideClick)
+}, [])
+
+  // ── Subject handlers ──
+  function handleSubjectSave() {
+    if (subjectName.trim() === '') return
+    setSubjects((prev) => [...prev, subjectName.trim()])
+    setSubjectName('')
+    setIsSubjectModalOpen(false)
+    setIsDropdownOpen(true)
+  }
+
+  // ── Modal open helpers ──
+  function openNoteModal() {
+    setSelectedNote(null)
+    setModalMode('create')
+    const now = new Date()
+    setModalTime({
+      date: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    })
+    setNoteTitle('')
+    setNoteSubject(selectedSubject !== 'All Subject' ? selectedSubject : 'All Subject')
+    setNoteContent('')
+    setIsNoteModalOpen(true)
+  }
+
+  function openViewModal(note: Note) {
+    setSelectedNote(note)
+    setModalMode('view')
+    setModalTime({
+      date: new Date(note.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      time: new Date(note.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    })
+    setIsNoteModalOpen(true)
+  }
+
+  function openEditModal(note: Note) {
+    setSelectedNote(note)
+    setModalMode('edit')
+    setModalTime({
+      date: new Date(note.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      time: new Date(note.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    })
+    setNoteTitle(note.title)
+    setNoteSubject(note.subject)
+    setNoteContent(note.content)
+    setIsNoteModalOpen(true)
+  }
+
+  function closeNoteModal() {
+    setIsNoteModalOpen(false)
+    setSelectedNote(null)
+  }
+
+  // ── Note CRUD handlers ──
+  async function handleNoteSave() {
+    if (noteTitle.trim() === '') return
+    await addNote(noteTitle, noteSubject, noteContent)
+    setNoteTitle('')
+    setNoteSubject('All Subject')
+    setNoteContent('')
+    setIsNoteModalOpen(false)
+  }
+
+  async function handleNoteUpdate() {
+    if (!selectedNote || noteTitle.trim() === '') return
+    await updateNote(selectedNote.id, {
+      title: noteTitle.trim(),
+      subject: noteSubject,
+      content: noteContent.trim(),
+    })
+    closeNoteModal()
+  }
+
+  // ── Download as .txt ──
+  function downloadNote(note: Note) {
+    const text = [
+      `Title: ${note.title}`,
+      `Subject: ${note.subject}`,
+      `Date: ${new Date(note.createdAt).toLocaleDateString('en-US', {
+        month: 'long', day: 'numeric', year: 'numeric',
+      })}`,
+      '',
+      note.content,
+    ].join('\n')
+
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${note.title}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // ── Filtered notes ──
+  const filteredNotes = notes
+    .filter((n) => selectedSubject === 'All Subject' || n.subject === selectedSubject)
+    .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  // ── Derived modal display values ──
+  const displayTitle   = modalMode === 'view' ? (selectedNote?.title   ?? '') : noteTitle
+  const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'All Subject') : noteSubject
+  const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
+  const isReadOnly     = modalMode === 'view'
+
+  // ── Merge local subjects + subjects already used in saved notes ──
+  // Ensures a note's subject always appears in the <select> even after page refresh
+  const allSubjects = Array.from(
+    new Set([
+      ...subjects,
+      ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject'),
+    ])
+  )
+
   return (
     <div className='flex h-screen'>
       <Sidebar />
-      <main className='flex-1 overflow-auto p-8 mt-16 lg:mt-0'>
-        <div className='min-h-screen flex flex-col items-center justify-center'>
-          <h1>Welcome to Notes Module</h1>
+      <main className='flex-1 overflow-auto p-8'>
+        <div className='min-h-screen flex flex-col'>
+
+          {/* ── Header ── */}
+          <div className='flex flex-col lg:flex-row lg:items-center w-full gap-3 mb-6'>
+            <p className='text-3xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+              Notes
+            </p>
+
+            <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto'>
+              {/* + Subject Button */}
+              <button
+                onClick={() => setIsSubjectModalOpen(true)}
+                className='flex-shrink-0 flex items-center justify-center text-2xl h-8 w-8 leading-none bg-primary-600 text-white font-bold border rounded-full'
+              >
+                +
+              </button>
+
+              {/* Subject Dropdown */}
+              <div className='relative' ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen((prev) => !prev)}
+                  className='flex justify-between items-center border-primary-600 w-36 lg:w-52 border-2 shadow-md text-primary-600 px-3 lg:px-5 py-2 rounded-md text-sm lg:text-md font-bold'
+                >
+                  <span className='truncate'>{selectedSubject}</span>
+                  <span className='ml-1'>▼</span>
+                </button>
+
+                {isDropdownOpen && (
+                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52 bg-white border rounded-md shadow-md z-50'>
+                    <button
+                      className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm font-semibold
+                        ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
+                      onClick={() => { setSelectedSubject('All Subject'); setIsDropdownOpen(false) }}
+                    >
+                      All Subject
+                    </button>
+                    {allSubjects.map((subject, index) => (
+                      <button
+                        key={index}
+                        className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm truncate
+                          ${selectedSubject === subject ? 'bg-primary-50 font-semibold text-primary-600' : ''}`}
+                        onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
+                      >
+                        {subject}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Search Bar */}
+              <div className='relative'>
+                <input
+                  type='text'
+                  placeholder='Search...'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className='w-32 lg:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-primary-600 font-bold'
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <hr className='w-full border-t border-primary-600 mb-6' />
+
+          {/* ── Notes Area ── */}
+          {loading ? (
+            <div className='flex-1 flex items-center justify-center text-primary-400 text-xl'>
+              Loading notes...
+            </div>
+          ) : (
+              <div className='grid grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-start lg:items-start gap-4 lg:p-5'>
+              {/* Mobile new note button */}
+                <button
+                  onClick={openNoteModal}
+                  className='col-span-2 lg:hidden border mx-14  py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
+                >
+                + New Note
+              </button>
+
+              {/* Desktop new note button */}
+              <button
+                onClick={openNoteModal}
+                className='hidden lg:flex items-center justify-center border px-12 py-16 rounded-xl bg-green-500 font-bold font-roboto text-7xl text-white'
+              >
+                +
+              </button>
+
+              {/* ── Note Cards ── */}
+              {filteredNotes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => openViewModal(note)}
+                  className='relative bg-primary-700 border-2 border-primary-600 rounded-xl p-5 w-full lg:w-64 flex flex-col shadow-sm cursor-pointer hover:shadow-md transition-shadow'
+                >
+                  {/* ── Top: Title + 3-dot menu ── */}
+                  <div className='flex justify-between items-center'>
+                    <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
+
+                    {/* 3-dot menu wrapper */}
+                    <div
+                      className='relative ml-2'
+                      data-note-menu
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
+                        className='text-primary-600 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
+                        aria-label='Note options'
+                      >
+                        ⋮
+                      </button>
+
+                      {openMenuId === note.id && (
+                        <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
+                          <button
+                            onClick={() => { openEditModal(note); setOpenMenuId(null) }}
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          >
+                            <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+                          </button>
+                          <hr className='my-1 border-gray-100' />
+                          <button
+                            onClick={() => { setConfirmDownload(note); setOpenMenuId(null) }}
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          >
+                            <img className='w-5 h-5' src="download.png" alt="download icon" />Download
+                          </button>
+                          <hr className='my-1 border-gray-100' />
+                          <button
+                            onClick={() => { deleteNote(note.id); setOpenMenuId(null) }}
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                          >
+                            <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Divider line under title ── */}
+                  <hr className='border-t border-primary-600 my-2' />
+
+                  {/* ── Bottom: content preview ── */}
+                  <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{note.content}</p>
+
+                  {/* ── Footer: subject + date ── */}
+                  <div className='flex justify-between items-center mt-3'>
+                    <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
+                    <p className='text-xs text-gray-400 shrink-0 ml-2'>
+                      {new Date(note.createdAt).toLocaleDateString('en-US', {
+                        month: 'long', day: 'numeric', year: 'numeric',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              </div>
+          )}
+          {/* ── Download Confirmation Modal ── */}
+          {confirmDownload && (
+            <div
+              className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
+              onClick={() => setConfirmDownload(null)}
+            >
+              <div
+                className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className='text-xl font-bold text-primary-600 uppercase text-center'>
+                  are you sure you want to download?
+                </p>
+                <p className='text-sm text-gray-500 text-justify'>
+                  <span className='font-semibold text-primary-600'>"{confirmDownload.title}"</span> will be downloaded as .txt file.
+                </p>
+                <div className='flex gap-4 w-full mt-2'>
+                  <button
+                    onClick={() => setConfirmDownload(null)}
+                    className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    onClick={() => { downloadNote(confirmDownload); setConfirmDownload(null) }}
+                    className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
+                  >
+                    CONTINUE
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Add Subject Modal ── */}
+          {isSubjectModalOpen && (
+            <div
+              className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
+              onClick={() => setIsSubjectModalOpen(false)}
+            >
+              <div
+                className='bg-white rounded-2xl p-10 w-full max-w-md mx-6'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className='text-2xl font-bold uppercase text-primary-600 text-center mb-6'>
+                  Add A Subject Name
+                </p>
+                <input
+                  className='w-full border-2 border-primary-600 rounded-md px-3 py-3 mb-4'
+                  type='text'
+                  placeholder='ex. Araling Panlipunan'
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
+                  autoFocus
+                />
+                <div className='flex gap-4 mt-4'>
+                  <button
+                    onClick={() => setIsSubjectModalOpen(false)}
+                    className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    onClick={handleSubjectSave}
+                    disabled={subjectName.trim() === ''}
+                    className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                  >
+                    SAVE
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Note Modal (create / view / edit) ── */}
+          {isNoteModalOpen && (
+            <div
+              className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
+              onClick={closeNoteModal}
+            >
+              <div
+                className='bg-white w-full h-screen lg:rounded-2xl lg:h-auto lg:max-w-lg lg:mx-6 flex flex-col overflow-y-auto'
+                onClick={(e) => e.stopPropagation()}
+              >
+
+                {/* ── MOBILE layout ── */}
+                <div className='lg:hidden flex flex-col flex-1 p-6'>
+
+                  <select
+                    aria-label='Select subject'
+                    value={displaySubject}
+                    onChange={(e) => setNoteSubject(e.target.value)}
+                    disabled={isReadOnly}
+                    className='w-64 ml-auto border-2 border-primary-600 rounded-md px-3 py-2 mb-4 text-primary-600 font-semibold disabled:opacity-70 disabled:cursor-default'
+                  >
+                    <option value='All Subject'>All Subject</option>
+                    {allSubjects.map((subject, index) => (
+                      <option key={index} value={subject}>{subject}</option>
+                    ))}
+                  </select>
+
+                  <input
+                    className='w-full text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 px-1 py-2 mb-2 focus:outline-none read-only:cursor-default'
+                    type='text'
+                    placeholder='UNTITLED'
+                    value={displayTitle}
+                    onChange={(e) => setNoteTitle(e.target.value)}
+                    readOnly={isReadOnly}
+                    autoFocus={!isReadOnly}
+                  />
+
+                  <p className='text-sm text-gray-400 mb-4'>{modalTime.date} — {modalTime.time}</p>
+
+                  <textarea
+                    className='w-full flex-1 min-h-[300px] px-3 py-2 mb-4 resize-none read-only:cursor-default'
+                    placeholder='Write your notes here...'
+                    value={displayContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    readOnly={isReadOnly}
+                  />
+
+                  <div className='flex gap-4 mt-auto'>
+                    {modalMode === 'view' && (
+                      <button
+                        onClick={closeNoteModal}
+                        className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                      >
+                        CLOSE
+                      </button>
+                    )}
+                    {modalMode === 'edit' && (
+                      <>
+                        <button
+                          onClick={closeNoteModal}
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          onClick={handleNoteUpdate}
+                          disabled={noteTitle.trim() === ''}
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        >
+                          UPDATE
+                        </button>
+                      </>
+                    )}
+                    {modalMode === 'create' && (
+                      <>
+                        <button
+                          onClick={closeNoteModal}
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          onClick={handleNoteSave}
+                          disabled={noteTitle.trim() === ''}
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        >
+                          SAVE
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── DESKTOP layout ── */}
+                <div className='hidden lg:flex flex-col flex-1 py-10 px-5'>
+
+                  <div className='flex items-center gap-1 mb-2'>
+                    <input
+                      className='flex-1 py-2 text-primary-600 text-2xl font-bold placeholder:text-primary-600 focus:outline-none read-only:cursor-default'
+                      type='text'
+                      placeholder='UNTITLED'
+                      value={displayTitle}
+                      onChange={(e) => setNoteTitle(e.target.value)}
+                      readOnly={isReadOnly}
+                      autoFocus={!isReadOnly}
+                    />
+                    <select
+                      aria-label='Select subject'
+                      value={displaySubject}
+                      onChange={(e) => setNoteSubject(e.target.value)}
+                      disabled={isReadOnly}
+                      className='border-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold disabled:opacity-70 disabled:cursor-default'
+                    >
+                      <option value='All Subject'>All Subject</option>
+                      {allSubjects.map((subject, index) => (
+                        <option key={index} value={subject}>{subject}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <p className='text-sm text-primary-600 mb-4'>{modalTime.date} — {modalTime.time}</p>
+                  <hr className='w-full border-t border-primary-600 mb-6' />
+
+                  <textarea
+                    className='w-full flex-1 min-h-[400px] rounded-md px-3 py-2 mb-4 resize-none read-only:cursor-default'
+                    placeholder='Write your notes here...'
+                    value={displayContent}
+                    onChange={(e) => setNoteContent(e.target.value)}
+                    readOnly={isReadOnly}
+                  />
+
+                  <div className='flex gap-4 mt-auto'>
+                    {modalMode === 'view' && (
+                      <button
+                        onClick={closeNoteModal}
+                        className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                      >
+                        CLOSE
+                      </button>
+                    )}
+                    {modalMode === 'edit' && (
+                      <>
+                        <button
+                          onClick={closeNoteModal}
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          onClick={handleNoteUpdate}
+                          disabled={noteTitle.trim() === ''}
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        >
+                          UPDATE
+                        </button>
+                      </>
+                    )}
+                    {modalMode === 'create' && (
+                      <>
+                        <button
+                          onClick={closeNoteModal}
+                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          onClick={handleNoteSave}
+                          disabled={noteTitle.trim() === ''}
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                        >
+                          SAVE
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+
         </div>
       </main>
     </div>
