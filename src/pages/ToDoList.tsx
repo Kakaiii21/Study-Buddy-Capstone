@@ -124,70 +124,66 @@ return (
     ref={setNodeRef}
     style={style}
     {...attributes}
-    {...listeners}
     className={`
       rounded-xl p-4 mb-3
       hover:shadow-md
       w-full select-none relative
-      cursor-grab active:cursor-grabbing
       ${getCardStyle(task, today)}
     `}
   >
-    <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
-      <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
-      })}</p>
-    </div>
-    <div className="flex justify-between items-start">
-      <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
-        {task.name}
-      </p>
-    </div>
+    {/* Drag area covers everything except the menu */}
+    <div
+      {...listeners}
+      className="cursor-grab active:cursor-grabbing"
+    >
+      <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
+        <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+        })}</p>
+      </div>
+      <div className="flex justify-between items-start">
+        <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+          {task.name}
+        </p>
+      </div>
 
-    <div className="flex justify-between">
       {task.deadline && (
         <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
           {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
           {toDisplayFormat(task.deadline)}
         </p>
       )}
+    </div>
 
-      <div className="relative">
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={() => setShowMenu((prev) => !prev)}
-          className="text-primary-600 hover:text-primary-800 text-lg"
-        >
-          ⋮
-        </button>
+    {/* Menu button is OUTSIDE the drag listener div */}
+    <div className="absolute bottom-3 right-3">
+      <button
+        onClick={() => setShowMenu((prev) => !prev)}
+        className="text-primary-600 hover:text-primary-800 text-lg"
+      >
+        ⋮
+      </button>
 
-        {showMenu && (
-          <div ref={menuRef} className="absolute right-0 mt-2 w-28 bg-white border rounded-md shadow-md z-50">
-            <button
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => {
-                onEdit(task)
-                setShowMenu(false)
-              }}
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
-            >
-              Edit
-            </button>
-            <button
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => {
-                onDelete(task.id)
-                setShowMenu(false)
-              }}
-              className="block w-full text-left px-3 py-2 hover:bg-red-100 text-red-500 text-sm"
-            >
-              Delete
-            </button>
-          </div>
-        )}
-      </div>
+      {showMenu && (
+        <div ref={menuRef} className="absolute right-0 mt-2 w-28 bg-white border rounded-md shadow-md z-50">
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => { onEdit(task); setShowMenu(false) }}
+            className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+          >
+            Edit
+          </button>
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => { onDelete(task.id); setShowMenu(false) }}
+            className="block w-full text-left px-3 py-2 hover:bg-red-100 text-red-500 text-sm"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   </div>
 )
@@ -204,23 +200,35 @@ function Column({
   onEdit: (task: Task) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id })
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div
       ref={setNodeRef}
       className={`
         w-full lg:flex-1
-        min-h-[300px]
         flex flex-col items-center p-4 sm:p-6 lg:p-10
         transition-colors duration-200
+        ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
         ${isOver ? 'bg-primary-50' : ''}
       `}
     >
-      <div className="bg-primary-600 max-w-64 w-full p-3">
-        <p className="text-white text-xl text-center font-semibold">{label}</p>
+      {/* Header with toggle button (only visible on small screens) */}
+      <div className="bg-primary-600 max-w-full w-full p-3 flex items-center justify-between">
+        <p className="text-white text-xl text-center font-semibold flex-1">{label}</p>
+
+        {/* Only show toggle on mobile */}
+        <button
+          onClick={() => setCollapsed((prev) => !prev)}
+          className="lg:hidden text-white ml-2 text-xl font-bold"
+          aria-label={collapsed ? 'Expand column' : 'Collapse column'}
+        >
+          {collapsed ? '▼' : '▲'}
+        </button>
       </div>
 
-      <div className="flex flex-col items-center w-full mt-4">
+      {/* Collapsible body — hidden on mobile when collapsed, always visible on lg */}
+      <div className={`flex flex-col items-center w-full mt-4 ${collapsed ? 'hidden lg:flex' : 'flex'}`}>
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} onDelete={onDelete} onEdit={onEdit} />
         ))}
@@ -500,7 +508,7 @@ function ToDoList() {
             }}
           >              
           <div className="w-full flex flex-col lg:flex-row
-                h-auto lg:min-h-screen
+                h-auto lg:min-h-screen 
                 mt-6 lg:mt-10
                 border-primary-600 border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
