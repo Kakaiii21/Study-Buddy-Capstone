@@ -14,7 +14,8 @@ export default {
       },
       fontFamily:{
         roboto: ['Roboto', 'sans-serif'],
-        orbitron:['Orbitron', 'sans-serif']
+        orbitron:['Orbitron', 'sans-serif'],
+        fustat:['Fustat', 'sans-serif'],
       }
     },
   },

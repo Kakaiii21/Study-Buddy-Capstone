@@ -216,7 +216,7 @@ function Column({
     >
       {/* Header with toggle button (only visible on small screens) */}
       <div className="bg-primary-600 max-w-full w-full p-3 flex items-center justify-between">
-        <p className="text-white pl-5 text-xl  text-start font-semibold flex-1">{label}</p>
+        <p className="text-white pl-5 lg:pl-0 text-xl lg:text-center  text-start font-semibold flex-1">{label}</p>
 
         {/* Only show toggle on mobile */}
         <button
