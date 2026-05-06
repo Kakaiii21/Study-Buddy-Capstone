@@ -107,7 +107,7 @@ function ClassSchedule() {
             daySchedules.map((s) => (
               <div key={s.id} className='bg-white mt-2 p-4 mx-4 mb-1 rounded-md relative'>
                 <div className='flex flex-row'>
-                  <p className='text-xl font-roboto font-bold text-primary-600'>{s.subject}</p>
+                  <p className='text-[20px] font-roboto font-bold text-primary-600'>{s.subject}</p>
 
                   {/* 3-dot menu */}
                   <div data-note-menu className='relative ml-auto'>
@@ -140,7 +140,7 @@ function ClassSchedule() {
                   </div>
                 </div>
 
-                <p className='text-md font-roboto font-medium text-primary-600'>
+                <p className='text-[18px] font-roboto font-medium text-primary-600'>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
                 <p className='text-sm text-gray-600'>{s.instructor}</p>

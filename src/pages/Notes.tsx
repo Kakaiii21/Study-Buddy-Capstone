@@ -2,13 +2,30 @@ import { useState, useRef, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
+import { useClassSched } from '../hooks/useClassSched'
+
 
 function Notes() {
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
 
+  const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
+
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
+async function handleSubjectDelete(subject: string) {
+  // Reset all notes with this subject to 'All Subject' in Firestore
+  const affectedNotes = notes.filter((n) => n.subject === subject)
+  await Promise.all(
+    affectedNotes.map((n) => updateNote(n.id, { subject: 'All Subject' }))
+  )
+
+  setSubjects((prev) => prev.filter((s) => s !== subject))
+  if (selectedSubject === subject) setSelectedSubject('All Subject')
+  setDeleteSubjectConfirm(null)
+
+}
+  const { schedules } = useClassSched(user)   
   // ── Subject & filter state ──
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
@@ -32,11 +49,20 @@ const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
 // ── Close dropdowns on outside click ──
 useEffect(() => {
+  if (notes.length === 0) return
+  const schedSubjects = schedules.map((s) => s.subject)
+  const fromNotes = notes
+    .map((n) => n.subject)
+    .filter((s) => s !== 'All Subject' && !schedSubjects.includes(s))
+  setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
+}, [notes])
+
+// ── Close dropdowns on outside click ──
+useEffect(() => {
   function handleOutsideClick(e: MouseEvent) {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
       setIsDropdownOpen(false)
     }
-    // ✅ Only close the menu if clicking OUTSIDE all note menus
     const clickedInsideMenu = Array.from(
       document.querySelectorAll('[data-note-menu]')
     ).some((el) => el.contains(e.target as Node))
@@ -161,6 +187,7 @@ useEffect(() => {
     new Set([
       ...subjects,
       ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject'),
+      ...schedules.map((s) => s.subject), // ← pulls class sched subjects automatically
     ])
   )
 
@@ -204,16 +231,31 @@ useEffect(() => {
                     >
                       All Subject
                     </button>
-                    {allSubjects.map((subject, index) => (
-                      <button
-                        key={index}
-                        className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm truncate
-                          ${selectedSubject === subject ? 'bg-primary-50 font-semibold text-primary-600' : ''}`}
-                        onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
-                      >
-                        {subject}
-                      </button>
-                    ))}
+                      {allSubjects.map((subject, index) => (
+                        <div
+                          key={index}
+                          className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
+                            ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
+                        >
+                          <button
+                            className={`flex-1 text-left text-xs lg:text-sm truncate font-semibold text-primary-600`}
+                            onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
+                          >
+                            {subject}
+                          </button>
+
+                          {/* Only show ✕ for manually added subjects, not class sched ones */}
+                          {subjects.includes(subject) && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                              className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
+                              aria-label={`Delete ${subject}`}
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
@@ -410,6 +452,39 @@ useEffect(() => {
             </div>
           )}
 
+          {/* ── Delete Subject Confirmation Modal ── */}
+          {deleteSubjectConfirm && (
+            <div
+              className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
+              onClick={() => setDeleteSubjectConfirm(null)}
+            >
+              <div
+                className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className='text-xl font-bold text-primary-600 uppercase text-center'>
+                  Remove Subject?
+                </p>
+                  <p className='text-sm text-gray-500 text-center'>
+                    <span className='font-semibold text-primary-600'>"{deleteSubjectConfirm}"</span> will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
+                  </p>
+                <div className='flex gap-4 w-full mt-2'>
+                  <button
+                    onClick={() => setDeleteSubjectConfirm(null)}
+                    className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    onClick={() => handleSubjectDelete(deleteSubjectConfirm)}
+                    className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600'
+                  >
+                    REMOVE
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* ── Note Modal (create / view / edit) ── */}
           {isNoteModalOpen && (
             <div
