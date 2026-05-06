@@ -519,9 +519,9 @@ useEffect(() => {
                 {/* ── DESKTOP layout ── */}
                 <div className='hidden lg:flex flex-col flex-1 py-10 px-5 relative'>
 
-                  <div className='flex items-center gap-1 mb-2 '>
+                  <div className='flex justify-between items-center gap-1 mb-2 '>
                     <input
-                      className='flex-1 py-2 text-primary-600 text-2xl font-bold placeholder:text-primary-600 focus:outline-none read-only:cursor-default'
+                      className='min-w-20   py-2 text-primary-600 text-2xl font-bold placeholder:text-primary-600 focus:outline-none read-only:cursor-default'
                       type='text'
                       placeholder='UNTITLED'
                       value={displayTitle}
@@ -530,13 +530,13 @@ useEffect(() => {
                       autoFocus={!isReadOnly}
                     />
                     {isReadOnly ? (
-                    <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
+                    <p className=' text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
                   ) : (
                     <select
                       aria-label='Select subject'
                       value={displaySubject}
                       onChange={(e) => setNoteSubject(e.target.value)}
-                      className='border-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
+                      className='max-w-52 border-2 mr-2  border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
                     >
                       <option value='All Subject'>All Subject</option>
                       {allSubjects.map((subject, index) => (
