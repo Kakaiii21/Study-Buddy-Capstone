@@ -72,7 +72,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/courses/:folderName',
+    path: '/courses/:courseId',
     element:(
       <ProtectedRoute>
         <CourseFolder />

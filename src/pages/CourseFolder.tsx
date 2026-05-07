@@ -1,50 +1,50 @@
 import React, { useState, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-
-interface UploadedFile {
-  id: number
-  name: string
-  size: string
-  type: string
-}
+import { useAuth } from '../hooks/useAuth'
+import { useCourseFiles } from '../hooks/useCourseFiles'
+import { uploadToCloudinary } from '../services/cloudinary'
 
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt'
 
-const formatSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
 function CourseFolder() {
-  const [editError, setEditError] = useState('')
-  const { folderName } = useParams()
+  const { user } = useAuth()
   const navigate = useNavigate()
-  const decodedName = decodeURIComponent(folderName || '')
+  const location = useLocation()
+  const { courseId } = useParams()
+    console.log('courseId:', courseId)
+
+  // Get folder name from navigation state
+  const folderName = location.state?.folderName || 'Course Folder'
+
+  const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [files, setFiles] = useState<UploadedFile[]>([])
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState('')
-  const [activeFileMenu, setActiveFileMenu] = useState<number | null>(null)
+  const [activeFileMenu, setActiveFileMenu] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
+
+  // Upload progress state
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadingFileName, setUploadingFileName] = useState('')
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editError, setEditError] = useState('')
 
-  const handleFiles = (incoming: FileList | null) => {
+  const handleFiles = async (incoming: FileList | null) => {
     if (!incoming) return
-
     setError('')
 
     const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
-
-    const newFiles: UploadedFile[] = []
     const rejected: string[] = []
     const duplicates: string[] = []
+    const toUpload: File[] = []
 
     Array.from(incoming).forEach((file) => {
       const ext = file.name.split('.').pop()?.toLowerCase() || ''
@@ -60,49 +60,73 @@ function CourseFolder() {
         return
       }
 
-      const alreadyExists =
-        files.some((f) => f.name.toLowerCase() === trimmedName.toLowerCase()) ||
-        newFiles.some((f) => f.name.toLowerCase() === trimmedName.toLowerCase())
+      const alreadyExists = files.some(
+        (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
+      )
 
       if (alreadyExists) {
         duplicates.push(file.name)
         return
       }
 
-      newFiles.push({
-        id: Date.now() + Math.random(),
-        name: trimmedName,
-        size: formatSize(file.size),
-        type: ext,
-      })
+      toUpload.push(file)
     })
 
     const messages: string[] = []
     if (rejected.length > 0) messages.push(`File(s) not allowed: ${rejected.join(', ')}`)
     if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
+    if (messages.length > 0) setError(messages.join(' | '))
 
-    setError(messages.join(' | '))
-    setFiles((prev) => [...prev, ...newFiles])
+    // Upload each file to Cloudinary then save to Firestore
+    for (const file of toUpload) {
+      try {
+        setUploading(true)
+        setUploadProgress(0)
+        setUploadingFileName(file.name)
+
+        const result = await uploadToCloudinary(file, (percent) => {
+        setUploadProgress(percent)
+        })
+
+        console.log('Cloudinary result:', result)  // ← add this
+
+        await addCourseFile(
+        result.fileName,
+        result.url,
+        result.publicId,
+        result.fileType,
+        result.fileSize,
+        )
+
+console.log('Saved to Firestore!')  // ← add this
+        } catch (error) {
+        console.error('Full upload error:', error)
+        setError(`Failed to upload ${file.name}. Please try again.`)
+        } finally {
+        setUploading(false)
+        setUploadProgress(0)
+        setUploadingFileName('')
+      }
+    }
   }
 
-  const handleDelete = (id: number) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id))
+  const handleDelete = async (id: string) => {
+    await deleteCourseFile(id)
     setActiveFileMenu(null)
   }
 
-  const handleEdit = (id: number) => {
+  const handleEdit = (id: string) => {
     const file = files.find((f) => f.id === id)
     if (!file) return
     setEditingId(id)
-    setEditName(file.name.replace(/\.[^/.]+$/, ''))
+    setEditName(file.fileName.replace(/\.[^/.]+$/, ''))
     setShowEditModal(true)
     setActiveFileMenu(null)
     setEditError('')
   }
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     const trimmedName = editName.trim()
-
     if (!trimmedName) {
       setEditError('File name cannot be empty.')
       return
@@ -111,11 +135,11 @@ function CourseFolder() {
     const currentFile = files.find((f) => f.id === editingId)
     if (!currentFile) return
 
-    const extension = currentFile.name.match(/\.[^/.]+$/)?.[0] || ''
+    const extension = currentFile.fileName.match(/\.[^/.]+$/)?.[0] || ''
     const finalName = `${trimmedName}${extension}`
 
     const duplicateExists = files.some(
-      (f) => f.id !== editingId && f.name.toLowerCase() === finalName.toLowerCase()
+      (f) => f.id !== editingId && f.fileName.toLowerCase() === finalName.toLowerCase()
     )
 
     if (duplicateExists) {
@@ -123,14 +147,11 @@ function CourseFolder() {
       return
     }
 
-    setFiles((prev) =>
-      prev.map((f) => (f.id === editingId ? { ...f, name: finalName } : f))
-    )
-
-    setError('')
+    await renameCourseFile(editingId!, finalName)
     setShowEditModal(false)
     setEditingId(null)
     setEditName('')
+    setEditError('')
   }
 
   const handleEditClose = () => {
@@ -144,8 +165,8 @@ function CourseFolder() {
     filter === 'all'
       ? files
       : filter === 'images'
-      ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.type))
-      : files.filter((f) => f.type === filter)
+      ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
+      : files.filter((f) => f.fileType === filter)
 
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
@@ -153,75 +174,96 @@ function CourseFolder() {
       <main className='flex-1 overflow-y-auto p-8'>
         <div className='min-h-screen flex flex-col'>
 
-        {/* Header */}
-        <div className='flex flex-col md:flex-row justify-between lg:flex-row lg:items-center w-full gap-3 mb-6'>
-        <div className='flex items-center gap-3'>
-            <button
-            title='Go Back to Courses'
-            onClick={() => navigate('/courses')}
-            className='text-primary-600 lg:ml-0 ml-10 font-extrabold font-roboto hover:underline text-3xl'
-            >
-            ←
-            </button>
-            <p className='text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto'>
-            {decodedName}
-            </p>
-        </div>
-        <div className='flex flex-row gap-2'>
-    {/* Filter Dropdown — only shows after files are uploaded */}
-        {files.length > 0 && (
-            <div className='flex items-center gap-2 mx-10 lg:mx-0 md:mx-0'>
-            <label
-                htmlFor='file-filter'
-                className='text-sm font-semibold font-roboto text-primary-600 whitespace-nowrap'
-            >
-                Filter:
-            </label>
-            <select
-                id='file-filter'
-                aria-label='Filter files by type'
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className='border border-primary-600 rounded-md px-3 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
-            >
-                <option value='all'>All Files</option>
-                <option value='pdf'>PDF</option>
-                <option value='doc'>DOC</option>
-                <option value='docx'>DOCX</option>
-                <option value='ppt'>PPT</option>
-                <option value='pptx'>PPTX</option>
-                <option value='txt'>TXT</option>
-                <option value='images'>Images (PNG / JPG)</option>
-            </select>
+          {/* Header */}
+          <div className='flex flex-col md:flex-row justify-between lg:flex-row lg:items-center w-full gap-3 mb-6'>
+            <div className='flex items-center gap-3'>
+              <button
+                title='Go Back to Courses'
+                onClick={() => navigate('/courses')}
+                className='text-primary-600 lg:ml-0 ml-10 font-extrabold font-roboto hover:underline text-3xl'
+              >
+                ←
+              </button>
+              <p className='text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto'>
+                {folderName}
+              </p>
             </div>
-        )}
+            <div className='flex flex-row gap-2'>
 
-        <input
-            aria-label='Upload academic files'
-            ref={fileInputRef}
-            type='file'
-            accept={ACCEPTED_TYPES}
-            multiple
-            className='hidden'
-            onChange={(e) => handleFiles(e.target.files)}
-        />
+              {/* Filter Dropdown */}
+              {files.length > 0 && (
+                <div className='flex items-center gap-2 mx-10 lg:mx-0 md:mx-0'>
+                  <label
+                    htmlFor='file-filter'
+                    className='text-sm font-semibold font-roboto text-primary-600 whitespace-nowrap'
+                  >
+                    Filter:
+                  </label>
+                  <select
+                    id='file-filter'
+                    aria-label='Filter files by type'
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className='border border-primary-600 rounded-md px-3 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+                  >
+                    <option value='all'>All Files</option>
+                    <option value='pdf'>PDF</option>
+                    <option value='doc'>DOC</option>
+                    <option value='docx'>DOCX</option>
+                    <option value='ppt'>PPT</option>
+                    <option value='pptx'>PPTX</option>
+                    <option value='txt'>TXT</option>
+                    <option value='images'>Images (PNG / JPG)</option>
+                  </select>
+                </div>
+              )}
 
-        <button
-            onClick={() => fileInputRef.current?.click()}
-            className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
-        >
-            + Upload Files
-        </button>
-        </div>
+              <input
+                aria-label='Upload academic files'
+                ref={fileInputRef}
+                type='file'
+                accept={ACCEPTED_TYPES}
+                multiple
+                className='hidden'
+                onChange={(e) => handleFiles(e.target.files)}
+              />
 
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                + Upload Files
+              </button>
+            </div>
+          </div>
 
-        </div>
+          {/* Upload Progress Bar */}
+          {uploading && (
+            <div className='mb-4 w-full'>
+              <div className='flex justify-between text-sm font-roboto text-primary-600 mb-1'>
+                <span>Uploading <span className='font-bold'>{uploadingFileName}</span>...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className='w-full bg-gray-200 rounded-full h-2'>
+                <div
+                  className='bg-primary-600 h-2 rounded-full transition-all duration-300'
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {error && (
             <p className='text-red-500 text-sm font-roboto mb-4 text-center'>{error}</p>
           )}
 
-          {files.length === 0 ? (
+          {/* Files Area */}
+          {loading ? (
+            <div className='flex-1 flex items-center justify-center text-primary-400 text-xl'>
+              Loading files...
+            </div>
+          ) : files.length === 0 ? (
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
@@ -252,19 +294,26 @@ function CourseFolder() {
                 >
                   <div className='relative w-full flex justify-center items-end'>
 
-                    {/* File icon */}
+                    {/* File icon — clicking opens the file URL */}
+                    <a
+                    href={file.fileUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    title={`Open ${file.fileName}`}
+                    >
                     <img
-                      src={
-                        ['doc', 'docx'].includes(file.type) ? '/docsIcon.png' :
-                        file.type === 'pdf' ? '/pdfIcon.png' :
-                        ['ppt', 'pptx'].includes(file.type) ? '/pptIcon.png' :
-                        file.type === 'txt' ? '/txtIcon.png' :
-                        ['png', 'jpg', 'jpeg'].includes(file.type) ? '/imgIcon.png' :
+                        src={
+                        ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
+                        file.fileType === 'pdf' ? '/pdfIcon.png' :
+                        ['ppt', 'pptx'].includes(file.fileType) ? '/pptIcon.png' :
+                        file.fileType === 'txt' ? '/txtIcon.png' :
+                        ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/imgIcon.png' :
                         '/fileIcon.png'
-                      }
-                      alt={file.type}
-                      className='w-32 h-32 md:w-40 md:h-40 object-contain mt-4 hover:cursor-pointer'
+                        }
+                        alt={file.fileType}
+                        className='w-32 h-32 md:w-40 md:h-40 object-contain mt-4 hover:opacity-80 hover:cursor-pointer'
                     />
+                    </a>
 
                     <button
                       onClick={(e) => {
@@ -288,7 +337,7 @@ function CourseFolder() {
                           onClick={() => handleEdit(file.id)}
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                         >
-                          <img src='/edit.png' alt='edit icon' className='w-5 h-5' /> Edit
+                          <img src='/edit.png' alt='edit icon' className='w-5 h-5' /> Rename
                         </button>
                         <hr className='my-1 border-gray-100' />
                         <button
@@ -302,9 +351,9 @@ function CourseFolder() {
                   </div>
 
                   <p className='text-center font-roboto font-semibold text-primary-600 text-xs md:text-sm mt-1 w-full truncate px-1'>
-                    {file.name}
+                    {file.fileName}
                   </p>
-                  <p className='text-center font-roboto text-gray-400 text-xs'>{file.size}</p>
+                  <p className='text-center font-roboto text-gray-400 text-xs'>{file.fileSize}</p>
                 </div>
               ))}
 
@@ -365,7 +414,6 @@ function CourseFolder() {
           </div>
         </div>
       )}
-
     </div>
   )
 }

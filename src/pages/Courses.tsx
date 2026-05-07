@@ -1,26 +1,25 @@
 import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
-
-interface Folder {
-  id: number
-  name: string
-}
+import { useAuth } from '../hooks/useAuth'
+import { useCourses } from '../hooks/useCourses'
 
 function Courses() {
+  const { user } = useAuth()
+  const { courses, loading, addCourse, updateCourse, deleteCourse } = useCourses(user)
+
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [folderName, setFolderName] = useState('')
-  const [folders, setFolders] = useState<Folder[]>([])
-  const [activeMenu, setActiveMenu] = useState<number | null>(null)
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [activeMenu, setActiveMenu] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
 
   const navigate = useNavigate()
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (folderName.trim() === '') return
-    setFolders([...folders, { id: Date.now(), name: folderName.trim() }])
+    await addCourse(folderName.trim())
     setFolderName('')
     setShowModal(false)
   }
@@ -30,21 +29,21 @@ function Courses() {
     setShowModal(false)
   }
 
-  const handleDelete = (id: number) => {
-    setFolders(folders.filter((f) => f.id !== id))
+  const handleDelete = async (id: string) => {
+    await deleteCourse(id)
     setActiveMenu(null)
   }
 
-  const handleEditOpen = (folder: Folder) => {
-    setEditingId(folder.id)
-    setEditName(folder.name)
+  const handleEditOpen = (id: string, name: string) => {
+    setEditingId(id)
+    setEditName(name)
     setActiveMenu(null)
     setShowEditModal(true)
   }
 
-  const handleEditSave = () => {
-    if (editName.trim() === '') return
-    setFolders(folders.map((f) => f.id === editingId ? { ...f, name: editName.trim() } : f))
+  const handleEditSave = async () => {
+    if (!editingId || editName.trim() === '') return
+    await updateCourse(editingId, editName.trim())
     setEditingId(null)
     setEditName('')
     setShowEditModal(false)
@@ -60,10 +59,9 @@ function Courses() {
     <div className='flex h-screen' onClick={() => setActiveMenu(null)}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-8 mt-0">
-
         <div className='min-h-screen flex flex-col'>
 
-          {/*Header Part*/}
+          {/* Header */}
           <div className='flex flex-col md:flex-row justify-between lg:flex-row lg:items-center w-full gap-3 mb-6'>
             <p className='text-3xl lg:text-4xl lg:ml-0 md:text-4xl md:ml-10 font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Courses
@@ -77,69 +75,76 @@ function Courses() {
           </div>
           <hr className='w-full border-t border-primary-600 mb-6' />
 
-          {/*Folder Area*/}
-          <div className='grid grid-cols-2 lg:grid-cols-3 md:grid-cols-3 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
-            {folders.length === 0 ? (
-              <div className='col-span-2 md:col-span-3 lg:col-span-3 flex items-center justify-center py-20'>
-                <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
-                  No folders yet. Click <span className='text-primary-600 font-bold'>+ Course Folder</span> to create one.
-                </p>
-              </div>
-            ) : (
-              folders.map((folder) => (
-                <div key={folder.id} className='max-w-36 md:max-w-64 lg:max-w-64'>
-                  <div className="relative">
-                    <button
-                    title={`Open ${folder.name} Folder`}
-                    onClick={() => navigate(`/courses/${encodeURIComponent(folder.name)}`)}>
-                      <img src="folder.png" alt="folder" className='hover:opacity-90' />
-                    </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveMenu(activeMenu === folder.id ? null : folder.id)
-                      }}
-                      className="absolute hover:{setActivemenu} top-2 right-2 w-8 mr-1 md:w-10 md:mr-4 md:mt-2 lg:w-10 lg:mr-4 lg:mt-2"
-                    >
-                  <img
-                    src="folderbtn.png"
-                    alt="menu"
-                    title='Edit/Delete'
-                    className="brightness-200 contrast-200 hover:scale-110 transition"
-                  />
-                    </button>
-
-                    {/* Dropdown Menu */}
-                    {activeMenu === folder.id && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="absolute top-10 right-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 w-32 overflow-hidden"
-                      >
-                        <button
-                          onClick={() => handleEditOpen(folder)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                        >
-                          <img className='w-5 h-5' src="edit.png" alt="edit icon" /> Edit
-                        </button>
-                        <hr className='my-1 border-gray-100' />
-                        <button
-                          onClick={() => handleDelete(folder.id)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
-                        >
-                          <img src="delete.png" alt="delete icon" className='w-5 h-5' /> Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className='text-center font-bold font-roboto text-md md:text-2xl lg:text-2xl text-primary-600'>
-                    {folder.name}
+          {/* Folder Area */}
+          {loading ? (
+            <div className='flex-1 flex items-center justify-center text-primary-400 text-xl'>
+              Loading courses...
+            </div>
+          ) : (
+            <div className='grid grid-cols-2 lg:grid-cols-3 md:grid-cols-3 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
+              {courses.length === 0 ? (
+                <div className='col-span-2 md:col-span-3 lg:col-span-3 flex items-center justify-center py-20'>
+                  <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
+                    No folders yet. Click <span className='text-primary-600 font-bold'>+ Course Folder</span> to create one.
                   </p>
                 </div>
-              ))
-            )}
-          </div>
+              ) : (
+                courses.map((course) => (
+                  <div key={course.id} className='max-w-36 md:max-w-64 lg:max-w-64'>
+                    <div className="relative">
+                      <button
+                        title={`Open ${course.name} Folder`}
+                        onClick={() => navigate(`/courses/${course.id}`, { state: { folderName: course.name } })}
+                      >
+                        <img src="folder.png" alt="folder" className='hover:opacity-90' />
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActiveMenu(activeMenu === course.id ? null : course.id)
+                        }}
+                        className="absolute hover:{setActivemenu} top-2 right-2 w-8 mr-1 md:w-10 md:mr-4 md:mt-2 lg:w-10 lg:mr-4 lg:mt-2"
+                      >
+                        <img
+                          src="folderbtn.png"
+                          alt="menu"
+                          title='Edit/Delete'
+                          className="brightness-200 contrast-200 hover:scale-110 transition"
+                        />
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {activeMenu === course.id && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute top-10 right-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 w-32 overflow-hidden"
+                        >
+                          <button
+                            onClick={() => handleEditOpen(course.id, course.name)}
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          >
+                            <img className='w-5 h-5' src="edit.png" alt="edit icon" /> Edit
+                          </button>
+                          <hr className='my-1 border-gray-100' />
+                          <button
+                            onClick={() => handleDelete(course.id)}
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                          >
+                            <img src="delete.png" alt="delete icon" className='w-5 h-5' /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className='text-center font-bold font-roboto text-md md:text-2xl lg:text-2xl text-primary-600'>
+                      {course.name}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Add Folder Modal */}
