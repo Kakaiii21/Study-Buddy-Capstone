@@ -15,6 +15,7 @@ import StudyGenerator from './pages/StudyGenerator'
 import GeneratedHistory from './pages/GeneratedHistory'
 import RecentlyDeleted from './pages/RecentlyDeleted'
 import Account from './pages/Account'
+import CourseFolder from './pages/CourseFolder'
 
 
 const router = createBrowserRouter([
@@ -67,6 +68,14 @@ const router = createBrowserRouter([
     element:(
       <ProtectedRoute>
         <Courses />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/courses/:folderName',
+    element:(
+      <ProtectedRoute>
+        <CourseFolder />
       </ProtectedRoute>
     )
   },

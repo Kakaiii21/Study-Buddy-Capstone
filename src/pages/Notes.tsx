@@ -293,7 +293,7 @@ useEffect(() => {
               {/* Mobile new note button */}
                 <button
                   onClick={openNoteModal}
-                  className='col-span-2 lg:hidden border mx-14  py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
+                  className='col-span-2 lg:hidden hover:bg-green-200 hover:text-green-500 border mx-14 md:mx-72 md:items-ce  py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
                 >
                 + New Note
               </button>
