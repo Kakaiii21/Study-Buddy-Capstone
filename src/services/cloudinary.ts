@@ -15,19 +15,15 @@ const formatSize = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-const getResourceType = (ext: string): string => {
-  if (['png', 'jpg', 'jpeg'].includes(ext)) return 'image'
-  if (['txt'].includes(ext)) return 'raw'  
-  return 'raw'
-}
-
 export async function uploadToCloudinary(
   file: File,
   onProgress?: (percent: number) => void
 ): Promise<CloudinaryUploadResult> {
   return new Promise((resolve, reject) => {
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
-    const resourceType = getResourceType(ext)
+
+    const isImage = ['png', 'jpg', 'jpeg'].includes(ext)
+    const resourceType = isImage ? 'image' : 'raw'
 
     const formData = new FormData()
     formData.append('file', file)
@@ -44,25 +40,24 @@ export async function uploadToCloudinary(
     })
 
     xhr.addEventListener('load', () => {
-    console.log('XHR status:', xhr.status)
-    console.log('XHR response:', xhr.responseText)
-    if (xhr.status === 200) {
+      console.log('XHR status:', xhr.status)
+      console.log('XHR response:', xhr.responseText)
+      if (xhr.status === 200) {
         const data = JSON.parse(xhr.responseText)
         resolve({
-        url: data.secure_url,
-        publicId: data.public_id,
-        fileName: file.name,
-        fileType: ext,
-        fileSize: formatSize(file.size),
+          url: data.secure_url,
+          publicId: data.public_id,
+          fileName: file.name,
+          fileType: ext,
+          fileSize: formatSize(file.size),
         })
-    } else {
+      } else {
         reject(new Error('Upload failed'))
-    }
+      }
     })
 
     xhr.addEventListener('error', () => reject(new Error('Upload failed')))
 
-    // Use correct resource type per file
     xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`)
     xhr.send(formData)
   })

@@ -16,6 +16,7 @@
     "firebase": "^12.12.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-pdf": "^10.4.1",
     "react-router-dom": "^7.14.2",
     "react-timer-hook": "^4.0.5"
   },

@@ -1,46 +1,80 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useCourseFiles } from '../hooks/useCourseFiles'
 import { uploadToCloudinary } from '../services/cloudinary'
+import { Document, Page, pdfjs } from 'react-pdf'
+import 'react-pdf/dist/Page/AnnotationLayer.css'
+import 'react-pdf/dist/Page/TextLayer.css'
+
+import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
+
+interface CourseFile {
+  id: string
+  fileName: string
+  fileUrl: string
+  fileType: string
+  fileSize: string
+}
 
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt'
+function TxtPreview({ url }: { url: string }) {
+  const [text, setText] = useState('Loading...')
 
+  useEffect(() => {
+    fetch(url)
+      .then((r) => r.text())
+      .then(setText)
+      .catch(() => setText('Failed to load file.'))
+  }, [url])
+
+  return (
+    <pre className='w-full h-full overflow-auto p-6 bg-white text-gray-800 font-mono text-sm whitespace-pre-wrap'>
+      {text}
+    </pre>
+  )
+}
 function CourseFolder() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const { courseId } = useParams()
-    console.log('courseId:', courseId)
 
-  // Get folder name from navigation state
-  const folderName = location.state?.folderName || 'Course Folder'
-
-  const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
+  const [previewFile, setPreviewFile] = useState<CourseFile | null>(null)
+  const [numPages, setNumPages] = useState<number>(0)
+  const [pageNumber, setPageNumber] = useState<number>(1)
   const [dragOver, setDragOver] = useState(false)
   const [error, setError] = useState('')
   const [activeFileMenu, setActiveFileMenu] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
-
-  // Upload progress state
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadingFileName, setUploadingFileName] = useState('')
-
-  // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [editError, setEditError] = useState('')
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const folderName = location.state?.folderName || 'Course Folder'
+
+  const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
+
+
+
+
+  const handleFileClick = (file: CourseFile) => {
+    setPreviewFile(file)
+  }
+
   const handleFiles = async (incoming: FileList | null) => {
     if (!incoming) return
     setError('')
 
+   
     const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
     const rejected: string[] = []
     const duplicates: string[] = []
@@ -50,24 +84,13 @@ function CourseFolder() {
       const ext = file.name.split('.').pop()?.toLowerCase() || ''
       const trimmedName = file.name.trim()
 
-      if (!allowed.includes(ext)) {
-        rejected.push(file.name)
-        return
-      }
-
-      if (!trimmedName) {
-        rejected.push(file.name)
-        return
-      }
+      if (!allowed.includes(ext)) { rejected.push(file.name); return }
+      if (!trimmedName) { rejected.push(file.name); return }
 
       const alreadyExists = files.some(
         (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
       )
-
-      if (alreadyExists) {
-        duplicates.push(file.name)
-        return
-      }
+      if (alreadyExists) { duplicates.push(file.name); return }
 
       toUpload.push(file)
     })
@@ -77,7 +100,6 @@ function CourseFolder() {
     if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
     if (messages.length > 0) setError(messages.join(' | '))
 
-    // Upload each file to Cloudinary then save to Firestore
     for (const file of toUpload) {
       try {
         setUploading(true)
@@ -85,24 +107,20 @@ function CourseFolder() {
         setUploadingFileName(file.name)
 
         const result = await uploadToCloudinary(file, (percent) => {
-        setUploadProgress(percent)
+          setUploadProgress(percent)
         })
 
-        console.log('Cloudinary result:', result)  // ← add this
-
         await addCourseFile(
-        result.fileName,
-        result.url,
-        result.publicId,
-        result.fileType,
-        result.fileSize,
+          result.fileName,
+          result.url,
+          result.publicId,
+          result.fileType,
+          result.fileSize,
         )
-
-console.log('Saved to Firestore!')  // ← add this
-        } catch (error) {
+      } catch (error) {
         console.error('Full upload error:', error)
         setError(`Failed to upload ${file.name}. Please try again.`)
-        } finally {
+      } finally {
         setUploading(false)
         setUploadProgress(0)
         setUploadingFileName('')
@@ -127,10 +145,7 @@ console.log('Saved to Firestore!')  // ← add this
 
   const handleEditSave = async () => {
     const trimmedName = editName.trim()
-    if (!trimmedName) {
-      setEditError('File name cannot be empty.')
-      return
-    }
+    if (!trimmedName) { setEditError('File name cannot be empty.'); return }
 
     const currentFile = files.find((f) => f.id === editingId)
     if (!currentFile) return
@@ -141,11 +156,7 @@ console.log('Saved to Firestore!')  // ← add this
     const duplicateExists = files.some(
       (f) => f.id !== editingId && f.fileName.toLowerCase() === finalName.toLowerCase()
     )
-
-    if (duplicateExists) {
-      setEditError('A file with this name already exists.')
-      return
-    }
+    if (duplicateExists) { setEditError('A file with this name already exists.'); return }
 
     await renameCourseFile(editingId!, finalName)
     setShowEditModal(false)
@@ -168,6 +179,10 @@ console.log('Saved to Firestore!')  // ← add this
       ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
       : files.filter((f) => f.fileType === filter)
 
+      const pdfFile = useMemo(
+      () => previewFile?.fileType === 'pdf' ? { url: previewFile.fileUrl } : null,
+      [previewFile?.fileUrl]
+)
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
       <Sidebar />
@@ -190,13 +205,9 @@ console.log('Saved to Firestore!')  // ← add this
             </div>
             <div className='flex flex-row gap-2'>
 
-              {/* Filter Dropdown */}
               {files.length > 0 && (
                 <div className='flex items-center gap-2 mx-10 lg:mx-0 md:mx-0'>
-                  <label
-                    htmlFor='file-filter'
-                    className='text-sm font-semibold font-roboto text-primary-600 whitespace-nowrap'
-                  >
+                  <label htmlFor='file-filter' className='text-sm font-semibold font-roboto text-primary-600 whitespace-nowrap'>
                     Filter:
                   </label>
                   <select
@@ -293,33 +304,23 @@ console.log('Saved to Firestore!')  // ← add this
                   className='flex flex-col items-center bg-white border-gray-200 rounded-xl p-4 hover:shadow-md transition relative w-36 md:w-44 lg:w-48'
                 >
                   <div className='relative w-full flex justify-center items-end'>
-
-                    {/* File icon — clicking opens the file URL */}
-                    <a
-                    href={file.fileUrl}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    title={`Open ${file.fileName}`}
-                    >
-                    <img
+                    <button onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
+                      <img
                         src={
-                        ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
-                        file.fileType === 'pdf' ? '/pdfIcon.png' :
-                        ['ppt', 'pptx'].includes(file.fileType) ? '/pptIcon.png' :
-                        file.fileType === 'txt' ? '/txtIcon.png' :
-                        ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/imgIcon.png' :
-                        '/fileIcon.png'
+                          ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
+                          file.fileType === 'pdf' ? '/pdfIcon.png' :
+                          ['ppt', 'pptx'].includes(file.fileType) ? '/pptIcon.png' :
+                          file.fileType === 'txt' ? '/txtIcon.png' :
+                          ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/imgIcon.png' :
+                          '/fileIcon.png'
                         }
                         alt={file.fileType}
                         className='w-32 h-32 md:w-40 md:h-40 object-contain mt-4 hover:opacity-80 hover:cursor-pointer'
-                    />
-                    </a>
+                      />
+                    </button>
 
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setActiveFileMenu(activeFileMenu === file.id ? null : file.id)
-                      }}
+                      onClick={(e) => { e.stopPropagation(); setActiveFileMenu(activeFileMenu === file.id ? null : file.id) }}
                       className='flex flex-col items-center justify-center gap-[3px] p-2 rounded-full hover:bg-gray-100 w-7 h-7'
                       title='Options'
                     >
@@ -375,6 +376,103 @@ console.log('Saved to Firestore!')  // ← add this
         </div>
       </main>
 
+      {/* File Preview Modal */}
+      {previewFile && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col'
+        onClick={(e) => e.stopPropagation()}>
+          <div className='flex justify-between items-center px-4 py-3 bg-primary-600'>
+            <p className='text-white font-roboto font-semibold truncate'>{previewFile.fileName}</p>
+            <div className='flex items-center gap-3'>
+              <a
+                href={previewFile.fileUrl}
+                download
+                className='text-white text-sm font-roboto underline hover:opacity-70'
+              >
+                Download
+              </a>
+              <button
+                onClick={() => { setPreviewFile(null); setPageNumber(1); setNumPages(0) }}
+                className='text-white font-bold text-xl hover:opacity-70'
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div className={`flex-1 bg-gray-900 ${previewFile.fileType === 'pdf' ? 'flex flex-col overflow-hidden' : 'flex items-center justify-center overflow-auto'}`}>
+
+            {/* Images */}
+            {['png', 'jpg', 'jpeg'].includes(previewFile.fileType) && (
+              <img
+                src={previewFile.fileUrl}
+                alt={previewFile.fileName}
+                className='max-w-full max-h-full object-contain'
+              />
+            )}
+            {/*PDF*/}
+            {previewFile.fileType === 'pdf' && (
+              <div className='flex flex-col w-full h-full'>
+                
+                <div className='flex-1 overflow-y-auto flex justify-center py-4'>
+                  <Document
+                    file={pdfFile}
+                    onLoadSuccess={({ numPages }) => {
+                      setNumPages(numPages)
+                      setPageNumber(1)
+                    }}
+                    onLoadError={(error) => console.error('PDF load error:', error)}
+                    loading={<p className='text-white font-roboto mt-10'>Loading PDF...</p>}
+                    error={<p className='text-red-400 font-roboto mt-10'>Failed to load PDF.</p>}
+                  >
+                    <Page
+                      pageNumber={pageNumber}
+                      width={Math.min(window.innerWidth - 32, 800)}
+                      renderTextLayer={true}
+                      renderAnnotationLayer={true}
+                    />
+                  </Document>
+                </div>
+
+                {numPages > 0 && (
+                  <div className='flex-shrink-0 flex items-center justify-center gap-4 py-4 bg-gray-900'>
+                    <div className='flex items-center gap-4 bg-gray-800 px-6 py-3 rounded-full'>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.max(p - 1, 1)) }}
+                        disabled={pageNumber <= 1}
+                        className='text-white font-bold text-lg disabled:opacity-30 px-2'
+                      >‹</button>
+                      <p className='text-white font-roboto text-sm'>
+                        Page {pageNumber} of {numPages}
+                      </p>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.min(p + 1, numPages)) }}
+                        disabled={pageNumber >= numPages}
+                        className='text-white font-bold text-lg disabled:opacity-30 px-2'
+                      >›</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {/* TXT */}
+            {previewFile.fileType === 'txt' && (
+              <TxtPreview url={previewFile.fileUrl} />
+            )}
+            
+
+            {/* DOCX / PPTX / DOC / PPT */}
+            {['doc', 'docx', 'ppt', 'pptx'].includes(previewFile.fileType) && (
+              <iframe
+                src={`https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(previewFile.fileUrl)}`}
+                className='w-full h-full'
+                title={previewFile.fileName}
+              />
+            )}
+
+          </div>
+        </div>
+      )}
+
       {/* Edit Filename Modal */}
       {showEditModal && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
@@ -392,10 +490,7 @@ console.log('Saved to Firestore!')  // ← add this
                 autoFocus
                 type='text'
                 value={editName}
-                onChange={(e) => {
-                  setEditName(e.target.value)
-                  setEditError('')
-                }}
+                onChange={(e) => { setEditName(e.target.value); setEditError('') }}
                 onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
                 placeholder='Enter file name'
                 aria-label='Edit file name'
