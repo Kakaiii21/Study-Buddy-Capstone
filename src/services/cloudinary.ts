@@ -40,8 +40,12 @@ export async function uploadToCloudinary(
     })
 
     xhr.addEventListener('load', () => {
+      
+      {/*
       console.log('XHR status:', xhr.status)
       console.log('XHR response:', xhr.responseText)
+      */}
+      
       if (xhr.status === 200) {
         const data = JSON.parse(xhr.responseText)
         resolve({

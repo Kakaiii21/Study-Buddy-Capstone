@@ -24,7 +24,6 @@ export interface CourseFile {
 }
 
 export function useCourseFiles(user: User | null, courseId: string | undefined) {
-  console.log('useCourseFiles — user:', user?.uid, 'courseId:', courseId)  
   const [files, setFiles] = useState<CourseFile[]>([])
   const [loading, setLoading] = useState(true)
 

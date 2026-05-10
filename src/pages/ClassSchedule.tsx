@@ -112,6 +112,7 @@ function ClassSchedule() {
                   {/* 3-dot menu */}
                   <div data-note-menu className='relative ml-auto'>
                     <button
+                    title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
                       <img src="subM.png" alt="menu" className='h-[5px] w-[28px]' />
@@ -120,19 +121,19 @@ function ClassSchedule() {
                     {menuOpenIndex === s.id && (
                       <>
                         <div className='fixed inset-0 z-0' onClick={() => setMenuOpenIndex(null)} />
-                        <div className='absolute right-0 top-6 bg-white border rounded-md shadow-lg z-10 w-28'>
+                        <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
                           <button
                             onClick={() => handleEditOpen(s)}
-                            className='w-full flex gap-3 font-bold text-left px-4 py-3 text-md text-primary-600 hover:bg-gray-100 font-roboto'
-                          >
-                            <img src='edit.png' alt='edit icon' className='h-5 w-5' /> Edit
-                          </button>
-                          <hr className='border-primary-600 mx-2' />
+                              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                            >
+                            <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+                            </button>
+                            <hr className='my-1 border-gray-100' />
                           <button
                             onClick={() => { setDeleteConfirmId(s.id); setMenuOpenIndex(null) }}
-                            className='w-full flex gap-2 font-bold text-left px-4 py-2 text-md text-primary-600 hover:bg-gray-100 font-roboto'
-                          >
-                            <img src='delete.png' alt='delete icon' className='h-5 w-5' /> Delete
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                            >
+                            <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
                           </button>
                         </div>
                       </>

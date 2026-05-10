@@ -161,6 +161,7 @@ return (
     {/* Menu button is OUTSIDE the drag listener div */}
     <div className="absolute bottom-3 right-3">
       <button
+      title='More Options'
         onClick={() => setShowMenu((prev) => !prev)}
         className="text-primary-600 hover:text-primary-800 text-lg"
       >
@@ -168,21 +169,24 @@ return (
       </button>
 
       {showMenu && (
-        <div ref={menuRef} className="absolute right-0 mt-2 w-28 bg-white border rounded-md shadow-md z-50">
+        <div ref={menuRef} className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
+
           <button
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => { onEdit(task); setShowMenu(false) }}
-            className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
           >
-            Edit
+          <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
           </button>
+          <hr className='my-1 border-gray-100' />
           <button
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => { onDelete(task.id); setShowMenu(false) }}
-            className="block w-full text-left px-3 py-2 hover:bg-red-100 text-red-500 text-sm"
-          >
-            Delete
+            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+            >
+            <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
           </button>
+          
         </div>
       )}
     </div>

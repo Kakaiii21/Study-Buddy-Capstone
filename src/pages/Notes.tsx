@@ -324,6 +324,7 @@ useEffect(() => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
+                      title='More Options'
                         onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
                         className='text-primary-600 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
                         aria-label='Note options'
@@ -564,9 +565,9 @@ useEffect(() => {
                         <button
                           onClick={handleNoteUpdate}
                           disabled={noteTitle.trim() === ''}
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-50'
                         >
-                          UPDATE
+                          SAVE
                         </button>
                       </>
                     )}

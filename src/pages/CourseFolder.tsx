@@ -172,12 +172,16 @@ function CourseFolder() {
     setEditName('')
   }
 
-  const filteredFiles =
-    filter === 'all'
-      ? files
-      : filter === 'images'
-      ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
-      : files.filter((f) => f.fileType === filter)
+const filteredFiles =
+  filter === 'all'
+    ? files
+    : filter === 'images'
+    ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
+    : filter === 'word'
+    ? files.filter((f) => ['doc', 'docx'].includes(f.fileType))
+    : filter === 'powerpoint'
+    ? files.filter((f) => ['ppt', 'pptx'].includes(f.fileType))
+    : files.filter((f) => f.fileType === filter)
 
       const pdfFile = useMemo(
       () => previewFile?.fileType === 'pdf' ? { url: previewFile.fileUrl } : null,
@@ -185,49 +189,49 @@ function CourseFolder() {
 )
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
-      <Sidebar />
-      <main className='flex-1 overflow-y-auto p-8'>
+       <div className='hidden lg:block md:block '>
+        <Sidebar />
+       </div>
+     
+      <main className='flex-1 overflow-y-auto p-8 overflow-hidden '>
+
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row justify-between lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <div className='flex items-center gap-3'>
-              <button
-                title='Go Back to Courses'
-                onClick={() => navigate('/courses')}
-                className='text-primary-600 lg:ml-0 ml-10 font-extrabold font-roboto hover:underline text-3xl'
-              >
-                ←
-              </button>
-              <p className='text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto'>
-                {folderName}
-              </p>
-            </div>
-            <div className='flex flex-row gap-2'>
+        <div className='flex flex-col md:flex-row lg:justify-between lg:items-center w-full gap-3 mb-6'>
+          <div className="flex items-center gap-4">
+            <button
+              title="Go Back to Courses"
+              onClick={() => navigate('/courses')}
+              className="flex flex-col items-center px-3 py-1 rounded hover:bg-gray-100 transition"
+            >
+              <span className="text-2xl leading-none">←</span>
+              <span className="text-sm">Back</span>
+            </button>
 
-              {files.length > 0 && (
-                <div className='flex items-center gap-2 mx-10 lg:mx-0 md:mx-0'>
-                  <label htmlFor='file-filter' className='text-sm font-semibold font-roboto text-primary-600 whitespace-nowrap'>
-                    Filter:
-                  </label>
+            <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
+              {folderName}
+            </p>
+          </div>
+            <div className='flex flex-row lg:ml-auto'>
+                <div className='flex items-center gap-2 mx-2 lg:mx-2 md:mx-2'>
+
                   <select
                     id='file-filter'
                     aria-label='Filter files by type'
                     value={filter}
                     onChange={(e) => setFilter(e.target.value)}
-                    className='border border-primary-600 rounded-md px-3 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+                    className='border border-primary-600 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
                   >
-                    <option value='all'>All Files</option>
-                    <option value='pdf'>PDF</option>
-                    <option value='doc'>DOC</option>
-                    <option value='docx'>DOCX</option>
-                    <option value='ppt'>PPT</option>
-                    <option value='pptx'>PPTX</option>
-                    <option value='txt'>TXT</option>
-                    <option value='images'>Images (PNG / JPG)</option>
+                  <option value='all'>All Files</option>
+                  <option value='pdf'>PDF</option>
+                  <option value='word'>Word Documents</option>
+                  <option value='powerpoint'>PowerPoint</option>
+                  <option value='txt'>TXT</option>
+                  <option value='images'>Images (PNG / JPG)</option>
                   </select>
                 </div>
-              )}
+              
 
               <input
                 aria-label='Upload academic files'
@@ -242,12 +246,20 @@ function CourseFolder() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md
+                   lg:mx-0
+                  hover:bg-white hover:border hover:border-primary-600
+                  hover:text-primary-600 text-white font-bold font-roboto text-md
+                  disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 + Upload Files
               </button>
             </div>
           </div>
+
+          <hr className='w-full border-t border-primary-600 lg:mb-6' />
+
+
 
           {/* Upload Progress Bar */}
           {uploading && (
@@ -280,11 +292,11 @@ function CourseFolder() {
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl py-24 cursor-pointer transition-colors
+              className={`flex flex-col items-center mt-3 justify-center border-2 border-dashed rounded-xl py-24 cursor-pointer transition-colors
                 ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-300 hover:border-primary-600'}`}
             >
               <p className='text-5xl mb-4'>📂</p>
-              <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
+              <p className='text-gray-400 font-roboto text-center text-sm  md:text-lg'>
                 Drag & drop files here or{' '}
                 <span className='text-primary-600 font-bold'>click to browse</span>
               </p>
@@ -311,7 +323,7 @@ function CourseFolder() {
                           file.fileType === 'pdf' ? '/pdfIcon.png' :
                           ['ppt', 'pptx'].includes(file.fileType) ? '/pptIcon.png' :
                           file.fileType === 'txt' ? '/txtIcon.png' :
-                          ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/imgIcon.png' :
+                          ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/ImageIcon.png' :
                           '/fileIcon.png'
                         }
                         alt={file.fileType}
@@ -382,14 +394,33 @@ function CourseFolder() {
         onClick={(e) => e.stopPropagation()}>
           <div className='flex justify-between items-center px-4 py-3 bg-primary-600'>
             <p className='text-white font-roboto font-semibold truncate'>{previewFile.fileName}</p>
-            <div className='flex items-center gap-3'>
-              <a
-                href={previewFile.fileUrl}
-                download
-                className='text-white text-sm font-roboto underline hover:opacity-70'
-              >
-                Download
-              </a>
+            <div className='flex items-center gap-5'>
+              {previewFile.fileType === 'pdf' ? (
+                <a
+                  href={previewFile.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white text-md font-roboto hover:opacity-70"
+                  title="Open PDF in new tab"
+                >
+                  <div className="flex flex-row gap-3 items-center">
+                    <img className="w-5 h-5" src="/ViewIcon.png" alt="view icon" />
+                    View in New Tab
+                  </div>
+                </a>
+              ) : (
+                <a
+                  href={previewFile.fileUrl}
+                  download
+                  className="text-white text-md font-roboto hover:opacity-70"
+                  title="Download file"
+                >
+                  <div className="flex flex-row gap-3 items-center">
+                    <img className="w-5 h-5" src="/downloadIcon.png" alt="download icon" />
+                    Download
+                  </div>
+                </a>
+              )}
               <button
                 onClick={() => { setPreviewFile(null); setPageNumber(1); setNumPages(0) }}
                 className='text-white font-bold text-xl hover:opacity-70'

@@ -81,7 +81,7 @@ function Courses() {
               Loading courses...
             </div>
           ) : (
-            <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
+            <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
               {courses.length === 0 ? (
                 <div className='col-span-2 md:col-span-3 lg:col-span-3 flex items-center justify-center py-20'>
                   <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
@@ -90,7 +90,7 @@ function Courses() {
                 </div>
               ) : (
                 courses.map((course) => (
-                  <div key={course.id} className='max-w-36 md:max-w-64   lg:max-w-52'>
+                  <div key={course.id} className='max-w-36 md:max-w-52   lg:max-w-52'>
                     <div className="relative">
                       <button
                         title={`Open ${course.name} Folder`}
@@ -107,9 +107,10 @@ function Courses() {
                         className="absolute hover:{setActivemenu} top-2 right-2 w-8 mr-1 md:w-10 md:mr-4 md:mt-2 lg:w-10 lg:mr-4 lg:mt-2"
                       >
                         <img
+                        
                           src="folderbtn.png"
                           alt="menu"
-                          title='Edit/Delete'
+                          title='More Options'
                           className="brightness-200 contrast-200 hover:scale-110 transition"
                         />
                       </button>
@@ -124,7 +125,7 @@ function Courses() {
                             onClick={() => handleEditOpen(course.id, course.name)}
                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5' src="edit.png" alt="edit icon" /> Edit
+                            <img className='w-5 h-5' src="edit.png" alt="edit icon" /> Rename
                           </button>
                           <hr className='my-1 border-gray-100' />
                           <button
