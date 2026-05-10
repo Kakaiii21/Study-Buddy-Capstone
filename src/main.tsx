@@ -16,6 +16,9 @@ import GeneratedHistory from './pages/GeneratedHistory'
 import RecentlyDeleted from './pages/RecentlyDeleted'
 import Account from './pages/Account'
 import CourseFolder from './pages/CourseFolder'
+import { TimerProvider } from './context/TimerContext'   // ← add this
+import ExpiredAlert from './components/ExpiredAlert'  // ← import here
+
 
 
 const router = createBrowserRouter([
@@ -115,6 +118,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <TimerProvider>
+      <ExpiredAlert />
+      <RouterProvider router={router} />
+    </TimerProvider>
   </StrictMode>
 )
