@@ -18,8 +18,8 @@ import Account from './pages/Account'
 import CourseFolder from './pages/CourseFolder'
 import { TimerProvider } from './context/TimerContext'   // ← add this
 import ExpiredAlert from './components/ExpiredAlert'  // ← import here
-
-
+import Quiz from './pages/StudyGenerator/Quiz'
+import Flashcard from './pages/StudyGenerator/Flashcard'
 
 const router = createBrowserRouter([
   {
@@ -87,6 +87,22 @@ const router = createBrowserRouter([
     element:(
       <ProtectedRoute>
         <StudyGenerator />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: '/StudyGenerator/Quiz',
+    element:(
+      <ProtectedRoute>
+        <Quiz />
+      </ProtectedRoute>
+    )
+  },
+    {
+    path: '/StudyGenerator/Flashcard',
+    element:(
+      <ProtectedRoute>
+        <Flashcard />
       </ProtectedRoute>
     )
   },
