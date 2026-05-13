@@ -342,8 +342,12 @@ function StudyGenerator() {
             {/* ── Output type + items ── */}
             <div className='mt-8 flex flex-col justify-start items-center min-w-full'>
 
+
+            {/*Papakita lang if nagupload*/}
+            {uploadedFile && (
+              <>
               {/* Quiz / Flashcard toggle */}
-              <div className='flex flex-row gap-2 lg:gap-16 md:gap-14'>
+              <div className='flex flex-row gap-2 lg:gap-8 md:gap-14'>
                 <button
                   className={`border-primary-600 border-2 font-roboto font-bold min-w-44 py-2 rounded-md uppercase transition
                     ${activeTab === 'quiz' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
@@ -360,8 +364,7 @@ function StudyGenerator() {
                 >
                   Flashcards
                 </button>
-              </div>
-
+              </div>  
               <div className='mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
 
                 <select
@@ -405,7 +408,6 @@ function StudyGenerator() {
                   </span>
                 </button>
               </div>
-              </div>
                         {/* ── Generate Button ── */}
             <button
               className={`mt-8 border font-bold font-roboto uppercase px-5 py-2 rounded-md mb-20 transition
@@ -417,9 +419,15 @@ function StudyGenerator() {
               disabled={!uploadedFile || !selectItems}
             >
               Generate Now
-            </button>
-            </div>
+            </button>              
 
+              </>
+            )}
+
+
+
+            </div>
+          </div>
   
 
           </div>
