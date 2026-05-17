@@ -1,4 +1,4 @@
-import { useTimerContext } from '../context/TimerContext'
+import { useTimerContext } from "../context/TimerContext"
 
 function ExpiredAlert() {
   const { showExpired, setShowExpired } = useTimerContext()

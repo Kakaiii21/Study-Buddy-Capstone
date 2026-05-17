@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { onAuthChange } from '../services/authService'
 import type { User } from 'firebase/auth'
-
+import { onAuthChange } from '../services/authService'
 type Props = {
   children: React.ReactNode
 }

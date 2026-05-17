@@ -3,9 +3,7 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks } from '../hooks/useTasks'
-import { useTimerContext } from '../context/TimerContext'  // ← add
-
-// ↑ remove: import { useTimer } from 'react-timer-hook'
+import { useTimerContext } from '../context/TimerContext'
 
 const PRESETS = [
   { label: '15 min', h: 0, m: 15, s: 0 },
@@ -21,12 +19,15 @@ function StudyTimer() {
   const { user }  = useAuth()
   const { tasks } = useTasks(user)
 
-  const completedPercent = useMemo(() => {
-    const total = tasks.length
-    const done  = tasks.filter((t) => t.status === 'done').length
-    return total === 0 ? 0 : Math.round((done / total) * 100)
-  }, [tasks])
+const completedPercent = useMemo(() => {
+  const total = tasks.length
 
+  const done = tasks.filter(
+    (t: { status: string }) => t.status === 'done'
+  ).length
+
+  return total === 0 ? 0 : Math.round((done / total) * 100)
+}, [tasks])
   // ↓ from context now — replaces useTimer + totalTimeInSeconds + showExpiredMsg
   const {
     seconds, minutes, hours,
