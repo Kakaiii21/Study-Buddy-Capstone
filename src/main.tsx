@@ -91,7 +91,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/StudyGenerator/Quiz',
+    path: '/studyGenerator/Quiz',
     element:(
       <ProtectedRoute>
         <Quiz />
@@ -99,7 +99,7 @@ const router = createBrowserRouter([
     )
   },
     {
-    path: '/StudyGenerator/Flashcard',
+    path: '/studyGenerator/Flashcard',
     element:(
       <ProtectedRoute>
         <Flashcard />

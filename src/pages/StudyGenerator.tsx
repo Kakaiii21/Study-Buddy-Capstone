@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -30,6 +30,9 @@ interface CourseFile {
 const ACCEPTED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.txt'
 const FUNCTION_URL = import.meta.env.VITE_STUDY_GENERATOR_URL as string
+
+// Session storage keys
+export const SESSION_KEY_RESULT = 'studygen_result'
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -156,6 +159,8 @@ function CoursePicker({
   )
 }
 
+
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 function StudyGenerator() {
@@ -173,6 +178,20 @@ function StudyGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const items = [10, 20, 30, 40, 50]
 
+
+  useEffect(() => {
+  const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.mode === 'quiz') {
+        navigate('/studyGenerator/Quiz', { state: parsed, replace: true })
+      } else if (parsed.mode === 'flashcard') {
+        navigate('/studyGenerator/Flashcard', { state: parsed, replace: true })
+      }
+    } catch {/**/}
+  }
+}, [])
   // ── Local file handling ───────────────────────────────────────────────────
 
   const handleLocalFile = (fileList: FileList | null) => {
@@ -204,17 +223,14 @@ function StudyGenerator() {
     try {
       let body: BodyInit
       const headers: Record<string, string> = {}
-      
+
       if (uploadedFile.source === 'local' && uploadedFile.file) {
-        // ── Local file: send as multipart/form-data ──
         const formData = new FormData()
         formData.append('file', uploadedFile.file)
         formData.append('mode', activeTab)
         formData.append('numItems', String(selectItems))
         body = formData
-        // Don't set Content-Type — browser sets it with boundary automatically
       } else {
-        // ── Course file: send as JSON with URL ──
         headers['Content-Type'] = 'application/json'
         body = JSON.stringify({
           fileUrl: uploadedFile.fileUrl,
@@ -232,15 +248,16 @@ function StudyGenerator() {
         return
       }
 
-      // Navigate to the result page with the generated items
-      const path = activeTab === 'quiz' ? '/StudyGenerator/Quiz' : '/StudyGenerator/Flashcard'
-      navigate(path, {
-        state: {
-          items: data.items,
-          mode: activeTab,
-          fileName: uploadedFile.name,
-        },
-      })
+      // ── Save result to sessionStorage so it survives navigation ──
+      const sessionData = {
+        items: data.items,
+        mode: activeTab,
+        fileName: uploadedFile.name,
+      }
+      sessionStorage.setItem(SESSION_KEY_RESULT, JSON.stringify(sessionData))
+
+      const path = activeTab === 'quiz' ? '/studyGenerator/Quiz' : '/studyGenerator/Flashcard'
+      navigate(path, { state: sessionData })
     } catch (err) {
       console.error(err)
       setFileError('Network error. Please check your connection and try again.')
@@ -286,7 +303,6 @@ function StudyGenerator() {
               </p>
 
               <div className='flex flex-row gap-5 md:gap-16 lg:gap-16'>
-                {/* Local */}
                 <div className='flex flex-col gap-3 justify-start items-center'>
                   <img className='w-20 md:w-32 lg:w-32' src='Localbtn.png' alt='localbtnicon' />
                   <button
@@ -300,7 +316,6 @@ function StudyGenerator() {
 
                 <p className='text-center lg:mt-16 text-primary-600 lg:text-xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
 
-                {/* Courses */}
                 <div className='flex flex-col gap-3 justify-start items-center'>
                   <img className='w-20 md:w-32 lg:w-32' src='Coursesbtn.png' alt='coursesbtnicon' />
                   <button
@@ -322,7 +337,6 @@ function StudyGenerator() {
                 onChange={(e) => handleLocalFile(e.target.files)}
               />
 
-              {/* Selected file display */}
               {uploadedFile && (
                 <div className='w-full mt-2 flex items-center gap-4 bg-white bg-opacity-90 border-2 border-primary-600 rounded-xl px-4 py-3'>
                   <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 object-contain flex-shrink-0' />
@@ -344,7 +358,6 @@ function StudyGenerator() {
               )}
             </div>
 
-            {/* Error */}
             {fileError && (
               <p className='mt-3 text-red-500 text-sm font-roboto text-center'>{fileError}</p>
             )}
@@ -354,11 +367,8 @@ function StudyGenerator() {
               Users are advised to review the generated files before proceeding. Thank you.</i>
             </p>
 
-            {/* Output type + items — only shown after file is selected */}
             {uploadedFile && (
               <div className='mt-8 flex flex-col justify-start items-center min-w-full'>
-
-                {/* Quiz / Flashcard toggle */}
                 <div className='flex flex-row gap-2 lg:gap-8 md:gap-14'>
                   <button
                     className={`border-primary-600 border-2 font-roboto font-bold min-w-44 py-2 rounded-md uppercase transition
@@ -378,7 +388,6 @@ function StudyGenerator() {
                   </button>
                 </div>
 
-                {/* Item count + random */}
                 <div className='mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
                   <select
                     className='w-52 border-2 border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center py-3 px-2'
@@ -403,7 +412,6 @@ function StudyGenerator() {
                   </button>
                 </div>
 
-                {/* Generate Button */}
                 <button
                   className={`mt-8 border font-bold font-roboto uppercase px-5 py-2 rounded-md mb-20 transition
                     ${uploadedFile && selectItems && !isGenerating
@@ -420,7 +428,6 @@ function StudyGenerator() {
         </div>
       </main>
 
-      {/* Course Picker Modal */}
       {showCoursePicker && (
         <CoursePicker
           user={user}

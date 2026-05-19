@@ -107,7 +107,7 @@ function Sidebar() {
                     w-full text-left py-2 px-4 pl-20 mb-1
                     font-medium text-lg
                     transition-colors duration-200
-                    ${location.pathname === item.path
+                    ${location.pathname === item.path || location.pathname.startsWith(item.path + '/')
                       ? 'bg-primary-100 text-primary-600 font-semibold'
                       : 'text-primary-600 hover:bg-primary-100'
                     }
