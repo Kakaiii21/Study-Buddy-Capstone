@@ -8,101 +8,70 @@ import { parseQuiz, parseFlashcards } from './parsers'
 
 admin.initializeApp()
 
-// ─── CORS helper ──────────────────────────────────────────────────────────────
 function setCors(res: any) {
   res.set('Access-Control-Allow-Origin', '*')
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.set('Access-Control-Allow-Headers', 'Content-Type')
 }
 
-// ─── Main Cloud Function ───────────────────────────────────────────────────────
 export const generateStudyMaterial = onRequest(
   { timeoutSeconds: 300, memory: '512MiB' },
   async (req, res) => {
     setCors(res)
 
-    if (req.method === 'OPTIONS') {
-      res.status(204).send('')
-      return
-    }
-
-    if (req.method !== 'POST') {
-      res.status(405).json({ error: 'Method not allowed' })
-      return
-    }
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
 
     try {
-      // ── Read Groq key from process.env (functions/.env) ──────────────────
       const apiKey = process.env.GROQ_API_KEY
-      if (!apiKey) {
-        res.status(500).json({ error: 'GROQ_API_KEY not set in functions/.env' })
-        return
-      }
+      if (!apiKey) { res.status(500).json({ error: 'GROQ_API_KEY not set in functions/.env' }); return }
 
       const contentType = req.headers['content-type'] || ''
-
       let fileBuffer: Buffer | null = null
       let fileType = ''
       let mode: 'quiz' | 'flashcard' = 'quiz'
       let numItems = 10
 
-      // ── Case 1: multipart/form-data (local file upload) ───────────────────
       if (contentType.includes('multipart/form-data')) {
         const result = await parseMultipart(req)
         fileBuffer = result.fileBuffer
         fileType = result.fileType
         mode = result.mode
         numItems = result.numItems
-      }
-
-      // ── Case 2: application/json (course file via URL) ────────────────────
-      else if (contentType.includes('application/json')) {
-        const body = req.body as {
-          fileUrl?: string
-          fileType?: string
-          mode?: string
-          numItems?: number
-        }
-
-        if (!body.fileUrl || !body.fileType) {
-          res.status(400).json({ error: 'fileUrl and fileType are required.' })
-          return
-        }
-
-        const response = await axios.get(body.fileUrl, {
-          responseType: 'arraybuffer',
-          timeout: 30000,
-        })
+      } else if (contentType.includes('application/json')) {
+        const body = req.body as { fileUrl?: string; fileType?: string; mode?: string; numItems?: number }
+        if (!body.fileUrl || !body.fileType) { res.status(400).json({ error: 'fileUrl and fileType are required.' }); return }
+        const response = await axios.get(body.fileUrl, { responseType: 'arraybuffer', timeout: 30000 })
         fileBuffer = Buffer.from(response.data)
         fileType = body.fileType
         mode = (body.mode as 'quiz' | 'flashcard') ?? 'quiz'
         numItems = body.numItems ?? 10
       } else {
-        res.status(400).json({ error: 'Unsupported content type.' })
-        return
+        res.status(400).json({ error: 'Unsupported content type.' }); return
       }
 
-      // ── Extract text ───────────────────────────────────────────────────────
-      if (!fileBuffer) {
-        res.status(400).json({ error: 'No file received.' })
-        return
-      }
+      if (!fileBuffer) { res.status(400).json({ error: 'No file received.' }); return }
 
       const rawText = await extractText(fileBuffer, fileType)
       if (!rawText || rawText.trim().length < 50) {
-        res.status(400).json({ error: 'Could not extract enough text from the file.' })
-        return
+        res.status(400).json({ error: 'Could not extract enough text from the file.' }); return
       }
 
       const textSample = rawText.slice(0, 4000)
 
-      // ── Build prompt ───────────────────────────────────────────────────────
       let prompt = ''
 
       if (mode === 'quiz') {
-        prompt = `Create exactly ${numItems} multiple choice questions based on this text.
-For each question provide 4 options (A, B, C, D) and mark the correct answer.
-DO NOT add any introduction or closing remarks.
+        prompt = `Create exactly ${numItems} multiple choice questions based on the text below.
+
+STRICT RULES:
+- Each question must have exactly 4 options (A, B, C, D)
+- All 4 options must be MEANINGFULLY DIFFERENT from each other
+- Do NOT create options that say the same thing in a different order or with minor word swaps
+- Do NOT create options that are synonyms or near-identical restatements
+- Each wrong option must be clearly distinct and plausible but incorrect
+- Only ONE option can be correct
+- Do NOT add any introduction, closing remarks, or explanations
 
 FORMAT (strict):
 Question 1: [question text]
@@ -117,15 +86,17 @@ ${textSample}`
       } else {
         prompt = `Create exactly ${numItems} flashcards based on the text below.
 
-RULES:
+STRICT RULES:
 - DO NOT add introductions or summaries
 - DO NOT say 'Here are the flashcards'
+- Each term must be unique — do NOT repeat or rephrase the same concept twice
+- The definition must be clearly different from the term (do NOT restate the term as the definition)
 - Use ONLY the format below
 - One blank line between cards
 
 FORMAT (STRICT):
 Card 1 Front: [short term or concept]
-Card 1 Back: [clear and concise definition]
+Card 1 Back: [clear and concise definition that does not just reword the term]
 
 Card 2 Front: ...
 Card 2 Back: ...
@@ -134,17 +105,46 @@ TEXT:
 ${textSample}`
       }
 
-      // ── Call Groq ──────────────────────────────────────────────────────────
-      const aiResponse = await callGroq(prompt, apiKey)
+      // ── Call Groq and capture token usage ───────────────────────────────
+      const { text: aiResponse, usage } = await callGroq(prompt, apiKey)
+      console.log(`[Token Usage] prompt: ${usage.prompt_tokens} | completion: ${usage.completion_tokens} | total: ${usage.total_tokens}`)
+      // 👇 Add this temporarily to debug
+      console.log('[AI Raw Response]', aiResponse.slice(0, 500))
 
-      // ── Parse & respond ────────────────────────────────────────────────────
-      if (mode === 'quiz') {
-        const questions = parseQuiz(aiResponse)
-        res.status(200).json({ mode: 'quiz', items: questions })
-      } else {
-        const flashcards = parseFlashcards(aiResponse)
-        res.status(200).json({ mode: 'flashcard', items: flashcards })
+      let items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
+
+      // 👇 Add this too
+      console.log(`[Parsed Items Count] ${items.length}`)
+
+
+      // ── Background verification (only if enough token budget remains) ───
+      const tokensUsed = usage.total_tokens
+      const TOKEN_LIMIT = 6000
+      const tokensRemaining = TOKEN_LIMIT - tokensUsed
+
+      // Skip verification if items is empty (prevents the wasted 429 call)
+      if (tokensRemaining > 1500 && items.length > 0) {
+        try {
+          items = await verifyItems(items, mode, apiKey)
+        } catch (verifyErr) {
+          console.warn('[Verify] Skipped due to error:', verifyErr)
+        }
       }
+
+      if (tokensRemaining > 1500) {
+        try {
+          items = await verifyItems(items, mode, apiKey)
+        } catch (verifyErr) {
+          console.warn('[Verify] Skipped due to error:', verifyErr)
+        }
+      }
+
+      if (mode === 'quiz') {
+        res.status(200).json({ mode: 'quiz', items, usage })
+      } else {
+        res.status(200).json({ mode: 'flashcard', items, usage })
+      }
+
     } catch (err: unknown) {
       console.error('generateStudyMaterial error:', err)
       const message = err instanceof Error ? err.message : 'Internal server error'
@@ -153,16 +153,11 @@ ${textSample}`
   }
 )
 
-// ─── Multipart parser ──────────────────────────────────────────────────────────
-function parseMultipart(req: any): Promise<{
-  fileBuffer: Buffer
-  fileType: string
-  mode: 'quiz' | 'flashcard'
-  numItems: number
-}> {
+// ── Helpers (outside the request handler) ─────────────────────────────────────
+
+function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: string; mode: 'quiz' | 'flashcard'; numItems: number }> {
   return new Promise((resolve, reject) => {
     const bb = Busboy({ headers: req.headers })
-
     let fileType = ''
     let mode: 'quiz' | 'flashcard' = 'quiz'
     let numItems = 10
@@ -175,10 +170,7 @@ function parseMultipart(req: any): Promise<{
 
     bb.on('field', (name: string, value: string) => {
       if (name === 'mode' && (value === 'quiz' || value === 'flashcard')) mode = value
-      if (name === 'numItems') {
-        const n = parseInt(value, 10)
-        if (!isNaN(n)) numItems = n
-      }
+      if (name === 'numItems') { const n = parseInt(value, 10); if (!isNaN(n)) numItems = n }
     })
 
     bb.on('finish', () => {
@@ -195,4 +187,46 @@ function parseMultipart(req: any): Promise<{
       req.pipe(bb)
     }
   })
+}
+
+async function verifyItems(
+  items: any[],
+  mode: 'quiz' | 'flashcard',
+  apiKey: string
+): Promise<any[]> {
+  const verifyPrompt = mode === 'quiz'
+    ? `You are a quiz quality checker. Review these questions and fix the following issues:
+- Merge or rewrite answer choices that mean the same thing, even if worded differently or reordered
+- Fix questions where the marked correct answer is actually wrong
+- Remove completely duplicate questions
+- Keep the same number of items if possible
+
+Return ONLY a valid JSON array with this exact shape, no explanation, no markdown:
+[{"question":"...","options":["...","...","...","..."],"answer":"A"}]
+
+Questions to review:
+${JSON.stringify(items)}`
+
+    : `You are a flashcard quality checker. Review these flashcards and fix the following issues:
+- Remove cards where the definition just restates the term
+- Merge duplicate cards that cover the same concept
+- Keep the same number of items if possible
+
+Return ONLY a valid JSON array with this exact shape, no explanation, no markdown:
+[{"term":"...","definition":"..."}]
+
+Flashcards to review:
+${JSON.stringify(items)}`
+
+  const { text } = await callGroq(verifyPrompt, apiKey)
+
+  const cleaned = text.replace(/```json|```/g, '').trim()
+  const parsed = JSON.parse(cleaned)
+
+  if (!Array.isArray(parsed) || parsed.length < Math.floor(items.length / 2)) {
+    console.warn('[Verify] Returned too few items, keeping original')
+    return items
+  }
+
+  return parsed
 }

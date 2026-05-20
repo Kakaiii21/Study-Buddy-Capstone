@@ -40,22 +40,25 @@ function Quiz() {
   const [selected, setSelected] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
 
-  if (!result?.items || result.items.length === 0) {
-    return (
-      <div className='flex h-screen'>
-        <Sidebar />
-        <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
-          <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No quiz data found.</p>
-          <button
-            className='bg-primary-600 text-white font-roboto px-6 py-2 rounded-md hover:bg-primary-500'
-            onClick={() => navigate('/studyGenerator')}
-          >
-            Go Back
-          </button>
-        </main>
-      </div>
-    )
-  }
+if (!result?.items || result.items.length === 0) {
+  // 👇 Clear bad session data so Go Back actually works
+  sessionStorage.removeItem(SESSION_KEY_RESULT)
+
+  return (
+    <div className='flex h-screen'>
+      <Sidebar />
+      <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
+        <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No flashcard data found.</p>
+        <button
+          className='bg-primary-600 text-white font-roboto px-6 py-2 rounded-md hover:bg-primary-500'
+          onClick={() => navigate('/studyGenerator')}
+        >
+          Go Back
+        </button>
+      </main>
+    </div>
+  )
+}
 
   const questions = result.items
   const optionLetters = ['A', 'B', 'C', 'D']

@@ -47,11 +47,13 @@ function CoursePicker({
   courses,
   onSelect,
   onClose,
+  onError,
 }: {
   user: User | null
   courses: { id: string; name: string }[]
   onSelect: (file: UploadedFile) => void
   onClose: () => void
+  onError: (msg:string) => void 
 }) {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
   const selectedCourse = courses.find((c) => c.id === selectedCourseId)
@@ -59,6 +61,19 @@ function CoursePicker({
   const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
 
   const handlePickFile = (file: CourseFile) => {
+    const parseSize = (sizeStr: string): number => {
+      const num = parseFloat(sizeStr)
+      if (sizeStr.includes('GB')) return num * 1024 * 1024 * 1024
+      if (sizeStr.includes('MB')) return num * 1024 * 1024
+      if (sizeStr.includes('KB')) return num * 1024
+      return num
+    }
+
+    if (parseSize(file.fileSize) > 10 * 1024 * 1024) {
+      onError('File size exceeds 10MB. Please upload a smaller file.')
+      return
+    }
+
     onSelect({
       name: file.fileName,
       size: file.fileSize,
@@ -194,17 +209,25 @@ function StudyGenerator() {
 }, [])
   // ── Local file handling ───────────────────────────────────────────────────
 
-  const handleLocalFile = (fileList: FileList | null) => {
-    if (!fileList || fileList.length === 0) return
-    setFileError('')
-    const file = fileList[0]
-    const ext = file.name.split('.').pop()?.toLowerCase() || ''
-    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-      setFileError(`File type ".${ext}" is not supported. Please upload PDF, DOC, DOCX, PPT, PPTX, or TXT.`)
-      return
-    }
-    setUploadedFile({ name: file.name, size: formatBytes(file.size), type: ext, source: 'local', file })
+const handleLocalFile = (fileList: FileList | null) => {
+  if (!fileList || fileList.length === 0) return
+  setFileError('')
+  const file = fileList[0]
+  const ext = file.name.split('.').pop()?.toLowerCase() || ''
+  if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+    setFileError(`File type ".${ext}" is not supported. Please upload PDF, DOC, DOCX, PPT, PPTX, or TXT.`)
+    return
   }
+
+  // Add this 👇
+  const MAX_SIZE = 10 * 1024 * 1024 // 10MB in bytes
+  if (file.size > MAX_SIZE) {
+    setFileError('File size exceeds 10MB. Please upload a smaller file.')
+    return
+  }
+
+  setUploadedFile({ name: file.name, size: formatBytes(file.size), type: ext, source: 'local', file })
+}
 
   const handleRemoveFile = () => {
     setUploadedFile(null)
@@ -434,6 +457,7 @@ function StudyGenerator() {
           courses={courses}
           onSelect={(file) => { setUploadedFile(file); setFileError('') }}
           onClose={() => setShowCoursePicker(false)}
+          onError={(msg) => { setFileError(msg); setShowCoursePicker(false) }} 
         />
       )}
     </div>

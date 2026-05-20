@@ -22,33 +22,32 @@ export function parseQuiz(response: string): QuizQuestion[] {
     const line = raw.trim()
     if (!line) continue
 
-    // Match: "Question 1:", "Q1:", "1."
-    if (/^(?:Question\s*\d+:|Q\d+:|\d+\.)\s*(.+)$/i.test(line)) {
-      if (current) questions.push(current)
-      const match = line.match(/^(?:Question\s*\d+:|Q\d+:|\d+\.)\s*(.+)$/i)!
+    // Match: "Question 1:", "Q1:", "1.", "1)"  ← added "1)"
+    if (/^(?:Question\s*\d+[:.)]|Q\d+[:.)]|\d+[.):])\s*(.+)$/i.test(line)) {
+      if (current && current.options.length > 0) questions.push(current)
+      const match = line.match(/^(?:Question\s*\d+[:.)]|Q\d+[:.)]|\d+[.):])\s*(.+)$/i)!
       current = { question: match[1].trim(), options: [], answer: '' }
       continue
     }
 
-    // Match: "A) ...", "A. ...", "A: ..."
-    if (current && /^[A-D][).:]\s*.+$/i.test(line)) {
-      const match = line.match(/^[A-D][).:]?\s*(.+)$/i)!
+    // Match: "A) ...", "A. ...", "A: ...", "(A) ..."  ← added "(A)"
+    if (current && /^[(]?[A-D][).:]\s*.+$/i.test(line)) {
+      const match = line.match(/^[(]?[A-D][).:]?\s*(.+)$/i)!
       current.options.push(match[1].trim())
       continue
     }
 
-    // Match: "Answer: B" or "Correct: B" or "Correct Answer: B"
-    if (current && /^(?:Answer|Correct(?:\s+Answer)?):\s*([A-D])/i.test(line)) {
+    // Match: "Answer: B", "Correct: B", "Correct Answer: B", "Answer: B)"  ← added trailing paren
+    if (current && /^(?:Answer|Correct(?:\s+Answer)?):\s*([A-D])[).]?/i.test(line)) {
       const match = line.match(/^(?:Answer|Correct(?:\s+Answer)?):\s*([A-D])/i)!
       current.answer = match[1].toUpperCase()
       continue
     }
   }
 
-  if (current) questions.push(current)
+  if (current && current.options.length > 0) questions.push(current)
   return questions
 }
-
 // ─── Flashcard Parser ─────────────────────────────────────────────────────────
 
 export function parseFlashcards(response: string): Flashcard[] {
