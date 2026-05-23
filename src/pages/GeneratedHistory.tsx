@@ -1,19 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useFlashcardHistory } from '../hooks/useFlashcardHistory'
 
 function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleString('en-US', {
     month: '2-digit',
     day: '2-digit',
     year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 
 function GeneratedHistory() {
+
+  
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [selectedGen, setSelectedGen] = useState('Quiz')
   const [searchQuery, setSearchQuery] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
@@ -38,6 +44,52 @@ function GeneratedHistory() {
     setDeleteConfirmId(null)
   }
 
+  // ── Navigate to QuizView with all saved data ──
+  const handleViewQuiz = (item: (typeof quizHistory)[number]) => {
+    navigate('/quizView', {
+      state: {
+        items: item.items,
+        selectedAnswers: item.selectedAnswers,
+        score: item.score,
+        total: item.total,
+        fileName: item.fileName,
+        id: item.id,
+      },
+    })
+  }
+
+  // ── Navigate to Quiz as a fresh retake ──
+  const handleRetakeQuiz = (item: (typeof quizHistory)[number]) => {
+    navigate('/studyGenerator/Quiz', {
+      state: {
+        items: item.items,
+        mode: 'quiz' as const,
+        fileName: item.fileName,
+      },
+    })
+  }
+
+  // ── Navigate to FlashcardView ──
+  const handleViewFlashcard = (item: (typeof flashcardHistory)[number]) => {
+    navigate('/flashcardView', {
+      state: {
+        items: item.items,
+        fileName: item.fileName,
+        id: item.id, 
+      },
+    })
+  }
+
+  useEffect(() => {
+  const quizView = sessionStorage.getItem('quizView_state')
+  const flashcardView = sessionStorage.getItem('flashcardView_state')
+  if (quizView) {
+    navigate('/quizView', { state: JSON.parse(quizView) })
+  } else if (flashcardView) {
+    navigate('/flashcardView', { state: JSON.parse(flashcardView) })
+  }
+}, [])
+
   return (
     <div className='flex h-screen'>
       <Sidebar />
@@ -46,7 +98,7 @@ function GeneratedHistory() {
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6'>
+          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6 mt-4'>
             <p className='text-2xl lg:ml-0 md:ml-16 md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Generated History
             </p>
@@ -55,7 +107,7 @@ function GeneratedHistory() {
           <hr className='w-full border-t border-primary-600 mb-6' />
 
           {/* Filters */}
-          <div className='flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
+          <div className='flex flex-row lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
             <select
               value={selectedGen}
               aria-label='Generation Type'
@@ -112,15 +164,25 @@ function GeneratedHistory() {
                             <p className='text-xs md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
                               {item.fileName}
                             </p>
-                            <p className='text-xs  md:text-sm text-gray-400'>{formatDate(item.dateTaken)}</p>
+                            <p className='text-xs md:text-sm text-gray-400'>{formatDate(item.dateTaken)}</p>
                           </div>
                           <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.score}</p>
                           <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
                           <div className='flex justify-center'>
-                            <img src='/View.png' alt='View' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                            <img
+                              src='/View.png'
+                              alt='View'
+                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              onClick={() => handleViewQuiz(item)}
+                            />
                           </div>
                           <div className='flex justify-center'>
-                            <img src='/Retake.png' alt='Retake' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                            <img
+                              src='/Retake.png'
+                              alt='Retake'
+                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              onClick={() => handleRetakeQuiz(item)}
+                            />
                           </div>
                           <div className='flex justify-center'>
                             <img
@@ -154,14 +216,19 @@ function GeneratedHistory() {
                       <div key={item.id} className='border-b py-3'>
                         <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
                           <div className='min-w-0'>
-                            <p className='text-xs  md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
+                            <p className='text-xs md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
                               {item.fileName}
                             </p>
-                            <p className='text-xs md:text-sm lg:text-sm   text-gray-400'>{formatDate(item.dateSaved)}</p>
+                            <p className='text-xs md:text-sm lg:text-sm text-gray-400'>{formatDate(item.dateSaved)}</p>
                           </div>
                           <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
                           <div className='flex justify-center'>
-                            <img src='/View.png' alt='View' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                            <img
+                              src='/View.png'
+                              alt='View'
+                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              onClick={() => handleViewFlashcard(item)}
+                            />
                           </div>
                           <div className='flex justify-center'>
                             <img

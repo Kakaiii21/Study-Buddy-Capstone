@@ -16,10 +16,12 @@ import GeneratedHistory from './pages/GeneratedHistory'
 import RecentlyDeleted from './pages/RecentlyDeleted'
 import Account from './pages/Account'
 import CourseFolder from './pages/CourseFolder'
-import { TimerProvider } from './context/TimerContext'   // ← add this
-import ExpiredAlert from './components/ExpiredAlert'  // ← import here
+import { TimerProvider } from './context/TimerContext'  
+import ExpiredAlert from './components/ExpiredAlert'  
 import Quiz from './pages/StudyGenerator/Quiz'
 import Flashcard from './pages/StudyGenerator/Flashcard'
+import QuizView from './pages/StudyGenerator/QuizView'
+import FlashcardView from './pages/StudyGenerator/FlashcardView'
 
 const router = createBrowserRouter([
   {
@@ -111,6 +113,22 @@ const router = createBrowserRouter([
     element:(
       <ProtectedRoute>
         <GeneratedHistory />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path:'/quizView',
+    element:(
+      <ProtectedRoute>
+        <QuizView />
+      </ProtectedRoute>
+    )
+  },
+    {
+    path:'/flashcardView',
+    element:(
+      <ProtectedRoute>
+        <FlashcardView />
       </ProtectedRoute>
     )
   },
