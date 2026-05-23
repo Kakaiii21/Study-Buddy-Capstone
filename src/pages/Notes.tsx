@@ -493,7 +493,7 @@ useEffect(() => {
               onClick={closeNoteModal}
             >
               <div
-                className='bg-white w-full h-screen lg:rounded-2xl lg:h-auto lg:max-w-lg lg:mx-6 flex flex-col overflow-y-auto'
+                className='bg-white w-full h-screen lg:rounded-2xl lg:h-screen  lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
                 onClick={(e) => e.stopPropagation()}
               >
 
