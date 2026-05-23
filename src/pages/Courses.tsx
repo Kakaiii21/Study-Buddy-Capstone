@@ -66,6 +66,8 @@ function Courses() {
             <p className='text-3xl lg:text-4xl lg:ml-0 md:text-4xl md:ml-10 font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Courses
             </p>
+                         <hr className='lg:hidden w-full border-t border-primary-600 ' />
+
             <button
               onClick={() => setShowModal(true)}
               className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
@@ -73,7 +75,7 @@ function Courses() {
               + Course Folder
             </button>
           </div>
-          <hr className='w-full border-t border-primary-600 mb-6' />
+<hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 
           {/* Folder Area */}
           {loading ? (

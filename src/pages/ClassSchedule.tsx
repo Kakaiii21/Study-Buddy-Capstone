@@ -164,15 +164,16 @@ function ClassSchedule() {
           {/* Header */}
           <div className='flex flex-col  md:flex-row lg:flex-row justify-between items-center w-full'>
             <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
+            <hr className='lg:hidden w-full border-t mt-3 border-primary-600 ' />
+
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-4 mt-8 md:mt-0 lg:mt-0 px-8 text-white uppercase font-roboto text-sm rounded-md'
+              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-4 mt-2 md:mt-0 lg:mt-0 px-8 text-white uppercase font-roboto text-sm rounded-md'
             >
               + Add Schedule
             </button>
           </div>
-          <hr className='w-full border-t mt-3 border-primary-600 mb-6' />
-
+<hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 
           {/* Add / Edit Modal */}
           {isAddSubOpen && (

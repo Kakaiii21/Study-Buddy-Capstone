@@ -6,14 +6,37 @@ import { useAuth } from '../hooks/useAuth'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { useTimerContext } from '../context/TimerContext' 
+import { useQuizHistory } from '../hooks/useQuizHistory'
+
 
 
 function Dashboard() {
   const [showTimer, setShowTimer] = useState(false)
   const navigate = useNavigate()
   const { user } = useAuth()
-  const [firstName, setFirstName] = useState('Student')
   const { elapsedSeconds } = useTimerContext() 
+
+  const { quizHistory } = useQuizHistory(user)
+const latestQuiz = quizHistory[0] ?? null
+
+const [firstName, setFirstName] = useState<string | null>(
+  () => sessionStorage.getItem('firstName')  // load instantly if cached
+)
+
+useEffect(() => {
+  if (!user) return
+  // Already cached, no need to fetch again
+  if (sessionStorage.getItem('firstName')) return
+  const fetchUser = async () => {
+    const snap = await getDoc(doc(db, 'users', user.uid))
+    if (snap.exists()) {
+      const name = snap.data().firstName || 'Student'
+      setFirstName(name)
+      sessionStorage.setItem('firstName', name)
+    }
+  }
+  fetchUser()
+}, [user])
 
   const formatElapsed = (total: number): string => {
     const h = Math.floor(total / 3600)
@@ -74,7 +97,7 @@ function Dashboard() {
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>
                     <h1 className='font-roboto text-white md:text-5xl  text-xl  lg:text-6xl font-bold leading-none'>
-                      Welcome, {firstName}
+                      Welcome, {firstName ?? ''}
                     </h1>
                     <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px]  mt-1'>
                       Start your day by being productive.
@@ -124,7 +147,9 @@ function Dashboard() {
                   />
                   <div className='flex flex-col'>
                     <p className='text-sm font-bold text-primary-600'>Current Score</p>
-                    <p className='text-md sm:text-2xl font-bold text-primary-600'>00/00</p>
+                    <p className='text-md sm:text-2xl font-bold text-primary-600'>
+                      {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total}` : '00/00'}
+                    </p>
                   </div>
                 </div>
 

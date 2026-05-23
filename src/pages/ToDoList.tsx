@@ -469,6 +469,8 @@ function ToDoList() {
 
           <div className="w-full flex flex-col lg:flex-row justify-center lg:justify-between lg:items-start sm:items-center gap-4 p-2">
             <p className="text-3xl lg:text-4xl lg:pt-2 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
+             <hr className='lg:hidden w-full border-t border-primary-600 ' />
+
             <button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-green-500 text-white font-roboto font-bold mx-10 text-md py-3 px-9 rounded-md"

@@ -8,6 +8,7 @@ import { useClassSched } from '../hooks/useClassSched'
 function Notes() {
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
 
@@ -24,6 +25,13 @@ async function handleSubjectDelete(subject: string) {
   if (selectedSubject === subject) setSelectedSubject('All Subject')
   setDeleteSubjectConfirm(null)
 
+}
+function handleCloseAttempt() {
+  if (modalMode === 'edit') {
+    setShowDiscardConfirm(true)
+  } else {
+    closeNoteModal()
+  }
 }
   const { schedules } = useClassSched(user)   
   // ── Subject & filter state ──
@@ -490,10 +498,12 @@ useEffect(() => {
           {isNoteModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
-              onClick={closeNoteModal}
+              onClick={handleCloseAttempt}
+
             >
               <div
-                className='bg-white w-full h-screen lg:rounded-2xl lg:h-screen  lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
+              className='bg-white w-full h-screen lg:rounded-2xl lg:h-[85vh] lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
+
                 onClick={(e) => e.stopPropagation()}
               >
 
@@ -501,7 +511,7 @@ useEffect(() => {
                 <div className='lg:hidden flex flex-col flex-1 p-6 '>
 
                 {isReadOnly ? (
-                  <p className='w-32 ml-auto text-2xl text-right  text-primary-600 font-bold '>{displaySubject}</p>
+                  <p className='w-32 ml-auto text-1xl text-right  text-primary-600  '>{displaySubject}</p>
                 ) : (
                   <select
                     aria-label='Select subject'
@@ -540,7 +550,7 @@ useEffect(() => {
                   {modalMode === 'view' && (
                     <>
                       <button
-                        onClick={closeNoteModal}
+                        onClick={handleCloseAttempt}
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                       >
                         CLOSE
@@ -557,7 +567,7 @@ useEffect(() => {
                     {modalMode === 'edit' && (
                       <>
                         <button
-                          onClick={closeNoteModal}
+                          onClick={handleCloseAttempt}
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
@@ -574,7 +584,7 @@ useEffect(() => {
                     {modalMode === 'create' && (
                       <>
                         <button
-                          onClick={closeNoteModal}
+                          onClick={handleCloseAttempt}
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
@@ -654,7 +664,7 @@ useEffect(() => {
                     {modalMode === 'edit' && (
                       <div className='bottom-4 right-4 flex gap-2 ml-auto'>
                         <button
-                          onClick={closeNoteModal}
+                          onClick={handleCloseAttempt}
                         className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
@@ -694,6 +704,39 @@ useEffect(() => {
 
         </div>
       </main>
+      {/* ── Discard Changes Confirmation Modal ── */}
+{showDiscardConfirm && (
+  <div
+    className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60]'
+    onClick={() => setShowDiscardConfirm(false)}
+  >
+    <div
+      className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p className='text-xl font-bold text-primary-600 uppercase text-center'>
+        Discard Changes?
+      </p>
+      <p className='text-sm text-gray-500 text-center'>
+        You have unsaved changes. Are you sure you want to discard them?
+      </p>
+      <div className='flex gap-4 w-full mt-2'>
+        <button
+          onClick={() => setShowDiscardConfirm(false)}
+          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+        >
+          KEEP EDITING
+        </button>
+        <button
+          onClick={() => { setShowDiscardConfirm(false); closeNoteModal() }}
+          className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600'
+        >
+          DISCARD
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   )
 }
