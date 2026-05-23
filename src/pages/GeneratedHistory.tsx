@@ -42,7 +42,7 @@ function GeneratedHistory() {
     <div className='flex h-screen'>
       <Sidebar />
 
-      <main className='flex-1 overflow-auto p-8 mt-1'>
+      <main className='flex-1 overflow-auto p-4 md:p-8 mt-1'>
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
@@ -88,128 +88,96 @@ function GeneratedHistory() {
           )}
 
           {!loading && (
-            <div className='w-full overflow-x-auto'>
-              <div className='min-w-[720px]'>
+            <div className='w-full'>
 
-                {/* ── Quiz Table ── */}
-                {selectedGen === 'Quiz' && (
-                  <>
-                    <div className='hidden md:grid grid-cols-[1.8fr_.5fr_.5fr_.4fr_.4fr_.4fr] gap-4 pb-3 border-b text-gray-500 text-sm font-medium'>
-                      <p>Name</p>
-                      <p className='text-center'>Score</p>
-                      <p className='text-center'>Items</p>
-                      <p className='text-center'>View</p>
-                      <p className='text-center'>Retake</p>
-                      <p className='text-center'>Delete</p>
-                    </div>
+              {/* ── Quiz Table ── */}
+              {selectedGen === 'Quiz' && (
+                <>
+                  <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                    <p>Name</p>
+                    <p className='text-center'>Score</p>
+                    <p className='text-center'>Items</p>
+                    <p className='text-center'>View</p>
+                    <p className='text-center'>Retake</p>
+                    <p className='text-center'>Delete</p>
+                  </div>
 
-                    {filteredQuiz.length === 0 ? (
-                      <p className='text-gray-400 font-roboto text-center py-10'>No quiz history found.</p>
-                    ) : (
-                      filteredQuiz.map((item) => (
-                        <div key={item.id} className='border-b py-4'>
-                          <div className='grid grid-cols-[1.8fr_.5fr_.5fr_.4fr_.4fr_.4fr] gap-4 items-center'>
-                            <div className='min-w-0'>
-                              <p className='text-sm md:text-xl lg:text-2xl font-semibold text-primary-600 whitespace-normal sm:truncate'>
-                                {item.fileName}
-                              </p>
-                              <p className='text-xs md:text-sm text-gray-400'>
-                                {formatDate(item.dateTaken)}
-                              </p>
-                            </div>
-
-                            <p className='text-center text-lg text-primary-600'>
-                              {item.score}
+                  {filteredQuiz.length === 0 ? (
+                    <p className='text-gray-400 font-roboto text-center py-10'>No quiz history found.</p>
+                  ) : (
+                    filteredQuiz.map((item) => (
+                      <div key={item.id} className='border-b py-3'>
+                        <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
+                          <div className='min-w-0'>
+                            <p className='text-xs md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
+                              {item.fileName}
                             </p>
-
-                            <p className='text-center text-lg text-primary-600'>
-                              {item.total}
-                            </p>
-
-                            <div className='flex justify-center'>
-                              <img
-                                src='/View.png'
-                                alt='View'
-                                className='w-6 h-6 cursor-pointer hover:opacity-70'
-                              />
-                            </div>
-
-                            <div className='flex justify-center'>
-                              <img
-                                src='/Retake.png'
-                                alt='Retake'
-                                className='w-6 h-6 cursor-pointer hover:opacity-70'
-                              />
-                            </div>
-
-                            <div className='flex justify-center'>
-                              <img
-                                src='/delete.png'
-                                alt='Delete'
-                                className='w-6 h-6 cursor-pointer hover:opacity-70'
-                                onClick={() => setDeleteConfirmId(item.id)}
-                              />
-                            </div>
+                            <p className='text-xs  md:text-sm text-gray-400'>{formatDate(item.dateTaken)}</p>
+                          </div>
+                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.score}</p>
+                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
+                          <div className='flex justify-center'>
+                            <img src='/View.png' alt='View' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                          </div>
+                          <div className='flex justify-center'>
+                            <img src='/Retake.png' alt='Retake' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                          </div>
+                          <div className='flex justify-center'>
+                            <img
+                              src='/delete.png'
+                              alt='Delete'
+                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              onClick={() => setDeleteConfirmId(item.id)}
+                            />
                           </div>
                         </div>
-                      ))
-                    )}
-                  </>
-                )}
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
 
-                {/* ── Flashcard Table ── */}
-                {selectedGen === 'Flashcard' && (
-                  <>
-                    <div className='grid grid-cols-[2fr_.7fr_.5fr_.5fr] gap-4 pb-3 border-b text-gray-500 text-sm font-medium'>
-                      <p>Name</p>
-                      <p className='text-center'>Items</p>
-                      <p className='text-center'>View</p>
-                      <p className='text-center'>Delete</p>
-                    </div>
+              {/* ── Flashcard Table ── */}
+              {selectedGen === 'Flashcard' && (
+                <>
+                  <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                    <p>Name</p>
+                    <p className='text-center'>Items</p>
+                    <p className='text-center'>View</p>
+                    <p className='text-center'>Delete</p>
+                  </div>
 
-                    {filteredFlashcard.length === 0 ? (
-                      <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
-                    ) : (
-                      filteredFlashcard.map((item) => (
-                        <div key={item.id} className='border-b py-4'>
-                          <div className='grid grid-cols-[2fr_.7fr_.5fr_.5fr] gap-4 items-center'>
-                            <div>
-                              <p className='text-sm md:text-xl lg:text-2xl font-semibold text-primary-600 whitespace-normal sm:truncate'>
-                                {item.fileName}
-                              </p>
-                              <p className='text-sm text-gray-400'>
-                                {formatDate(item.dateSaved)}
-                              </p>
-                            </div>
-
-                            <p className='text-center text-lg text-primary-600'>
-                              {item.total}
+                  {filteredFlashcard.length === 0 ? (
+                    <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
+                  ) : (
+                    filteredFlashcard.map((item) => (
+                      <div key={item.id} className='border-b py-3'>
+                        <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
+                          <div className='min-w-0'>
+                            <p className='text-xs  md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
+                              {item.fileName}
                             </p>
-
-                            <div className='flex justify-center'>
-                              <img
-                                src='/View.png'
-                                alt='View'
-                                className='w-6 h-6 cursor-pointer hover:opacity-70'
-                              />
-                            </div>
-
-                            <div className='flex justify-center'>
-                              <img
-                                src='/delete.png'
-                                alt='Delete'
-                                className='w-6 h-6 cursor-pointer hover:opacity-70'
-                                onClick={() => setDeleteConfirmId(item.id)}
-                              />
-                            </div>
+                            <p className='text-xs md:text-sm lg:text-sm   text-gray-400'>{formatDate(item.dateSaved)}</p>
+                          </div>
+                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
+                          <div className='flex justify-center'>
+                            <img src='/View.png' alt='View' className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70' />
+                          </div>
+                          <div className='flex justify-center'>
+                            <img
+                              src='/delete.png'
+                              alt='Delete'
+                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              onClick={() => setDeleteConfirmId(item.id)}
+                            />
                           </div>
                         </div>
-                      ))
-                    )}
-                  </>
-                )}
+                      </div>
+                    ))
+                  )}
+                </>
+              )}
 
-              </div>
             </div>
           )}
 
