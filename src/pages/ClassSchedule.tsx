@@ -141,7 +141,7 @@ function ClassSchedule() {
                   </div>
                 </div>
 
-                <p className='text-[18px] font-roboto font-medium text-primary-600'>
+                <p className='text-[18px] font-roboto  text-primary-600'>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
                 <p className='text-sm text-gray-600'>{s.instructor}</p>

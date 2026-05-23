@@ -105,38 +105,23 @@ TEXT:
 ${textSample}`
       }
 
-      // ── Call Groq and capture token usage ───────────────────────────────
-      const { text: aiResponse, usage } = await callGroq(prompt, apiKey)
+      // ── Call Groq and capture token usage + remaining budget ─────────────
+      const { text: aiResponse, usage, remainingTokens } = await callGroq(prompt, apiKey)
       console.log(`[Token Usage] prompt: ${usage.prompt_tokens} | completion: ${usage.completion_tokens} | total: ${usage.total_tokens}`)
-      // 👇 Add this temporarily to debug
-      console.log('[AI Raw Response]', aiResponse.slice(0, 500))
+      console.log(`[Remaining Tokens from Groq] ${remainingTokens}`)
 
       let items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
-
-      // 👇 Add this too
       console.log(`[Parsed Items Count] ${items.length}`)
 
-
-      // ── Background verification (only if enough token budget remains) ───
-      const tokensUsed = usage.total_tokens
-      const TOKEN_LIMIT = 6000
-      const tokensRemaining = TOKEN_LIMIT - tokensUsed
-
-      // Skip verification if items is empty (prevents the wasted 429 call)
-      if (tokensRemaining > 1500 && items.length > 0) {
+      // ── Verify only if enough token headroom remains ──────────────────────
+      if (remainingTokens > 2000 && items.length > 0) {
         try {
           items = await verifyItems(items, mode, apiKey)
         } catch (verifyErr) {
           console.warn('[Verify] Skipped due to error:', verifyErr)
         }
-      }
-
-      if (tokensRemaining > 1500) {
-        try {
-          items = await verifyItems(items, mode, apiKey)
-        } catch (verifyErr) {
-          console.warn('[Verify] Skipped due to error:', verifyErr)
-        }
+      } else {
+        console.warn(`[Verify] Skipped — only ${remainingTokens} tokens remaining`)
       }
 
       if (mode === 'quiz') {
@@ -153,7 +138,7 @@ ${textSample}`
   }
 )
 
-// ── Helpers (outside the request handler) ─────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: string; mode: 'quiz' | 'flashcard'; numItems: number }> {
   return new Promise((resolve, reject) => {

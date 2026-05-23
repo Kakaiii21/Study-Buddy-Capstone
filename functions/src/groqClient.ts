@@ -12,7 +12,9 @@ export interface GroqUsage {
 export interface GroqResult {
   text: string
   usage: GroqUsage
+  remainingTokens: number
 }
+
 
 export async function callGroq(
   prompt: string,
@@ -44,5 +46,9 @@ export async function callGroq(
     total_tokens: response.data?.usage?.total_tokens ?? 0,
   }
 
-  return { text: content, usage }
-}
+  const remainingTokens = parseInt(
+    response.headers['x-ratelimit-remaining-tokens'] ?? '6000'
+  )
+ 
+  return { text: content, usage, remainingTokens }
+ }
