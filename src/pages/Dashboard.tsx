@@ -98,8 +98,8 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* Stats Row */}
-              <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 mx-28 mb-6'>
+              {/* Stats Row */};
+              <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 mx-6 lg:mx-28 md:mx-24 mb-6'>
 
 {/* Current Time Spent */}
               <div className='col-span-1 lg:col-span-2 lg:justify-center p-3 border-2 border-primary-600 rounded-xl flex items-center gap-3'>
