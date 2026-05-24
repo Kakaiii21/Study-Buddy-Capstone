@@ -59,17 +59,34 @@ function Courses() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
 
+  const [folderError, setFolderError] = useState('')
+  const [editError, setEditError] = useState('')
+
   const navigate = useNavigate()
 
   const handleSave = async () => {
-    if (folderName.trim() === '') return
+    if (folderName.trim() === '') {
+      setFolderError('Please enter a folder name.')
+      return
+    }
+
+    const isDuplicate = courses.some(
+      (c) => c.name.toLowerCase() === folderName.trim().toLowerCase()
+    )
+    if (isDuplicate) {
+      setFolderError('A folder with that name already exists.')
+      return
+    }
+
     await addCourse(folderName.trim())
     setFolderName('')
+    setFolderError('')
     setShowModal(false)
   }
 
   const handleClose = () => {
     setFolderName('')
+    setFolderError('')
     setShowModal(false)
   }
 
@@ -86,16 +103,30 @@ function Courses() {
   }
 
   const handleEditSave = async () => {
-    if (!editingId || editName.trim() === '') return
+    if (!editingId || editName.trim() === '') {
+      setEditError('Please enter a folder name.')
+      return
+    }
+
+    const isDuplicate = courses.some(
+      (c) => c.id !== editingId && c.name.toLowerCase() === editName.trim().toLowerCase()
+    )
+    if (isDuplicate) {
+      setEditError('A folder with that name already exists.')
+      return
+    }
+
     await updateCourse(editingId, editName.trim())
     setEditingId(null)
     setEditName('')
+    setEditError('')
     setShowEditModal(false)
   }
 
   const handleEditClose = () => {
     setEditingId(null)
     setEditName('')
+    setEditError('')
     setShowEditModal(false)
   }
 
@@ -127,13 +158,13 @@ function Courses() {
               Loading courses...
             </div>
           ) : (
-            <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3 md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
+            <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
               {courses.length === 0 ? (
-                <div className='col-span-2 md:col-span-3 lg:col-span-3 flex items-center justify-center py-20'>
-                  <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
-                    No folders yet. Click <span className='text-primary-600 font-bold'>+ Course Folder</span> to create one.
-                  </p>
-                </div>
+              <div className='col-span-2 md:col-span-3 lg:col-span-5 flex items-center justify-center py-20 w-full'>
+                <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
+                  No folders yet. Click <span className='text-primary-600 font-bold'>+ Course Folder</span> to create one.
+                </p>
+              </div>
               ) : (
                 courses.map((course) => (
                   <div key={course.id} className='max-w-36 md:max-w-52   lg:max-w-52'>
@@ -211,18 +242,22 @@ function Courses() {
                   type='text'
                   maxLength={20}
                   value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
+                  onChange={(e) => { setFolderName(e.target.value); setFolderError('') }}
                   onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                   placeholder='Enter folder name'
-                  className='flex-1 border border-gray-300 rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none focus:border-primary-600'
+                  className={`flex-1 border rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none ${
+                    folderError ? 'border-red-400' : 'border-gray-300'
+                  }`}
                 />
-                <button
-                  onClick={handleSave}
-                  className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'
-                >
+                <button onClick={handleSave} className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'>
                   <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert hover:invert-0' />
                 </button>
               </div>
+
+              {/* ← Add this below the input row */}
+              {folderError && (
+                <p className='text-red-300 text-sm font-semibold -mt-3'>{folderError}</p>
+              )}
             </div>
           </div>
         )}
@@ -239,23 +274,27 @@ function Courses() {
                   Edit Course
                 </p>
               </div>
-              <div className='flex flex-row w-full gap-2'>
-                <input
-                  autoFocus
-                  type='text'
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
-                  placeholder='Enter folder name'
-                  className='flex-1 border border-gray-300 rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none focus:border-primary-600'
-                />
-                <button
-                  onClick={handleEditSave}
-                  className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'
-                >
-                  <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert' />
-                </button>
-              </div>
+                <div className='flex flex-row w-full gap-2'>
+                  <input
+                    autoFocus
+                    type='text'
+                    value={editName}
+                    onChange={(e) => { setEditName(e.target.value); setEditError('') }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
+                    placeholder='Enter folder name'
+                    className={`flex-1 border rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none ${
+                      editError ? 'border-red-400' : 'border-gray-300'
+                    }`}
+                  />
+                  <button onClick={handleEditSave} className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'>
+                    <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert' />
+                  </button>
+                </div>
+
+                {/* ← Add this below the input row */}
+                {editError && (
+                  <p className='text-red-300 text-sm font-semibold -mt-3'>{editError}</p>
+                )}
             </div>
           </div>
         )}

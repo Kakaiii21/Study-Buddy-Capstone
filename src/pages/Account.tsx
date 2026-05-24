@@ -41,23 +41,28 @@ function Account() {
   }, [user])
 
   // ─── Save a single field to Firestore ────────────────────────────────────
-  const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
-    if (!user) return
-    setSaving(field)
-    try {
-      const value =
-        field === 'firstName' ? firstName :
-        field === 'lastName'  ? lastName  : email
-      await updateDoc(doc(db, 'users', user.uid), { [field]: value })
-      const label = field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : 'Email'
-      showToast(`${label} updated successfully!`)
-    } catch (err) {
-      console.error(`Failed to save ${field}:`, err)
-      showToast('Failed to save. Please try again.')
-    } finally {
-      setSaving(null)
-    }
+const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
+  if (!user) return
+  setSaving(field)
+  try {
+    const value =
+      field === 'firstName' ? firstName :
+      field === 'lastName'  ? lastName  : email
+    await updateDoc(doc(db, 'users', user.uid), { [field]: value })
+
+    // ← Add this: keep sessionStorage in sync
+    if (field === 'firstName') sessionStorage.setItem('firstName', firstName)
+    if (field === 'lastName') sessionStorage.setItem('lastName', lastName)
+
+    const label = field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : 'Email'
+    showToast(`${label} updated successfully!`)
+  } catch (err) {
+    console.error(`Failed to save ${field}:`, err)
+    showToast('Failed to save. Please try again.')
+  } finally {
+    setSaving(null)
   }
+}
 
   // ─── Upload profile pic via Cloudinary, save URL to Firestore ────────────
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
