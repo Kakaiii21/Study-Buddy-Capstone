@@ -79,7 +79,7 @@ function RecentlyDeleted() {
                 key={item.id}
                 className='grid grid-cols-[1fr_auto_auto] gap-4 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors'
               >
-                <p className='font-medium text-gray-700 text-xl'>{item.name}</p>
+                <p className='font-medium text-primary-600 text-xl'>{item.name}</p>
 
                 {/* Restore */}
                 <div className='w-16 flex justify-center'>
