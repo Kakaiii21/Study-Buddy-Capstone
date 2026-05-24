@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { collection, onSnapshot, orderBy, query, deleteDoc, doc } from 'firebase/firestore'
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { softDelete } from '../services/recentlyDeletedService'
 import { db } from '../services/firebase'
 import type { User } from 'firebase/auth'
 
@@ -43,11 +44,18 @@ export function useFlashcardHistory(user: User | null) {
 
     return unsubscribe
   }, [user])
-
-  const deleteFlashcard = async (id: string) => {
-    if (!user) return
-    await deleteDoc(doc(db, 'users', user.uid, 'flashcardHistory', id))
-  }
+    const deleteFlashcard = async (id: string) => {
+      if (!user) return
+      const item = state.flashcardHistory.find((f) => f.id === id)
+      if (!item) return
+      await softDelete(user.uid, {
+        name: item.fileName,
+        type: 'Flashcard',
+        originalCollection: `users/${user.uid}/flashcardHistory`,
+        originalDocId: id,
+        data: { ...item, dateSaved: item.dateSaved.toISOString() },
+      })
+    }
 
   return { ...state, deleteFlashcard }
 }

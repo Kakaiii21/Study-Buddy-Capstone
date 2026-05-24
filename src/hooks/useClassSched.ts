@@ -1,10 +1,10 @@
 // hooks/useClassSched.ts
 import { useState, useEffect } from 'react'
+import { softDelete } from '../services/recentlyDeletedService'
 import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -88,8 +88,15 @@ export function useClassSched(user: User | null) {
 
   async function deleteSchedule(scheduleId: string) {
     if (!user) return
-    const schedRef = doc(db, 'users', user.uid, 'schedules', scheduleId)
-    await deleteDoc(schedRef)
+    const schedule = schedules.find((s) => s.id === scheduleId)
+    if (!schedule) return
+    await softDelete(user.uid, {
+      name: schedule.subject,
+      type: 'Class Schedule',
+      originalCollection: `users/${user.uid}/schedules`,
+      originalDocId: scheduleId,
+      data: { ...schedule },
+    })
   }
 
   return { schedules, loading, addSchedule, updateSchedule, deleteSchedule }

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
+import { softDelete } from '../services/recentlyDeletedService'
 import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -11,6 +11,8 @@ import {
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
+
+
 
 export interface Note {
   id: string
@@ -60,17 +62,26 @@ export function useNotes(user: User | null) {
     })
   }
 
+  // Notes example
+async function deleteNote(noteId: string) {
+  if (!user) return
+  const note = notes.find((n) => n.id === noteId)
+  if (!note) return
+  await softDelete(user.uid, {
+    name: note.title,         // ← change to your name field
+    type: 'Notes',            // ← change per hook
+    originalCollection: `users/${user.uid}/notes`, // ← change path
+    originalDocId: noteId,
+    data: { ...note },
+  })
+}
   async function updateNote(noteId: string, fields: Partial<Pick<Note, 'title' | 'subject' | 'content'>>) {
     if (!user) return
     const noteRef = doc(db, 'users', user.uid, 'notes', noteId)
     await updateDoc(noteRef, fields)
   }
 
-  async function deleteNote(noteId: string) {
-    if (!user) return
-    const noteRef = doc(db, 'users', user.uid, 'notes', noteId)
-    await deleteDoc(noteRef)
-  }
+
 
   return { notes, loading, addNote, updateNote, deleteNote }
 }

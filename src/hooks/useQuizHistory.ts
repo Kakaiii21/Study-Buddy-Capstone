@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { collection, onSnapshot, orderBy, query, deleteDoc, doc } from 'firebase/firestore'
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { softDelete } from '../services/recentlyDeletedService'
 import { db } from '../services/firebase'
 import type { User } from 'firebase/auth'
 
@@ -48,7 +49,15 @@ export function useQuizHistory(user: User | null) {
 
   const deleteQuiz = async (id: string) => {
     if (!user) return
-    await deleteDoc(doc(db, 'users', user.uid, 'quizHistory', id))
+    const item = state.quizHistory.find((q) => q.id === id)
+    if (!item) return
+    await softDelete(user.uid, {
+      name: item.fileName,
+      type: 'Quiz',
+      originalCollection: `users/${user.uid}/quizHistory`,
+      originalDocId: id,
+      data: { ...item, dateTaken: item.dateTaken.toISOString() },
+    })
   }
 
   return { ...state, deleteQuiz }

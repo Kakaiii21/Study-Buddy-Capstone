@@ -3,7 +3,6 @@ import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -11,6 +10,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
+import { softDelete } from '../services/recentlyDeletedService'
 
 export type Status = 'todo' | 'in-progress' | 'done'
 
@@ -76,8 +76,16 @@ export function useTasks(user: User | null) {
 
   async function deleteTask(taskId: string) {
     if (!user) return
-    const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
-    await deleteDoc(taskRef)
+    const task = tasks.find((t) => t.id === taskId)
+    if (!task) return
+
+    await softDelete(user.uid, {
+      name: task.name,
+      type: 'To Do',
+      originalCollection: `users/${user.uid}/tasks`,
+      originalDocId: taskId,
+      data: { ...task },
+    })
   }
 
   return { tasks, loading, addTask, updateTask, updateTaskStatus, deleteTask }

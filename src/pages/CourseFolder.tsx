@@ -36,7 +36,37 @@ function TxtPreview({ url }: { url: string }) {
     </pre>
   )
 }
+
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <span className='text-2xl'>🗑️</span>
+          <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+            Cancel
+          </button>
+          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
+            Move to Trash
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 function CourseFolder() {
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
+
   const { user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -128,9 +158,10 @@ function CourseFolder() {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    await deleteCourseFile(id)
-    setActiveFileMenu(null)
+  async function handleDelete() {
+    if (!pendingDelete) return
+    await deleteCourseFile(pendingDelete.id)
+    setPendingDelete(null)
   }
 
   const handleEdit = (id: string) => {
@@ -354,7 +385,7 @@ const filteredFiles =
                         </button>
                         <hr className='my-1 border-gray-100' />
                         <button
-                          onClick={() => handleDelete(file.id)}
+                          onClick={() => { setPendingDelete({ id: file.id, name: file.fileName }); setActiveFileMenu(null) }}
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                         >
                           <img src='/delete.png' alt='delete icon' className='w-5 h-5' /> Delete
@@ -383,10 +414,13 @@ const filteredFiles =
                   + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
                 </p>
               </div>
+              
             </div>
           )}
+          
         </div>
       </main>
+
 
       {/* File Preview Modal */}
       {previewFile && (
@@ -503,6 +537,14 @@ const filteredFiles =
           </div>
         </div>
       )}
+            {pendingDelete && (
+            <SoftDeleteModal
+              itemName={pendingDelete.name}
+              onConfirm={handleDelete}
+              onCancel={() => setPendingDelete(null)}
+            />
+          )}
+      
 
       {/* Edit Filename Modal */}
       {showEditModal && (

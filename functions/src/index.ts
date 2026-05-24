@@ -5,6 +5,8 @@ import axios from 'axios'
 import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
+import { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
+
 
 admin.initializeApp()
 

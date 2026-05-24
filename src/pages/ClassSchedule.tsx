@@ -3,6 +3,34 @@ import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useClassSched } from '../hooks/useClassSched'
 
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <span className='text-2xl'>🗑️</span>
+          <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+            Cancel
+          </button>
+          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
+            Move to Trash
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ClassSchedule() {
   const { user } = useAuth()
   const { schedules, loading, addSchedule, updateSchedule, deleteSchedule } = useClassSched(user)
@@ -16,10 +44,9 @@ function ClassSchedule() {
   const [roomAssigned, setRoomAssigned] = useState('')
   const [instructor, setInstructor] = useState('')
   const [formError, setFormError] = useState('')
-
   const [menuOpenIndex, setMenuOpenIndex] = useState<string | null>(null)
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [editTargetId, setEditTargetId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const typeRoom = ['Lecture', 'Laboratory']
@@ -74,6 +101,12 @@ function ClassSchedule() {
     resetForm()
   }
 
+  async function handleDelete() {
+    if (!pendingDelete) return
+    await deleteSchedule(pendingDelete.id)
+    setPendingDelete(null)
+  }
+
   const handleEditOpen = (s: { id: string; day: string; subject: string; timeStart: string; timeEnd: string; room: string; roomType: string; instructor: string }) => {
     setSelectedDay(s.day)
     setSubjectName(s.subject)
@@ -87,16 +120,9 @@ function ClassSchedule() {
     setIsAddSubOpen(true)
   }
 
-  const handleDelete = async () => {
-    if (!deleteConfirmId) return
-    await deleteSchedule(deleteConfirmId)
-    setDeleteConfirmId(null)
-  }
-
   const byDay = (day: string) =>
     schedules.filter(s => s.day === day).sort((a, b) => a.timeStart.localeCompare(b.timeStart))
 
-  // Reusable schedule card per day
   const DayCard = ({ day }: { day: string }) => {
     const daySchedules = byDay(day)
     return (
@@ -109,10 +135,9 @@ function ClassSchedule() {
                 <div className='flex flex-row'>
                   <p className='text-[20px] font-roboto font-bold text-primary-600'>{s.subject}</p>
 
-                  {/* 3-dot menu */}
                   <div data-note-menu className='relative ml-auto'>
                     <button
-                    title='More Options'
+                      title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
                       <img src="subM.png" alt="menu" className='h-[5px] w-[28px]' />
@@ -124,15 +149,18 @@ function ClassSchedule() {
                         <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
                           <button
                             onClick={() => handleEditOpen(s)}
-                              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                            >
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          >
                             <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
-                            </button>
-                            <hr className='my-1 border-gray-100' />
+                          </button>
+                          <hr className='my-1 border-gray-100' />
                           <button
-                            onClick={() => { setDeleteConfirmId(s.id); setMenuOpenIndex(null) }}
+                            onClick={() => {
+                              setMenuOpenIndex(null)
+                              setPendingDelete({ id: s.id, name: s.subject })
+                            }}
                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
-                            >
+                          >
                             <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
                           </button>
                         </div>
@@ -141,7 +169,7 @@ function ClassSchedule() {
                   </div>
                 </div>
 
-                <p className='text-[18px] font-roboto  text-primary-600'>
+                <p className='text-[18px] font-roboto text-primary-600'>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
                 <p className='text-sm text-gray-600'>{s.instructor}</p>
@@ -162,10 +190,9 @@ function ClassSchedule() {
         <div className='min-h-screen flex flex-col items-center justify-start'>
 
           {/* Header */}
-          <div className='flex flex-col  md:flex-row lg:flex-row justify-between items-center w-full'>
+          <div className='flex flex-col md:flex-row lg:flex-row justify-between items-center w-full'>
             <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
-            <hr className='lg:hidden w-full border-t mt-3 border-primary-600 ' />
-
+            <hr className='lg:hidden w-full border-t mt-3 border-primary-600' />
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
               className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-4 mt-2 md:mt-0 lg:mt-0 px-8 text-white uppercase font-roboto text-sm rounded-md'
@@ -173,7 +200,7 @@ function ClassSchedule() {
               + Add Schedule
             </button>
           </div>
-<hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
+          <hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 
           {/* Add / Edit Modal */}
           {isAddSubOpen && (
@@ -186,9 +213,7 @@ function ClassSchedule() {
                 <div className='flex flex-row gap-2 w-full'>
                   <div className='flex-1 flex flex-col'>
                     <label className='text-white text-md font-roboto font-medium mb-1'>DAY</label>
-                    <select
-                    aria-label='Select Day'
-                    value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className='border rounded-md px-3 py-2 w-full'>
+                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className='border rounded-md px-3 py-2 w-full'>
                       <option value='' disabled>Select a day</option>
                       {days.map((day) => <option key={day} value={day}>{day}</option>)}
                     </select>
@@ -221,9 +246,7 @@ function ClassSchedule() {
                   </div>
                   <div className='flex-1 flex flex-col'>
                     <label className='text-white text-md uppercase font-roboto mb-1'>Room Type</label>
-                    <select
-                    aria-label='Select Day'
-                    value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className='border rounded-md py-2 px-3 w-full'>
+                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className='border rounded-md py-2 px-3 w-full'>
                       <option value='' disabled>Select type</option>
                       {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
                     </select>
@@ -264,24 +287,13 @@ function ClassSchedule() {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
-        {deleteConfirmId && (
-          <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
-            <div className='bg-white rounded-lg p-6 w-full max-w-sm mx-5 shadow-lg'>
-              <h2 className='text-xl font-bold font-roboto text-primary-600 text-center mb-2'>Delete Schedule</h2>
-              <p className='text-center text-gray-600 font-roboto mb-6'>Are you sure you want to delete this class?</p>
-              <div className='flex flex-row justify-center gap-6'>
-                <button onClick={() => setDeleteConfirmId(null)}
-                  className='bg-gray-200 text-primary-600 uppercase font-bold font-roboto px-8 rounded-full py-1'>
-                  Cancel
-                </button>
-                <button onClick={handleDelete}
-                  className='bg-red-500 text-white uppercase font-bold font-roboto px-8 rounded-full py-1'>
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
+        {/* Soft Delete Modal — rendered at root level, outside DayCard */}
+        {pendingDelete && (
+          <SoftDeleteModal
+            itemName={pendingDelete.name}
+            onConfirm={handleDelete}
+            onCancel={() => setPendingDelete(null)}
+          />
         )}
       </main>
     </div>

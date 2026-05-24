@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
+import { softDelete } from '../services/recentlyDeletedService'
 import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
   onSnapshot,
   query,
   orderBy,
+  getDocs,      
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
@@ -64,8 +65,33 @@ export function useCourses(user: User | null) {
 
   async function deleteCourse(courseId: string) {
     if (!user) return
-    const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
-    await deleteDoc(courseRef)
+    const course = courses.find((c) => c.id === courseId)
+    if (!course) return
+
+    // Soft-delete all files inside the folder first
+    const filesRef = collection(db, 'users', user.uid, 'courses', courseId, 'files')
+    const snapshot = await getDocs(filesRef)
+    await Promise.all(
+      snapshot.docs.map((fileDoc) => {
+        const fileData = fileDoc.data()
+        return softDelete(user.uid, {
+          name: fileData.fileName,
+          type: 'Course',
+          originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+          originalDocId: fileDoc.id,
+          data: { ...fileData, id: fileDoc.id },
+        })
+      })
+    )
+
+    // Then soft-delete the folder itself
+    await softDelete(user.uid, {
+      name: course.name,
+      type: 'Course',
+      originalCollection: `users/${user.uid}/courses`,
+      originalDocId: courseId,
+      data: { ...course },
+    })
   }
 
   return { courses, loading, addCourse, updateCourse, deleteCourse }

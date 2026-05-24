@@ -15,14 +15,46 @@ function formatDate(date: Date): string {
   })
 }
 
+// paste this ONCE anywhere above your return()
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <span className='text-2xl'>🗑️</span>
+          <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+            Cancel
+          </button>
+          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
+            Move to Trash
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
 function GeneratedHistory() {
+
+
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
 
   
   const { user } = useAuth()
   const navigate = useNavigate()
   const [selectedGen, setSelectedGen] = useState('Quiz')
   const [searchQuery, setSearchQuery] = useState('')
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const { quizHistory, loading: quizLoading, deleteQuiz } = useQuizHistory(user)
   const { flashcardHistory, loading: flashLoading, deleteFlashcard } = useFlashcardHistory(user)
@@ -38,10 +70,11 @@ function GeneratedHistory() {
     item.fileName.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleDelete = async (id: string) => {
-    if (selectedGen === 'Quiz') await deleteQuiz(id)
-    else await deleteFlashcard(id)
-    setDeleteConfirmId(null)
+  const handleDelete = async () => {
+    if (!pendingDelete) return
+    if (selectedGen === 'Quiz') await deleteQuiz(pendingDelete.id)
+    else await deleteFlashcard(pendingDelete.id)
+    setPendingDelete(null)
   }
 
   // ── Navigate to QuizView with all saved data ──
@@ -189,7 +222,8 @@ function GeneratedHistory() {
                               src='/delete.png'
                               alt='Delete'
                               className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
-                              onClick={() => setDeleteConfirmId(item.id)}
+                              onClick={() => setPendingDelete({ id: item.id, name: item.fileName })}
+
                             />
                           </div>
                         </div>
@@ -235,7 +269,8 @@ function GeneratedHistory() {
                               src='/delete.png'
                               alt='Delete'
                               className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
-                              onClick={() => setDeleteConfirmId(item.id)}
+                              onClick={() => setPendingDelete({ id: item.id, name: item.fileName })}
+
                             />
                           </div>
                         </div>
@@ -249,35 +284,17 @@ function GeneratedHistory() {
           )}
 
         </div>
+              {/* ── Delete Confirm Modal ── */}
+{pendingDelete && (
+  <SoftDeleteModal
+    itemName={pendingDelete.name}
+    onConfirm={handleDelete}
+    onCancel={() => setPendingDelete(null)}
+  />
+)}
       </main>
 
-      {/* ── Delete Confirm Modal ── */}
-      {deleteConfirmId && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
-            <p className='text-primary-600 font-roboto font-bold text-xl text-center uppercase'>
-              Delete this item?
-            </p>
-            <p className='text-gray-400 font-roboto text-sm text-center'>
-              This action cannot be undone.
-            </p>
-            <div className='flex flex-row w-full gap-3'>
-              <button
-                onClick={() => setDeleteConfirmId(null)}
-                className='flex-1 border-2 border-primary-600 text-primary-600 font-roboto py-2.5 rounded-lg hover:bg-primary-50 transition uppercase font-semibold text-sm'
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteConfirmId)}
-                className='flex-1 bg-red-500 text-white font-roboto py-2.5 rounded-lg hover:opacity-80 transition uppercase font-semibold text-sm'
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }

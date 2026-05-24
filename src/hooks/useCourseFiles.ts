@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
+import { softDelete } from '../services/recentlyDeletedService'
 import {
   collection,
   addDoc,
   updateDoc,
-  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -76,11 +76,17 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     await updateDoc(fileRef, { fileName: newFileName.trim() })
   }
 
-  async function deleteCourseFile(fileId: string) {
-    if (!user || !courseId) return
-    const fileRef = doc(db, 'users', user.uid, 'courses', courseId, 'files', fileId)
-    await deleteDoc(fileRef)
-  }
-
+async function deleteCourseFile(fileId: string) {
+  if (!user || !courseId) return
+  const file = files.find((f) => f.id === fileId)
+  if (!file) return
+  await softDelete(user.uid, {
+    name: file.fileName,
+    type: 'Course',
+    originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+    originalDocId: fileId,
+    data: { ...file },
+  })
+}
   return { files, loading, addCourseFile, renameCourseFile, deleteCourseFile }
 }
