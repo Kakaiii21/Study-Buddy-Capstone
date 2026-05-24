@@ -21,7 +21,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <span className='text-2xl'>🗑️</span>
+          <img src="/delete.png" alt="delteicon" className='w-7 h-7' />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>

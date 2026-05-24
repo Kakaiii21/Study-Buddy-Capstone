@@ -22,6 +22,7 @@ import Quiz from './pages/StudyGenerator/Quiz'
 import Flashcard from './pages/StudyGenerator/Flashcard'
 import QuizView from './pages/StudyGenerator/QuizView'
 import FlashcardView from './pages/StudyGenerator/FlashcardView'
+import ChangePassword from './pages/ChangePassword'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,14 @@ const router = createBrowserRouter([
   {
     path: '/forgotPassword',
     element: <ForgotPassword />,
+  },
+    {
+    path: '/changePassword',
+    element:(
+      <ProtectedRoute>
+       <ChangePassword />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/dashboard',
