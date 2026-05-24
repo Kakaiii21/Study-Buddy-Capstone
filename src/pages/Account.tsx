@@ -140,7 +140,7 @@ const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
               </button>
             </div>
 
-            <div className='w-full px-8 my-8 mt-10'>
+            <div className='w-full  my-8 mt-10'>
               <div className='flex items-center gap-3'>
                 <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
                   Account Settings

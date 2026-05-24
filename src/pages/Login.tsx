@@ -96,7 +96,8 @@ const handleLogin = async () => {
           />
 
           <div className='flex justify-end'>
-            <button className='mb-8 text-sm text-primary-600 font-bold hover:underline'>FORGOT PASSWORD</button>
+            <button className='mb-8 text-sm text-primary-600 font-bold hover:underline'
+            onClick={()=>navigate('/forgotPassword')}>FORGOT PASSWORD</button>
           </div>
 
           <button

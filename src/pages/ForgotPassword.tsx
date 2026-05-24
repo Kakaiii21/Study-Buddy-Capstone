@@ -1,31 +1,91 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
 
 function ForgotPassword() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSendLink = async () => {
+    setError('')
+    setSuccess('')
+
+    if (!email) {
+      setError('Please enter your email.')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const auth = getAuth()
+      await sendPasswordResetEmail(auth, email)
+      setSuccess('Password reset link sent! Check your inbox.')
+      setEmail('')
+    } catch (err) {
+      const e = err as { code: string }
+      if (e.code === 'auth/user-not-found') {
+        setError('No account found with this email.')
+      } else if (e.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.')
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className='h-screen w-full '>
-      <div className='flex flex-row  mt-3 ml-5 ' >
-        <button className='flex flex-row  justify-start  gap-2 items-center hover:opacity-60'
-        title='Go Back'>
+    <div className='h-screen w-full'>
+      <div className='flex flex-row mt-3 ml-5'>
+        <button
+          onClick={() => navigate('/login')}
+          className='flex flex-row justify-start gap-2 items-center hover:opacity-60'
+          title='Go Back'
+        >
           <img src="/back.png" alt="backbutton" className='w-10 h-10' />
           <p className='font-roboto font-bold text-primary-600 text-2xl'>Back</p>
         </button>
       </div>
 
-      {/*img*/}
-      <div className=' flex flex-col justify-center items-center'>
+      <div className='flex flex-col justify-center items-center'>
         <img src="logo.png" alt="" className='w-64 h-44' />
-        {/*forgot pass con*/}
-        <div className='flex flex-col border-2 border-primary-600 rounded-xl w-[850px] h-[300px] mt-10 gap-10  justify-start items-center'>
-          <p className='font-roboto font-bold  mt-10 text-primary-600 uppercase text-3xl'>Change Password</p>
 
-          <div>
-            <p className='font-roboto font-bold text-primary-600  text-md'>Email</p>
-          <input type="email" placeholder='Enter Your email' className='w-80  px-3 py-2 border border-primary-600 rounded-md' />
+        <div className='flex flex-col border-2 border-primary-600 rounded-xl w-[90%] lg:w-[850px] mt-10 gap-6 justify-start items-center px-5 py-10'>
+          <p className='font-roboto font-bold text-primary-600 uppercase text-2xl lg:text-3xl'>
+            Forgot Password
+          </p>
+
+          <p className='text-gray-500 text-sm text-center max-w-md'>
+            Enter your email and we'll send you a link to reset your password.
+          </p>
+
+          {error && <p className='text-red-500 text-sm font-semibold'>{error}</p>}
+          {success && <p className='text-green-500 text-sm font-semibold text-center'>{success}</p>}
+
+          <div className='w-full max-w-sm'>
+            <p className='font-roboto font-bold text-primary-600 text-md mb-1'>Email</p>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError('') }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendLink()}
+              placeholder='Enter your email'
+              className='w-full px-3 py-2 border border-primary-600 rounded-md focus:outline-none'
+            />
           </div>
-
         </div>
 
-        {/*Send Link Button*/}
-        <button className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 mt-10 rounded-md uppercase'>Send Link</button>
+        <button
+          onClick={handleSendLink}
+          disabled={loading}
+          className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 mt-10 rounded-md uppercase disabled:opacity-50'
+        >
+          {loading ? 'Sending...' : 'Send Link'}
+        </button>
       </div>
     </div>
   )
