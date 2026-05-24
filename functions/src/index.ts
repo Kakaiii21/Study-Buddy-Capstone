@@ -5,7 +5,6 @@ import axios from 'axios'
 import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
-import { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
 
 
 admin.initializeApp()
@@ -217,3 +216,4 @@ ${JSON.stringify(items)}`
 
   return parsed
 }
+export { deleteCloudinaryAsset } from './deleteCloudinaryAsset'

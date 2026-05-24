@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import  { useState, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 import { SESSION_KEY_RESULT } from '../StudyGenerator'

@@ -17,18 +17,24 @@ const formatSize = (bytes: number): string => {
 
 export async function uploadToCloudinary(
   file: File,
-  onProgress?: (percent: number) => void
+  onProgress?: (percent: number) => void,
+  userId?: string
 ): Promise<CloudinaryUploadResult> {
   return new Promise((resolve, reject) => {
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
-
     const isImage = ['png', 'jpg', 'jpeg'].includes(ext)
     const resourceType = isImage ? 'image' : 'raw'
 
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', UPLOAD_PRESET)
-    formData.append('folder', 'courses')
+
+    if (!userId) {
+      // Courses upload — put in courses folder
+      formData.append('folder', 'courses')
+    }
+    // Profile pic upload — no folder, no public_id, no overwrite
+    // Cloudinary auto-generates URL, we save it to Firestore
 
     const xhr = new XMLHttpRequest()
 
@@ -40,12 +46,6 @@ export async function uploadToCloudinary(
     })
 
     xhr.addEventListener('load', () => {
-      
-      {/*
-      console.log('XHR status:', xhr.status)
-      console.log('XHR response:', xhr.responseText)
-      */}
-      
       if (xhr.status === 200) {
         const data = JSON.parse(xhr.responseText)
         resolve({

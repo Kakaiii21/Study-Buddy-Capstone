@@ -20,19 +20,26 @@ function Dashboard() {
 const latestQuiz = quizHistory[0] ?? null
 
 const [firstName, setFirstName] = useState<string | null>(
-  () => sessionStorage.getItem('firstName')  // load instantly if cached
+  () => sessionStorage.getItem('firstName')
+)
+const [profilePic, setProfilePic] = useState(
+  () => sessionStorage.getItem('profilePic') || '/profile.png'
 )
 
 useEffect(() => {
   if (!user) return
-  // Already cached, no need to fetch again
-  if (sessionStorage.getItem('firstName')) return
+  if (sessionStorage.getItem('firstName') && sessionStorage.getItem('profilePic')) return
+
   const fetchUser = async () => {
     const snap = await getDoc(doc(db, 'users', user.uid))
     if (snap.exists()) {
-      const name = snap.data().firstName || 'Student'
+      const data = snap.data()
+      const name = data.firstName || 'Student'
+      const photo = data.photoURL || '/profile.png'
       setFirstName(name)
+      setProfilePic(photo)
       sessionStorage.setItem('firstName', name)
+      sessionStorage.setItem('profilePic', photo)
     }
   }
   fetchUser()
@@ -45,16 +52,7 @@ useEffect(() => {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
 
-  useEffect(() => {
-    if (!user) return
-    const fetchUser = async () => {
-      const snap = await getDoc(doc(db, 'users', user.uid))
-      if (snap.exists()) {
-        setFirstName(snap.data().firstName || 'Student')
-      }
-    }
-    fetchUser()
-  }, [user])
+
 
   const activities = [
     { label: 'To Do List',     icon: '/ToDo.png',       path: '/todolist'  },
@@ -104,8 +102,8 @@ useEffect(() => {
                     </p>
                   </div>
                   <img
-                    className='h-20 w-20 sm:h-28 sm:w-28 rounded-full object-cover border-2 border-white bg-white'
-                    src="/profile.png"
+                    className='h-32 w-32 sm:h-28 sm:w-28 rounded-full object-cover border-2 border-white bg-white'
+                    src={profilePic}
                     alt="Profile"
                   />
                 </div>

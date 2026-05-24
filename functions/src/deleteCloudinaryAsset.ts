@@ -7,24 +7,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-export const deleteCloudinaryAsset = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'Must be logged in to delete files.')
-  }
+export const deleteCloudinaryAsset = onCall(
+  { cors: true },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Must be logged in to delete files.')
+    }
 
-  const { publicId, resourceType = 'image' } = request.data as {
-    publicId: string
-    resourceType?: 'image' | 'raw' | 'video'
-  }
+    const { publicId, resourceType = 'image' } = request.data as {
+      publicId: string
+      resourceType?: 'image' | 'raw' | 'video'
+    }
 
-  if (!publicId) {
-    throw new HttpsError('invalid-argument', 'publicId is required.')
-  }
+    if (!publicId) {
+      throw new HttpsError('invalid-argument', 'publicId is required.')
+    }
 
-  try {
-    await cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
-    return { success: true }
-  } catch (err) {
-    throw new HttpsError('internal', 'Failed to delete asset from Cloudinary.')
+    try {
+      await cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
+      return { success: true }
+    } catch (err) {
+      throw new HttpsError('internal', 'Failed to delete asset from Cloudinary.')
+    }
   }
-})
+)
