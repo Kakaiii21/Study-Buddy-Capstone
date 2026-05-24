@@ -4,6 +4,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  sendEmailVerification, // ← add this
   type User
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
@@ -22,6 +23,9 @@ export const signup = async (
   await updateProfile(user, {
     displayName: `${firstName} ${lastName}`
   })
+
+  // Send verification email
+  await sendEmailVerification(user) // ← add this
 
   try {
     await setDoc(doc(db, 'users', user.uid), {

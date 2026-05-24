@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
+import { getAuth } from 'firebase/auth'
 
 function Login() {
   const navigate = useNavigate()
@@ -10,35 +11,41 @@ function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async () => {
-    setError('')
+const handleLogin = async () => {
+  setError('')
 
-    // check if fields are filled
-    if (!email || !password) {
-      setError('All fields are required.')
+  if (!email || !password) {
+    setError('All fields are required.')
+    return
+  }
+
+  try {
+    setLoading(true)
+    const user = await login(email, password) // ← capture returned user
+
+    // Block unverified users
+    if (!user.emailVerified) {
+      await getAuth().signOut()
+      setError('Please verify your email first. Check your inbox.')
       return
     }
 
-  try {
-      setLoading(true)
-      await login(email, password)
-      navigate('/dashboard')
-    } catch (err) {
-      const error = err as { code: string }
-      if (error.code === 'auth/invalid-credential') {
-        setError('Invalid email or password.')
-      } else if (error.code === 'auth/user-not-found') {
-        setError('No account found with this email.')
-      } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password.')
-      } else {
-        setError('Something went wrong. Please try again.')
-      }
-    } finally {
-      setLoading(false)
+    navigate('/dashboard')
+  } catch (err) {
+    const error = err as { code: string }
+    if (error.code === 'auth/invalid-credential') {
+      setError('Invalid email or password.')
+    } else if (error.code === 'auth/user-not-found') {
+      setError('No account found with this email.')
+    } else if (error.code === 'auth/wrong-password') {
+      setError('Incorrect password.')
+    } else {
+      setError('Something went wrong. Please try again.')
     }
+  } finally {
+    setLoading(false)
   }
-
+}
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 

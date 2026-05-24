@@ -67,7 +67,7 @@ function App() {
       setSuccess('✅ Account created successfully! Redirecting to login...')
 
       setTimeout(() => {
-        navigate('/login')
+        navigate('/verify-email')
       }, 2000)
 
     } catch (err) {

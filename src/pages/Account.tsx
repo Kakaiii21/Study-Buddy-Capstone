@@ -97,7 +97,7 @@ function Account() {
 
           {/* Header */}
           <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <p className='text-2xl lg:ml-0 md:ml-16 md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+            <p className='text-3xl md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Account
             </p>
           </div>
