@@ -19,64 +19,207 @@ const COLUMNS: { id: Status; label: string }[] = [
   { id: 'done',        label: 'DONE' },
 ]
 
-// ── Date helpers ──────────────────────────────
+function TaskModal({
+  title,
+  initialName,
+  initialDeadline,
+  requireDeadline = false,
+  onSave,
+  onClose,
+}: {
+  title: string
+  initialName: string
+  initialDeadline: string
+  requireDeadline?: boolean
+  onSave: (name: string, deadline: string) => void
+  onClose: () => void
+}) {
+  const nowISO = getNowISO()
+  const todayDate = nowISO.split('T')[0]
+  const calendarRef = useRef<HTMLInputElement>(null)
 
-function getToday(): string {
-  return new Date().toISOString().split('T')[0]
+  // Split existing deadline into date + time parts for editing
+  const [initialDateDisplay, initialTime] = (() => {
+    if (!initialDeadline) return ['', '09:00']
+    const [datePart, timePart] = initialDeadline.split('T')
+    const [yyyy, mm, dd] = datePart.split('-')
+    return [`${mm}/${dd}/${yyyy}`, timePart ?? '09:00']
+  })()
+
+  const [taskName, setTaskName] = useState(initialName)
+  const [taskDeadline, setTaskDeadline] = useState(initialDateDisplay)
+  const [taskTime, setTaskTime] = useState(initialTime)
+  const [dateError, setDateError] = useState('')
+
+  function handleDeadlineChange(value: string) {
+    const formatted = formatDateInput(value)
+    setTaskDeadline(formatted)
+    setDateError('')
+    if (formatted.length === 10) {
+      if (!isValidDate(formatted)) {
+        setDateError('Invalid date — please check month, day and year')
+        return
+      }
+      const storage = buildStorageValue(formatted, taskTime)
+      if (storage <= nowISO) {
+        setDateError('Deadline must be in the future')
+      }
+    }
+  }
+
+  function handleTimeChange(value: string) {
+    setTaskTime(value)
+    setDateError('')
+    if (taskDeadline.length === 10 && isValidDate(taskDeadline)) {
+      const storage = buildStorageValue(taskDeadline, value)
+      if (storage <= nowISO) {
+        setDateError('Deadline must be in the future')
+      }
+    }
+  }
+
+  function handleCalendarChange(value: string) {
+    if (!value) return
+    const [yyyy, mm, dd] = value.split('-')
+    setTaskDeadline(`${mm}/${dd}/${yyyy}`)
+    const storage = buildStorageValue(`${mm}/${dd}/${yyyy}`, taskTime)
+    setDateError(storage <= nowISO ? 'Deadline must be in the future' : '')
+  }
+
+  const deadlineStorageValue = buildStorageValue(taskDeadline, taskTime)
+  const deadlineIsValid =
+    isValidDate(taskDeadline) &&
+    taskTime.length === 5 &&
+    deadlineStorageValue > nowISO
+
+  const canSave = taskName.trim() !== '' && deadlineIsValid && !dateError
+
+  function handleSave() {
+    if (!canSave) return
+    onSave(taskName.trim(), deadlineStorageValue)
+  }
+
+  const calendarValue = isValidDate(taskDeadline)
+    ? toStorageDateOnly(taskDeadline)
+    : ''
+
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-12 mx-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-center font-bold text-primary-600 text-3xl p-4 pt-1">{title}</p>
+
+        <label className="flex font-semibold text-primary-600 text-xl py-2">Task</label>
+        <input
+          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 py-3 px-3"
+          value={taskName}
+          onChange={(e) => setTaskName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+          type="text"
+          placeholder="Enter Task Name"
+          autoFocus
+          maxLength={40}
+        />
+
+        <div className="flex flex-col gap-1">
+          <label className="flex text-primary-600 font-semibold text-xl py-3">Suggested Tasks:</label>
+          <div className="flex flex-wrap gap-2">
+            {['Prepare report', 'Review', 'Study', 'Plan', 'Research', 'Advance Study', 'Read'].map((s) => (
+              <button
+                key={s}
+                onClick={() => setTaskName(s)}
+                className="text-sm px-3 py-1 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <label className="flex text-primary-600 text-xl font-semibold pt-3 gap-1">
+          Deadline
+          {requireDeadline && <span className="text-red-500">*</span>}
+        </label>
+
+        {/* Date + Time row */}
+        <div className="flex gap-3 my-3">
+          {/* Date input */}
+          <div className="relative flex items-center flex-1">
+            <input
+              className={`border-2 rounded-md w-full py-3 px-3 pr-11 font-mono
+                ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+              value={taskDeadline}
+              onChange={(e) => handleDeadlineChange(e.target.value)}
+              type="text"
+              placeholder="MM/DD/YYYY"
+              maxLength={10}
+            />
+            <button
+              type="button"
+              onClick={() => calendarRef.current?.showPicker()}
+              className="absolute right-3 text-primary-600 hover:text-primary-800 transition-colors"
+              tabIndex={-1}
+              title="Pick a date"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </button>
+            <input
+            aria-label='cal'
+              ref={calendarRef}
+              type="date"
+              min={todayDate}
+              value={calendarValue}
+              onChange={(e) => handleCalendarChange(e.target.value)}
+              className="absolute right-0 bottom-0 opacity-0 w-0 h-0 pointer-events-none"
+              tabIndex={-1}
+            />
+          </div>
+
+          {/* Time input */}
+          <input
+          aria-label='time'
+            type="time"
+            value={taskTime}
+            onChange={(e) => handleTimeChange(e.target.value)}
+            className={`border-2 rounded-md py-3 px-3 w-36 font-mono
+              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+          />
+        </div>
+
+        {dateError && (
+          <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>
+        )}
+
+        <div className="flex flex-row justify-between gap-10">
+          <button
+            onClick={onClose}
+            className="flex-1 bg-white border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-primary-600 font-roboto py-2 hover:bg-primary-50"
+          >
+            CANCEL
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!canSave}
+            className="flex-1 bg-primary-600 border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-white font-roboto hover:bg-primary-50 hover:text-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            SAVE
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-function getCardStyle(task: Task, today: string): string {
-  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62'
-  if (task.deadline && task.deadline < today) return 'bg-red-600 lg:max-h-32 lg:max-w-62'
-  return 'bg-primary-700 lg:max-h-32 lg:max-w-62'
-}
-
-function formatDateInput(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
-}
-
-function toStorageFormat(display: string): string {
-  const parts = display.split('/')
-  if (parts.length !== 3 || parts[2].length !== 4) return ''
-  const [mm, dd, yyyy] = parts
-  return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`
-}
-
-function toDisplayFormat(storage: string): string {
-  const parts = storage.split('-')
-  if (parts.length !== 3) return storage
-  const [yyyy, mm, dd] = parts
-  return `${mm}/${dd}/${yyyy}`
-}
-
-function isValidDate(display: string): boolean {
-  if (display.length !== 10) return false
-  const parts = display.split('/')
-  if (parts.length !== 3) return false
-  const mm = parseInt(parts[0])
-  const dd = parseInt(parts[1])
-  const yyyy = parseInt(parts[2])
-  if (isNaN(mm) || isNaN(dd) || isNaN(yyyy)) return false
-  if (yyyy < 2000 || yyyy > 2100) return false
-  if (mm < 1 || mm > 12) return false
-  if (dd < 1 || dd > 31) return false
-  const date = new Date(yyyy, mm - 1, dd)
-  if (
-    date.getFullYear() !== yyyy ||
-    date.getMonth() !== mm - 1 ||
-    date.getDate() !== dd
-  ) return false
-  return true
-}
-
-function getTomorrow(): string {
-  const d = new Date()
-  d.setDate(d.getDate() + 1)
-  return d.toISOString().split('T')[0]
-}
 
 // ── Soft Delete Confirm Modal ─────────────────
 
@@ -151,8 +294,8 @@ function TaskCard({
     id: task.id,
   })
 
-  const today = getToday()
-  const isOverdue = task.deadline && task.deadline < today && task.status !== 'done'
+  const nowISO = getNowISO()
+  const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
   const isDone = task.status === 'done'
 
   const style: React.CSSProperties = transform
@@ -172,7 +315,7 @@ function TaskCard({
         rounded-xl p-4 mb-3
         hover:shadow-md
         w-full select-none relative
-        ${getCardStyle(task, today)}
+        ${getCardStyle(task, nowISO)}
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
@@ -282,165 +425,67 @@ function Column({
   )
 }
 
-// ── Task Modal (shared for Add & Edit) ────────
 
-function TaskModal({
-  title,
-  initialName,
-  initialDeadline,
-  requireDeadline = false,
-  onSave,
-  onClose,
-}: {
-  title: string
-  initialName: string
-  initialDeadline: string
-  requireDeadline?: boolean
-  onSave: (name: string, deadline: string) => void
-  onClose: () => void
-}) {
-  const today = getToday()
-  const calendarRef = useRef<HTMLInputElement>(null)
+// ── Date/time helpers ─────────────────────────
 
-  const [taskName, setTaskName] = useState(initialName)
-  const [taskDeadline, setTaskDeadline] = useState(
-    initialDeadline ? toDisplayFormat(initialDeadline) : ''
-  )
-  const [dateError, setDateError] = useState('')
+function getNowISO(): string {
+  // "YYYY-MM-DDTHH:MM" in local time
+  const now = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
+}
 
-  function handleDeadlineChange(value: string) {
-    const formatted = formatDateInput(value)
-    setTaskDeadline(formatted)
-    setDateError('')
-    if (formatted.length === 10) {
-      if (!isValidDate(formatted)) {
-        setDateError('Invalid date please check month, day and year')
-        return
-      }
-      const storage = toStorageFormat(formatted)
-      if (storage <= today) {
-        setDateError('Deadline cannot be in the past')
-      }
-    }
-  }
+/** "YYYY-MM-DDTHH:MM"  →  "MM/DD/YYYY HH:MM AM/PM" */
+function toDisplayFormat(storage: string): string {
+  if (!storage) return ''
+  const [datePart, timePart] = storage.split('T')
+  const [yyyy, mm, dd] = datePart.split('-')
+  if (!timePart) return `${mm}/${dd}/${yyyy}`
+  const [hStr, mStr] = timePart.split(':')
+  let h = parseInt(hStr)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12 || 12
+  return `${mm}/${dd}/${yyyy} ${h}:${mStr} ${ampm}`
+}
 
-  function handleCalendarChange(value: string) {
-    if (!value) return
-    setTaskDeadline(toDisplayFormat(value))
-    setDateError(value <= today ? 'Deadline cannot be in the past' : '')
-  }
+/** "MM/DD/YYYY" string → "YYYY-MM-DD" */
+function toStorageDateOnly(display: string): string {
+  const parts = display.split('/')
+  if (parts.length !== 3 || parts[2].length !== 4) return ''
+  const [mm, dd, yyyy] = parts
+  return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`
+}
 
-  const deadlineIsValid = isValidDate(taskDeadline) && toStorageFormat(taskDeadline) > today
-  const canSave = taskName.trim() !== '' && deadlineIsValid && !dateError
+function formatDateInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
 
-  function handleSave() {
-    if (!canSave) return
-    onSave(taskName.trim(), toStorageFormat(taskDeadline))
-  }
+function isValidDate(display: string): boolean {
+  if (display.length !== 10) return false
+  const parts = display.split('/')
+  if (parts.length !== 3) return false
+  const mm = parseInt(parts[0]), dd = parseInt(parts[1]), yyyy = parseInt(parts[2])
+  if (isNaN(mm) || isNaN(dd) || isNaN(yyyy)) return false
+  if (yyyy < 2000 || yyyy > 2100) return false
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false
+  const date = new Date(yyyy, mm - 1, dd)
+  return date.getFullYear() === yyyy && date.getMonth() === mm - 1 && date.getDate() === dd
+}
 
-  const calendarValue = isValidDate(taskDeadline) ? toStorageFormat(taskDeadline) : ''
+/** Combine "MM/DD/YYYY" + "HH:MM" → "YYYY-MM-DDTHH:MM" */
+function buildStorageValue(dateDisplay: string, time: string): string {
+  const datePart = toStorageDateOnly(dateDisplay)
+  if (!datePart) return ''
+  return time ? `${datePart}T${time}` : datePart
+}
 
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-2xl p-12 mx-6 w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <p className="text-center font-bold text-primary-600 text-3xl p-4 pt-1">{title}</p>
-
-        <label className="flex font-semibold text-primary-600 text-xl py-2">Task</label>
-        <input
-          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 py-3 px-3"
-          value={taskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-          type="text"
-          placeholder="Enter Task Name"
-          autoFocus
-          maxLength={40}
-        />
-
-        <div className="flex flex-col gap-1">
-          <label className="flex text-primary-600 font-semibold text-xl py-3">Suggested Tasks:</label>
-          <div className="flex flex-wrap gap-2">
-            {['Prepare report', 'Review', 'Study', 'Plan', 'Research', 'Advance Study', 'Read'].map((suggestion) => (
-              <button
-                key={suggestion}
-                onClick={() => setTaskName(suggestion)}
-                className="text-sm px-3 py-1 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <label className="flex text-primary-600 text-xl font-semibold pt-3 gap-1">
-          Deadline
-          {requireDeadline && <span className="text-red-500"></span>}
-        </label>
-
-        <div className="relative flex items-center my-3">
-          <input
-            className={`border-2 rounded-md w-full py-3 px-3 pr-11 font-mono
-              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
-            value={taskDeadline}
-            onChange={(e) => handleDeadlineChange(e.target.value)}
-            type="text"
-            placeholder="MM/DD/YYYY"
-            maxLength={10}
-          />
-          <button
-            type="button"
-            onClick={() => calendarRef.current?.showPicker()}
-            className="absolute right-3 text-primary-600 hover:text-primary-800 transition-colors"
-            tabIndex={-1}
-            title="Pick a date"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-            </svg>
-          </button>
-          <input
-            ref={calendarRef}
-            type="date"
-            min={getTomorrow()}
-            value={calendarValue}
-            onChange={(e) => handleCalendarChange(e.target.value)}
-            className="absolute right-0 bottom-0 opacity-0 w-0 h-0 pointer-events-none"
-            tabIndex={-1}
-            placeholder='mm/dd/yyyy'
-          />
-        </div>
-
-        {dateError && (
-          <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>
-        )}
-
-        <div className="flex flex-row justify-between gap-10">
-          <button
-            onClick={onClose}
-            className="flex-1 bg-white border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-primary-600 font-roboto py-2 hover:bg-primary-50"
-          >
-            CANCEL
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!canSave}
-            className="flex-1 bg-primary-600 border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-white font-roboto hover:bg-primary-50 hover:text-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            SAVE
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+function getCardStyle(task: Task, nowISO: string): string {
+  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62'
+  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62'
+  return 'bg-primary-700 lg:max-h-32 lg:max-w-62'
 }
 
 // ── Main Page ─────────────────────────────────
