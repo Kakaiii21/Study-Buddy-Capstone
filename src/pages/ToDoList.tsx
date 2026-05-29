@@ -7,7 +7,9 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
+  DragOverlay,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
@@ -18,6 +20,70 @@ const COLUMNS: { id: Status; label: string }[] = [
   { id: 'in-progress', label: 'IN PROGRESS' },
   { id: 'done',        label: 'DONE' },
 ]
+
+// ── Date/time helpers ─────────────────────────
+
+function getNowISO(): string {
+  const now = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
+}
+
+
+/** "YYYY-MM-DDTHH:MM"  →  "MM/DD/YYYY H:MM AM/PM" */
+function toDisplayFormat(storage: string): string {
+  if (!storage) return ''
+  const [datePart, timePart] = storage.split('T')
+  const [yyyy, mm, dd] = datePart.split('-')
+  if (!timePart) return `${mm}/${dd}/${yyyy}`
+  const [hStr, mStr] = timePart.split(':')
+  let h = parseInt(hStr)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  h = h % 12 || 12
+  return `${mm}/${dd}/${yyyy} ${h}:${mStr} ${ampm}`
+}
+
+/** "MM/DD/YYYY" → "YYYY-MM-DD" */
+function toStorageDateOnly(display: string): string {
+  const parts = display.split('/')
+  if (parts.length !== 3 || parts[2].length !== 4) return ''
+  const [mm, dd, yyyy] = parts
+  return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`
+}
+
+function formatDateInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  if (digits.length <= 2) return digits
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
+function isValidDate(display: string): boolean {
+  if (display.length !== 10) return false
+  const parts = display.split('/')
+  if (parts.length !== 3) return false
+  const mm = parseInt(parts[0]), dd = parseInt(parts[1]), yyyy = parseInt(parts[2])
+  if (isNaN(mm) || isNaN(dd) || isNaN(yyyy)) return false
+  if (yyyy < 2000 || yyyy > 2100) return false
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false
+  const date = new Date(yyyy, mm - 1, dd)
+  return date.getFullYear() === yyyy && date.getMonth() === mm - 1 && date.getDate() === dd
+}
+
+/** "MM/DD/YYYY" + "HH:MM" → "YYYY-MM-DDTHH:MM" */
+function buildStorageValue(dateDisplay: string, time: string): string {
+  const datePart = toStorageDateOnly(dateDisplay)
+  if (!datePart) return ''
+  return time ? `${datePart}T${time}` : datePart
+}
+
+function getCardStyle(task: Task, nowISO: string): string {
+  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62'
+  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62'
+  return 'bg-primary-700 lg:max-h-32 lg:max-w-62'
+}
+
+// ── Task Modal ────────────────────────────────
 
 function TaskModal({
   title,
@@ -38,7 +104,6 @@ function TaskModal({
   const todayDate = nowISO.split('T')[0]
   const calendarRef = useRef<HTMLInputElement>(null)
 
-  // Split existing deadline into date + time parts for editing
   const [initialDateDisplay, initialTime] = (() => {
     if (!initialDeadline) return ['', '09:00']
     const [datePart, timePart] = initialDeadline.split('T')
@@ -61,9 +126,7 @@ function TaskModal({
         return
       }
       const storage = buildStorageValue(formatted, taskTime)
-      if (storage <= nowISO) {
-        setDateError('Deadline must be in the future')
-      }
+      if (storage <= nowISO) setDateError('Deadline must be in the future')
     }
   }
 
@@ -72,9 +135,7 @@ function TaskModal({
     setDateError('')
     if (taskDeadline.length === 10 && isValidDate(taskDeadline)) {
       const storage = buildStorageValue(taskDeadline, value)
-      if (storage <= nowISO) {
-        setDateError('Deadline must be in the future')
-      }
+      if (storage <= nowISO) setDateError('Deadline must be in the future')
     }
   }
 
@@ -99,9 +160,7 @@ function TaskModal({
     onSave(taskName.trim(), deadlineStorageValue)
   }
 
-  const calendarValue = isValidDate(taskDeadline)
-    ? toStorageDateOnly(taskDeadline)
-    : ''
+  const calendarValue = isValidDate(taskDeadline) ? toStorageDateOnly(taskDeadline) : ''
 
   return (
     <div
@@ -146,9 +205,7 @@ function TaskModal({
           {requireDeadline && <span className="text-red-500">*</span>}
         </label>
 
-        {/* Date + Time row */}
         <div className="flex gap-3 my-3">
-          {/* Date input */}
           <div className="relative flex items-center flex-1">
             <input
               className={`border-2 rounded-md w-full py-3 px-3 pr-11 font-mono
@@ -174,7 +231,7 @@ function TaskModal({
               </svg>
             </button>
             <input
-            aria-label='cal'
+              aria-label="cal"
               ref={calendarRef}
               type="date"
               min={todayDate}
@@ -185,9 +242,8 @@ function TaskModal({
             />
           </div>
 
-          {/* Time input */}
           <input
-          aria-label='time'
+            aria-label="time"
             type="time"
             value={taskTime}
             onChange={(e) => handleTimeChange(e.target.value)}
@@ -196,9 +252,7 @@ function TaskModal({
           />
         </div>
 
-        {dateError && (
-          <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>
-        )}
+        {dateError && <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>}
 
         <div className="flex flex-row justify-between gap-10">
           <button
@@ -220,13 +274,10 @@ function TaskModal({
   )
 }
 
-
-// ── Soft Delete Confirm Modal ─────────────────
+// ── Soft Delete Modal ─────────────────────────
 
 function SoftDeleteModal({
-  taskName,
-  onConfirm,
-  onCancel,
+  taskName, onConfirm, onCancel,
 }: {
   taskName: string
   onConfirm: () => void
@@ -236,7 +287,7 @@ function SoftDeleteModal({
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="delteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="delete icon" className='w-7 h-7' />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
@@ -268,9 +319,7 @@ function SoftDeleteModal({
 // ── TaskCard ──────────────────────────────────
 
 function TaskCard({
-  task,
-  onDelete,
-  onEdit,
+  task, onDelete, onEdit,
 }: {
   task: Task
   onDelete: (id: string, name: string) => void
@@ -290,9 +339,7 @@ function TaskCard({
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [showMenu])
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id,
-  })
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: task.id })
 
   const nowISO = getNowISO()
   const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
@@ -300,8 +347,7 @@ function TaskCard({
 
   const style: React.CSSProperties = transform
     ? {
-        transform: `translate(${transform.x}px, ${transform.y}px)`,
-        zIndex: 50,
+        opacity: 0.4,
         transition: 'none',
       }
     : {}
@@ -316,14 +362,13 @@ function TaskCard({
         hover:shadow-md
         w-full select-none relative
         ${getCardStyle(task, nowISO)}
+        ${isDragging ? 'cursor-grabbing' : ''}
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
         <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
           <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: 'numeric',
+            month: '2-digit', day: '2-digit', year: 'numeric',
           })}</p>
         </div>
         <div className="flex justify-between items-start">
@@ -347,7 +392,6 @@ function TaskCard({
         >
           ⋮
         </button>
-
         {showMenu && (
           <div ref={menuRef} className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
             <button
@@ -372,19 +416,47 @@ function TaskCard({
   )
 }
 
+// ── Drag Overlay Card (rendered above everything) ──
+
+function DragCard({ task }: { task: Task }) {
+  const nowISO = getNowISO()
+  const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
+  const isDone = task.status === 'done'
+
+  return (
+    <div className={`rounded-xl p-4 w-full select-none relative shadow-2xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
+      <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
+        <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
+          month: '2-digit', day: '2-digit', year: 'numeric',
+        })}</p>
+      </div>
+      <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+        {task.name}
+      </p>
+      {task.deadline && (
+        <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
+          {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
+          {toDisplayFormat(task.deadline)}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ── Column ────────────────────────────────────
 
 function Column({
-  id, label, tasks, onDelete, onEdit,
+  id, label, tasks, onDelete, onEdit, collapsed, onToggleCollapse,
 }: {
   id: Status
   label: string
   tasks: Task[]
   onDelete: (id: string, name: string) => void
   onEdit: (task: Task) => void
+  collapsed: boolean
+  onToggleCollapse: () => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id })
-  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div
@@ -400,92 +472,39 @@ function Column({
       <div className="bg-primary-600 max-w-full w-full p-3 flex items-center justify-between">
         <p className="text-white pl-5 lg:pl-0 text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
-          onClick={() => setCollapsed((prev) => !prev)}
+          onClick={onToggleCollapse}
           className="lg:hidden text-white ml-2 text-xl font-bold"
           aria-label={collapsed ? 'Expand column' : 'Collapse column'}
         >
-          {collapsed ? <img className='w-5 h-5' src="arrowDown.png" alt="" /> : <img className='h-5 w-5' src='arrowUp.png' alt='' />}
+          {collapsed
+            ? <img className='w-5 h-5' src="arrowDown.png" alt="" />
+            : <img className='h-5 w-5' src='arrowUp.png' alt='' />}
         </button>
       </div>
 
-      <div className={`flex flex-col items-center w-full mt-4 ${collapsed ? 'hidden lg:flex' : 'flex'}`}>
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onDelete={onDelete} onEdit={onEdit} />
-        ))}
-        {tasks.length === 0 && (
-          <div className={`w-full border-2 border-dashed rounded-xl p-6 mt-2 text-center
-            transition-colors duration-200
-            ${isOver ? 'border-primary-400 text-primary-400' : 'border-gray-200 text-gray-300'}`}
-          >
-            {isOver ? 'Drop here' : 'No tasks yet'}
-          </div>
-        )}
+      {/* Smooth collapse using grid-rows trick — no overflow-hidden on outer so dragged cards aren't clipped */}
+      <div
+        style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
+        className="grid transition-all duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
+      >
+        <div className={`min-h-0 flex flex-col items-center w-full mt-4 transition-opacity duration-300
+          ${collapsed ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}
+        >
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task} onDelete={onDelete} onEdit={onEdit} />
+          ))}
+          {tasks.length === 0 && (
+            <div className={`w-full border-2 border-dashed rounded-xl p-6 mt-2 text-center
+              transition-colors duration-200
+              ${isOver ? 'border-primary-400 text-primary-400' : 'border-gray-200 text-gray-300'}`}
+            >
+              {isOver ? 'Drop here' : 'No tasks yet'}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
-}
-
-
-// ── Date/time helpers ─────────────────────────
-
-function getNowISO(): string {
-  // "YYYY-MM-DDTHH:MM" in local time
-  const now = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`
-}
-
-/** "YYYY-MM-DDTHH:MM"  →  "MM/DD/YYYY HH:MM AM/PM" */
-function toDisplayFormat(storage: string): string {
-  if (!storage) return ''
-  const [datePart, timePart] = storage.split('T')
-  const [yyyy, mm, dd] = datePart.split('-')
-  if (!timePart) return `${mm}/${dd}/${yyyy}`
-  const [hStr, mStr] = timePart.split(':')
-  let h = parseInt(hStr)
-  const ampm = h >= 12 ? 'PM' : 'AM'
-  h = h % 12 || 12
-  return `${mm}/${dd}/${yyyy} ${h}:${mStr} ${ampm}`
-}
-
-/** "MM/DD/YYYY" string → "YYYY-MM-DD" */
-function toStorageDateOnly(display: string): string {
-  const parts = display.split('/')
-  if (parts.length !== 3 || parts[2].length !== 4) return ''
-  const [mm, dd, yyyy] = parts
-  return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`
-}
-
-function formatDateInput(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 8)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
-}
-
-function isValidDate(display: string): boolean {
-  if (display.length !== 10) return false
-  const parts = display.split('/')
-  if (parts.length !== 3) return false
-  const mm = parseInt(parts[0]), dd = parseInt(parts[1]), yyyy = parseInt(parts[2])
-  if (isNaN(mm) || isNaN(dd) || isNaN(yyyy)) return false
-  if (yyyy < 2000 || yyyy > 2100) return false
-  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return false
-  const date = new Date(yyyy, mm - 1, dd)
-  return date.getFullYear() === yyyy && date.getMonth() === mm - 1 && date.getDate() === dd
-}
-
-/** Combine "MM/DD/YYYY" + "HH:MM" → "YYYY-MM-DDTHH:MM" */
-function buildStorageValue(dateDisplay: string, time: string): string {
-  const datePart = toStorageDateOnly(dateDisplay)
-  if (!datePart) return ''
-  return time ? `${datePart}T${time}` : datePart
-}
-
-function getCardStyle(task: Task, nowISO: string): string {
-  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62'
-  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62'
-  return 'bg-primary-700 lg:max-h-32 lg:max-w-62'
 }
 
 // ── Main Page ─────────────────────────────────
@@ -497,6 +516,13 @@ function ToDoList() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+
+  const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
+    'todo': false,
+    'in-progress': false,
+    'done': false,
+  })
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -504,6 +530,34 @@ function ToDoList() {
       activationConstraint: { delay: 200, tolerance: 8 },
     })
   )
+
+  function handleToggleCollapse(id: Status) {
+    setCollapsedCols((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveTaskId(event.active.id as string)
+  }
+
+  function handleDragOver(event: DragEndEvent) {
+    const { over } = event
+    if (!over) return
+    const overId = over.id as Status
+    if (window.innerWidth < 1024 && collapsedCols[overId]) {
+      setCollapsedCols((prev) => ({ ...prev, [overId]: false }))
+    }
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveTaskId(null)
+    const { active, over } = event
+    if (!over) return
+    const taskId = active.id as string
+    const newStatus = over.id as Status
+    const task = tasks.find((t) => t.id === taskId)
+    if (!task || task.status === newStatus) return
+    updateTaskStatus(taskId, newStatus)
+  }
 
   async function handleAddSave(name: string, deadline: string) {
     await addTask(name, deadline)
@@ -516,33 +570,22 @@ function ToDoList() {
     setEditingTask(null)
   }
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!over) return
-    const taskId = active.id as string
-    const newStatus = over.id as Status
-    const task = tasks.find((t) => t.id === taskId)
-    if (!task || task.status === newStatus) return
-    updateTaskStatus(taskId, newStatus)
-  }
-
-  // Show the soft delete confirmation modal
   function handleDeleteClick(id: string, name: string) {
     setPendingDelete({ id, name })
   }
 
-  // User confirmed — actually soft delete
   async function handleConfirmDelete() {
     if (!pendingDelete) return
     await deleteTask(pendingDelete.id)
     setPendingDelete(null)
   }
 
+  const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null
+
   return (
     <div className="flex h-screen">
       <Sidebar />
 
-      {/* Soft Delete Confirmation */}
       {pendingDelete && (
         <SoftDeleteModal
           taskName={pendingDelete.name}
@@ -594,11 +637,10 @@ function ToDoList() {
           ) : (
             <DndContext
               sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
-              autoScroll={{
-                enabled: true,
-                threshold: { x: 0, y: 0.2 },
-              }}
+              autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
               <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
@@ -609,9 +651,18 @@ function ToDoList() {
                     tasks={tasks.filter((t) => t.status === col.id)}
                     onDelete={handleDeleteClick}
                     onEdit={setEditingTask}
+                    collapsed={collapsedCols[col.id]}
+                    onToggleCollapse={() => handleToggleCollapse(col.id)}
                   />
                 ))}
               </div>
+
+              {/* Renders the dragged card in a portal above everything */}
+              <DragOverlay dropAnimation={null}>
+                {activeTask ? (
+                  <DragCard task={activeTask} />
+                ) : null}
+              </DragOverlay>
             </DndContext>
           )}
 
