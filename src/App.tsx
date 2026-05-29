@@ -3,6 +3,22 @@ import { useNavigate } from 'react-router-dom'
 import { signup } from './services/authService'
 import './index.css'
 
+type FieldErrors = {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+type TouchedFields = {
+  firstName: boolean
+  lastName: boolean
+  email: boolean
+  password: boolean
+  confirmPassword: boolean
+}
+
 function App() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('signup')
@@ -13,48 +29,107 @@ function App() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
+
+  const [touched, setTouched] = useState<TouchedFields>({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  })
+
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const touch = (field: keyof TouchedFields) =>
+    setTouched(prev => ({ ...prev, [field]: true }))
+
+  const validateField = (field: keyof FieldErrors, values: {
+    firstName: string
+    lastName: string
+    email: string
+    password: string
+    confirmPassword: string
+  }): string => {
+    switch (field) {
+      case 'firstName':
+        return !values.firstName.trim() ? 'First name is required.' : ''
+      case 'lastName':
+        return !values.lastName.trim() ? 'Last name is required.' : ''
+      case 'email':
+        if (!values.email.trim()) return 'Email is required.'
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) return 'Enter a valid email address.'
+        return ''
+      case 'password':
+        if (!values.password) return 'Password is required.'
+        if (values.password.length < 8) return 'Must be at least 8 characters.'
+        if (!/[A-Z]/.test(values.password)) return 'Must include an uppercase letter.'
+        if (!/[a-z]/.test(values.password)) return 'Must include a lowercase letter.'
+        if (!/[0-9]/.test(values.password)) return 'Must include a number.'
+        if (!/[!@#$%^&*()_+=;'"|,.<>?@-]/.test(values.password)) return 'Must include a special character.'
+        return ''
+      case 'confirmPassword':
+        if (!values.confirmPassword) return 'Please confirm your password.'
+        if (values.confirmPassword !== values.password) return 'Passwords do not match.'
+        return ''
+      default:
+        return ''
+    }
+  }
+
+  const currentValues = { firstName, lastName, email, password, confirmPassword }
+
+  const handleChange = (field: keyof FieldErrors, value: string) => {
+    const newValues = { ...currentValues, [field]: value }
+
+    // Update the state value
+    const setters = {
+      firstName: setFirstName,
+      lastName: setLastName,
+      email: setEmail,
+      password: setPassword,
+      confirmPassword: setConfirmPassword,
+    }
+    setters[field](value)
+
+    // Mark as touched and validate immediately
+    setTouched(prev => ({ ...prev, [field]: true }))
+    const error = validateField(field, newValues)
+    setFieldErrors(prev => ({ ...prev, [field]: error }))
+
+    // Also re-validate confirmPassword live when password changes
+    if (field === 'password') {
+      const confirmError = validateField('confirmPassword', newValues)
+      setFieldErrors(prev => ({ ...prev, confirmPassword: touched.confirmPassword ? confirmError : prev.confirmPassword }))
+    }
+  }
+
+  const handleBlur = (field: keyof FieldErrors) => {
+    touch(field)
+    const error = validateField(field, currentValues)
+    setFieldErrors(prev => ({ ...prev, [field]: error }))
+  }
+
+  const validateAll = (): boolean => {
+    const fields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword'] as (keyof FieldErrors)[]
+    const errors = {} as FieldErrors
+    fields.forEach(f => { errors[f] = validateField(f, currentValues) })
+    setFieldErrors(errors)
+    setTouched({ firstName: true, lastName: true, email: true, password: true, confirmPassword: true })
+    return Object.values(errors).every(e => e === '')
+  }
+
   const handleSignup = async () => {
-    setError('')
     setSuccess('')
+    if (!validateAll()) return
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('All fields are required.')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters.')
-      return
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      setError('Password must contain at least one uppercase letter.')
-      return
-    }
-
-    if (!/[a-z]/.test(password)) {
-      setError('Password must contain at least one lowercase letter.')
-      return
-    }
-
-    if (!/[0-9]/.test(password)) {
-      setError('Password must contain at least one number.')
-      return
-    }
-
-    if (!/[!@#$%^&*()_+=;'"|,.<>?@-]/.test(password)) {
-      setError('Password must contain at least one special character.')
-      return
-    }
     try {
       setLoading(true)
       await signup(firstName, lastName, email, password)
@@ -64,22 +139,23 @@ function App() {
       setEmail('')
       setPassword('')
       setConfirmPassword('')
+      setFieldErrors({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' })
+      setTouched({ firstName: false, lastName: false, email: false, password: false, confirmPassword: false })
       setSuccess('✅ Account created successfully! Redirecting to login...')
-
-      setTimeout(() => {
-        navigate('/verify-email')
-      }, 2000)
-
+      setTimeout(() => navigate('/verify-email'), 2000)
     } catch (err) {
       setLoading(false)
       const firebaseError = err as { code: string }
       if (firebaseError.code === 'auth/email-already-in-use') {
-        setError('Email is already in use.')
+        setFieldErrors(prev => ({ ...prev, email: 'Email is already in use.' }))
       } else {
-        setError('Something went wrong. Please try again.')
+        setFieldErrors(prev => ({ ...prev, email: 'Something went wrong. Please try again.' }))
       }
     }
   }
+
+  const inputClass = (field: keyof FieldErrors) =>
+    `w-full mb-1 p-2 border rounded ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
@@ -93,88 +169,97 @@ function App() {
             <button
               onClick={() => setActiveTab('signup')}
               className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
-                activeTab === 'signup'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-primary-600'
+                activeTab === 'signup' ? 'bg-primary-600 text-white' : 'bg-white text-primary-600'
               }`}
             >
               SIGN UP
             </button>
-
             <button
-              onClick={() => {
-                setActiveTab('login')
-                navigate('/login')
-              }}
+              onClick={() => { setActiveTab('login'); navigate('/login') }}
               className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
-                activeTab === 'login'
-                  ? 'bg-primary-500 text-primary-100'
-                  : 'bg-white text-primary-600'
+                activeTab === 'login' ? 'bg-primary-500 text-primary-100' : 'bg-white text-primary-600'
               }`}
             >
               LOG IN
             </button>
           </div>
 
-          {/* ERROR MESSAGE */}
-          {error && (
-            <p className="text-red-500 text-sm text-center mb-4 font-semibold">
-              {error}
-            </p>
-          )}
-
           {/* SUCCESS MESSAGE */}
           {success && (
-            <p className="text-green-500 text-sm text-center mb-4 font-semibold">
-              {success}
-            </p>
+            <p className="text-green-500 text-sm text-center mb-4 font-semibold">{success}</p>
           )}
 
-          {/* FORM FIELDS */}
+          {/* FIRST NAME */}
           <p className="text-primary-600 font-bold p-2">FIRST NAME</p>
           <input
             type="text"
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="w-full mb-1 p-2 border rounded"
+            onChange={(e) => handleChange('firstName', e.target.value)}
+            onBlur={() => handleBlur('firstName')}
+            className={inputClass('firstName')}
             placeholder="ex. Juan"
           />
+          {touched.firstName && fieldErrors.firstName && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.firstName}</p>
+          )}
 
+          {/* LAST NAME */}
           <p className="text-primary-600 font-bold p-2">LAST NAME</p>
           <input
             type="text"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="w-full mb-1 p-2 border rounded"
+            onChange={(e) => handleChange('lastName', e.target.value)}
+            onBlur={() => handleBlur('lastName')}
+            className={inputClass('lastName')}
             placeholder="ex. Dela Cruz"
           />
+          {touched.lastName && fieldErrors.lastName && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.lastName}</p>
+          )}
 
+          {/* EMAIL */}
           <p className="text-primary-600 font-bold p-2">EMAIL</p>
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-1 p-2 border rounded"
+            onChange={(e) => handleChange('email', e.target.value)}
+            onBlur={() => handleBlur('email')}
+            className={inputClass('email')}
             placeholder="juandelacruz@gmail.com"
           />
+          {touched.email && fieldErrors.email && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
+          )}
 
+          {/* PASSWORD */}
           <p className="text-primary-600 font-bold p-2">PASSWORD</p>
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-1 p-2 border rounded"
+            onChange={(e) => handleChange('password', e.target.value)}
+            onBlur={() => handleBlur('password')}
+            className={inputClass('password')}
             placeholder="ex. Ju1an_delaCruz"
           />
+          {touched.password && fieldErrors.password && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
+          )}
 
+          {/* CONFIRM PASSWORD */}
           <p className="text-primary-600 font-bold p-2">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full mb-8 p-2 border rounded"
+            onChange={(e) => handleChange('confirmPassword', e.target.value)}
+            onBlur={() => handleBlur('confirmPassword')}
+            className={`w-full mb-2 p-2 border rounded ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="ex. Ju1an_delaCruz"
           />
+          {touched.confirmPassword && fieldErrors.confirmPassword && (
+            <p className="text-red-500 text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
+          )}
+
+          <div className="mb-4" />
 
           <button
             onClick={handleSignup}
@@ -190,8 +275,6 @@ function App() {
               Google
             </button>
           </div>
-
-
 
         </div>
       </div>

@@ -3,49 +3,102 @@ import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
 
+type FieldErrors = {
+  email: string
+  password: string
+}
+
+type TouchedFields = {
+  email: boolean
+  password: boolean
+}
+
 function Login() {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({ email: '', password: '' })
+  const [touched, setTouched] = useState<TouchedFields>({ email: false, password: false })
+
   const [loading, setLoading] = useState(false)
 
-const handleLogin = async () => {
-  setError('')
-
-  if (!email || !password) {
-    setError('All fields are required.')
-    return
+  const validateField = (field: keyof FieldErrors, values: { email: string; password: string }): string => {
+    switch (field) {
+      case 'email':
+        if (!values.email.trim()) return 'Email is required.'
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) return 'Enter a valid email address.'
+        return ''
+      case 'password':
+        if (!values.password) return 'Password is required.'
+        return ''
+      default:
+        return ''
+    }
   }
 
-  try {
-    setLoading(true)
-    const user = await login(email, password) // ← capture returned user
+  const handleChange = (field: keyof FieldErrors, value: string) => {
+    const newValues = { email, password, [field]: value }
 
-    // Block unverified users
-    if (!user.emailVerified) {
-      await getAuth().signOut()
-      setError('Please verify your email first. Check your inbox.')
-      return
-    }
+    if (field === 'email') setEmail(value)
+    if (field === 'password') setPassword(value)
 
-    navigate('/dashboard')
-  } catch (err) {
-    const error = err as { code: string }
-    if (error.code === 'auth/invalid-credential') {
-      setError('Invalid email or password.')
-    } else if (error.code === 'auth/user-not-found') {
-      setError('No account found with this email.')
-    } else if (error.code === 'auth/wrong-password') {
-      setError('Incorrect password.')
-    } else {
-      setError('Something went wrong. Please try again.')
-    }
-  } finally {
-    setLoading(false)
+    setTouched(prev => ({ ...prev, [field]: true }))
+    const error = validateField(field, newValues)
+    setFieldErrors(prev => ({ ...prev, [field]: error }))
   }
-}
+
+  const handleBlur = (field: keyof FieldErrors) => {
+    setTouched(prev => ({ ...prev, [field]: true }))
+    const error = validateField(field, { email, password })
+    setFieldErrors(prev => ({ ...prev, [field]: error }))
+  }
+
+  const validateAll = (): boolean => {
+    const errors: FieldErrors = {
+      email: validateField('email', { email, password }),
+      password: validateField('password', { email, password }),
+    }
+    setFieldErrors(errors)
+    setTouched({ email: true, password: true })
+    return Object.values(errors).every(e => e === '')
+  }
+
+  const handleLogin = async () => {
+    if (!validateAll()) return
+
+    try {
+      setLoading(true)
+      const user = await login(email, password)
+
+      if (!user.emailVerified) {
+        await getAuth().signOut()
+        setFieldErrors(prev => ({ ...prev, email: 'Please verify your email first. Check your inbox.' }))
+        return
+      }
+
+      navigate('/dashboard')
+    } catch (err) {
+      const firebaseError = err as { code: string }
+      if (
+        firebaseError.code === 'auth/invalid-credential' ||
+        firebaseError.code === 'auth/user-not-found' ||
+        firebaseError.code === 'auth/wrong-password'
+      ) {
+        setFieldErrors({ email: 'Invalid email or password.', password: 'Invalid email or password.' })
+        setTouched({ email: true, password: true })
+      } else {
+        setFieldErrors(prev => ({ ...prev, email: 'Something went wrong. Please try again.' }))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const inputClass = (field: keyof FieldErrors) =>
+    `w-full mb-1 p-2 border rounded ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 
@@ -61,7 +114,6 @@ const handleLogin = async () => {
             >
               SIGN UP
             </button>
-
             <button
               className="text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] bg-primary-600 text-white"
             >
@@ -69,35 +121,41 @@ const handleLogin = async () => {
             </button>
           </div>
 
-          {/* ERROR MESSAGE */}
-          {error && (
-            <p className="text-red-500 text-sm text-center mb-4 font-semibold">
-              {error}
-            </p>
-          )}
-
-          {/* FORM FIELDS */}
+          {/* EMAIL */}
           <p className="text-primary-600 font-bold p-2">EMAIL</p>
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-1 p-2 border rounded"
+            onChange={(e) => handleChange('email', e.target.value)}
+            onBlur={() => handleBlur('email')}
+            className={inputClass('email')}
             placeholder="juandelacruz@gmail.com"
           />
+          {touched.email && fieldErrors.email && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
+          )}
 
+          {/* PASSWORD */}
           <p className="text-primary-600 font-bold p-2">PASSWORD</p>
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-3 p-2 border rounded"
+            onChange={(e) => handleChange('password', e.target.value)}
+            onBlur={() => handleBlur('password')}
+            className={inputClass('password')}
             placeholder="Your password"
           />
+          {touched.password && fieldErrors.password && (
+            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
+          )}
 
-          <div className='flex justify-end'>
-            <button className='mb-8 text-sm text-primary-600 font-bold hover:underline'
-            onClick={()=>navigate('/forgotPassword')}>FORGOT PASSWORD</button>
+          <div className="flex justify-end">
+            <button
+              className="mb-8 mt-1 text-sm text-primary-600 font-bold hover:underline"
+              onClick={() => navigate('/forgotPassword')}
+            >
+              FORGOT PASSWORD
+            </button>
           </div>
 
           <button
@@ -114,8 +172,6 @@ const handleLogin = async () => {
               Google
             </button>
           </div>
-
-          
 
         </div>
       </div>

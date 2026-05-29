@@ -1,4 +1,4 @@
-import  { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
@@ -7,6 +7,9 @@ import { uploadToCloudinary } from '../services/cloudinary'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../services/firebase'
+import { STORAGE_LIMIT } from '../utils/fileUtils'  // ← only STORAGE_LIMIT needed here now
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
@@ -20,6 +23,8 @@ interface CourseFile {
 }
 
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt'
+
+
 function TxtPreview({ url }: { url: string }) {
   const [text, setText] = useState('Loading...')
 
@@ -64,6 +69,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
     </div>
   )
 }
+
 function CourseFolder() {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
 
@@ -86,6 +92,7 @@ function CourseFolder() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [editError, setEditError] = useState('')
+  const [storageUsed, setStorageUsed] = useState(0)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -93,8 +100,12 @@ function CourseFolder() {
 
   const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
 
-
-
+  useEffect(() => {
+    if (!user) return
+    getDoc(doc(db, 'users', user.uid)).then(snap => {
+      setStorageUsed(snap.data()?.storageUsed ?? 0)
+    })
+  }, [user, files])
 
   const handleFileClick = (file: CourseFile) => {
     setPreviewFile(file)
@@ -104,7 +115,19 @@ function CourseFolder() {
     if (!incoming) return
     setError('')
 
-   
+    // Check storage limit
+    if (user) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      const currentUsed: number = userDoc.data()?.storageUsed ?? 0
+      const incomingSize = Array.from(incoming).reduce((sum, f) => sum + f.size, 0)
+
+      if (currentUsed + incomingSize > STORAGE_LIMIT) {
+        const usedMB = (currentUsed / (1024 * 1024)).toFixed(1)
+        setError(`Storage limit reached. You've used ${usedMB} MB of 1 GB.`)
+        return
+      }
+    }
+
     const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
     const rejected: string[] = []
     const duplicates: string[] = []
@@ -203,66 +226,69 @@ function CourseFolder() {
     setEditName('')
   }
 
-const filteredFiles =
-  filter === 'all'
-    ? files
-    : filter === 'images'
-    ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
-    : filter === 'word'
-    ? files.filter((f) => ['doc', 'docx'].includes(f.fileType))
-    : filter === 'powerpoint'
-    ? files.filter((f) => ['ppt', 'pptx'].includes(f.fileType))
-    : files.filter((f) => f.fileType === filter)
+  const filteredFiles =
+    filter === 'all'
+      ? files
+      : filter === 'images'
+      ? files.filter((f) => ['png', 'jpg', 'jpeg'].includes(f.fileType))
+      : filter === 'word'
+      ? files.filter((f) => ['doc', 'docx'].includes(f.fileType))
+      : filter === 'powerpoint'
+      ? files.filter((f) => ['ppt', 'pptx'].includes(f.fileType))
+      : files.filter((f) => f.fileType === filter)
 
-      const pdfFile = useMemo(
-      () => previewFile?.fileType === 'pdf' ? { url: previewFile.fileUrl } : null,
-      [previewFile?.fileUrl]
-)
+  const pdfFile = useMemo(
+    () => previewFile?.fileType === 'pdf' ? { url: previewFile.fileUrl } : null,
+    [previewFile?.fileUrl]
+  )
+
+  const storagePercent = Math.min((storageUsed / STORAGE_LIMIT) * 100, 100)
+  const storageColor =
+    storagePercent > 90 ? 'bg-red-500' :
+    storagePercent > 70 ? 'bg-yellow-400' :
+    'bg-primary-600'
+
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
-       <div className='hidden lg:block md:block '>
+      <div className='hidden lg:block md:block'>
         <Sidebar />
-       </div>
-     
-      <main className='flex-1 overflow-y-auto p-8 overflow-hidden '>
+      </div>
 
+      <main className='flex-1 overflow-y-auto p-8 overflow-hidden'>
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-        <div className='flex flex-col md:flex-row lg:justify-between lg:items-center w-full gap-3 mb-6'>
-          <div className="flex items-center gap-4">
-            <button
-              title="Go Back to Courses"
-              onClick={() => navigate('/courses')}
-              className="flex flex-col items-center px-3 py-1 rounded hover:bg-gray-100 transition"
-            >
-              <span className="text-2xl leading-none">←</span>
-              <span className="text-sm">Back</span>
-            </button>
-
-            <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
-              {folderName}
-            </p>
-          </div>
+          <div className='flex flex-col md:flex-row lg:justify-between lg:items-center w-full gap-3 mb-6'>
+            <div className="flex items-center gap-4">
+              <button
+                title="Go Back to Courses"
+                onClick={() => navigate('/courses')}
+                className="flex flex-col items-center px-3 py-1 rounded hover:bg-gray-100 transition"
+              >
+                <span className="text-2xl leading-none">←</span>
+                <span className="text-sm">Back</span>
+              </button>
+              <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
+                {folderName}
+              </p>
+            </div>
             <div className='flex flex-row lg:ml-auto'>
-                <div className='flex items-center gap-2 mx-2 lg:mx-2 md:mx-2'>
-
-                  <select
-                    id='file-filter'
-                    aria-label='Filter files by type'
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className='border border-primary-600 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
-                  >
+              <div className='flex items-center gap-2 mx-2 lg:mx-2 md:mx-2'>
+                <select
+                  id='file-filter'
+                  aria-label='Filter files by type'
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className='border border-primary-600 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+                >
                   <option value='all'>All Files</option>
                   <option value='pdf'>PDF</option>
                   <option value='word'>Word Documents</option>
                   <option value='powerpoint'>PowerPoint</option>
                   <option value='txt'>TXT</option>
                   <option value='images'>Images (PNG / JPG)</option>
-                  </select>
-                </div>
-              
+                </select>
+              </div>
 
               <input
                 aria-label='Upload academic files'
@@ -277,20 +303,35 @@ const filteredFiles =
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                  className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md
-                   lg:mx-0
-                  hover:bg-white hover:border hover:border-primary-600
-                  hover:text-primary-600 text-white font-bold font-roboto text-md
-                  disabled:opacity-50 disabled:cursor-not-allowed'
+                className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md lg:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 + Upload Files
               </button>
             </div>
           </div>
 
-          <hr className='w-full border-t border-primary-600 lg:mb-6' />
+          <hr className='w-full border-t border-primary-600 lg:mb-4' />
 
-
+          {/* Storage Bar */}
+          <div className='w-full mb-4 mt-3'>
+            <div className='flex justify-between text-xs text-gray-400 font-roboto mb-1'>
+              <span>Storage used</span>
+              <span className={storagePercent > 90 ? 'text-red-500 font-semibold' : ''}>
+                {(storageUsed / (1024 * 1024)).toFixed(1)} MB / 1 GB
+              </span>
+            </div>
+            <div className='w-full bg-gray-200 rounded-full h-2'>
+              <div
+                className={`h-2 rounded-full transition-all duration-300 ${storageColor}`}
+                style={{ width: `${storagePercent}%` }}
+              />
+            </div>
+            {storagePercent > 90 && (
+              <p className='text-red-400 text-xs font-roboto mt-1'>
+                ⚠ You're almost out of storage. Delete some files to free up space.
+              </p>
+            )}
+          </div>
 
           {/* Upload Progress Bar */}
           {uploading && (
@@ -327,7 +368,7 @@ const filteredFiles =
                 ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-300 hover:border-primary-600'}`}
             >
               <p className='text-5xl mb-4'>📂</p>
-              <p className='text-gray-400 font-roboto text-center text-sm  md:text-lg'>
+              <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
                 Drag & drop files here or{' '}
                 <span className='text-primary-600 font-bold'>click to browse</span>
               </p>
@@ -414,41 +455,26 @@ const filteredFiles =
                   + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
                 </p>
               </div>
-              
             </div>
           )}
-          
         </div>
       </main>
 
-
       {/* File Preview Modal */}
       {previewFile && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col'
-        onClick={(e) => e.stopPropagation()}>
+        <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col' onClick={(e) => e.stopPropagation()}>
           <div className='flex justify-between items-center px-4 py-3 bg-primary-600'>
             <p className='text-white font-roboto font-semibold truncate'>{previewFile.fileName}</p>
             <div className='flex items-center gap-5'>
               {previewFile.fileType === 'pdf' ? (
-                <a
-                  href={previewFile.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white text-md font-roboto hover:opacity-70"
-                  title="Open PDF in new tab"
-                >
+                <a href={previewFile.fileUrl} target="_blank" rel="noopener noreferrer" className="text-white text-md font-roboto hover:opacity-70" title="Open PDF in new tab">
                   <div className="flex flex-row gap-3 items-center">
                     <img className="w-5 h-5" src="/ViewIcon.png" alt="view icon" />
                     View in New Tab
                   </div>
                 </a>
               ) : (
-                <a
-                  href={previewFile.fileUrl}
-                  download
-                  className="text-white text-md font-roboto hover:opacity-70"
-                  title="Download file"
-                >
+                <a href={previewFile.fileUrl} download className="text-white text-md font-roboto hover:opacity-70" title="Download file">
                   <div className="flex flex-row gap-3 items-center">
                     <img className="w-5 h-5" src="/downloadIcon.png" alt="download icon" />
                     Download
@@ -465,26 +491,16 @@ const filteredFiles =
           </div>
 
           <div className={`flex-1 bg-gray-900 ${previewFile.fileType === 'pdf' ? 'flex flex-col overflow-hidden' : 'flex items-center justify-center overflow-auto'}`}>
-
-            {/* Images */}
             {['png', 'jpg', 'jpeg'].includes(previewFile.fileType) && (
-              <img
-                src={previewFile.fileUrl}
-                alt={previewFile.fileName}
-                className='max-w-full max-h-full object-contain'
-              />
+              <img src={previewFile.fileUrl} alt={previewFile.fileName} className='max-w-full max-h-full object-contain' />
             )}
-            {/*PDF*/}
+
             {previewFile.fileType === 'pdf' && (
               <div className='flex flex-col w-full h-full'>
-                
                 <div className='flex-1 overflow-y-auto flex justify-center py-4'>
                   <Document
                     file={pdfFile}
-                    onLoadSuccess={({ numPages }) => {
-                      setNumPages(numPages)
-                      setPageNumber(1)
-                    }}
+                    onLoadSuccess={({ numPages }) => { setNumPages(numPages); setPageNumber(1) }}
                     onLoadError={(error) => console.error('PDF load error:', error)}
                     loading={<p className='text-white font-roboto mt-10'>Loading PDF...</p>}
                     error={<p className='text-red-400 font-roboto mt-10'>Failed to load PDF.</p>}
@@ -497,35 +513,20 @@ const filteredFiles =
                     />
                   </Document>
                 </div>
-
                 {numPages > 0 && (
                   <div className='flex-shrink-0 flex items-center justify-center gap-4 py-4 bg-gray-900'>
                     <div className='flex items-center gap-4 bg-gray-800 px-6 py-3 rounded-full'>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.max(p - 1, 1)) }}
-                        disabled={pageNumber <= 1}
-                        className='text-white font-bold text-lg disabled:opacity-30 px-2'
-                      >‹</button>
-                      <p className='text-white font-roboto text-sm'>
-                        Page {pageNumber} of {numPages}
-                      </p>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.min(p + 1, numPages)) }}
-                        disabled={pageNumber >= numPages}
-                        className='text-white font-bold text-lg disabled:opacity-30 px-2'
-                      >›</button>
+                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.max(p - 1, 1)) }} disabled={pageNumber <= 1} className='text-white font-bold text-lg disabled:opacity-30 px-2'>‹</button>
+                      <p className='text-white font-roboto text-sm'>Page {pageNumber} of {numPages}</p>
+                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.min(p + 1, numPages)) }} disabled={pageNumber >= numPages} className='text-white font-bold text-lg disabled:opacity-30 px-2'>›</button>
                     </div>
                   </div>
                 )}
               </div>
             )}
-            {/* TXT */}
-            {previewFile.fileType === 'txt' && (
-              <TxtPreview url={previewFile.fileUrl} />
-            )}
-            
 
-            {/* DOCX / PPTX / DOC / PPT */}
+            {previewFile.fileType === 'txt' && <TxtPreview url={previewFile.fileUrl} />}
+
             {['doc', 'docx', 'ppt', 'pptx'].includes(previewFile.fileType) && (
               <iframe
                 src={`https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(previewFile.fileUrl)}`}
@@ -533,18 +534,17 @@ const filteredFiles =
                 title={previewFile.fileName}
               />
             )}
-
           </div>
         </div>
       )}
-            {pendingDelete && (
-            <SoftDeleteModal
-              itemName={pendingDelete.name}
-              onConfirm={handleDelete}
-              onCancel={() => setPendingDelete(null)}
-            />
-          )}
-      
+
+      {pendingDelete && (
+        <SoftDeleteModal
+          itemName={pendingDelete.name}
+          onConfirm={handleDelete}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
 
       {/* Edit Filename Modal */}
       {showEditModal && (

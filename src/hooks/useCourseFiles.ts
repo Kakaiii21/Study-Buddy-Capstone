@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { softDelete } from '../services/recentlyDeletedService'
+import { parseFileSizeToBytes } from '../utils/fileUtils'
 import {
   collection,
   addDoc,
@@ -8,6 +9,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  increment,
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
@@ -59,6 +61,7 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     fileSize: string,
   ) {
     if (!user || !courseId) return
+
     await addDoc(collection(db, 'users', user.uid, 'courses', courseId, 'files'), {
       fileName,
       fileUrl,
@@ -68,6 +71,10 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
       uid: user.uid,
       createdAt: Date.now(),
     })
+
+    await updateDoc(doc(db, 'users', user.uid), {
+      storageUsed: increment(parseFileSizeToBytes(fileSize))
+    })
   }
 
   async function renameCourseFile(fileId: string, newFileName: string) {
@@ -76,17 +83,23 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     await updateDoc(fileRef, { fileName: newFileName.trim() })
   }
 
-async function deleteCourseFile(fileId: string) {
-  if (!user || !courseId) return
-  const file = files.find((f) => f.id === fileId)
-  if (!file) return
-  await softDelete(user.uid, {
-    name: file.fileName,
-    type: 'Course',
-    originalCollection: `users/${user.uid}/courses/${courseId}/files`,
-    originalDocId: fileId,
-    data: { ...file },
-  })
-}
+  async function deleteCourseFile(fileId: string) {
+    if (!user || !courseId) return
+    const file = files.find((f) => f.id === fileId)
+    if (!file) return
+
+    await softDelete(user.uid, {
+      name: file.fileName,
+      type: 'Course',
+      originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+      originalDocId: fileId,
+      data: { ...file },
+    })
+
+    await updateDoc(doc(db, 'users', user.uid), {
+      storageUsed: increment(-parseFileSizeToBytes(file.fileSize))
+    })
+  }
+
   return { files, loading, addCourseFile, renameCourseFile, deleteCourseFile }
 }
