@@ -6,7 +6,6 @@ import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
 
-
 admin.initializeApp()
 
 function setCors(res: any) {
@@ -25,7 +24,7 @@ export const generateStudyMaterial = onRequest(
 
     try {
       const apiKey = process.env.GROQ_API_KEY
-      if (!apiKey) { res.status(500).json({ error: 'GROQ_API_KEY not set in functions/.env' }); return }
+      if (!apiKey) { res.status(500).json({ error: 'GROQ_API_KEY not set' }); return }
 
       const contentType = req.headers['content-type'] || ''
       let fileBuffer: Buffer | null = null
@@ -59,7 +58,6 @@ export const generateStudyMaterial = onRequest(
       }
 
       const textSample = rawText.slice(0, 4000)
-
       let prompt = ''
 
       if (mode === 'quiz') {
@@ -69,18 +67,25 @@ STRICT RULES:
 - Each question must have exactly 4 options (A, B, C, D)
 - All 4 options must be MEANINGFULLY DIFFERENT from each other
 - Do NOT create options that say the same thing in a different order or with minor word swaps
-- Do NOT create options that are synonyms or near-identical restatements
 - Each wrong option must be clearly distinct and plausible but incorrect
 - Only ONE option can be correct
+- You MUST include the "Correct:" line after EVERY question — do NOT skip it
 - Do NOT add any introduction, closing remarks, or explanations
 
-FORMAT (strict):
+FORMAT (copy this pattern exactly for every question):
 Question 1: [question text]
 A) [option]
 B) [option]
 C) [option]
 D) [option]
 Correct: A
+
+Question 2: [question text]
+A) [option]
+B) [option]
+C) [option]
+D) [option]
+Correct: C
 
 TEXT:
 ${textSample}`
@@ -91,13 +96,13 @@ STRICT RULES:
 - DO NOT add introductions or summaries
 - DO NOT say 'Here are the flashcards'
 - Each term must be unique — do NOT repeat or rephrase the same concept twice
-- The definition must be clearly different from the term (do NOT restate the term as the definition)
+- The definition must be clearly different from the term
 - Use ONLY the format below
 - One blank line between cards
 
 FORMAT (STRICT):
 Card 1 Front: [short term or concept]
-Card 1 Back: [clear and concise definition that does not just reword the term]
+Card 1 Back: [clear and concise definition]
 
 Card 2 Front: ...
 Card 2 Back: ...
@@ -106,30 +111,15 @@ TEXT:
 ${textSample}`
       }
 
-      // ── Call Groq and capture token usage + remaining budget ─────────────
       const { text: aiResponse, usage, remainingTokens } = await callGroq(prompt, apiKey)
       console.log(`[Token Usage] prompt: ${usage.prompt_tokens} | completion: ${usage.completion_tokens} | total: ${usage.total_tokens}`)
-      console.log(`[Remaining Tokens from Groq] ${remainingTokens}`)
+      console.log(`[Remaining Tokens] ${remainingTokens}`)
+      console.log('[Raw AI Response]', aiResponse)
 
-      let items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
+      const items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
       console.log(`[Parsed Items Count] ${items.length}`)
 
-      // ── Verify only if enough token headroom remains ──────────────────────
-      if (remainingTokens > 2000 && items.length > 0) {
-        try {
-          items = await verifyItems(items, mode, apiKey)
-        } catch (verifyErr) {
-          console.warn('[Verify] Skipped due to error:', verifyErr)
-        }
-      } else {
-        console.warn(`[Verify] Skipped — only ${remainingTokens} tokens remaining`)
-      }
-
-      if (mode === 'quiz') {
-        res.status(200).json({ mode: 'quiz', items, usage })
-      } else {
-        res.status(200).json({ mode: 'flashcard', items, usage })
-      }
+      res.status(200).json({ mode, items, usage })
 
     } catch (err: unknown) {
       console.error('generateStudyMaterial error:', err)
@@ -138,8 +128,6 @@ ${textSample}`
     }
   }
 )
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: string; mode: 'quiz' | 'flashcard'; numItems: number }> {
   return new Promise((resolve, reject) => {
@@ -175,45 +163,4 @@ function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: strin
   })
 }
 
-async function verifyItems(
-  items: any[],
-  mode: 'quiz' | 'flashcard',
-  apiKey: string
-): Promise<any[]> {
-  const verifyPrompt = mode === 'quiz'
-    ? `You are a quiz quality checker. Review these questions and fix the following issues:
-- Merge or rewrite answer choices that mean the same thing, even if worded differently or reordered
-- Fix questions where the marked correct answer is actually wrong
-- Remove completely duplicate questions
-- Keep the same number of items if possible
-
-Return ONLY a valid JSON array with this exact shape, no explanation, no markdown:
-[{"question":"...","options":["...","...","...","..."],"answer":"A"}]
-
-Questions to review:
-${JSON.stringify(items)}`
-
-    : `You are a flashcard quality checker. Review these flashcards and fix the following issues:
-- Remove cards where the definition just restates the term
-- Merge duplicate cards that cover the same concept
-- Keep the same number of items if possible
-
-Return ONLY a valid JSON array with this exact shape, no explanation, no markdown:
-[{"term":"...","definition":"..."}]
-
-Flashcards to review:
-${JSON.stringify(items)}`
-
-  const { text } = await callGroq(verifyPrompt, apiKey)
-
-  const cleaned = text.replace(/```json|```/g, '').trim()
-  const parsed = JSON.parse(cleaned)
-
-  if (!Array.isArray(parsed) || parsed.length < Math.floor(items.length / 2)) {
-    console.warn('[Verify] Returned too few items, keeping original')
-    return items
-  }
-
-  return parsed
-}
 export { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
