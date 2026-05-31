@@ -14,6 +14,14 @@ function setCors(res: any) {
   res.set('Access-Control-Allow-Headers', 'Content-Type')
 }
 
+// ── NEW: estimate how many items the text can support ────────────────────────
+function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
+  const wordCount = text.trim().split(/\s+/).length
+  const wordsPerItem = mode === 'quiz' ? 80 : 40
+  return Math.max(10, Math.floor(wordCount / wordsPerItem))
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const generateStudyMaterial = onRequest(
   { timeoutSeconds: 300, memory: '512MiB' },
   async (req, res) => {
@@ -57,11 +65,33 @@ export const generateStudyMaterial = onRequest(
         res.status(400).json({ error: 'Could not extract enough text from the file.' }); return
       }
 
+      // ── NEW: check if file has enough content for the requested item count ─
+      const estimatedMax = estimateMaxItems(rawText, mode)
+      if (numItems > estimatedMax) {
+        res.status(400).json({
+          error: `The file may not have enough content for ${numItems} ${mode === 'quiz' ? 'questions' : 'flashcards'}. Try ${estimatedMax} or fewer.`,
+          suggested_max: estimatedMax,
+        })
+        return
+      }
+      // ───────────────────────────────────────────────────────────────────────
+
       const textSample = rawText.slice(0, 4000)
+
+      // ── NEW: language + strict source instruction ─────────────────────────
+        const languageInstruction = `IMPORTANT:
+        - Keep ALL format keywords in English exactly as shown (Question 1:, A), B), C), D), Correct:, Card 1 Front:, Card 1 Back:, etc.)
+        - Write the actual content (questions, options, terms, definitions) in the same language as the SOURCE TEXT below.
+        - Use ONLY the information provided in the SOURCE TEXT below. Do NOT use any external knowledge, assumptions, or information not found in the text.
+        - If the text does not contain enough information for ${numItems} items, generate fewer items rather than making things up.`
+      // ─────────────────────────────────────────────────────────────────────
+
       let prompt = ''
 
       if (mode === 'quiz') {
-        prompt = `Create exactly ${numItems} multiple choice questions based on the text below.
+        prompt = `${languageInstruction}
+
+Create exactly ${numItems} multiple choice questions based on the text below.
 
 STRICT RULES:
 - Each question must have exactly 4 options (A, B, C, D)
@@ -87,16 +117,19 @@ C) [option]
 D) [option]
 Correct: C
 
-TEXT:
+SOURCE TEXT (use ONLY this, nothing else):
 ${textSample}`
       } else {
-        prompt = `Create exactly ${numItems} flashcards based on the text below.
+        prompt = `${languageInstruction}
+
+Create exactly ${numItems} flashcards based on the text below.
 
 STRICT RULES:
 - DO NOT add introductions or summaries
 - DO NOT say 'Here are the flashcards'
 - Each term must be unique — do NOT repeat or rephrase the same concept twice
 - The definition must be clearly different from the term
+- Write ALL definitions in the SAME LANGUAGE as the source text
 - Use ONLY the format below
 - One blank line between cards
 
@@ -107,7 +140,7 @@ Card 1 Back: [clear and concise definition]
 Card 2 Front: ...
 Card 2 Back: ...
 
-TEXT:
+SOURCE TEXT (use ONLY this, nothing else):
 ${textSample}`
       }
 

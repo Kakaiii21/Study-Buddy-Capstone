@@ -59,17 +59,13 @@ export function parseFlashcards(response: string): Flashcard[] {
     const line = raw.trim()
     if (!line) continue
 
-    // Match: "Card 1 Front: ..."
     if (/^Card\s*\d+\s*Front:\s*(.+)$/i.test(line)) {
-      if (current.term && current.definition) {
-        flashcards.push(current as Flashcard)
-      }
+      if (current.term && current.definition) flashcards.push(current as Flashcard)
       const match = line.match(/^Card\s*\d+\s*Front:\s*(.+)$/i)!
       current = { term: match[1].trim(), definition: '' }
       continue
     }
 
-    // Match: "Card 1 Back: ..."
     if (/^Card\s*\d+\s*Back:\s*(.+)$/i.test(line)) {
       const match = line.match(/^Card\s*\d+\s*Back:\s*(.+)$/i)!
       current.definition = match[1].trim()
@@ -77,9 +73,18 @@ export function parseFlashcards(response: string): Flashcard[] {
     }
   }
 
-  if (current.term && current.definition) {
-    flashcards.push(current as Flashcard)
+  if (current.term && current.definition) flashcards.push(current as Flashcard)
+
+  // ── NEW: fallback for plain "term\ndefinition" format ──────────────────
+  if (flashcards.length === 0) {
+    const plainLines = response.split('\n').map(l => l.trim()).filter(Boolean)
+    for (let i = 0; i + 1 < plainLines.length; i += 2) {
+      const term = plainLines[i]
+      const definition = plainLines[i + 1]
+      if (term && definition) flashcards.push({ term, definition })
+    }
   }
+  // ───────────────────────────────────────────────────────────────────────
 
   return flashcards
 }

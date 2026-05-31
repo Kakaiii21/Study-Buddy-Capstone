@@ -20,22 +20,31 @@ export async function callGroq(
   prompt: string,
   apiKey: string
 ): Promise<GroqResult> {
-  const response = await axios.post(
-    GROQ_API_URL,
-    {
-      model: GROQ_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
-      max_tokens: 4000,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+  let response
+  try {
+    response = await axios.post(
+      GROQ_API_URL,
+      {
+        model: GROQ_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 4000,
       },
-      timeout: 60000,
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 60000,
+      }
+    )
+  } catch (err: any) {
+    if (err?.response?.status === 429) {
+      const retryAfter = err.response.headers['retry-after'] ?? '30'
+      throw new Error(`Rate limit reached. Please wait ${retryAfter} seconds and try again.`)
     }
-  )
+    throw err
+  }
 
   const content = response.data?.choices?.[0]?.message?.content
   if (!content) throw new Error('Empty response from Groq API')
@@ -49,6 +58,6 @@ export async function callGroq(
   const remainingTokens = parseInt(
     response.headers['x-ratelimit-remaining-tokens'] ?? '6000'
   )
- 
+
   return { text: content, usage, remainingTokens }
- }
+}

@@ -135,8 +135,9 @@ function ClassSchedule() {
                 <div className='flex flex-row'>
                   <p className='text-[20px] font-roboto font-bold text-primary-600'>{s.subject}</p>
 
-                  <div data-note-menu className='relative ml-auto'>
+                  <div data-note-menu className='relative ml-auto '>
                     <button
+                    className='hover:opacity-50'
                       title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
