@@ -137,11 +137,11 @@ function Courses() {
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row justify-between lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <p className='text-3xl lg:text-4xl lg:ml-0 md:text-4xl md:ml-10 font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+          <div className='flex flex-col md:flex-row justify-between lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
+            <p className='text-4xl lg:ml-0  md:text-4xl md:ml-16  font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Courses
             </p>
-            <hr className='lg:hidden w-full border-t border-primary-600 ' />
+            <hr className='lg:hidden md:hidden w-full border-t border-primary-600 ' />
 
             <button
               onClick={() => setShowModal(true)}

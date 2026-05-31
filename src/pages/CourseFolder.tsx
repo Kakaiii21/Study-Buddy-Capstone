@@ -217,6 +217,25 @@ const handleFiles = async (incoming: FileList | null) => {
     setActiveFileMenu(null)
     setEditError('')
   }
+  const handleDownload = async (file: CourseFile) => {
+    setActiveFileMenu(null)
+    try {
+      const response = await fetch(file.fileUrl)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = file.fileName
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Download failed:', err)
+      // Fallback — open in new tab if fetch fails
+      window.open(file.fileUrl, '_blank')
+    }
+  }
 
   const handleEditSave = async () => {
     const trimmedName = editName.trim()
@@ -279,12 +298,12 @@ const handleFiles = async (incoming: FileList | null) => {
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row lg:justify-between lg:items-center w-full gap-3 mb-6'>
+          <div className='flex flex-col md:flex-row  md:justify-between md:items-center lg:justify-between lg:items-center w-full gap-3 mb-6'>
             <div className="flex items-center gap-4">
               <button
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
-                className="flex flex-col items-center px-3 py-1 rounded hover:bg-gray-100 transition"
+                className="flex flex-col items-center md:pl-16 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
                 <span className="text-2xl leading-none">←</span>
                 <span className="text-sm">Back</span>
@@ -431,7 +450,7 @@ const handleFiles = async (incoming: FileList | null) => {
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setActiveFileMenu(activeFileMenu === file.id ? null : file.id) }}
-                      className='flex flex-col items-center justify-center gap-[3px] p-2 rounded-full hover:bg-gray-100 w-7 h-7'
+                      className='flex flex-col items-center justify-center gap-[3px] p-2 rounded-full hover:bg-gray-100 w-8 h-12'
                       title='Options'
                     >
                       <span className='w-1 h-1 bg-gray-500 rounded-full'></span>
@@ -449,6 +468,14 @@ const handleFiles = async (incoming: FileList | null) => {
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                         >
                           <img src='/edit.png' alt='edit icon' className='w-5 h-5' /> Rename
+                        </button>
+                        <hr className='my-1 border-gray-100' />
+                        {/* ← add this: */}
+                        <button
+                          onClick={() => handleDownload(file)}
+                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                        >
+                          <img src='/download.png' alt='download icon' className='w-5 h-5' /> Download
                         </button>
                         <hr className='my-1 border-gray-100' />
                         <button
