@@ -165,7 +165,6 @@ function TaskModal({
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      onClick={onClose}
     >
       <div
         className="bg-white rounded-2xl p-12 mx-6 w-full max-w-md"
@@ -463,7 +462,8 @@ function Column({
       ref={setNodeRef}
       className={`
         w-full lg:flex-1
-        flex flex-col items-center p-4 sm:p-6 lg:p-10
+        md:px-20
+        flex flex-col items-center p-4 sm:p-6 lg:p-10 rounded-3xl
         transition-colors duration-200
         ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
         ${isOver ? 'bg-primary-50' : ''}
@@ -484,8 +484,9 @@ function Column({
 
       {/* Smooth collapse using grid-rows trick — no overflow-hidden on outer so dragged cards aren't clipped */}
       <div
+
         style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
-        className="grid transition-all duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
+        className="grid transition-all  md:px-24 duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
       >
         <div className={`min-h-0 flex flex-col items-center w-full mt-4 transition-opacity duration-300
           ${collapsed ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}
@@ -597,9 +598,9 @@ function ToDoList() {
       <main className="flex-1 overflow-auto p-8">
         <div className="min-h-screen flex flex-col">
 
-          <div className="w-full flex flex-col lg:flex-row justify-center lg:justify-between lg:items-start sm:items-center gap-4 p-2">
-            <p className="text-3xl lg:text-4xl lg:pt-2 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
-            <hr className='lg:hidden w-full border-t border-primary-600' />
+          <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
+            <p className="text-3xl lg:text-4xl lg:pt-2 md:ml-10 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
+            <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
             <button
               onClick={() => setIsAddModalOpen(true)}
               className="bg-green-500 text-white font-roboto font-bold mx-10 text-md py-3 px-9 rounded-md"
