@@ -64,7 +64,6 @@ function Account() {
     fetchUser()
   }, [user])
 
-  // ─── Save a single field to Firestore ────────────────────────────────────
   const handleSave = async (field: 'firstName' | 'lastName') => {
     if (!user) return
     setSaving(field)
@@ -74,6 +73,8 @@ function Account() {
 
       if (field === 'firstName') sessionStorage.setItem('firstName', firstName)
       if (field === 'lastName') sessionStorage.setItem('lastName', lastName)
+
+      sessionStorage.removeItem(`user_${user.uid}`)  
 
       const label = field === 'firstName' ? 'First name' : 'Last name'
       showToast(`${label} updated successfully!`)
@@ -95,10 +96,12 @@ function Account() {
       await updateDoc(doc(db, 'users', user.uid), {
         photoURL: result.url,
         photoPublicId: result.publicId
+        
       })
-      setProfilePic(result.url)
-      sessionStorage.setItem('profilePic', result.url)
-      showToast('Profile picture updated successfully!')
+        setProfilePic(result.url)
+        sessionStorage.setItem('profilePic', result.url)
+        sessionStorage.removeItem(`user_${user.uid}`)  
+        showToast('Profile picture updated successfully!')
     } catch (err) {
       console.error('Profile picture upload failed:', err)
       showToast('Failed to upload picture. Please try again.')
@@ -122,8 +125,8 @@ function Account() {
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <p className='text-3xl md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+          <div className='flex flex-col md:items-center md:ml-16 lg:ml-0 md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6'>
+            <p className='text-3xl  md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Account
             </p>
           </div>

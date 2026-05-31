@@ -124,8 +124,8 @@ function ChangeEmail() {
       <main className='flex-1 overflow-auto p-8 mt-1'>
         <div className='min-h-screen flex flex-col'>
 
-          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <p className='text-3xl md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+          <div className='flex flex-col md:flex-row lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
+            <p className='text-3xl md:ml-16 lg:ml-0  md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Change Email
             </p>
           </div>
