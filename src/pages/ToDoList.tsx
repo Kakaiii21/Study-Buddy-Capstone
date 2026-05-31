@@ -486,7 +486,7 @@ function Column({
       <div
 
         style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
-        className="grid transition-all  md:px-24 duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
+        className="grid transition-all lg:px-0 md:px-24 duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
       >
         <div className={`min-h-0 flex flex-col items-center w-full mt-4 transition-opacity duration-300
           ${collapsed ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}
@@ -599,7 +599,7 @@ function ToDoList() {
         <div className="min-h-screen flex flex-col">
 
           <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
-            <p className="text-3xl lg:text-4xl lg:pt-2 md:ml-10 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
+            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
             <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
             <button
               onClick={() => setIsAddModalOpen(true)}
