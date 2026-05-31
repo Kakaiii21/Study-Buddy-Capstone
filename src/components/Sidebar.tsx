@@ -4,9 +4,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 type Props = {
   uploading?: boolean
+   quizActive?: boolean  
 }
 
-function Sidebar({ uploading = false }: Props) {
+function Sidebar({ uploading = false, quizActive = false }: Props) {
+  const isBlocked = uploading || quizActive  // ← combine both
   const [isOpen, setIsOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const navigate = useNavigate()
@@ -20,11 +22,10 @@ function Sidebar({ uploading = false }: Props) {
   }
 
   const handleNavigate = (path: string) => {
-    if (uploading) return // ← block navigation while uploading
+    if (isBlocked) return  // ← block navigation
     navigate(path)
     setIsOpen(false)
   }
-
   const navSections = [
     {
       heading: 'Home',
@@ -56,9 +57,9 @@ function Sidebar({ uploading = false }: Props) {
     <>
       {/* BURGER BUTTON */}
       <button
-        onClick={() => !uploading && setIsOpen(!isOpen)}
+        onClick={() => !isBlocked && setIsOpen(!isOpen)}
         className={`lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center
-          ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <img src="/menu.png" alt="menu" className="w-10 h-8" />
         <span className="text-xs text-primary-600 mt-1" />
@@ -80,7 +81,7 @@ function Sidebar({ uploading = false }: Props) {
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:flex
-          ${uploading ? 'opacity-50 pointer-events-none' : ''}
+          ${isBlocked ? 'opacity-50 pointer-events-none' : ''}
         `}
       >
         {/* LOGO */}
@@ -128,7 +129,7 @@ function Sidebar({ uploading = false }: Props) {
 
           {/* LOGOUT */}
           <button
-            onClick={() => !uploading && setShowLogoutModal(true)}
+            onClick={() => !isBlocked && setShowLogoutModal(true)}
             className="w-full text-left py-2 pl-20 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout

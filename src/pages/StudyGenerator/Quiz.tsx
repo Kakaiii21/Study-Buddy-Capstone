@@ -1,4 +1,4 @@
-import  { useState, useRef } from 'react'
+import  { useState, useRef ,useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 import { SESSION_KEY_RESULT } from '../StudyGenerator'
@@ -56,6 +56,8 @@ function Quiz() {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+
   // useRef so result never goes null on re-renders
   const [result] = useState<ResultState | null>(() => loadResult(location.state))
 
@@ -79,23 +81,38 @@ function Quiz() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [finalScore, setFinalScore] = useState(0)
 
+      useEffect(() => {
+      if (submitted) return
+      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+      window.addEventListener('beforeunload', handleBeforeUnload)
+      return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    }, [submitted])
+
+      const handleDiscardAttempt = () => {
+        setShowLeaveConfirm(true)
+      }
+
   // Guard: only trigger if result was never available (not when session is cleared mid-quiz)
-  if (!result?.items || result.items.length === 0) {
-    return (
-      <div className='flex h-screen'>
-        <Sidebar />
-        <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
-          <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No quiz data found.</p>
-          <button
-            className='bg-primary-600 text-white font-roboto px-6 py-2 rounded-md hover:bg-primary-500'
-            onClick={() => navigate('/studyGenerator')}
-          >
-            Go Back
-          </button>
-        </main>
-      </div>
-    )
-  }
+    if (!result?.items || result.items.length === 0) {
+          return (
+          <div className='flex h-screen'>
+            <Sidebar quizActive={!submitted} />
+            <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
+              <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No quiz data found.</p>
+              <button
+                className='bg-primary-600 text-white font-roboto px-6 py-2 rounded-md hover:bg-primary-500'
+                onClick={() => navigate('/studyGenerator')}
+              >
+                Go Back
+              </button>
+            </main>
+          </div>
+        )
+      }
+
 
   const optionLetters = ['A', 'B', 'C', 'D']
   const allAnswered = questions.every((_, i) => selected[i] !== undefined)
@@ -244,9 +261,11 @@ function Quiz() {
     setEditDraft(null)
   }
 
+
+
   return (
     <div className='flex h-screen'>
-      <Sidebar />
+     <Sidebar quizActive={!submitted} />
       <main className='flex-1 overflow-auto p-8'>
 
         <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6'>
@@ -439,7 +458,7 @@ function Quiz() {
             )}
             <button
               className='hover:opacity-50 bg-gray-500 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase'
-              onClick={handleDiscard}
+                onClick={submitted ? handleDiscard : handleDiscardAttempt}
             >
               Discard
             </button>
@@ -522,6 +541,33 @@ function Quiz() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {showLeaveConfirm && (
+        <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/50'>
+          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
+            <p className='text-xl font-bold text-primary-600 uppercase text-center font-roboto'>
+              Leave Quiz?
+            </p>
+            <p className='text-sm text-gray-500 text-center'>
+              Your progress will be lost if you leave. Are you sure you want to discard this quiz?
+            </p>
+            <div className='flex gap-4 w-full'>
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50 font-roboto uppercase'
+              >
+                Keep Going
+              </button>
+              <button
+                onClick={() => { setShowLeaveConfirm(false); handleDiscard() }}
+                className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600 font-roboto uppercase'
+              >
+                Discard
+              </button>
+            </div>
           </div>
         </div>
       )}

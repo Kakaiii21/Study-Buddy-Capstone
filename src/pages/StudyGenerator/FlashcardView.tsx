@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 import { db, auth } from '../../services/firebase'
@@ -15,13 +15,24 @@ interface FlashcardViewState {
   id: string
 }
 
+// ← Outside the component so it's stable
+const FLASHCARD_VIEW_KEY = 'flashcard_view_state'
+
 function FlashcardView() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const state = location.state as FlashcardViewState | null
+  const rawState = location.state as FlashcardViewState | null
 
-  // ── All hooks must be before any early return ──
+  // Read from sessionStorage as fallback
+  const state: FlashcardViewState | null = rawState ?? (() => {
+    try {
+      const saved = sessionStorage.getItem(FLASHCARD_VIEW_KEY)
+      return saved ? JSON.parse(saved) : null
+    } catch { return null }
+  })()
+
+  // ── All hooks BEFORE any early return ──
   const [cards, setCards] = useState<FlashcardItem[]>(state?.items ?? [])
   const [flipped, setFlipped] = useState<Record<number, boolean>>({})
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null)
@@ -32,7 +43,14 @@ function FlashcardView() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null)
 
-  // Fallback guard — AFTER all hooks
+  // ← Save to sessionStorage via useEffect, not during render
+  useEffect(() => {
+    if (rawState?.items && rawState.items.length > 0) {
+      sessionStorage.setItem(FLASHCARD_VIEW_KEY, JSON.stringify(rawState))
+    }
+  }, [rawState])
+
+  // ── Early return guard AFTER all hooks ──
   if (!state?.items || state.items.length === 0) {
     return (
       <div className='flex h-screen'>
@@ -57,27 +75,27 @@ function FlashcardView() {
     setFlipped((prev) => ({ ...prev, [index]: !prev[index] }))
   }
 
-    const persistCards = async (updated: FlashcardItem[]) => {
+  const persistCards = async (updated: FlashcardItem[]) => {
     const user = auth.currentUser
     if (!user || !id) {
-        console.warn('Missing user or id', { uid: user?.uid, id })
-        return
+      console.warn('Missing user or id', { uid: user?.uid, id })
+      return
     }
     setSaving(true)
     setSaveError(null)
     try {
-        await updateDoc(doc(db, 'users', user.uid, 'flashcardHistory', id), {
+      await updateDoc(doc(db, 'users', user.uid, 'flashcardHistory', id), {
         items: updated,
         total: updated.length,
-        })
-        setShowSuccessModal(true)   
+      })
+      setShowSuccessModal(true)
     } catch (err) {
-        console.error('Update failed:', err)
-        setSaveError('Failed to save changes.')
+      console.error('Update failed:', err)
+      setSaveError('Failed to save changes.')
     } finally {
-        setSaving(false)
+      setSaving(false)
     }
-    }
+  }
 
   const handleEditOpen = (index: number) => {
     setEditIndex(index)
@@ -85,34 +103,35 @@ function FlashcardView() {
     setOpenMenuIndex(null)
   }
 
-    const handleEditSave = () => {
+  const handleEditSave = () => {
     if (editDraft && editIndex !== null) {
-        const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
-        setCards(updated)
+      const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
+      setCards(updated)
     }
     setEditIndex(null)
     setEditDraft(null)
-    }
+  }
+
   const handleEditCancel = () => {
     setEditIndex(null)
     setEditDraft(null)
   }
 
-    const handleDelete = (index: number) => {
+  const handleDelete = (index: number) => {
     const updated = cards.filter((_, i) => i !== index)
     setCards(updated)
     setFlipped((prev) => {
-        const next: Record<number, boolean> = {}
-        Object.entries(prev).forEach(([k, v]) => {
+      const next: Record<number, boolean> = {}
+      Object.entries(prev).forEach(([k, v]) => {
         const ki = parseInt(k)
         if (ki < index) next[ki] = v
         else if (ki > index) next[ki - 1] = v
-        })
-        return next
+      })
+      return next
     })
     setDeleteConfirmIndex(null)
     setOpenMenuIndex(null)
-    }
+  }
 
   return (
     <div className='flex h-screen'>
@@ -247,7 +266,10 @@ function FlashcardView() {
           <div className='flex flex-row ml-auto gap-4 mb-10'>
             <button
               className='hover:opacity-50 bg-gray-500 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'
-              onClick={() => navigate('/history')}
+              onClick={() => {
+                sessionStorage.removeItem(FLASHCARD_VIEW_KEY)
+                navigate('/history')
+              }}
             >
               Discard
             </button>
@@ -262,27 +284,31 @@ function FlashcardView() {
 
       </main>
 
+      {/* ── Success Modal ── */}
       {showSuccessModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-            <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
+          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
             <div className='flex flex-col items-center gap-2'>
-                <img src="/Saved.png" alt="Saved" className='w-16 h-16'/>
-                <p className='text-primary-600 font-roboto font-bold text-xl text-center uppercase'>
+              <img src='/Saved.png' alt='Saved' className='w-16 h-16' />
+              <p className='text-primary-600 font-roboto font-bold text-xl text-center uppercase'>
                 Flashcards Updated!
-                </p>
-                <p className='text-gray-400 font-roboto text-sm text-center'>
+              </p>
+              <p className='text-gray-400 font-roboto text-sm text-center'>
                 Your changes have been saved successfully.
-                </p>
+              </p>
             </div>
             <button
-                onClick={() => navigate('/history')}
-                className='w-full bg-primary-600 text-white font-roboto py-2.5 rounded-lg hover:opacity-80 transition uppercase font-semibold text-sm'
+              onClick={() => {
+                sessionStorage.removeItem(FLASHCARD_VIEW_KEY)
+                navigate('/history')
+              }}
+              className='w-full bg-primary-600 text-white font-roboto py-2.5 rounded-lg hover:opacity-80 transition uppercase font-semibold text-sm'
             >
-                OK
+              OK
             </button>
-            </div>
+          </div>
         </div>
-        )}
+      )}
 
       {/* ── Delete Confirm Modal ── */}
       {deleteConfirmIndex !== null && (
@@ -296,6 +322,7 @@ function FlashcardView() {
             </p>
             <div className='flex flex-row w-full gap-3'>
               <button
+              aria-label='cancel'
                 onClick={() => setDeleteConfirmIndex(null)}
                 className='flex-1 border-2 border-primary-600 text-primary-600 font-roboto py-2.5 rounded-lg hover:bg-primary-50 transition uppercase font-semibold text-sm'
               >
