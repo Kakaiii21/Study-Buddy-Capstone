@@ -30,6 +30,8 @@ interface CourseFile {
 const ACCEPTED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.txt'
 const FUNCTION_URL = import.meta.env.VITE_STUDY_GENERATOR_URL as string
+const COOLDOWN_MS = 2 * 60 * 1000 // ── NEW: 2 minutes
+const COOLDOWN_KEY = 'studygen_cooldown_until' // ── NEW: localStorage key
 
 // Session storage keys
 export const SESSION_KEY_RESULT = 'studygen_result'
@@ -39,6 +41,14 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
+
+// ── NEW: format seconds to mm:ss ─────────────────────────────────────────────
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Course Picker Modal ──────────────────────────────────────────────────────
 
@@ -189,51 +199,87 @@ function StudyGenerator() {
   const [showCoursePicker, setShowCoursePicker] = useState(false)
   const [fileError, setFileError] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [suggestedMax, setSuggestedMax] = useState<number | null>(null) // ── NEW
+  const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
+  const [cooldownSeconds, setCooldownSeconds] = useState(0) // ── NEW
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null) // ── NEW
   const items = [10, 20, 30, 40, 50]
 
+  // ── NEW: initialize cooldown from localStorage on mount ──────────────────
+  useEffect(() => {
+    const stored = localStorage.getItem(COOLDOWN_KEY)
+    if (stored) {
+      const remaining = Math.ceil((parseInt(stored) - Date.now()) / 1000)
+      if (remaining > 0) startCooldownTimer(remaining)
+    }
+  }, [])
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── NEW: countdown ticker ────────────────────────────────────────────────
+  function startCooldownTimer(seconds: number) {
+    setCooldownSeconds(seconds)
+    if (cooldownRef.current) clearInterval(cooldownRef.current)
+    cooldownRef.current = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(cooldownRef.current!)
+          cooldownRef.current = null
+          localStorage.removeItem(COOLDOWN_KEY)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── NEW: clear interval on unmount ───────────────────────────────────────
+  useEffect(() => {
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current) }
+  }, [])
+  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-  const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved)
-      if (parsed.mode === 'quiz') {
-        navigate('/studyGenerator/Quiz', { state: parsed, replace: true })
-      } else if (parsed.mode === 'flashcard') {
-        navigate('/studyGenerator/Flashcard', { state: parsed, replace: true })
-      }
-    } catch {/**/}
-  }
-}, [])
+    const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed.mode === 'quiz') {
+          navigate('/studyGenerator/Quiz', { state: parsed, replace: true })
+        } else if (parsed.mode === 'flashcard') {
+          navigate('/studyGenerator/Flashcard', { state: parsed, replace: true })
+        }
+      } catch {/**/}
+    }
+  }, [])
+
   // ── Local file handling ───────────────────────────────────────────────────
 
-const handleLocalFile = (fileList: FileList | null) => {
-  if (!fileList || fileList.length === 0) return
-  setFileError('')
-  setSuggestedMax(null) // ── NEW: reset on new file
-  const file = fileList[0]
-  const ext = file.name.split('.').pop()?.toLowerCase() || ''
-  if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-    setFileError(`File type ".${ext}" is not supported. Please upload PDF, DOC, DOCX, PPT, PPTX, or TXT.`)
-    return
-  }
+  const handleLocalFile = (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return
+    setFileError('')
+    setSuggestedMax(null)
+    const file = fileList[0]
+    const ext = file.name.split('.').pop()?.toLowerCase() || ''
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+      setFileError(`File type ".${ext}" is not supported. Please upload PDF, DOC, DOCX, PPT, PPTX, or TXT.`)
+      return
+    }
 
-  const MAX_SIZE = 10 * 1024 * 1024 // 10MB in bytes
-  if (file.size > MAX_SIZE) {
-    setFileError('File size exceeds 10MB. Please upload a smaller file.')
-    return
-  }
+    const MAX_SIZE = 10 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      setFileError('File size exceeds 10MB. Please upload a smaller file.')
+      return
+    }
 
-  setUploadedFile({ name: file.name, size: formatBytes(file.size), type: ext, source: 'local', file })
-}
+    setUploadedFile({ name: file.name, size: formatBytes(file.size), type: ext, source: 'local', file })
+  }
 
   const handleRemoveFile = () => {
     setUploadedFile(null)
     setFileError('')
-    setSuggestedMax(null) // ── NEW: reset on file remove
+    setSuggestedMax(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -242,8 +288,9 @@ const handleLocalFile = (fileList: FileList | null) => {
   const handleGenerate = async () => {
     if (!uploadedFile) { setFileError('Please upload or select a file first.'); return }
     if (!selectItems) { setFileError('Please select the number of items.'); return }
+    if (cooldownSeconds > 0) return // ── NEW: block if on cooldown
     setFileError('')
-    setSuggestedMax(null) // ── NEW: reset before each attempt
+    setSuggestedMax(null)
     setIsGenerating(true)
 
     try {
@@ -270,18 +317,21 @@ const handleLocalFile = (fileList: FileList | null) => {
       const data = await response.json()
 
       if (!response.ok) {
-        // ── NEW: handle suggested_max error from backend ──────────────────
         if (data.suggested_max) {
           setFileError(data.error)
           setSuggestedMax(data.suggested_max)
         } else {
           setFileError(data.error || 'Something went wrong. Please try again.')
         }
-        // ─────────────────────────────────────────────────────────────────
         return
       }
 
-      // ── Save result to sessionStorage so it survives navigation ──
+      // ── NEW: start cooldown on success ───────────────────────────────────
+      const cooldownUntil = Date.now() + COOLDOWN_MS
+      localStorage.setItem(COOLDOWN_KEY, String(cooldownUntil))
+      startCooldownTimer(Math.ceil(COOLDOWN_MS / 1000))
+      // ─────────────────────────────────────────────────────────────────────
+
       const sessionData = {
         items: data.items,
         mode: activeTab,
@@ -298,6 +348,9 @@ const handleLocalFile = (fileList: FileList | null) => {
       setIsGenerating(false)
     }
   }
+
+  const isCoolingDown = cooldownSeconds > 0 // ── NEW
+  const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCoolingDown // ── NEW
 
   const fileIconSrc = uploadedFile
     ? uploadedFile.type === 'pdf' ? '/pdfIcon.png'
@@ -328,6 +381,15 @@ const handleLocalFile = (fileList: FileList | null) => {
             <p className='mt-1 text-md text-center text-primary-600 font-roboto'>
               Generate your own quiz or flashcards by uploading a file.
             </p>
+
+            {/* ── NEW: cooldown banner ── */}
+            {isCoolingDown && (
+              <div className='mt-6 flex items-center gap-3 bg-yellow-50 border border-yellow-300 text-yellow-700 font-roboto text-sm font-semibold px-5 py-3 rounded-xl'>
+                <span>⏳</span>
+                <span>You can generate again in <span className='font-bold text-yellow-800'>{formatCountdown(cooldownSeconds)}</span></span>
+              </div>
+            )}
+            {/* ─────────────────────── */}
 
             {/* File Source Panel */}
             <div className='flex flex-col justify-center mt-10 gap-5 items-center w-full max-w-[800px] border-4 bg-primary-700 border-primary-600 rounded-3xl px-6 py-8'>
@@ -395,7 +457,6 @@ const handleLocalFile = (fileList: FileList | null) => {
               <p className='mt-3 text-red-500 text-sm font-roboto text-center'>{fileError}</p>
             )}
 
-            {/* ── NEW: suggested max quick-fix button ── */}
             {suggestedMax && (
               <button
                 className='mt-2 text-sm font-roboto font-bold text-white bg-primary-600 hover:bg-primary-500 px-4 py-2 rounded-md transition'
@@ -408,7 +469,6 @@ const handleLocalFile = (fileList: FileList | null) => {
                 Use {suggestedMax} items instead
               </button>
             )}
-            {/* ─────────────────────────────────────── */}
 
             <p className='mt-6 text-center text-xs lg:text-sm md:text-sm text-primary-600'>
               <i><strong>Reminder:</strong> All files generated by Study Buddy may not be 100% accurate.
@@ -443,7 +503,7 @@ const handleLocalFile = (fileList: FileList | null) => {
                     value={selectItems}
                     onChange={(e) => {
                       setSelectItems(e.target.value === '' ? '' : Number(e.target.value))
-                      setSuggestedMax(null) // ── NEW: reset when user manually picks
+                      setSuggestedMax(null)
                       setFileError('')
                     }}
                     disabled={isGenerating}
@@ -458,7 +518,7 @@ const handleLocalFile = (fileList: FileList | null) => {
                     className='sm:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md px-4 py-3'
                     onClick={() => {
                       setSelectItems(items[Math.floor(Math.random() * items.length)])
-                      setSuggestedMax(null) // ── NEW: reset on random pick
+                      setSuggestedMax(null)
                       setFileError('')
                     }}
                     disabled={isGenerating}
@@ -470,13 +530,17 @@ const handleLocalFile = (fileList: FileList | null) => {
 
                 <button
                   className={`mt-8 border font-bold font-roboto uppercase px-5 py-2 rounded-md mb-20 transition
-                    ${uploadedFile && selectItems && !isGenerating
+                    ${canGenerate
                       ? 'bg-green-500 text-white hover:bg-green-400 cursor-pointer'
                       : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
                   onClick={handleGenerate}
-                  disabled={!uploadedFile || !selectItems || isGenerating}
+                  disabled={!canGenerate}
                 >
-                  {isGenerating ? 'Generating...' : 'Generate Now'}
+                  {isGenerating
+                    ? 'Generating...'
+                    : isCoolingDown
+                      ? `Wait ${formatCountdown(cooldownSeconds)}`
+                      : 'Generate Now'}
                 </button>
               </div>
             )}
@@ -490,7 +554,7 @@ const handleLocalFile = (fileList: FileList | null) => {
           courses={courses}
           onSelect={(file) => { setUploadedFile(file); setFileError(''); setSuggestedMax(null) }}
           onClose={() => setShowCoursePicker(false)}
-          onError={(msg) => { setFileError(msg); setShowCoursePicker(false) }} 
+          onError={(msg) => { setFileError(msg); setShowCoursePicker(false) }}
         />
       )}
     </div>
