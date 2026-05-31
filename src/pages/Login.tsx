@@ -17,6 +17,8 @@ type TouchedFields = {
 function Login() {
   const navigate = useNavigate()
   const emailUpdated = new URLSearchParams(window.location.search).get('emailUpdated')
+  const passwordUpdated = new URLSearchParams(window.location.search).get('passwordUpdated') 
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -38,19 +40,21 @@ function Login() {
         return ''
     }
   }
-  const handleGoogleLogin = async () => {
-  try {
-    setLoading(true)
-    await googleLogin()
-    navigate('/dashboard')
-  } catch (err) {
-    const firebaseError = err as { code: string }
-    if (firebaseError.code === 'auth/popup-closed-by-user') return // user just closed popup, no error needed
-    setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
-  } finally {
-    setLoading(false)
-  }
-}
+    const handleGoogleLogin = async () => {
+      try {
+        setLoading(true)
+        await googleLogin()
+        navigate('/dashboard')
+      } catch (err: unknown) {
+        if (
+          typeof err === 'object' && err !== null && 'code' in err &&
+          (err as { code: string }).code === 'auth/popup-closed-by-user'
+        ) return
+        setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
+      } finally {
+        setLoading(false)
+      }
+    }
 
   const handleChange = (field: keyof FieldErrors, value: string) => {
     const newValues = { email, password, [field]: value }
@@ -93,22 +97,24 @@ function Login() {
       }
 
       navigate('/dashboard')
-    } catch (err) {
-      const firebaseError = err as { code: string }
-      if (
-        firebaseError.code === 'auth/invalid-credential' ||
-        firebaseError.code === 'auth/user-not-found' ||
-        firebaseError.code === 'auth/wrong-password'
-      ) {
-        setFieldErrors({ email: 'Invalid email or password.', password: 'Invalid email or password.' })
-        setTouched({ email: true, password: true })
-      } else {
-        setFieldErrors(prev => ({ ...prev, email: 'Something went wrong. Please try again.' }))
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+      } catch (err: unknown) {
+        if (typeof err === 'object' && err !== null && 'code' in err) {
+          const code = (err as { code: string }).code
+          if (
+            code === 'auth/invalid-credential' ||
+            code === 'auth/user-not-found' ||
+            code === 'auth/wrong-password'
+          ) {
+            setFieldErrors({ email: 'Invalid email or password.', password: 'Invalid email or password.' })
+            setTouched({ email: true, password: true })
+          } else {
+            setFieldErrors(prev => ({ ...prev, email: 'Something went wrong. Please try again.' }))
+          }
+        }
+      } finally {
+            setLoading(false)
+          }
+        }
 
   const inputClass = (field: keyof FieldErrors) =>
     `w-full mb-1 p-2 border rounded ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
@@ -138,6 +144,11 @@ function Login() {
           {emailUpdated && (
             <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
                Email updated! Please sign in with your new email.
+            </div>
+          )}
+          {passwordUpdated && (
+            <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              Password updated! Please sign in with your new password.
             </div>
           )}
 

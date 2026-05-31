@@ -2,21 +2,29 @@ import { useState } from 'react'
 import { logout } from '../services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-function Sidebar() {
+type Props = {
+  uploading?: boolean
+}
+
+function Sidebar({ uploading = false }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
- 
+  const handleLogout = async () => {
+    sessionStorage.clear()
+    await logout()
+    setShowLogoutModal(false)
+    navigate('/login')
+  }
 
-const handleLogout = async () => {
-  sessionStorage.clear() 
-  await logout()
-  setShowLogoutModal(false)
-  navigate('/login') 
-}
-  
+  const handleNavigate = (path: string) => {
+    if (uploading) return // ← block navigation while uploading
+    navigate(path)
+    setIsOpen(false)
+  }
+
   const navSections = [
     {
       heading: 'Home',
@@ -46,24 +54,20 @@ const handleLogout = async () => {
 
   return (
     <>
-            {/* BURGER BUTTON */}
+      {/* BURGER BUTTON */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center"
+        onClick={() => !uploading && setIsOpen(!isOpen)}
+        className={`lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center
+          ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
-        <img
-          src="/menu.png"
-          alt="menu"
-          className="w-10 h-8"
-        />
-        <span className="text-xs text-primary-600 mt-1">
-        </span>
+        <img src="/menu.png" alt="menu" className="w-10 h-8" />
+        <span className="text-xs text-primary-600 mt-1" />
       </button>
 
       {/* OVERLAY */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black  bg-opacity-50 z-30"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -72,13 +76,13 @@ const handleLogout = async () => {
       <aside
         className={`
           fixed top-0 left-0 h-full w-72 bg-primary-50 z-40
-          flex flex-col shadow-lg 
+          flex flex-col shadow-lg
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:flex
+          ${uploading ? 'opacity-50 pointer-events-none' : ''}
         `}
       >
-
         {/* LOGO */}
         <div className="p-6 flex justify-center items-center">
           <img src="/logo.png" alt="Study Buddy" className="w-40" />
@@ -86,7 +90,6 @@ const handleLogout = async () => {
 
         {/* NAV SECTIONS */}
         <nav className="flex-1 overflow-y-auto pb-4">
-
           {navSections.map((section) => (
             <div key={section.heading} className="mb-4">
 
@@ -102,10 +105,7 @@ const handleLogout = async () => {
               {section.items.map((item) => (
                 <button
                   key={item.path}
-                  onClick={() => {
-                    navigate(item.path)
-                    setIsOpen(false)
-                  }}
+                  onClick={() => handleNavigate(item.path)}
                   className={`
                     w-full text-left py-2 px-4 pl-20 mb-1
                     font-medium text-lg
@@ -128,12 +128,11 @@ const handleLogout = async () => {
 
           {/* LOGOUT */}
           <button
-            onClick={() => setShowLogoutModal(true)}
+            onClick={() => !uploading && setShowLogoutModal(true)}
             className="w-full text-left py-2 pl-20 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
-
         </nav>
       </aside>
 
@@ -167,7 +166,6 @@ const handleLogout = async () => {
           </div>
         </>
       )}
-
     </>
   )
 }

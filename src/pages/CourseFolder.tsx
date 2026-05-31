@@ -35,12 +35,16 @@ function TxtPreview({ url }: { url: string }) {
       .catch(() => setText('Failed to load file.'))
   }, [url])
 
+
   return (
     <pre className='w-full h-full overflow-auto p-6 bg-white text-gray-800 font-mono text-sm whitespace-pre-wrap'>
       {text}
     </pre>
   )
+  
 }
+
+
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
   return (
@@ -78,6 +82,7 @@ function CourseFolder() {
   const location = useLocation()
   const { courseId } = useParams()
 
+
   const [previewFile, setPreviewFile] = useState<CourseFile | null>(null)
   const [numPages, setNumPages] = useState<number>(0)
   const [pageNumber, setPageNumber] = useState<number>(1)
@@ -99,7 +104,15 @@ function CourseFolder() {
   const folderName = location.state?.folderName || 'Course Folder'
 
   const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
-
+    useEffect(() => {
+  if (!uploading) return
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+  window.addEventListener('beforeunload', handleBeforeUnload)
+  return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+}, [uploading])
   useEffect(() => {
     if (!user) return
     getDoc(doc(db, 'users', user.uid)).then(snap => {
@@ -111,47 +124,55 @@ function CourseFolder() {
     setPreviewFile(file)
   }
 
-  const handleFiles = async (incoming: FileList | null) => {
-    if (!incoming) return
-    setError('')
+const handleFiles = async (incoming: FileList | null) => {
+  if (!incoming) return
+  setError('')
 
-    // Check storage limit
-    if (user) {
-      const userDoc = await getDoc(doc(db, 'users', user.uid))
-      const currentUsed: number = userDoc.data()?.storageUsed ?? 0
-      const incomingSize = Array.from(incoming).reduce((sum, f) => sum + f.size, 0)
+  const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
+  const messages: string[] = []
+  const rejected: string[] = []
+  const duplicates: string[] = []
+  const toUpload: File[] = []
+  const MAX_FILE_SIZE = 10 * 1024 * 1024
 
-      if (currentUsed + incomingSize > STORAGE_LIMIT) {
-        const usedMB = (currentUsed / (1024 * 1024)).toFixed(1)
-        setError(`Storage limit reached. You've used ${usedMB} MB of 1 GB.`)
-        return
-      }
+  Array.from(incoming).forEach((file) => {
+    const ext = file.name.split('.').pop()?.toLowerCase() || ''
+    const trimmedName = file.name.trim()
+
+    if (!allowed.includes(ext)) { rejected.push(file.name); return }
+    if (!trimmedName) { rejected.push(file.name); return }
+
+    if (file.size > MAX_FILE_SIZE) {
+      messages.push(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Max is 10 MB.`)
+      return
     }
 
-    const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
-    const rejected: string[] = []
-    const duplicates: string[] = []
-    const toUpload: File[] = []
+    const alreadyExists = files.some(
+      (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
+    )
+    if (alreadyExists) { duplicates.push(file.name); return }
 
-    Array.from(incoming).forEach((file) => {
-      const ext = file.name.split('.').pop()?.toLowerCase() || ''
-      const trimmedName = file.name.trim()
+    toUpload.push(file)
+  })
 
-      if (!allowed.includes(ext)) { rejected.push(file.name); return }
-      if (!trimmedName) { rejected.push(file.name); return }
+  if (rejected.length > 0) messages.push(`File(s) not allowed: ${rejected.join(', ')}`)
+  if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
 
-      const alreadyExists = files.some(
-        (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
-      )
-      if (alreadyExists) { duplicates.push(file.name); return }
+  // ✅ Check storage only against files that actually passed validation
+  if (user && toUpload.length > 0) {
+    const userDoc = await getDoc(doc(db, 'users', user.uid))
+    const currentUsed: number = userDoc.data()?.storageUsed ?? 0
+    const incomingSize = toUpload.reduce((sum, f) => sum + f.size, 0)
 
-      toUpload.push(file)
-    })
+    if (currentUsed + incomingSize > STORAGE_LIMIT) {
+      const usedMB = (currentUsed / (1024 * 1024)).toFixed(1)
+      messages.push(`Storage limit reached. You've used ${usedMB} MB of 1 GB.`)
+      // Clear toUpload so nothing gets uploaded
+      toUpload.length = 0
+    }
+  }
 
-    const messages: string[] = []
-    if (rejected.length > 0) messages.push(`File(s) not allowed: ${rejected.join(', ')}`)
-    if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
-    if (messages.length > 0) setError(messages.join(' | '))
+  if (messages.length > 0) setError(messages.join(' | '))
 
     for (const file of toUpload) {
       try {
@@ -172,7 +193,7 @@ function CourseFolder() {
         )
       } catch (error) {
         console.error('Full upload error:', error)
-        setError(`Failed to upload ${file.name}. Please try again.`)
+        setError((prev) => prev ? `${prev} | Failed to upload ${file.name}. Please try again.` : `Failed to upload ${file.name}. Please try again.`)
       } finally {
         setUploading(false)
         setUploadProgress(0)
@@ -250,9 +271,9 @@ function CourseFolder() {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
-      <div className='hidden lg:block md:block'>
-        <Sidebar />
-      </div>
+  <div className='hidden lg:block md:block'>
+    <Sidebar uploading={uploading} />
+  </div>
 
       <main className='flex-1 overflow-y-auto p-8 overflow-hidden'>
         <div className='min-h-screen flex flex-col'>
@@ -279,7 +300,7 @@ function CourseFolder() {
                   aria-label='Filter files by type'
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className='border border-primary-600 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+                  className='border border-primary-600 pl-4 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
                 >
                   <option value='all'>All Files</option>
                   <option value='pdf'>PDF</option>
@@ -311,6 +332,11 @@ function CourseFolder() {
           </div>
 
           <hr className='w-full border-t border-primary-600 lg:mb-4' />
+          {uploading && (
+            <div className='w-full bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm font-roboto px-4 py-2 rounded-md mb-3 flex items-center gap-2'>
+              ⚠ Please wait — navigating away will cancel the upload.
+            </div>
+          )}
 
           {/* Storage Bar */}
           <div className='w-full mb-4 mt-3'>
@@ -451,9 +477,11 @@ function CourseFolder() {
                 className={`flex items-center justify-center border-2 border-dashed rounded-xl py-6 cursor-pointer transition-colors
                   ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-600'}`}
               >
-                <p className='text-gray-400 font-roboto text-sm text-center'>
-                  + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
-                </p>
+            <p className='text-gray-400 font-roboto text-sm text-center'>
+              + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
+              <br />
+              <span className='text-xs text-gray-500'>Max 10 MB per file</span>
+            </p>
               </div>
             </div>
           )}

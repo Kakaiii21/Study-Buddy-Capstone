@@ -20,6 +20,7 @@ import CourseFolder from './pages/CourseFolder'
 import { TimerProvider } from './context/TimerContext'  
 import ExpiredAlert from './components/ExpiredAlert'  
 import Quiz from './pages/StudyGenerator/Quiz'
+import PasswordChangeWatcher from './components/PasswordChangeWatcher'
 import Flashcard from './pages/StudyGenerator/Flashcard'
 import QuizView from './pages/StudyGenerator/QuizView'
 import FlashcardView from './pages/StudyGenerator/FlashcardView'
@@ -179,6 +180,7 @@ createRoot(document.getElementById('root')!).render(
     <TimerProvider>
       <ExpiredAlert />
       <EmailChangeWatcher /> 
+       <PasswordChangeWatcher /> 
       <RouterProvider router={router} />
     </TimerProvider>
   </StrictMode>

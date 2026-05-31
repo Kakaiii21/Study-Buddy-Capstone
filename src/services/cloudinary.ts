@@ -24,17 +24,13 @@ export async function uploadToCloudinary(
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
     const isImage = ['png', 'jpg', 'jpeg'].includes(ext)
     const resourceType = isImage ? 'image' : 'raw'
+const formData = new FormData()
+formData.append('file', file)
+formData.append('upload_preset', UPLOAD_PRESET)
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('upload_preset', UPLOAD_PRESET)
-
-    if (!userId) {
-      // Courses upload — put in courses folder
-      formData.append('folder', 'courses')
-    }
-    // Profile pic upload — no folder, no public_id, no overwrite
-    // Cloudinary auto-generates URL, we save it to Firestore
+if (!userId) {
+  formData.append('folder', 'courses')
+}
 
     const xhr = new XMLHttpRequest()
 
@@ -64,5 +60,21 @@ export async function uploadToCloudinary(
 
     xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`)
     xhr.send(formData)
+    xhr.addEventListener('load', () => {
+  if (xhr.status === 200) {
+    const data = JSON.parse(xhr.responseText)
+    resolve({
+      url: data.secure_url,
+      publicId: data.public_id,
+      fileName: file.name,
+      fileType: ext,
+      fileSize: formatSize(file.size),
+    })
+  } else {
+    const errorData = JSON.parse(xhr.responseText)  // ← add this
+    console.error('Cloudinary error:', errorData)    // ← add this
+    reject(new Error(`Upload failed: ${errorData.error?.message || xhr.responseText}`))
+  }
+})
   })
 }
