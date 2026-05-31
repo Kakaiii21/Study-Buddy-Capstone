@@ -15,7 +15,7 @@ type TouchedFields = {
 
 function Login() {
   const navigate = useNavigate()
-
+  const emailUpdated = new URLSearchParams(window.location.search).get('emailUpdated')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -120,6 +120,13 @@ function Login() {
               LOG IN
             </button>
           </div>
+
+
+          {emailUpdated && (
+            <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              ✅ Email updated! Please sign in with your new email.
+            </div>
+          )}
 
           {/* EMAIL */}
           <p className="text-primary-600 font-bold p-2">EMAIL</p>

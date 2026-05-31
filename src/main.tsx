@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App'
@@ -24,6 +25,7 @@ import QuizView from './pages/StudyGenerator/QuizView'
 import FlashcardView from './pages/StudyGenerator/FlashcardView'
 import ChangePassword from './pages/ChangePassword'
 import VerifyEmail from './pages/VerifyEmail'
+import ChangeEmail from './pages/ChangeEmail'
 
 const router = createBrowserRouter([
   {
@@ -161,6 +163,14 @@ const router = createBrowserRouter([
         <Account />
       </ProtectedRoute>
     )
+  },
+    {
+    path: '/changeEmail',
+    element: (
+      <ProtectedRoute>
+        <ChangeEmail />
+      </ProtectedRoute>
+    )
   }
 ])
 
@@ -168,6 +178,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TimerProvider>
       <ExpiredAlert />
+      <EmailChangeWatcher /> 
       <RouterProvider router={router} />
     </TimerProvider>
   </StrictMode>

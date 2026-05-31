@@ -4,7 +4,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
-  sendEmailVerification, // ← add this
+  sendEmailVerification,
   type User
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
@@ -25,7 +25,7 @@ export const signup = async (
   })
 
   // Send verification email
-  await sendEmailVerification(user) // ← add this
+  await sendEmailVerification(user)
 
   try {
     await setDoc(doc(db, 'users', user.uid), {
@@ -34,6 +34,9 @@ export const signup = async (
       email,
       createdAt: new Date()
     })
+
+    // ─── Register email for duplicate checking ────────────────────────────
+    await setDoc(doc(db, 'emails', email), { uid: user.uid })
   } catch {
     console.warn('Firestore save failed — possibly blocked by ad blocker.')
   }
@@ -56,4 +59,5 @@ export const logout = async () => {
 export const onAuthChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback)
 }
+
 export type { User }

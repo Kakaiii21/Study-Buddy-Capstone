@@ -111,7 +111,8 @@ function Sidebar() {
                     transition-colors duration-200
                     ${location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/') ||
-                      (item.path === '/history' && ['/quizView', '/flashcardView'].includes(location.pathname))
+                      (item.path === '/history' && ['/quizView', '/flashcardView'].includes(location.pathname)) ||
+                      (item.path === '/account' && location.pathname === '/changeEmail')
                       ? 'bg-primary-100 text-primary-600 font-semibold'
                       : 'text-primary-600 hover:bg-primary-100'
                     }

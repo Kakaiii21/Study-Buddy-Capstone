@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
+import { auth } from '../services/firebase'
 
 function Account() {
   const navigate = useNavigate()
@@ -24,45 +25,65 @@ function Account() {
     setTimeout(() => setToast(null), 3000)
   }
 
+  // ─── Mask email: only show first letter ──────────────────────────────────
+  const maskEmail = (em: string) => {
+    if (!em) return ''
+    const [local, domain] = em.split('@')
+    return `${local[0]}${'•'.repeat(Math.max(local.length - 1, 3))}@${domain}`
+  }
+
   // ─── Load user data from Firestore ───────────────────────────────────────
+  // Also checks if email was verified and updates Firestore if needed
   useEffect(() => {
     if (!user) return
     const fetchUser = async () => {
+      // Force refresh Firebase Auth token so auth.currentUser.email is up to date
+      await user.reload()
+
       const docSnap = await getDoc(doc(db, 'users', user.uid))
       if (docSnap.exists()) {
         const data = docSnap.data()
         setFirstName(data.firstName || '')
         setLastName(data.lastName || '')
-        setEmail(data.email || user.email || '')
         setProfilePic(data.photoURL || '/profile.png')
+
+        // ─── If user clicked verification link, sync new email to Firestore ──
+        const authEmail = auth.currentUser?.email
+        if (data.pendingEmail && authEmail === data.pendingEmail) {
+          await updateDoc(doc(db, 'users', user.uid), {
+            email: data.pendingEmail,
+            pendingEmail: null
+          })
+          setEmail(data.pendingEmail)
+          showToast('Email updated successfully!')
+        } else {
+          setEmail(data.email || user.email || '')
+        }
       }
     }
     fetchUser()
   }, [user])
 
   // ─── Save a single field to Firestore ────────────────────────────────────
-const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
-  if (!user) return
-  setSaving(field)
-  try {
-    const value =
-      field === 'firstName' ? firstName :
-      field === 'lastName'  ? lastName  : email
-    await updateDoc(doc(db, 'users', user.uid), { [field]: value })
+  const handleSave = async (field: 'firstName' | 'lastName') => {
+    if (!user) return
+    setSaving(field)
+    try {
+      const value = field === 'firstName' ? firstName : lastName
+      await updateDoc(doc(db, 'users', user.uid), { [field]: value })
 
-    // ← Add this: keep sessionStorage in sync
-    if (field === 'firstName') sessionStorage.setItem('firstName', firstName)
-    if (field === 'lastName') sessionStorage.setItem('lastName', lastName)
+      if (field === 'firstName') sessionStorage.setItem('firstName', firstName)
+      if (field === 'lastName') sessionStorage.setItem('lastName', lastName)
 
-    const label = field === 'firstName' ? 'First name' : field === 'lastName' ? 'Last name' : 'Email'
-    showToast(`${label} updated successfully!`)
-  } catch (err) {
-    console.error(`Failed to save ${field}:`, err)
-    showToast('Failed to save. Please try again.')
-  } finally {
-    setSaving(null)
+      const label = field === 'firstName' ? 'First name' : 'Last name'
+      showToast(`${label} updated successfully!`)
+    } catch (err) {
+      console.error(`Failed to save ${field}:`, err)
+      showToast('Failed to save. Please try again.')
+    } finally {
+      setSaving(null)
+    }
   }
-}
 
   // ─── Upload profile pic via Cloudinary, save URL to Firestore ────────────
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,8 +129,6 @@ const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
           </div>
           <hr className='w-full border-t border-primary-600 mb-6' />
 
-
-
           <div className='flex flex-col w-full h-screen justify-start items-center'>
 
             {/* Profile Pic */}
@@ -140,7 +159,7 @@ const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
               </button>
             </div>
 
-            <div className='w-full  my-8 mt-10'>
+            <div className='w-full my-8 mt-10'>
               <div className='flex items-center gap-3'>
                 <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
                   Account Settings
@@ -150,14 +169,14 @@ const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
 
               {/* First Name */}
               <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-                <p className='text-primary-600 font-bold font-roboto  lg:text-xl text-xl'>First Name:</p>
+                <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>First Name:</p>
                 <div className='flex flex-row gap-3 lg:gap-5'>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder='First name'
-                    className='border border-primary-600 rounded-md  bg-primary-700 text-primary-600  w-[300px] lg:w-[500px] md:w-[500px] px-5'
+                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5'
                   />
                   <button
                     onClick={() => handleSave('firstName')}
@@ -192,23 +211,18 @@ const handleSave = async (field: 'firstName' | 'lastName' | 'email') => {
               </div>
               <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
 
-              {/* Email */}
+              {/* Email — masked display + Change Email button */}
               <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
                 <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>Email:</p>
-                <div className='flex flex-row gap-3 lg:gap-5 lg:ml-12 md:ml-12'>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder='example@gmail.com'
-                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5'
-                  />
+                <div className='flex flex-row gap-3 lg:gap-5 lg:ml-12 md:ml-12 items-center'>
+                  <p className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5 py-2 tracking-widest'>
+                    {maskEmail(email)}
+                  </p>
                   <button
-                    onClick={() => handleSave('email')}
-                    disabled={saving === 'email'}
-                    className='bg-primary-600 text-white p-2 lg:px-10 px-5 rounded-md font-roboto uppercase disabled:opacity-50'
+                    onClick={() => navigate('/changeEmail')}
+                    className='bg-primary-600 text-white p-2 lg:px-10 px-5 rounded-md font-roboto uppercase'
                   >
-                    {saving === 'email' ? 'Saving...' : 'Save'}
+                    Change
                   </button>
                 </div>
               </div>
