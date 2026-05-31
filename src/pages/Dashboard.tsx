@@ -19,18 +19,23 @@ function Dashboard() {
   const { quizHistory } = useQuizHistory(user)
 const latestQuiz = quizHistory[0] ?? null
 
-const [firstName, setFirstName] = useState<string | null>(
-  () => sessionStorage.getItem('firstName')
-)
-const [profilePic, setProfilePic] = useState(
-  () => sessionStorage.getItem('profilePic') || '/profile.png'
-)
+const [firstName, setFirstName] = useState<string | null>(null)
+const [profilePic, setProfilePic] = useState('/profile.png')
 
 useEffect(() => {
   if (!user) return
-  if (sessionStorage.getItem('firstName') && sessionStorage.getItem('profilePic')) return
 
-  const fetchUser = async () => {
+  const loadUser = async () => {
+    const cacheKey = `user_${user.uid}`
+
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      const { firstName, profilePic } = JSON.parse(cached)
+      setFirstName(firstName)
+      setProfilePic(profilePic)
+      return
+    }
+
     const snap = await getDoc(doc(db, 'users', user.uid))
     if (snap.exists()) {
       const data = snap.data()
@@ -38,13 +43,12 @@ useEffect(() => {
       const photo = data.photoURL || '/profile.png'
       setFirstName(name)
       setProfilePic(photo)
-      sessionStorage.setItem('firstName', name)
-      sessionStorage.setItem('profilePic', photo)
+      sessionStorage.setItem(cacheKey, JSON.stringify({ firstName: name, profilePic: photo }))
     }
   }
-  fetchUser()
-}, [user])
 
+  loadUser()
+}, [user])
   const formatElapsed = (total: number): string => {
     const h = Math.floor(total / 3600)
     const m = Math.floor((total % 3600) / 60)

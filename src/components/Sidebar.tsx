@@ -10,11 +10,12 @@ function Sidebar() {
 
  
 
-  const handleLogout = async () => {
-    await logout()
-    setShowLogoutModal(false)
-    navigate('/')
-  }
+const handleLogout = async () => {
+  sessionStorage.clear() 
+  await logout()
+  setShowLogoutModal(false)
+  navigate('/login') 
+}
   
   const navSections = [
     {
