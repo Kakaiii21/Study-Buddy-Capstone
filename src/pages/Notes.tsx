@@ -4,6 +4,34 @@ import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
 
+  // paste this ONCE anywhere above your return()
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <img src="/delete.png" alt="delteicon" className='w-7 h-7' />
+          <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+            Cancel
+          </button>
+          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
+            Move to Trash
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function Notes() {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
@@ -200,34 +228,6 @@ useEffect(() => {
     ])
   )
 
-  // paste this ONCE anywhere above your return()
-function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
-  return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
-        <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="delteicon" className='w-7 h-7' />
-          <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
-        </div>
-        <p className='text-sm text-gray-500 mb-1'>
-          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
-          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
-        </p>
-        <p className='text-xs text-gray-400 mb-6'>
-          You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
-        </p>
-        <div className='flex gap-3 justify-end'>
-          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
-            Cancel
-          </button>
-          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
-            Move to Trash
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // inside your page component:
 async function handleConfirmDelete() {
@@ -243,12 +243,12 @@ async function handleConfirmDelete() {
         <div className='min-h-screen flex flex-col'>
 
           {/* ── Header ── */}
-          <div className='flex flex-col lg:flex-row lg:items-center w-full gap-3 mb-6'>
-            <p className='text-3xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+          <div className='flex flex-col lg:flex-row lg:items-center md:flex-row md:items-center w-full gap-3 mb-6'>
+            <p className='text-3xl lg:text-4xl md:text-4xl lg:pl-0 md:pl-16 font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Notes
             </p>
 
-            <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto'>
+            <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto md:gap-4 md:ml-auto'>
               {/* + Subject Button */}
               <button
                 onClick={() => setIsSubjectModalOpen(true)}
@@ -261,14 +261,14 @@ async function handleConfirmDelete() {
               <div className='relative' ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className='flex justify-between items-center border-primary-600 w-36 lg:w-52 border-2 shadow-md text-primary-600 px-3 lg:px-5 py-2 rounded-md text-sm lg:text-md font-bold'
+                  className='flex justify-between items-center border-primary-600 w-36 lg:w-52 md:w-52 border-2 shadow-md text-primary-600 px-3 lg:px-5 md:px-5 py-2 rounded-md text-sm lg:text-md font-bold'
                 >
                   <span className='truncate'>{selectedSubject}</span>
                   <span className='ml-1'>▼</span>
                 </button>
 
                 {isDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52 bg-white border rounded-md shadow-md z-50'>
+                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52  bg-white border rounded-md shadow-md z-50'>
                     <button
                       className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm font-semibold
                         ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
@@ -312,7 +312,7 @@ async function handleConfirmDelete() {
                   placeholder='Search...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='w-32 lg:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
+                  className='w-32 lg:w-72 md:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
                 />
                 {searchQuery && (
                   <button
@@ -364,14 +364,15 @@ async function handleConfirmDelete() {
 
                     {/* 3-dot menu wrapper */}
                     <div
-                      className='relative ml-2'
+                      className='relative ml-2 '
+                      
                       data-note-menu
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
                       title='More Options'
                         onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
-                        className='text-primary-600 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
+                        className='text-primary-600 hover:opacity-40 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
                         aria-label='Note options'
                       >
                         ⋮
@@ -397,13 +398,7 @@ async function handleConfirmDelete() {
                             onClick={() => setPendingDelete({ id: note.id, name: note.title })}
                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                           >
-                                  {pendingDelete && (
-<SoftDeleteModal
-    itemName={pendingDelete.name}
-    onConfirm={handleConfirmDelete}
-    onCancel={() => setPendingDelete(null)}
-  />
-)}
+
                             <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
                           </button>
                         </div>
@@ -428,8 +423,17 @@ async function handleConfirmDelete() {
                   </div>
                 </div>
               ))}
+              
               </div>
+              
           )}
+               {pendingDelete && (
+               <SoftDeleteModal
+                   itemName={pendingDelete.name}
+                onConfirm={handleConfirmDelete}
+             onCancel={() => setPendingDelete(null)}
+             />
+            )}
           {/* ── Download Confirmation Modal ── */}
           {confirmDownload && (
             <div
