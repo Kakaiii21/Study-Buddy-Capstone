@@ -63,8 +63,8 @@ useEffect(() => {
     { label: 'Notes',          icon: '/Notes.png',      path: '/notes'     },
     { label: 'Class Schedule', icon: '/ClassSched.png', path: '/schedule'  },
     { label: 'Courses',        icon: '/Courses.png',    path: '/courses'   },
-    { label: 'Quiz',           icon: '/Quizes.png',     path: '/quiz'      },
-    { label: 'Flashcard',      icon: '/Flashcards.png', path: '/flashcard' },
+    { label: 'Quiz',           icon: '/Quizes.png',     path: '/studyGenerator'      },
+    { label: 'Flashcard',      icon: '/Flashcards.png', path: '/studyGenerator' },
   ]
 
   return (

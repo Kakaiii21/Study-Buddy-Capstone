@@ -27,13 +27,7 @@ async function handleSubjectDelete(subject: string) {
   setDeleteSubjectConfirm(null)
 
 }
-function handleCloseAttempt() {
-  if (modalMode === 'edit') {
-    setShowDiscardConfirm(true)
-  } else {
-    closeNoteModal()
-  }
-}
+
   const { schedules } = useClassSched(user)   
   // ── Subject & filter state ──
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
@@ -91,7 +85,16 @@ useEffect(() => {
     setIsSubjectModalOpen(false)
     setIsDropdownOpen(true)
   }
-
+  function handleCloseAttempt() {
+    if (modalMode === 'edit') {
+      setShowDiscardConfirm(true)
+    } else if (modalMode === 'create' && (noteTitle.trim() !== '' || noteContent.trim() !== '')) {
+      // ← only ask if user has typed something
+      setShowDiscardConfirm(true)
+    } else {
+      closeNoteModal()
+    }
+  }
   // ── Modal open helpers ──
   function openNoteModal() {
     setSelectedNote(null)
@@ -542,7 +545,6 @@ async function handleConfirmDelete() {
           {isNoteModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
-              onClick={handleCloseAttempt}
 
             >
               <div
@@ -594,7 +596,6 @@ async function handleConfirmDelete() {
                   {modalMode === 'view' && (
                     <>
                       <button
-                        onClick={handleCloseAttempt}
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                       >
                         CLOSE
@@ -611,7 +612,7 @@ async function handleConfirmDelete() {
                     {modalMode === 'edit' && (
                       <>
                         <button
-                          onClick={handleCloseAttempt}
+                           onClick={handleCloseAttempt} 
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
@@ -628,19 +629,18 @@ async function handleConfirmDelete() {
                     {modalMode === 'create' && (
                       <>
                         <button
-                          onClick={handleCloseAttempt}
+                              onClick={handleCloseAttempt} 
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
-                        <button
-                          onClick={handleNoteSave}
-                          disabled={noteTitle.trim() === '' || noteContent.trim() === ''
-                          }
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-                        >
-                          SAVE
-                        </button>
+                          <button
+                            onClick={handleNoteSave}
+                            disabled={noteTitle.trim() === '' || noteContent.trim() === ''}
+                            className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50 disabled:opacity-40 disabled:cursor-not-allowed'
+                          >
+                            SAVE
+                          </button>
                       </>
                     )}
                   </div>
@@ -706,9 +706,10 @@ async function handleConfirmDelete() {
                     </div>
                   )}
                     {modalMode === 'edit' && (
+                      
                       <div className='bottom-4 right-4 flex gap-2 ml-auto'>
                         <button
-                          onClick={handleCloseAttempt}
+                              onClick={handleCloseAttempt} 
                         className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
@@ -725,18 +726,18 @@ async function handleConfirmDelete() {
                     {modalMode === 'create' && (
                       <div className='bottom-4 right-4 flex gap-2 ml-auto'>
                         <button
-                          onClick={closeNoteModal}
+                           onClick={handleCloseAttempt} 
                         className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
-                        <button
-                          onClick={handleNoteSave}
-                          disabled={noteTitle.trim() === ''}
-                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
-                        >
-                          SAVE
-                        </button>
+                            <button
+                              onClick={handleNoteSave}
+                              disabled={noteTitle.trim() === '' || noteContent.trim() === ''}
+                              className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+                            >
+                              SAVE
+                            </button>
                       </div>
                     )}
                   </div>
