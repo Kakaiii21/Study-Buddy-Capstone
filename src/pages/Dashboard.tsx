@@ -63,8 +63,8 @@ useEffect(() => {
     { label: 'Notes',          icon: '/Notes.png',      path: '/notes'     },
     { label: 'Class Schedule', icon: '/ClassSched.png', path: '/schedule'  },
     { label: 'Courses',        icon: '/Courses.png',    path: '/courses'   },
-    { label: 'Quiz',           icon: '/Quizes.png',     path: '/quiz'      },
-    { label: 'Flashcard',      icon: '/Flashcards.png', path: '/flashcard' },
+    { label: 'Quiz',           icon: '/Quizes.png',     path: '/studyGenerator'      },
+    { label: 'Flashcard',      icon: '/Flashcards.png', path: '/studyGenerator' },
   ]
 
   return (
@@ -106,7 +106,7 @@ useEffect(() => {
                     </p>
                   </div>
                   <img
-                    className='h-32 w-32 sm:h-28 sm:w-28 rounded-full object-cover border-2 border-white bg-white'
+                    className='h-28 w-32 lg:h-32 lg:w-32 rounded-full object-cover border-2 border-white bg-white'
                     src={profilePic}
                     alt="Profile"
                   />
