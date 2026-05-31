@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signup } from './services/authService'
 import './index.css'
+import { googleLogin } from './services/authService'
 
 type FieldErrors = {
   firstName: string
@@ -18,6 +19,7 @@ type TouchedFields = {
   password: boolean
   confirmPassword: boolean
 }
+
 
 function App() {
   const navigate = useNavigate()
@@ -47,6 +49,20 @@ function App() {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+
+    const handleGoogleSignup = async () => {
+      try {
+        setLoading(true)
+        await googleLogin()
+        navigate('/dashboard')
+      } catch (err) {
+        const firebaseError = err as { code: string }
+        if (firebaseError.code === 'auth/popup-closed-by-user') return
+        setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
+      } finally {
+        setLoading(false)
+      }
+    }
 
   const touch = (field: keyof TouchedFields) =>
     setTouched(prev => ({ ...prev, [field]: true }))
@@ -269,12 +285,16 @@ function App() {
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
-          <div className="flex justify-center">
-            <button className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600">
-              <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
-              Google
-            </button>
-          </div>
+        <div className="flex justify-center">
+          <button
+            onClick={handleGoogleSignup}
+            disabled={loading}
+            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
+          >
+            <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
+            Google
+          </button>
+        </div>
 
         </div>
       </div>

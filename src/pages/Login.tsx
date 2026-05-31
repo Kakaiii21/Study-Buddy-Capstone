@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
+import { googleLogin } from '../services/authService'
 
 type FieldErrors = {
   email: string
@@ -37,6 +38,19 @@ function Login() {
         return ''
     }
   }
+  const handleGoogleLogin = async () => {
+  try {
+    setLoading(true)
+    await googleLogin()
+    navigate('/dashboard')
+  } catch (err) {
+    const firebaseError = err as { code: string }
+    if (firebaseError.code === 'auth/popup-closed-by-user') return // user just closed popup, no error needed
+    setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
+  } finally {
+    setLoading(false)
+  }
+}
 
   const handleChange = (field: keyof FieldErrors, value: string) => {
     const newValues = { email, password, [field]: value }
@@ -104,8 +118,7 @@ function Login() {
 
       {/* FORM */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 order-2 lg:order-1">
-        <div className="w-full max-w-md h-[600px] bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
-
+      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
           {/* TABS */}
           <div className="flex justify-center space-x-12 mb-5">
             <button
@@ -124,7 +137,7 @@ function Login() {
 
           {emailUpdated && (
             <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
-              ✅ Email updated! Please sign in with your new email.
+               Email updated! Please sign in with your new email.
             </div>
           )}
 
@@ -173,12 +186,16 @@ function Login() {
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
 
-          <div className="flex justify-center">
-            <button className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600">
-              <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
-              Google
-            </button>
-          </div>
+        <div className="flex justify-center">
+          <button
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
+          >
+            <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
+            Google
+          </button>
+        </div>
 
         </div>
       </div>

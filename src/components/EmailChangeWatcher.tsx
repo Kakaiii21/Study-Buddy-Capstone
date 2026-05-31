@@ -1,4 +1,3 @@
-// src/components/EmailChangeWatcher.tsx
 
 import { useEffect, useRef, useState } from 'react'
 import { signOut } from 'firebase/auth'
