@@ -18,7 +18,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
     sessionStorage.clear()
     await logout()
     setShowLogoutModal(false)
-    navigate('/login')
+    navigate('/login', { replace: true })
   }
 
   const handleNavigate = (path: string) => {

@@ -4,6 +4,7 @@ import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
 import { googleLogin } from '../services/authService'
 import InstallPWA from '../components/InstallPWA'
+import { useLocation } from 'react-router-dom'
 
 type FieldErrors = {
   email: string
@@ -17,8 +18,16 @@ type TouchedFields = {
 
 function Login() {
   const navigate = useNavigate()
-  const emailUpdated = new URLSearchParams(window.location.search).get('emailUpdated')
-  const passwordUpdated = new URLSearchParams(window.location.search).get('passwordUpdated') 
+  const location = useLocation()
+
+  const [emailUpdated] = useState(() => {
+    const val = new URLSearchParams(window.location.search).get('emailUpdated')
+    if (val) window.history.replaceState({}, '', '/login')
+    return val
+  })
+  const [passwordUpdated] = useState<boolean>(
+    !!(location.state as { passwordUpdated?: boolean })?.passwordUpdated
+  )
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,6 +36,8 @@ function Login() {
   const [touched, setTouched] = useState<TouchedFields>({ email: false, password: false })
 
   const [loading, setLoading] = useState(false)
+
+
 
   const validateField = (field: keyof FieldErrors, values: { email: string; password: string }): string => {
     switch (field) {
@@ -41,6 +52,7 @@ function Login() {
         return ''
     }
   }
+
     const handleGoogleLogin = async () => {
       try {
         setLoading(true)
@@ -140,6 +152,7 @@ function Login() {
               LOG IN
             </button>
           </div>
+
 
 
           {emailUpdated && (
