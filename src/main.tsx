@@ -27,6 +27,12 @@ import FlashcardView from './pages/StudyGenerator/FlashcardView'
 import ChangePassword from './pages/ChangePassword'
 import VerifyEmail from './pages/VerifyEmail'
 import ChangeEmail from './pages/ChangeEmail'
+import { setInstallPrompt } from './utils/pwaPrompt'
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault()
+  setInstallPrompt(e)
+})
 
 const router = createBrowserRouter([
   {

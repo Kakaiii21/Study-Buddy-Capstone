@@ -1,42 +1,31 @@
-// src/hooks/useInstallPWA.ts
-import { useState, useEffect } from 'react';
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
+import { useState, useEffect } from 'react'
+import { getInstallPrompt, setInstallPrompt, clearInstallPrompt } from '../utils/pwaPrompt'
 
 export const useInstallPWA = () => {
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
-
-  // Initialize directly — no need for useEffect for these
-  const [isIOS] = useState(() =>
-    /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase())
-  );
-  const [isStandalone] = useState(() =>
-    window.matchMedia('(display-mode: standalone)').matches
-  );
+  const [isInstallable, setIsInstallable] = useState(() => !!getInstallPrompt())
+  const [isIOS] = useState(() => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()))
+  const [isStandalone] = useState(() => window.matchMedia('(display-mode: standalone)').matches)
 
   useEffect(() => {
     const handler = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e as BeforeInstallPromptEvent);
-      setIsInstallable(true);
-    };
-
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+      e.preventDefault()
+      setInstallPrompt(e)
+      setIsInstallable(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
 
   const installApp = async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
+    const prompt = getInstallPrompt()
+    if (!prompt) return
+    await prompt.prompt()
+    const { outcome } = await prompt.userChoice
     if (outcome === 'accepted') {
-      setIsInstallable(false);
+      clearInstallPrompt()
+      setIsInstallable(false)
     }
-  };
+  }
 
-  return { isInstallable, installApp, isIOS, isStandalone };
-};
+  return { isInstallable, installApp, isIOS, isStandalone }
+}

@@ -8,7 +8,10 @@ cloudinary.config({
 })
 
 export const deleteCloudinaryAsset = onCall(
-  { cors: true },
+  {
+    cors: true,
+    secrets: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'], // 👈 add this
+  },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'Must be logged in to delete files.')

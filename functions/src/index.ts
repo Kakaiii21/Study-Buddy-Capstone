@@ -1,3 +1,4 @@
+// v2
 import { onRequest } from 'firebase-functions/v2/https'
 import * as admin from 'firebase-admin'
 import Busboy from 'busboy'
@@ -14,6 +15,7 @@ function setCors(res: any) {
   res.set('Access-Control-Allow-Headers', 'Content-Type')
 }
 
+
 // ── NEW: estimate how many items the text can support ────────────────────────
 function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
   const wordCount = text.trim().split(/\s+/).length
@@ -23,7 +25,11 @@ function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const generateStudyMaterial = onRequest(
-  { timeoutSeconds: 300, memory: '512MiB' },
+  {
+    timeoutSeconds: 300,
+    memory: '512MiB',
+    secrets: ['GROQ_API_KEY', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'], // 👈 add this
+  },
   async (req, res) => {
     setCors(res)
 

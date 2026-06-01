@@ -124,7 +124,7 @@ function Login() {
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 
       {/* FORM */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 order-2 lg:order-1">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 pt-1 order-2 lg:order-1">
       <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
           {/* TABS */}
           <div className="flex justify-center space-x-12 mb-5">
@@ -214,9 +214,9 @@ function Login() {
       </div>
 
       {/* LOGO + TEXT */}
-      <div className="w-full lg:w-1/2 p-10 flex flex-col items-center justify-center order-1 lg:order-2 text-center pr-20">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center order-1 lg:order-2 text-center px-6 py-10">
         <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[600px] h-auto mb-6" />
-        <p className="text-[#132442] text-lg max-w-xl">
+        <p className="text-[#132442] text-center text-lg max-w-xl">
           Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.
         </p>
         <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[300px] h-auto mb-6" />

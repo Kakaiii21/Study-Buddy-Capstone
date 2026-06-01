@@ -95,7 +95,7 @@ useEffect(() => {
             <div className='flex-[3] min-h-screen bg-white px-2 lg:px-11'>
 
               {/* Welcome Banner */}
-              <div className='lg:px-20 mt-10 lg:mt-5 mb-6 mx-8 bg-primary-600 p-6 rounded-xl'>
+              <div className='lg:px-20 mt-10 lg:mt-5 mb-6 mx-2 bg-primary-600 p-6 rounded-xl'>
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>
                     <h1 className='font-roboto text-white md:text-5xl  text-xl  lg:text-6xl font-bold leading-none'>
@@ -124,7 +124,7 @@ useEffect(() => {
               </div>
 
               {/* Stats Row */};
-              <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 mx-6 lg:mx-28 md:mx-24 mb-6'>
+              <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2 mx-2 lg:mx-28 md:mx-24 mb-6'>
 {/* Current Time Spent */}
               <div className='col-span-1 lg:col-span-2 lg:justify-center p-3 border-2 border-primary-600 rounded-xl flex items-center gap-3'>
                 <img
