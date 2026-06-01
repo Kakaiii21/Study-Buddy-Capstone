@@ -271,7 +271,7 @@ function FlashcardView() {
                 navigate('/history')
               }}
             >
-              Discard
+              Back
             </button>
             <button
               className='hover:opacity-50 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'

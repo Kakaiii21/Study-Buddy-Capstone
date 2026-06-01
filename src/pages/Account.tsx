@@ -162,7 +162,7 @@ function Account() {
               </button>
             </div>
 
-            <div className='w-full my-8 mt-10'>
+            <div className='w-full my-2 mt-10'>
               <div className='flex items-center gap-3'>
                 <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
                   Account Settings
@@ -179,7 +179,7 @@ function Account() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder='First name'
-                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5'
+                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
                   />
                   <button
                     onClick={() => handleSave('firstName')}
@@ -201,7 +201,7 @@ function Account() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder='Last name'
-                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5'
+                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
                   />
                   <button
                     onClick={() => handleSave('lastName')}
@@ -218,12 +218,12 @@ function Account() {
               <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
                 <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>Email:</p>
                 <div className='flex flex-row gap-3 lg:gap-5 lg:ml-12 md:ml-12 items-center'>
-                  <p className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5 py-2 tracking-widest'>
+                  <p className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[220px] lg:w-[500px] md:w-[500px] px-2 py-2 tracking-widest'>
                     {maskEmail(email)}
                   </p>
                   <button
                     onClick={() => navigate('/changeEmail')}
-                    className='bg-primary-600 text-white p-2 lg:px-10 px-5 rounded-md font-roboto uppercase'
+                    className='bg-primary-600 text-white p-2 lg:px-10 px-3 rounded-md font-roboto uppercase'
                   >
                     Change
                   </button>
