@@ -207,7 +207,7 @@ const handleSave = async () => {
 
           {/* Header */}
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
-            <p className='text-3xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
+            <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
             <hr className='lg:hidden md:hidden w-full border-t mt-3 border-primary-600' />
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
@@ -236,7 +236,7 @@ const handleSave = async () => {
                   </div>
                   <div className='flex-1 flex flex-col'>
                     <label className='text-white text-md font-roboto mb-1'>SUBJECT NAME</label>
-                    <input type='text' placeholder='Enter Subject Name' className={`py-2 rounded-md pl-4 text-md w-full ${errClass('subjectName')}`} 
+                    <input type='text' placeholder='Enter Subject' className={`py-2 rounded-md pl-4 text-md w-full ${errClass('subjectName')}`} 
                       value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
                   </div>
                 </div>
