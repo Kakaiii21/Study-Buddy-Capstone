@@ -556,33 +556,35 @@ async function handleConfirmDelete() {
               >
 
                 {/* ── MOBILE layout ── */}
-                <div className='lg:hidden flex flex-col flex-1 p-6 '>
+                <div className='lg:hidden flex flex-col flex-1 p-6 pt-16'>
 
-                {isReadOnly ? (
-                  <p className='w-32 ml-auto text-1xl text-right  text-primary-600  '>{displaySubject}</p>
-                ) : (
-                  <select
-                    aria-label='Select subject'
-                    value={displaySubject}
-                    onChange={(e) => setNoteSubject(e.target.value)}
-                    className='w-64 ml-auto border-2 border-primary-600 rounded-md px-3 py-2 mb-4 text-primary-600 font-semibold'
-                  >
-                    <option value='All Subject'>All Subject</option>
-                    {allSubjects.map((subject, index) => (
-                      <option key={index} value={subject}>{subject}</option>
-                    ))}
-                  </select>
-                )}
+                  <div className='flex justify-between items-start gap-2 mb-2'>
+                    <input
+                      className='flex-1 min-w-0 text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200  py-2 focus:outline-none read-only:cursor-default'
+                      type='text'
+                      placeholder='UNTITLED'
+                      value={displayTitle}
+                      onChange={(e) => setNoteTitle(e.target.value)}
+                      readOnly={isReadOnly}
+                      autoFocus={!isReadOnly}
+                    />
 
-                  <input
-                    className='w-full text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 px-1 py-2 mb-2 focus:outline-none read-only:cursor-default'
-                    type='text'
-                    placeholder='UNTITLED'
-                    value={displayTitle}
-                    onChange={(e) => setNoteTitle(e.target.value)}
-                    readOnly={isReadOnly}
-                    autoFocus={!isReadOnly}
-                  />
+                    {isReadOnly ? (
+                      <p className='text-sm text-right text-primary-600 font-semibold pt-2 shrink-0 max-w-[120px] truncate'>{displaySubject}</p>
+                    ) : (
+                      <select
+                        aria-label='Select subject'
+                        value={displaySubject}
+                        onChange={(e) => setNoteSubject(e.target.value)}
+                        className='shrink-0 max-w-[100px] border-2 border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
+                      >
+                        <option value='All Subject'>All Subject</option>
+                        {allSubjects.map((subject, index) => (
+                          <option key={index} value={subject}>{subject}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
 
                   <p className='text-sm text-gray-400 mb-4'>{modalTime.date} — {modalTime.time}</p>
 
