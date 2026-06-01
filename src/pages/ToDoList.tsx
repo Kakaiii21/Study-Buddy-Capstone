@@ -167,7 +167,7 @@ function TaskModal({
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white rounded-2xl p-12 mx-6 w-full max-w-md"
+        className="bg-white rounded-2xl p-7 mx-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-center font-bold text-primary-600 text-3xl p-4 pt-1">{title}</p>
@@ -207,7 +207,7 @@ function TaskModal({
         <div className="flex gap-3 my-3">
           <div className="relative flex items-center flex-1">
             <input
-              className={`border-2 rounded-md w-full py-3 px-3 pr-11 font-mono
+              className={`border-2 rounded-md w-full py-3 text-sm px-3 pr-11 font-mono
                 ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
               value={taskDeadline}
               onChange={(e) => handleDeadlineChange(e.target.value)}
@@ -595,11 +595,11 @@ function ToDoList() {
         />
       )}
 
-      <main className="flex-1 overflow-auto p-8">
+      <main className="flex-1 overflow-auto p-8 pt-7">
         <div className="min-h-screen flex flex-col">
 
           <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
-            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex text-primary-600 font-roboto">TO DO LIST</p>
+            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex  text-primary-600 font-roboto">TO DO LIST</p>
             <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
             <button
               onClick={() => setIsAddModalOpen(true)}
