@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import  { useState, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useRecentlyDeleted } from '../hooks/useRecentlyDeleted'
 import { daysRemaining } from '../services/recentlyDeletedService'
@@ -13,14 +13,7 @@ const PAGE_TYPES: DeletedItemType[] = [
   'Flashcard',
 ]
 
-const TYPE_ICONS: Record<DeletedItemType, string> = {
-  'To Do':            '✅',
-  'Notes':            '📝',
-  'Class Schedule':   '📅',
-  'Course':           '🎓',
-  'Quiz':             '🧠',
-  'Flashcard':        '🃏',
-}
+
 
 function DaysBadge({ days }: { days: number }) {
   const isUrgent = days <= 7
@@ -170,8 +163,7 @@ function RecentlyDeleted() {
           </div>
 
           {/* Table header */}
-          <div className='grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
-            <p className='w-6' />
+          <div className='grid grid-cols-[auto_1fr_auto_auto] gap-4 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
             <p>Name</p>
             <p className='w-20 text-center'>Expires</p>
             <p className='w-16 text-center'>Restore</p>
@@ -212,12 +204,9 @@ function RecentlyDeleted() {
                       isActing ? 'opacity-50 pointer-events-none' : ''
                     }`}
                   >
-                    <span className='text-xl w-6 text-center'>
-                      {TYPE_ICONS[item.type]}
-                    </span>
+                
 
-                    <p className='font-medium text-primary-600 text-xl truncate'>{item.name}</p>
-
+                      <p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>{item.name}</p>
                     <div className='w-20 flex justify-center'>
                       <DaysBadge days={days} />
                     </div>
