@@ -556,7 +556,8 @@ async function handleConfirmDelete() {
               >
 
                 {/* ── MOBILE layout ── */}
-                <div className='lg:hidden flex flex-col flex-1 p-6 pt-16'>
+                <div className='lg:hidden flex flex-col flex-1 p-6 pt-4 md:mt-24'>
+
 
                   <div className='flex justify-between items-start gap-2 mb-2'>
                     <input

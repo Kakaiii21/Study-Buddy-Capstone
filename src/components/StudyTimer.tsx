@@ -70,9 +70,9 @@ const completedPercent = useMemo(() => {
       }
 
   return (
-    <div className='flex flex-col h-full w-full bg-gradient-to-t from-primary-500 to-primary-50 p-6 gap-20 items-center justify-center'>
+    <div className='flex flex-col h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3 gap-6 lg:gap-24 xl:gap-24 2xl:gap-28 items-center justify-center'>
 
-      <p className='font-orbitron font-semibold text-primary-600 tracking-widest text-3xl uppercase'>
+    <p className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-xl lg:text-2xl 2xl:text-3xl uppercase'>
         Study Timer
       </p>
 
@@ -87,7 +87,7 @@ const completedPercent = useMemo(() => {
         ].map((item, i) => (
           <div key={i} className='flex items-end gap-2'>
             <div className='flex flex-col items-center'>
-              <span className='font-orbitron font-bold text-primary-600 text-5xl'>{item.val}</span>
+              <span className='font-orbitron font-bold text-primary-600 lg:text-4xl 2xl:text-5xl'>{item.val}</span>
               <span className='text-md font-bold text-primary-600 tracking-widest'>{item.label}</span>
             </div>
             {i < 2 && (
@@ -101,7 +101,7 @@ const completedPercent = useMemo(() => {
       <div className='flex gap-3'>
         <button
           onClick={() => setShowModal(true)}
-          className='px-6 py-2 rounded-xl text-primary-600 font-bold text-sm bg-white hover:bg-primary-100'
+          className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl text-primary-600 font-bold text-sm bg-white hover:bg-primary-100'
         >
           Set Time
         </button>
@@ -145,7 +145,7 @@ const completedPercent = useMemo(() => {
           onMouseDown={() => closeModal()}
         >
           <div
-            className='bg-white rounded-2xl p-6 w-full lg:mx-[700px] mx-5 h-auto  flex flex-col gap-0 shadow-xl'
+            className='bg-white rounded-2xl p-6  w-[400px] lg:w-[400px] xl:w-[400px] 2xl:w-[500px] mx-5 h-auto  flex flex-col gap-0 shadow-xl'
             onMouseDown={(e) => e.stopPropagation()}
           >       
           {/*  

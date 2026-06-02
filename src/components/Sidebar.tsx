@@ -76,7 +76,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
       {/* SIDEBAR */}
       <aside
         className={`
-          fixed top-0 left-0 h-full w-72 bg-primary-50 z-40
+          fixed top-0 left-0 h-full w-60 lg:w-56 xl:w-56 2xl:w-80 bg-primary-50 z-40
           flex flex-col shadow-lg
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -86,7 +86,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
       >
         {/* LOGO */}
         <div className="p-6 flex justify-center items-center">
-          <img src="/logo.png" alt="Study Buddy" className="w-40" />
+          <img src="/logo.png" alt="Study Buddy" className="w-40 lg:w-40 xl:w-48 2xl:w-56" />
         </div>
 
         {/* NAV SECTIONS */}
@@ -95,7 +95,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
             <div key={section.heading} className="mb-4">
 
               {/* SECTION HEADER */}
-              <div className="flex items-center gap-2 px-10 mb-2">
+              <div className="flex items-center gap-2 px-10 lg:px-6 xl:px-8 2xl:px-14 mb-2">
                 <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
                   {section.heading}
                 </span>
@@ -108,8 +108,8 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
                   className={`
-                    w-full text-left py-2 px-4 pl-20 mb-1
-                    font-medium text-lg
+                    w-full text-left py-2 px-4 pl-20  lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
+                    font-medium text-lg lg:text-md xl:text-md 2xl:text-xl 
                     transition-colors duration-200
                     ${location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/') ||
@@ -130,7 +130,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
           {/* LOGOUT */}
           <button
             onClick={() => !isBlocked && setShowLogoutModal(true)}
-            className="w-full text-left py-2 pl-20 px-4 mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left  pl-20 lg:pl-14 xl:pl-14 2xl:pl-24 px-4  mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>

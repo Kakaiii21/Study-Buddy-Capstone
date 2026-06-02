@@ -3,12 +3,13 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+
       colors: {
         primary: {
-          50: '#EFF3FB', // light (correct)
-          100: '#929CB7', // medium/dark
-          500: '#195791', // main brand color
-          600: '#132442', // darkest
+          50: '#EFF3FB',
+          100: '#929CB7',
+          500: '#195791',
+          600: '#132442',
           700: '#D9D9D9'
         },
       },
