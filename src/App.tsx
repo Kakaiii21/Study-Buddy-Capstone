@@ -177,14 +177,14 @@ function App() {
     <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
 
       {/* FORM */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 pt-1 order-2 lg:order-1">
-        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-md border-4 border-primary-600">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 ">
+        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
           {/* TABS */}
-          <div className="flex justify-center space-x-12 mb-5">
+          <div className="flex justify-center space-x-12 mb-5 lg:mb-3 xl:mb-3 2xl:mb-5">
             <button
               onClick={() => setActiveTab('signup')}
-              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
+              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4 ${
                 activeTab === 'signup' ? 'bg-primary-600 text-white' : 'bg-white text-primary-600'
               }`}
             >
@@ -192,7 +192,7 @@ function App() {
             </button>
             <button
               onClick={() => { setActiveTab('login'); navigate('/login') }}
-              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] ${
+              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4 ${
                 activeTab === 'login' ? 'bg-primary-500 text-primary-100' : 'bg-white text-primary-600'
               }`}
             >
@@ -206,70 +206,70 @@ function App() {
           )}
 
           {/* FIRST NAME */}
-          <p className="text-primary-600 font-bold p-2">FIRST NAME</p>
+          <p className="text-primary-600 font-bold  p-2 lg:p-1 xl:p-1 2xl:pl-2">FIRST NAME</p>
           <input
             type="text"
             value={firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
             className={inputClass('firstName')}
-            placeholder="ex. Juan"
+            placeholder="Enter Your Name"
           />
           {touched.firstName && fieldErrors.firstName && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.firstName}</p>
           )}
 
           {/* LAST NAME */}
-          <p className="text-primary-600 font-bold p-2">LAST NAME</p>
+          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">LAST NAME</p>
           <input
             type="text"
             value={lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
             className={inputClass('lastName')}
-            placeholder="ex. Dela Cruz"
+            placeholder="Enter Your Last Name"
           />
           {touched.lastName && fieldErrors.lastName && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.lastName}</p>
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600 font-bold p-2">EMAIL</p>
+          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
           <input
             type="email"
             value={email}
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
             className={inputClass('email')}
-            placeholder="juandelacruz@gmail.com"
+            placeholder="Enter Your Email Address"
           />
           {touched.email && fieldErrors.email && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600 font-bold p-2">PASSWORD</p>
+          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
           <input
             type="password"
             value={password}
             onChange={(e) => handleChange('password', e.target.value)}
             onBlur={() => handleBlur('password')}
             className={inputClass('password')}
-            placeholder="ex. Ju1an_delaCruz"
+            placeholder="Enter Your Password"
           />
           {touched.password && fieldErrors.password && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
 
           {/* CONFIRM PASSWORD */}
-          <p className="text-primary-600 font-bold p-2">CONFIRM PASSWORD</p>
+          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
             className={`w-full mb-2 p-2 border rounded ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
-            placeholder="ex. Ju1an_delaCruz"
+            placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
             <p className="text-red-500 text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
@@ -280,7 +280,7 @@ function App() {
           <button
             onClick={handleSignup}
             disabled={loading}
-            className="w-full bg-primary-600 font-bold text-white p-6 border rounded-xl disabled:opacity-50"
+            className="w-full bg-primary-600 font-bold text-white p-6 lg:p-3 xl:p-3 2xl:p-6 border rounded-xl disabled:opacity-50"
           >
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
@@ -289,9 +289,9 @@ function App() {
           <button
             onClick={handleGoogleSignup}
             disabled={loading}
-            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
+            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 lg:py-1 xl:py-1 2xl:py-3 lg:mt-3 xl:mt-3 2xl:mt-6 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
           >
-            <img src="/google.png" alt="Google Logo" className="w-8 h-8" />
+            <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
             Google
           </button>
         </div>
@@ -300,12 +300,12 @@ function App() {
       </div>
 
       {/* LOGO + TEXT */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center order-1 lg:order-2 text-center px-6 py-10">
-        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[600px] h-auto mb-6" />
-        <p className="text-[#132442] text-center text-lg max-w-xl">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start order-1 lg:order-2 text-center lg:gap-1 xl:gap-1 2xl:gap-5 lg:pr-20 xl:pr-10 2xl:pr-40 px-6 py-10">
+        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[400px] xl:w-[400px] 2xl:w-[650px] h-auto mb-6" />
+        <p className="text-[#132442] text-center text-lg lg:text-sm xl:text-sm 2xl:text-lg max-w-xl">
           Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.
         </p>
-        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[300px] h-auto mb-6" />
+        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:w-[300px] h-auto mb-6" />
       </div>
 
 

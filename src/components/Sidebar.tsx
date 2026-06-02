@@ -132,7 +132,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
           {/* LOGOUT */}
           <button
             onClick={() => !isBlocked && setShowLogoutModal(true)}
-            className="w-full text-left  pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4  mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left py-2 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4 text-lg lg:text-md xl:text-md 2xl:text-xl mb-1 font-medium  font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
