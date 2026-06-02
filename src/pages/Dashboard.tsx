@@ -79,7 +79,7 @@ function Dashboard() {
             <div className='w-10' />
             <button
               onClick={() => setShowTimer(!showTimer)}
-              className='flex flex-col items-center gap-1 px-2 py-1'
+              className='flex flex-col items-center gap-1 px-2 mt-3 lg:mt-0 xl:mt-0 2xl:mt-0 md:mt-0 py-1'
             >
               <img src='/timer.png' alt='timer' className='w-10 h-10' />
               <span className='text-xs text-primary-600 font-bold'>

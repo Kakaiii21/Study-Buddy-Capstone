@@ -59,7 +59,9 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
       <button
         onClick={() => !isBlocked && setIsOpen(!isOpen)}
         className={`lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center
-          ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+          ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}
+          ${isOpen ? 'hidden' : ''}
+        `}
       >
         <img src="/menu.png" alt="menu" className="w-10 h-8" />
         <span className="text-xs text-primary-600 mt-1" />
@@ -95,7 +97,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
             <div key={section.heading} className="mb-4">
 
               {/* SECTION HEADER */}
-              <div className="flex items-center gap-2 px-10 lg:px-6 xl:px-8 2xl:px-14 mb-2">
+              <div className="flex items-center gap-2 px-6 lg:px-6 xl:px-8 2xl:px-14 mb-2">
                 <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
                   {section.heading}
                 </span>
@@ -108,7 +110,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
                   className={`
-                    w-full text-left py-2 px-4 pl-20  lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
+                    w-full text-left py-2 px-4 pl-14  lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
                     font-medium text-lg lg:text-md xl:text-md 2xl:text-xl 
                     transition-colors duration-200
                     ${location.pathname === item.path ||
@@ -130,7 +132,7 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
           {/* LOGOUT */}
           <button
             onClick={() => !isBlocked && setShowLogoutModal(true)}
-            className="w-full text-left  pl-20 lg:pl-14 xl:pl-14 2xl:pl-24 px-4  mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left  pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4  mb-1 font-medium text-lg font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
