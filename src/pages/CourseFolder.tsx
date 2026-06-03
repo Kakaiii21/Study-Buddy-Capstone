@@ -303,9 +303,9 @@ const handleFiles = async (incoming: FileList | null) => {
               <button
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
-                className="flex flex-col items-center md:pl-16 px-3 py-1 rounded hover:bg-gray-100 transition"
+                className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
-                <span className="text-2xl leading-none">←</span>
+                <span className="text-5xl leading-none">←</span>
                 <span className="text-sm">Back</span>
               </button>
               <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">

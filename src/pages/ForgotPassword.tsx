@@ -40,14 +40,14 @@ function ForgotPassword() {
   return (
     <div className='h-screen w-full'>
       <div className='flex flex-row mt-3 ml-5'>
-        <button
-          onClick={() => navigate('/login')}
-          className='flex flex-row justify-start gap-2 items-center hover:opacity-60'
-          title='Go Back'
-        >
-          <img src="/back.png" alt="backbutton" className='w-10 h-10' />
-          <p className='font-roboto font-bold text-primary-600 text-2xl'>Back</p>
-        </button>
+              <button
+                title="Go Back to Account"
+                onClick={() => navigate('/account')}
+                className="flex flex-col items-center md:ml-16 lg:ml-16 lg:mt-10 xl:ml-16 xl:mt-10 2xl:ml-16 2xl:mt-10 px-3 py-1 rounded hover:bg-gray-100 transition"
+              >
+                <span className="text-5xl leading-none">←</span>
+                <span className="text-sm">Back</span>
+              </button>
       </div>
 
       <div className='flex flex-col justify-center items-center'>

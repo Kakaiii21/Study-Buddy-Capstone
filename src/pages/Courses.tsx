@@ -137,7 +137,7 @@ function Courses() {
         <div className='min-h-screen flex flex-col'>
 
           {/* Header */}
-          <div className='flex flex-col md:flex-row justify-between lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
+          <div className='flex flex-col md:flex-row justify-between lg:flex-row md:items-center lg:items-center w-full gap-3 mb-2'>
             <p className='text-4xl lg:ml-0  md:text-4xl md:ml-16  font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
               Courses
             </p>
