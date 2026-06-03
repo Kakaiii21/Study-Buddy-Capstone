@@ -19,11 +19,38 @@ type TouchedFields = {
   password: boolean
   confirmPassword: boolean
 }
+function PasswordRequirements({ password }: { password: string }) {
+  
+  const requirements = [
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'One uppercase letter', met: /[A-Z]/.test(password) },
+    { label: 'One lowercase letter', met: /[a-z]/.test(password) },
+    { label: 'One number', met: /[0-9]/.test(password) },
+    { label: 'One special character (!@#$...)', met: /[!@#$%^&*()_+=;'"|,.<>?@-]/.test(password) },
+  ]
 
-
+  return (
+    <div className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-2'>
+      <p className='text-xs font-semibold text-primary-600 mb-1'>Password requirements:</p>
+      <ul className='space-y-0.5'>
+        {requirements.map((req) => (
+          <li key={req.label} className='flex items-center gap-2 text-xs'>
+            <span className={req.met ? 'text-green-500' : 'text-gray-400'}>
+              {req.met ? '✓' : '○'}
+            </span>
+            <span className={req.met ? 'text-green-600 line-through' : 'text-gray-500'}>
+              {req.label}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
 function App() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('signup')
+const [passwordFocused, setPasswordFocused] = useState(false)
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -253,14 +280,24 @@ function App() {
             type="password"
             value={password}
             onChange={(e) => handleChange('password', e.target.value)}
-            onBlur={() => handleBlur('password')}
+            onFocus={() => setPasswordFocused(true)}      // 👈 add
+
+            onBlur={() => {
+              setPasswordFocused(false)                   // 👈 add
+              handleBlur('password')
+            }}            
             className={inputClass('password')}
             placeholder="Enter Your Password"
           />
-          {touched.password && fieldErrors.password && (
+
+          {/* Show checklist ONLY while focused */}
+          {passwordFocused && (
+            <PasswordRequirements password={password} />
+          )}
+          {/* Show single error ONLY when blurred and invalid */}
+          {!passwordFocused && touched.password && fieldErrors.password && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
-
           {/* CONFIRM PASSWORD */}
           <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
           <input
