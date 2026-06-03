@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
+import { resetPassword } from '../services/authService'
 
 function ForgotPassword() {
   const navigate = useNavigate()
@@ -20,8 +20,7 @@ function ForgotPassword() {
 
     try {
       setLoading(true)
-      const auth = getAuth()
-      await sendPasswordResetEmail(auth, email)
+      await resetPassword(email) // ← changed
       setSuccess('Password reset link sent! Check your inbox.')
       setEmail('')
     } catch (err) {

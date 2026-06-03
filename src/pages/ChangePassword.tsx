@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
+import { getAuth } from 'firebase/auth'
+import { resetPassword } from '../services/authService'
 
 function ChangePassword() {
   const navigate = useNavigate()
@@ -22,7 +23,7 @@ function ChangePassword() {
 
     try {
       setLoading(true)
-      await sendPasswordResetEmail(auth, currentEmail)
+      await resetPassword(currentEmail) // ← changed
       setSuccess(`Reset link sent to ${currentEmail}. Check your inbox.`)
     } catch (err) {
       const e = err as { code: string }
@@ -35,6 +36,7 @@ function ChangePassword() {
       setLoading(false)
     }
   }
+
 
   return (
     <div className='h-screen w-full'>

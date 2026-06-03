@@ -4,30 +4,25 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
-  sendEmailVerification,
   type User
 } from 'firebase/auth'
-import { doc, setDoc,  getDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
 import { auth, db } from './firebase'
-// In services/authService.ts — add these imports and function
-
 import { 
   GoogleAuthProvider, 
   signInWithPopup,
 } from 'firebase/auth'
 
-
+const FUNCTIONS_BASE = 'https://us-central1-study-buddy-cbaa8.cloudfunctions.net'
+const SEND_PASSWORD_RESET_URL = 'https://sendpasswordreset-ghr3m2mkda-uc.a.run.app'
 
 export const googleLogin = async () => {
   const googleProvider = new GoogleAuthProvider()
-  googleProvider.setCustomParameters({ prompt: 'select_account' }) // ← forces account picker every time
-
+  googleProvider.setCustomParameters({ prompt: 'select_account' })
   const result = await signInWithPopup(auth, googleProvider)
   const user = result.user
-
   const userRef = doc(db, 'users', user.uid)
   const userSnap = await getDoc(userRef)
-
   if (!userSnap.exists()) {
     const [firstName, ...lastParts] = (user.displayName ?? 'User').split(' ')
     await setDoc(userRef, {
@@ -37,10 +32,8 @@ export const googleLogin = async () => {
       createdAt: new Date(),
     })
   }
-
   return user
 }
-
 
 // SIGNUP
 export const signup = async (
@@ -51,14 +44,10 @@ export const signup = async (
 ) => {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password)
   const user = userCredential.user
-
   await updateProfile(user, {
     displayName: `${firstName} ${lastName}`
   })
-
-  // Send verification email
-  await sendEmailVerification(user)
-
+  await sendVerificationEmail(email)
   try {
     await setDoc(doc(db, 'users', user.uid), {
       firstName,
@@ -66,14 +55,52 @@ export const signup = async (
       email,
       createdAt: new Date()
     })
-
-    // ─── Register email for duplicate checking ────────────────────────────
     await setDoc(doc(db, 'emails', email), { uid: user.uid })
   } catch {
     console.warn('Firestore save failed — possibly blocked by ad blocker.')
   }
-
   return user
+}
+
+// SEND VERIFICATION EMAIL
+export const sendVerificationEmail = async (email: string) => {
+  const response = await fetch(`${FUNCTIONS_BASE}/sendVerificationEmail`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
+}
+
+// PASSWORD RESET (Forgot Password + Change Password)
+export const resetPassword = async (email: string) => {
+  const response = await fetch(SEND_PASSWORD_RESET_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
+}
+
+// CHANGE EMAIL
+export const changeEmail = async (newEmail: string) => {
+  const user = auth.currentUser
+  if (!user) throw { code: 'auth/no-user', message: 'No user logged in' }
+  const response = await fetch(`${FUNCTIONS_BASE}/sendChangeEmail`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ uid: user.uid, newEmail }),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
 }
 
 // LOGIN
@@ -91,7 +118,5 @@ export const logout = async () => {
 export const onAuthChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback)
 }
-
-
 
 export type { User }

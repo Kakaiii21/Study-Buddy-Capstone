@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { changeEmail } from '../services/authService'
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
-  verifyBeforeUpdateEmail,
   signOut,
 } from 'firebase/auth'
 import { doc, updateDoc } from 'firebase/firestore'
@@ -77,37 +77,42 @@ function ChangeEmail() {
 
     setLoading(true)
     try {
+      // Step 1: Re-authenticate with current password (keep this)
       const credential = EmailAuthProvider.credential(user.email, password)
       await reauthenticateWithCredential(user, credential)
-      await verifyBeforeUpdateEmail(user, newEmail)
+
+      // Step 2: Use YOUR function (Resend) instead of verifyBeforeUpdateEmail
+      await changeEmail(newEmail)  // 👈 this calls your Cloud Function
+
       await updateDoc(doc(db, 'users', user.uid), { pendingEmail: newEmail })
 
-      originalEmailRef.current = user.email // snapshot original email for comparison
-      setWaitingForVerification(true)       // start polling
+      originalEmailRef.current = user.email
+      setWaitingForVerification(true)
 
       showToast('Verification link sent! Waiting for you to confirm in your new email...', 'success')
       setPassword('')
       setNewEmail('')
       setConfirmEmail('')
-    } catch (err) {
-      const error = err as { code?: string; message?: string }
-      console.error('Change email error:', err)
+      } catch (err) {
+        const error = err as { code?: string; message?: string }
+        console.error('Change email error:', err)
 
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        showToast('Incorrect password. Please try again.', 'error')
-      } else if (error.code === 'auth/email-already-in-use') {
-        showToast('This email is already in use by another account.', 'error')
-      } else if (error.code === 'auth/invalid-email') {
-        showToast('Invalid email address.', 'error')
-      } else if (error.message?.includes('ERR_BLOCKED_BY_CLIENT')) {
-        showToast('Request blocked. Please disable your ad blocker and try again.', 'error')
-      } else {
-        showToast('Something went wrong. Please try again.', 'error')
+        if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+          showToast('Incorrect password. Please try again.', 'error')
+        } else if (
+          error.code === 'auth/email-already-in-use' ||
+          error.message?.toLowerCase().includes('already in use')  // 👈 add this
+        ) {
+          showToast('This email is already in use by another account.', 'error')
+        } else if (error.code === 'auth/invalid-email') {
+          showToast('Invalid email address.', 'error')
+        } else {
+          showToast('Something went wrong. Please try again.', 'error')
+        }
+      } finally {
+          setLoading(false)
+        }
       }
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className='flex h-screen'>
