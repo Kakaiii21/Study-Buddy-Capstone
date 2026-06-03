@@ -219,7 +219,8 @@ function Dashboard() {
               ${showTimer ? 'translate-x-0' : 'translate-x-full'}
               lg:translate-x-0 lg:static lg:flex lg:flex-[1] lg:shadow-none lg:h-full
             `}>
-              <div className='h-full w-full'>
+              <div className='h-full w-full overflow-y-auto'>
+
                 <StudyTimer />
               </div>
             </div>

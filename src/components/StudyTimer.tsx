@@ -70,9 +70,9 @@ const completedPercent = useMemo(() => {
       }
 
   return (
-    <div className='flex flex-col h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3  gap-24 lg:gap-24 xl:gap-24 2xl:gap-28 items-center justify-center'>
+<div className='flex flex-col min-h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3 py-6 gap-6 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
 
-    <p className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-2xl lg:text-2xl 2xl:text-3xl uppercase'>
+    <p className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-0 lg:text-2xl 2xl:text-3xl uppercase'>
         Study Timer
       </p>
 
