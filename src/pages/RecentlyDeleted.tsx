@@ -163,7 +163,7 @@ function RecentlyDeleted() {
           </div>
 
           {/* Table header */}
-          <div className='grid grid-cols-[auto_1fr_auto_auto] gap-4 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
+          <div className='grid grid-cols-[250px_1fr_100px_80px] gap-4 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
             <p>Name</p>
             <p className='w-20 text-center'>Expires</p>
             <p className='w-16 text-center'>Restore</p>
@@ -200,7 +200,7 @@ function RecentlyDeleted() {
                 return (
                   <li
                     key={item.id}
-                    className={`grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
+                    className={`grid grid-cols-[250px_1fr_100px_80px] gap-4 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
                       isActing ? 'opacity-50 pointer-events-none' : ''
                     }`}
                   >
