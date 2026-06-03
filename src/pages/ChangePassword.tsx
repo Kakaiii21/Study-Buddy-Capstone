@@ -44,7 +44,7 @@ function ChangePassword() {
               <button
                 title="Go Back to Account"
                 onClick={() => navigate('/account')}
-                className="flex flex-col items-center md:ml-16 lg:ml-16 lg:mt-10 xl:ml-16 xl:mt-10 2xl:ml-16 2xl:mt-10 px-3 py-1 rounded hover:bg-gray-100 transition"
+                className="flex flex-col items-center md:ml-16 lg:ml-16 lg:mt-0 xl:ml-16 xl:mt-0 2xl:ml-16 2xl:mt-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
                 <span className="text-5xl leading-none">←</span>
                 <span className="text-sm">Back</span>
@@ -52,9 +52,9 @@ function ChangePassword() {
       </div>
 
       <div className='flex flex-col justify-center items-center'>
-        <img src="logo.png" alt="" className='w-64 h-44' />
+        <img src="logo.png" alt="" className='w-64 h-42 ' />
 
-        <div className='flex flex-col border-2 border-primary-600 rounded-xl px-5 py-10 w-[90%] lg:w-[850px] mt-10 gap-6 justify-start items-center'>
+        <div className='flex flex-col border-2 border-primary-600 rounded-xl w-[90%] lg:w-[850px] mt-10 lg:mt-2 xl:mt-2 2xl:mt-2 gap-6 justify-start items-center px-5 py-10'>
           <p className='font-roboto font-bold text-primary-600 uppercase text-xl lg:text-3xl'>
             Change Password
           </p>
@@ -82,7 +82,7 @@ function ChangePassword() {
         <button
           onClick={handleSendLink}
           disabled={loading}
-          className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 mt-10 rounded-md uppercase disabled:opacity-50'
+          className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 mt-10 lg:mt-5 xl:mt-5 2xl:mt-10 rounded-md uppercase disabled:opacity-50'
         >
           {loading ? 'Sending...' : 'Send Link'}
         </button>
