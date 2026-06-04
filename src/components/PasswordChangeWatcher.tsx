@@ -15,11 +15,14 @@ function PasswordChangeWatcher() {
     const unsubscribe = onAuthChange(async (u) => {
       if (prevUserRef.current && !u) {
         clearInterval(pollingRef.current!)
-        if (!window.location.href.includes('emailUpdated')) {
+        const isIntentional = sessionStorage.getItem('intentionalLogout') === 'true'
+        sessionStorage.removeItem('intentionalLogout')
+        if (!isIntentional && !window.location.href.includes('emailUpdated')) {
           window.location.replace('/login?passwordUpdated=true')
         }
         return
       }
+
       prevUserRef.current = u
 
       if (!u) {

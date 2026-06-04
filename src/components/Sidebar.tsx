@@ -14,12 +14,14 @@ function Sidebar({ uploading = false, quizActive = false }: Props) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const handleLogout = async () => {
-    sessionStorage.clear()
-    await logout()
-    setShowLogoutModal(false)
-    navigate('/login', { replace: true })
-  }
+const handleLogout = async () => {
+  sessionStorage.clear()
+  sessionStorage.setItem('intentionalLogout', 'true')  // ← set AFTER clear
+  await logout()
+  setShowLogoutModal(false)
+  navigate('/login')
+  window.history.replaceState(null, '', '/login')
+}
 
   const handleNavigate = (path: string) => {
     if (isBlocked) return  // ← block navigation

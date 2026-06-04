@@ -34,35 +34,46 @@ function Account() {
 
   // ─── Load user data from Firestore ───────────────────────────────────────
   // Also checks if email was verified and updates Firestore if needed
-  useEffect(() => {
-    if (!user) return
-    const fetchUser = async () => {
-      // Force refresh Firebase Auth token so auth.currentUser.email is up to date
-      await user.reload()
+useEffect(() => {
+  if (!user) return
+  const fetchUser = async () => {
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
 
-      const docSnap = await getDoc(doc(db, 'users', user.uid))
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        setFirstName(data.firstName || '')
-        setLastName(data.lastName || '')
-        setProfilePic(data.photoURL || '/profile.png')
+    if (cached) {
+      const data = JSON.parse(cached)
+      setFirstName(data.firstName || '')
+      setLastName(data.lastName || '')
+      setProfilePic(data.photoURL || '/profile.png')
+      setEmail(data.email || user.email || '')
+      return  // ← skip Firestore fetch
+    }
 
-        // ─── If user clicked verification link, sync new email to Firestore ──
-        const authEmail = auth.currentUser?.email
-        if (data.pendingEmail && authEmail === data.pendingEmail) {
-          await updateDoc(doc(db, 'users', user.uid), {
-            email: data.pendingEmail,
-            pendingEmail: null
-          })
-          setEmail(data.pendingEmail)
-          showToast('Email updated successfully!')
-        } else {
-          setEmail(data.email || user.email || '')
-        }
+    await user.reload()
+    const docSnap = await getDoc(doc(db, 'users', user.uid))
+    if (docSnap.exists()) {
+      const data = docSnap.data()
+      setFirstName(data.firstName || '')
+      setLastName(data.lastName || '')
+      setProfilePic(data.photoURL || '/profile.png')
+
+      const authEmail = auth.currentUser?.email
+      if (data.pendingEmail && authEmail === data.pendingEmail) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          email: data.pendingEmail,
+          pendingEmail: null
+        })
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ...data, email: data.pendingEmail, pendingEmail: null }))
+        setEmail(data.pendingEmail)
+        showToast('Email updated successfully!')
+      } else {
+        sessionStorage.setItem(cacheKey, JSON.stringify(data))  // ← write cache
+        setEmail(data.email || user.email || '')
       }
     }
-    fetchUser()
-  }, [user])
+  }
+  fetchUser()
+}, [user])
 
   const handleSave = async (field: 'firstName' | 'lastName') => {
     if (!user) return
@@ -71,10 +82,11 @@ function Account() {
       const value = field === 'firstName' ? firstName : lastName
       await updateDoc(doc(db, 'users', user.uid), { [field]: value })
 
-      if (field === 'firstName') sessionStorage.setItem('firstName', firstName)
-      if (field === 'lastName') sessionStorage.setItem('lastName', lastName)
-
-      sessionStorage.removeItem(`user_${user.uid}`)  
+      const cacheKey = `user_${user.uid}`
+      const cached = sessionStorage.getItem(cacheKey)
+      if (cached) {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
+      } 
 
       const label = field === 'firstName' ? 'First name' : 'Last name'
       showToast(`${label} updated successfully!`)
@@ -87,23 +99,28 @@ function Account() {
   }
 
   // ─── Upload profile pic via Cloudinary, save URL to Firestore ────────────
- const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0]
-  if (!file || !user) return
-  setUploading(true)
-  try {
-    // Get old publicId before uploading new one
-    const userSnap = await getDoc(doc(db, 'users', user.uid))
-    const oldPublicId = userSnap.data()?.photoPublicId ?? null
+    const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file || !user) return
+      setUploading(true)
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid))
+        const oldPublicId = userSnap.data()?.photoPublicId ?? null
 
-    const result = await uploadToCloudinary(file, undefined, user.uid)
-    await updateDoc(doc(db, 'users', user.uid), {
-      photoURL: result.url,
-      photoPublicId: result.publicId
-    })
-    setProfilePic(result.url)
-    sessionStorage.setItem('profilePic', result.url)
-    sessionStorage.removeItem(`user_${user.uid}`)
+        const result = await uploadToCloudinary(file, undefined, user.uid)
+        await updateDoc(doc(db, 'users', user.uid), {
+          photoURL: result.url,
+          photoPublicId: result.publicId
+        })
+        setProfilePic(result.url)
+        sessionStorage.setItem('profilePic', result.url)  // ← for dashboard/sidebar
+        window.dispatchEvent(new Event('profilePicUpdated'))  // ← add this
+
+        const cacheKey = `user_${user.uid}`
+        const cached = sessionStorage.getItem(cacheKey)
+        if (cached) {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: result.url, photoPublicId: result.publicId }))
+        }
 
     // Delete old profile pic from Cloudinary if it exists
     if (oldPublicId) {

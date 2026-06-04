@@ -20,33 +20,44 @@ function Dashboard() {
   const [firstName, setFirstName] = useState<string | null>(null)
   const [profilePic, setProfilePic] = useState('/profile.png')
 
-  useEffect(() => {
-    if (!user) return
+useEffect(() => {
+  if (!user) return
 
-    const loadUser = async () => {
-      const cacheKey = `user_${user.uid}`
-
-      const cached = sessionStorage.getItem(cacheKey)
-      if (cached) {
-        const { firstName, profilePic } = JSON.parse(cached)
-        setFirstName(firstName)
-        setProfilePic(profilePic)
-        return
-      }
-
-      const snap = await getDoc(doc(db, 'users', user.uid))
-      if (snap.exists()) {
-        const data = snap.data()
-        const name = data.firstName || 'Student'
-        const photo = data.photoURL || '/profile.png'
-        setFirstName(name)
-        setProfilePic(photo)
-        sessionStorage.setItem(cacheKey, JSON.stringify({ firstName: name, profilePic: photo }))
-      }
+  const loadUser = async () => {
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      const data = JSON.parse(cached)
+      setFirstName(data.firstName || 'Student')
+      setProfilePic(data.photoURL || '/profile.png')  // ← was data.profilePic
+      return
     }
 
-    loadUser()
-  }, [user])
+    const snap = await getDoc(doc(db, 'users', user.uid))
+    if (snap.exists()) {
+      const data = snap.data()
+      setFirstName(data.firstName || 'Student')
+      setProfilePic(data.photoURL || '/profile.png')
+      sessionStorage.setItem(cacheKey, JSON.stringify(data))  // ← store full doc
+    }
+  }
+
+  loadUser()
+
+  // ← listen for profile pic updates from account.tsx
+  const handleUpdate = () => {
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      const data = JSON.parse(cached)
+      setProfilePic(data.photoURL || '/profile.png')
+      setFirstName(data.firstName || 'Student')
+    }
+  }
+
+  window.addEventListener('profilePicUpdated', handleUpdate)
+  return () => window.removeEventListener('profilePicUpdated', handleUpdate)
+}, [user])
 
   const formatElapsed = (total: number): string => {
     const h = Math.floor(total / 3600)

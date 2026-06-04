@@ -329,6 +329,7 @@ export const sendVerificationEmail = onRequest(
 )
 
 // ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
+// ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
 export const sendChangeEmail = onRequest(
   { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
   async (req, res) => {
@@ -339,11 +340,18 @@ export const sendChangeEmail = onRequest(
       const { Resend } = await import('resend')
       const { uid, newEmail } = req.body as { uid: string; newEmail: string }
       if (!uid || !newEmail) { res.status(400).json({ error: 'uid and newEmail are required' }); return }
+
       const userRecord = await admin.auth().getUser(uid)
       if (!userRecord.email) { res.status(400).json({ error: 'User has no email' }); return }
-      const verifyLink = await admin.auth().generateVerifyAndChangeEmailLink(userRecord.email, newEmail, {
-        url: 'https://studybuddyph.site/login',
+
+      // ── Directly update email via Admin SDK (no Firebase notification email) ──
+      await admin.auth().updateUser(uid, { email: newEmail, emailVerified: false })
+
+      // ── Generate verification link for the new email via Resend ──
+      const verifyLink = await admin.auth().generateEmailVerificationLink(newEmail, {
+        url: 'https://studybuddyph.site/login?emailUpdated=true',
       })
+
       const resend = new Resend(process.env.RESEND_API_KEY!)
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
@@ -358,6 +366,7 @@ export const sendChangeEmail = onRequest(
           ${actionButton(verifyLink, 'Verify New Email')}
         `),
       })
+
       res.status(200).json({ success: true })
     } catch (err: unknown) {
       console.error('sendChangeEmail error:', err)

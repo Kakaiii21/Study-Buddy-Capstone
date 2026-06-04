@@ -28,6 +28,8 @@ import ChangePassword from './pages/ChangePassword'
 import VerifyEmail from './pages/VerifyEmail'
 import ChangeEmail from './pages/ChangeEmail'
 import { setInstallPrompt } from './utils/pwaPrompt'
+import PrivacyPolicy from './privacy'
+import TermsOfService from './terms'
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
@@ -43,6 +45,14 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
   },
+  {
+  path: '/terms',
+  element: <TermsOfService />
+},
+{
+  path: '/privacy',
+  element: <PrivacyPolicy />
+},
     {
     path: '/verify-email',
     element: <VerifyEmail />,
