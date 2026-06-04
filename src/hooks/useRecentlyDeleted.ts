@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useMemo } from 'react' 
 import {
   fetchRecentlyDeleted,
   restoreItem,
@@ -7,11 +8,6 @@ import {
   type DeletedItemType,
 } from '../services/recentlyDeletedService'
 import { useAuth } from './useAuth'
-
-
-// Remove these lines:
-// const functions = getFunctions()
-// const deleteCloudinaryAsset = httpsCallable(...)
 
 async function deleteFromCloudinary(publicId: string): Promise<void> {
   const ext = publicId.split('.').pop()?.toLowerCase() ?? ''
@@ -73,15 +69,10 @@ export function useRecentlyDeleted() {
       try {
         await restoreItem(uid, item)
         setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        if (message.includes('PARENT_FOLDER_DELETED')) {
-          setRestoreError(
-            'Cannot restore this file — its course folder was also deleted. Please restore the folder first.'
-          )
-        } else {
-          setRestoreError('Failed to restore item. Please try again.')
-        }
+        // ✅ No storage change on restore — file was never removed from Cloudinary
+        // so storageUsed was never decremented and should not be incremented here
+      } catch {
+        setRestoreError('Failed to restore item. Please try again.')
       } finally {
         setActionLoading(null)
       }
@@ -89,48 +80,69 @@ export function useRecentlyDeleted() {
     [uid]
   )
 
-const handlePermanentDelete = useCallback(
-  async (item: DeletedItem) => {
-    if (!uid) return
-    setActionLoading(item.id)
-    try {
-      await permanentDelete(uid, item, deleteFromCloudinary)
+  const handlePermanentDelete = useCallback(
+    async (item: DeletedItem) => {
+      if (!uid) return
+      setActionLoading(item.id)
+      try {
+        await permanentDelete(uid, item, deleteFromCloudinary)
 
-      // Subtract storage if it's a file
-      if (item.data?.fileSize) {
-        const sizeStr = String(item.data.fileSize).trim().toLowerCase().replace(/\s/g, '')
-        let bytes = 0
-        if (sizeStr.endsWith('mb')) bytes = parseFloat(sizeStr) * 1024 * 1024
-        else if (sizeStr.endsWith('kb')) bytes = parseFloat(sizeStr) * 1024
-        else if (sizeStr.endsWith('gb')) bytes = parseFloat(sizeStr) * 1024 * 1024 * 1024
-        else bytes = parseFloat(sizeStr)
+        // ✅ Only decrement storage on permanent delete (file is truly gone from Cloudinary)
+        if (item.data?.fileSize) {
+          const sizeStr = String(item.data.fileSize).trim().toLowerCase().replace(/\s/g, '')
+          let bytes = 0
+          if (sizeStr.endsWith('mb')) bytes = parseFloat(sizeStr) * 1024 * 1024
+          else if (sizeStr.endsWith('kb')) bytes = parseFloat(sizeStr) * 1024
+          else if (sizeStr.endsWith('gb')) bytes = parseFloat(sizeStr) * 1024 * 1024 * 1024
+          else bytes = parseFloat(sizeStr)
 
-        if (!isNaN(bytes) && bytes > 0) {
-          const { doc, updateDoc, increment } = await import('firebase/firestore')
-          const { db } = await import('../services/firebase')
-          await updateDoc(doc(db, 'users', uid), {
-            storageUsed: increment(-bytes)
-          })
+          if (!isNaN(bytes) && bytes > 0) {
+            // ✅ setDoc with merge:true works even if storageUsed field doesn't exist yet
+            // unlike updateDoc which silently fails on an empty/new document
+            const { doc, setDoc, increment } = await import('firebase/firestore')
+            const { db } = await import('../services/firebase')
+            await setDoc(doc(db, 'users', uid), {
+              storageUsed: increment(-bytes)
+            }, { merge: true })
+          }
         }
-      }
 
-      setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
-    } catch {
-      setState((prev) => ({ ...prev, error: 'Failed to permanently delete item.' }))
-    } finally {
-      setActionLoading(null)
-    }
-  },
-  [uid]
-)
+        setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
+      } catch {
+        setState((prev) => ({ ...prev, error: 'Failed to permanently delete item.' }))
+      } finally {
+        setActionLoading(null)
+      }
+    },
+    [uid]
+  )
 
   const filteredByType = useCallback(
     (type: DeletedItemType) => state.items.filter((i) => i.type === type),
     [state.items]
   )
 
+  const orphanedFileIds = useMemo(() => {
+    const deletedFolderIds = new Set(
+      state.items
+        .filter(i => i.type === 'Course' && !i.data?.fileUrl)
+        .map(i => i.originalDocId)
+    )
+    return new Set(
+      state.items
+        .filter(i => i.type === 'Course' && i.data?.fileUrl)
+        .filter(i => {
+          const parts = i.originalCollection.split('/')
+          const courseId = parts[3]
+          return deletedFolderIds.has(courseId)
+        })
+        .map(i => i.id)
+    )
+  }, [state.items])
+
   return {
     items: state.items,
+    orphanedFileIds,
     loading: state.loading,
     error: state.error,
     restoreError,

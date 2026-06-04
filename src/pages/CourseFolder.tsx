@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
@@ -7,9 +7,9 @@ import { uploadToCloudinary } from '../services/cloudinary'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
-import { doc, getDoc, updateDoc, increment } from 'firebase/firestore'
+import { doc, getDoc, setDoc, increment } from 'firebase/firestore'
 import { db } from '../services/firebase'
-import { STORAGE_LIMIT } from '../utils/fileUtils'  // ← only STORAGE_LIMIT needed here now
+import { STORAGE_LIMIT } from '../utils/fileUtils'
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
@@ -35,16 +35,12 @@ function TxtPreview({ url }: { url: string }) {
       .catch(() => setText('Failed to load file.'))
   }, [url])
 
-
-
   return (
     <pre className='w-full h-full overflow-auto p-6 bg-white text-gray-800 font-mono text-sm whitespace-pre-wrap'>
       {text}
     </pre>
   )
-  
 }
-
 
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
@@ -91,7 +87,6 @@ function CourseFolder() {
   const location = useLocation()
   const { courseId } = useParams()
 
-
   const [previewFile, setPreviewFile] = useState<CourseFile | null>(null)
   const [numPages, setNumPages] = useState<number>(0)
   const [pageNumber, setPageNumber] = useState<number>(1)
@@ -113,87 +108,115 @@ function CourseFolder() {
   const folderName = location.state?.folderName || 'Course Folder'
 
   const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
-    useEffect(() => {
-  if (!uploading) return
-  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-    e.preventDefault()
-    e.returnValue = ''
-  }
-  window.addEventListener('beforeunload', handleBeforeUnload)
-  return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-}, [uploading])
 
-    useEffect(() => {
-      if (!user) return
-      getDoc(doc(db, 'users', user.uid)).then(snap => {
-        const val = snap.data()?.storageUsed ?? 0
-        setStorageUsed(Math.max(0, val))  // ← clamp negative values
-      })
-    }, [user])
+  // ─── Shared helper: always reads fresh value from Firestore ───────────────
+  const refreshStorage = useCallback(async () => {
+    if (!user) return
+    const snap = await getDoc(doc(db, 'users', user.uid))
+    const val = snap.data()?.storageUsed ?? 0
+    setStorageUsed(Math.max(0, val))
+  }, [user])
+
+  // ─── On mount (and whenever user changes) fetch storage immediately ───────
+  // This fixes the "resets to 0 on page refresh" bug — we no longer depend
+  // on `files` being populated first.
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    getDoc(doc(db, 'users', user.uid)).then((snap) => {
+      if (cancelled) return
+      const val = snap.data()?.storageUsed ?? 0
+      setStorageUsed(Math.max(0, val))
+    })
+    return () => { cancelled = true }
+  }, [user])
+
+  // ─── Block navigation while uploading ────────────────────────────────────
+  useEffect(() => {
+    if (!uploading) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [uploading])
 
   const handleFileClick = (file: CourseFile) => {
     setPreviewFile(file)
   }
 
-const handleFiles = async (incoming: FileList | null) => {
-  if (!incoming) return
-  setError('')
+  const handleFiles = async (incoming: FileList | null) => {
+    if (!incoming) return
+    setError('')
 
-  const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
-  const messages: string[] = []
-  const rejected: string[] = []
-  const duplicates: string[] = []
-  const toUpload: File[] = []
-  const MAX_FILE_SIZE = 10 * 1024 * 1024
+    const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
+    const messages: string[] = []
+    const rejected: string[] = []
+    const duplicates: string[] = []
+    const toUpload: File[] = []
+    const MAX_FILE_SIZE = 10 * 1024 * 1024
 
-  Array.from(incoming).forEach((file) => {
-    const ext = file.name.split('.').pop()?.toLowerCase() || ''
-    const trimmedName = file.name.trim()
+    Array.from(incoming).forEach((file) => {
+      const ext = file.name.split('.').pop()?.toLowerCase() || ''
+      const trimmedName = file.name.trim()
 
-    if (!allowed.includes(ext)) { rejected.push(file.name); return }
-    if (!trimmedName) { rejected.push(file.name); return }
+      if (!allowed.includes(ext)) { rejected.push(file.name); return }
+      if (!trimmedName) { rejected.push(file.name); return }
 
-    if (file.size > MAX_FILE_SIZE) {
-      messages.push(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Max is 10 MB.`)
-      return
+      if (file.size > MAX_FILE_SIZE) {
+        messages.push(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Max is 10 MB.`)
+        return
+      }
+
+      const alreadyExists = files.some(
+        (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
+      )
+      if (alreadyExists) { duplicates.push(file.name); return }
+
+      toUpload.push(file)
+    })
+
+    if (rejected.length > 0) messages.push(`File(s) not allowed: ${rejected.join(', ')}`)
+    if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
+
+    // Check storage only against files that passed validation
+    if (user && toUpload.length > 0) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      const currentUsed: number = userDoc.data()?.storageUsed ?? 0
+      const incomingSize = toUpload.reduce((sum, f) => sum + f.size, 0)
+
+      if (currentUsed + incomingSize > STORAGE_LIMIT) {
+        const usedMB = (currentUsed / (1024 * 1024)).toFixed(1)
+        messages.push(`Storage limit reached. You've used ${usedMB} MB of 1 GB.`)
+        toUpload.length = 0
+      }
     }
 
-    const alreadyExists = files.some(
-      (f) => f.fileName.toLowerCase() === trimmedName.toLowerCase()
-    )
-    if (alreadyExists) { duplicates.push(file.name); return }
+    if (messages.length > 0) setError(messages.join(' | '))
+    if (toUpload.length === 0) return
 
-    toUpload.push(file)
-  })
+    setUploading(true)
 
-  if (rejected.length > 0) messages.push(`File(s) not allowed: ${rejected.join(', ')}`)
-  if (duplicates.length > 0) messages.push(`Duplicate file(s): ${duplicates.join(', ')}`)
-
-  // ✅ Check storage only against files that actually passed validation
-  if (user && toUpload.length > 0) {
-    const userDoc = await getDoc(doc(db, 'users', user.uid))
-    const currentUsed: number = userDoc.data()?.storageUsed ?? 0
-    const incomingSize = toUpload.reduce((sum, f) => sum + f.size, 0)
-
-    if (currentUsed + incomingSize > STORAGE_LIMIT) {
-      const usedMB = (currentUsed / (1024 * 1024)).toFixed(1)
-      messages.push(`Storage limit reached. You've used ${usedMB} MB of 1 GB.`)
-      // Clear toUpload so nothing gets uploaded
-      toUpload.length = 0
-    }
-  }
-
-  if (messages.length > 0) setError(messages.join(' | '))
     for (const file of toUpload) {
-      try {
-        setUploading(true)
-        setUploadProgress(0)
-        setUploadingFileName(file.name)
+      setUploadProgress(0)
+      setUploadingFileName(file.name)
 
-        const result = await uploadToCloudinary(file, (percent) => {
+      // Step 1: Upload to Cloudinary
+      let result
+      try {
+        result = await uploadToCloudinary(file, (percent) => {
           setUploadProgress(percent)
         })
+      } catch (err) {
+        console.error('Cloudinary upload failed:', err)
+        setError((prev) => prev ? `${prev} | Failed to upload ${file.name}. Please try again.` : `Failed to upload ${file.name}. Please try again.`)
+        continue // skip to next file, nothing was saved anywhere
+      }
 
+      // Step 2: Save to Firestore + update storage
+      // Cloudinary succeeded so the file exists — we must complete this step.
+      try {
         await addCourseFile(
           result.fileName,
           result.url,
@@ -202,59 +225,35 @@ const handleFiles = async (incoming: FileList | null) => {
           result.fileSize,
         )
 
-        // ✅ Update storage bar immediately after each successful upload
+        if (user) {
+          await setDoc(doc(db, 'users', user.uid), {
+            storageUsed: increment(file.size)
+          }, { merge: true })
+        }
+
+        // Update local state immediately so bar reflects it right away
         setStorageUsed((prev) => prev + file.size)
 
-      } catch (error) {
-        console.error('Full upload error:', error)
-        setError((prev) => prev ? `${prev} | Failed to upload ${file.name}. Please try again.` : `Failed to upload ${file.name}. Please try again.`)
-      } finally {
-        setUploading(false)
-        setUploadProgress(0)
-        setUploadingFileName('')
+      } catch (err) {
+        console.error('Firestore save failed:', err)
+        // File is on Cloudinary but Firestore failed — still show it
+        // by refreshing storage from Firestore to stay in sync
+        setError((prev) => prev ? `${prev} | "${file.name}" uploaded but failed to save metadata. Please refresh.` : `"${file.name}" uploaded but failed to save metadata. Please refresh.`)
+        await refreshStorage()
       }
     }
+
+    setUploading(false)
+    setUploadProgress(0)
+    setUploadingFileName('')
   }
 
-    async function handleDelete() {
-      if (!pendingDelete) return
-
-      const fileToDelete = files.find(f => f.id === pendingDelete.id)
-      await deleteCourseFile(pendingDelete.id)
-
-      if (fileToDelete) {
-        const sizeStr = fileToDelete.fileSize.trim().toLowerCase().replace(/\s/g, '')
-        let sizeInBytes = 0
-
-        if (sizeStr.endsWith('mb')) {
-          sizeInBytes = parseFloat(sizeStr) * 1024 * 1024
-        } else if (sizeStr.endsWith('kb')) {
-          sizeInBytes = parseFloat(sizeStr) * 1024
-        } else if (sizeStr.endsWith('gb')) {
-          sizeInBytes = parseFloat(sizeStr) * 1024 * 1024 * 1024
-        } else if (sizeStr.endsWith('b')) {
-          sizeInBytes = parseFloat(sizeStr)
-        } else {
-          sizeInBytes = parseFloat(sizeStr) // assume raw bytes
-        }
-
-        console.log('[Delete] fileSize string:', fileToDelete.fileSize, '→ parsed bytes:', sizeInBytes)
-
-        if (!isNaN(sizeInBytes) && sizeInBytes > 0) {
-          setStorageUsed(prev => Math.max(0, prev - sizeInBytes))
-
-          // Also update Firestore so it's accurate on next page load
-          if (user) {
-            const userRef = doc(db, 'users', user.uid)
-            await updateDoc(userRef, {
-              storageUsed: increment(-sizeInBytes)
-            })
-          }
-        }
-      }
-
-      setPendingDelete(null)
-    }
+  async function handleDelete() {
+    if (!pendingDelete) return
+    await deleteCourseFile(pendingDelete.id)
+    setPendingDelete(null)
+    // Storage is not decremented on soft delete — file still exists on Cloudinary
+  }
 
   const handleEdit = (id: string) => {
     const file = files.find((f) => f.id === id)
@@ -265,6 +264,7 @@ const handleFiles = async (incoming: FileList | null) => {
     setActiveFileMenu(null)
     setEditError('')
   }
+
   const handleDownload = async (file: CourseFile) => {
     setActiveFileMenu(null)
     try {
@@ -280,7 +280,6 @@ const handleFiles = async (incoming: FileList | null) => {
       URL.revokeObjectURL(url)
     } catch (err) {
       console.error('Download failed:', err)
-      // Fallback — open in new tab if fetch fails
       window.open(file.fileUrl, '_blank')
     }
   }
@@ -338,9 +337,9 @@ const handleFiles = async (incoming: FileList | null) => {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
-  <div className='hidden lg:block md:block'>
-    <Sidebar uploading={uploading} />
-  </div>
+      <div className='hidden lg:block md:block'>
+        <Sidebar uploading={uploading} />
+      </div>
 
       <main className='flex-1 overflow-y-auto p-8 overflow-hidden'>
         <div className='min-h-screen flex flex-col'>
@@ -424,6 +423,11 @@ const handleFiles = async (incoming: FileList | null) => {
                 ⚠ You're almost out of storage. Delete some files to free up space.
               </p>
             )}
+            <p className='text-xs text-gray-400 font-roboto mt-1'>
+              💡 Deleted files go to{' '}
+              <span className='font-semibold text-primary-600'>Recently Deleted</span>
+              {' '}and still count toward your storage. Permanently delete them there to free up space.
+            </p>
           </div>
 
           {/* Upload Progress Bar */}
@@ -518,7 +522,6 @@ const handleFiles = async (incoming: FileList | null) => {
                           <img src='/edit.png' alt='edit icon' className='w-5 h-5' /> Rename
                         </button>
                         <hr className='my-1 border-gray-100' />
-                        {/* ← add this: */}
                         <button
                           onClick={() => handleDownload(file)}
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
@@ -552,11 +555,11 @@ const handleFiles = async (incoming: FileList | null) => {
                 className={`flex items-center justify-center border-2 border-dashed rounded-xl py-6 cursor-pointer transition-colors
                   ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-600'}`}
               >
-            <p className='text-gray-400 font-roboto text-sm text-center'>
-              + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
-              <br />
-              <span className='text-xs text-gray-500'>Max 10 MB per file</span>
-            </p>
+                <p className='text-gray-400 font-roboto text-sm text-center'>
+                  + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
+                  <br />
+                  <span className='text-xs text-gray-500'>Max 10 MB per file</span>
+                </p>
               </div>
             </div>
           )}

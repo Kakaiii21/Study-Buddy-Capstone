@@ -2,8 +2,7 @@ import  { useState, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useRecentlyDeleted } from '../hooks/useRecentlyDeleted'
 import { daysRemaining } from '../services/recentlyDeletedService'
-import type { DeletedItemType } from '../services/recentlyDeletedService'
-
+import type { DeletedItemType , DeletedItem} from '../services/recentlyDeletedService'
 const PAGE_TYPES: DeletedItemType[] = [
   'To Do',
   'Notes',
@@ -84,6 +83,7 @@ function RecentlyDeleted() {
   const [selectedType, setSelectedType] = useState<DeletedItemType>('To Do')
   const [searchQuery, setSearchQuery] = useState('')
   const [confirmItem, setConfirmItem] = useState<{ id: string; name: string } | null>(null)
+  const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null) // ← add this
 
   const {
     items,
@@ -94,15 +94,18 @@ function RecentlyDeleted() {
     actionLoading,
     handleRestore,
     handlePermanentDelete,
+    orphanedFileIds, //
   } = useRecentlyDeleted()
 
-  const filtered = useMemo(() => {
-    return items.filter((item) => {
-      const matchesType = item.type === selectedType
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesType && matchesSearch
-    })
-  }, [items, selectedType, searchQuery])
+  
+const filtered = useMemo(() => {
+  return items.filter((item) => {
+    const matchesType = item.type === selectedType
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const isRestoredFolder = item.name === 'Restored Files' && item.type === 'Course'
+    return matchesType && matchesSearch && !isRestoredFolder
+  })
+}, [items, selectedType, searchQuery])
 
   const handleDeleteClick = (id: string, name: string) => {
     setConfirmItem({ id, name })
@@ -126,6 +129,16 @@ function RecentlyDeleted() {
           onCancel={() => setConfirmItem(null)}
         />
       )}
+              {orphanRestoreItem && (
+                  <OrphanRestoreModal
+                    itemName={orphanRestoreItem.name}
+                    onConfirm={async () => {
+                      await handleRestore(orphanRestoreItem)
+                      setOrphanRestoreItem(null)
+                    }}
+                    onCancel={() => setOrphanRestoreItem(null)}
+                  />
+                )}
 
       <main className='flex-1 overflow-auto p-4 md:p-8 mt-1 lg:mt-0'>
         <div className='min-h-screen flex flex-col'>
@@ -172,13 +185,77 @@ function RecentlyDeleted() {
             />
           </div>
 
-          {/* Table header */}
-          <div className='grid grid-cols-[250px_1fr_100px_80px] gap-4 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
-            <p>Name</p>
-            <p className='w-20 text-center'>Expires</p>
-            <p className='w-16 text-center'>Restore</p>
-            <p className='w-16 text-center'>Delete</p>
+{/* Table header */}
+<div className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
+  <p>Name</p>
+  <p className='text-center'>Expires</p>
+  <p className='text-center'>Restore</p>
+  <p className='text-center'>Delete</p>
+</div>
+
+{/* Rows */}
+{!loading && !error && (
+  <ul className='divide-y divide-gray-100'>
+    {filtered.map((item) => {
+      const days = daysRemaining(item.deletedAt)
+      const isActing = actionLoading === item.id
+      return (
+        <li
+          key={item.id}
+          className={`grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
+            isActing ? 'opacity-50 pointer-events-none' : ''
+          }`}
+        >
+<p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
+  {item.name}
+  {item.type === 'Course' && (
+    <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+      item.data?.fileUrl
+        ? 'bg-blue-100 text-blue-600'
+        : 'bg-orange-100 text-orange-600'
+    }`}>
+      {item.data?.fileUrl ? '📄 File' : '📁 Folder'}
+    </span>
+  )}
+</p>          <div className='flex justify-center'>
+            <DaysBadge days={days} />
           </div>
+              <div className='flex justify-center'>
+                <button
+                  aria-label={`Restore ${item.name}`}
+                  onClick={() => {
+                    if (orphanedFileIds.has(item.id)) {
+                      setOrphanRestoreItem(item) // ← show modal instead
+                    } else {
+                      handleRestore(item)
+                    }
+                  }}
+                  disabled={isActing}
+                  className='p-2 rounded-lg hover:bg-primary-50 transition-colors'
+                >
+                  {isActing ? (
+                    <span className='w-6 h-6 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
+                  ) : (
+                    <img src='/Restore.png' alt='Restore' className='w-6 h-6 md:w-8 md:h-8' />
+                  )}
+                </button>
+              </div>
+
+          <div className='flex justify-center'>
+            <button
+              aria-label={`Delete ${item.name}`}
+              onClick={() => handleDeleteClick(item.id, item.name)}
+              disabled={isActing}
+              className='p-2 rounded-lg hover:bg-red-50 transition-colors'
+            >
+              <img src='/delete.png' alt='Delete' className='w-5 h-5 md:w-7 md:h-7' />
+            </button>
+          </div>
+        </li>
+      )
+    })}
+  </ul>
+)}
 
           {/* States */}
           {loading && (
@@ -200,60 +277,62 @@ function RecentlyDeleted() {
             </div>
           )}
 
-          {/* Rows */}
-          {!loading && !error && (
-            <ul className='divide-y divide-gray-100'>
-              {filtered.map((item) => {
-                const days = daysRemaining(item.deletedAt)
-                const isActing = actionLoading === item.id
 
-                return (
-                  <li
-                    key={item.id}
-                    className={`grid grid-cols-[250px_1fr_100px_80px] gap-4 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
-                      isActing ? 'opacity-50 pointer-events-none' : ''
-                    }`}
-                  >
-                
-
-                      <p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>{item.name}</p>
-                    <div className='w-20 flex justify-center'>
-                      <DaysBadge days={days} />
-                    </div>
-
-                    <div className='w-16 flex justify-center'>
-                      <button
-                        aria-label={`Restore ${item.name}`}
-                        onClick={() => handleRestore(item)}
-                        disabled={isActing}
-                        className='p-2 rounded-lg hover:bg-primary-50 transition-colors'
-                      >
-                        {isActing ? (
-                          <span className='w-8 h-8 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
-                        ) : (
-                          <img src='/Restore.png' alt='Restore' className='w-8 h-8' />
-                        )}
-                      </button>
-                    </div>
-
-                    <div className='w-16 flex justify-center'>
-                      <button
-                        aria-label={`Delete ${item.name}`}
-                        onClick={() => handleDeleteClick(item.id, item.name)}
-                        disabled={isActing}
-                        className='p-2 rounded-lg hover:bg-red-50 transition-colors'
-                      >
-                        <img src='/delete.png' alt='Delete' className='w-7 h-7' />
-                      </button>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
 
         </div>
       </main>
+    </div>
+  )
+}
+function OrphanRestoreModal({
+  itemName,
+  onConfirm,
+  onCancel,
+}: {
+  itemName: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const [restoring, setRestoring] = useState(false)
+
+  const handleConfirm = async () => {
+    if (restoring) return
+    setRestoring(true)
+    await onConfirm()
+  }
+
+  return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <span className='text-2xl'>📁</span>
+          <h2 className='text-lg font-bold text-gray-800'>Original Folder Not Found</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-3'>
+          The original folder for <span className='font-semibold text-gray-700'>"{itemName}"</span> no longer exists.
+        </p>
+        <div className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-5'>
+          <p className='text-xs text-blue-700'>
+            This file will be restored to a <span className='font-bold'>Restored Files</span> folder in your Courses instead.
+          </p>
+        </div>
+        <div className='flex gap-3 justify-end'>
+          <button
+            onClick={onCancel}
+            disabled={restoring}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50'
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={restoring}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {restoring ? 'Restoring...' : 'Restore Anyway'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

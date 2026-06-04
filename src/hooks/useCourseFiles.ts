@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { softDelete } from '../services/recentlyDeletedService'
-import { parseFileSizeToBytes } from '../utils/fileUtils'
 import {
   collection,
   addDoc,
@@ -9,7 +8,6 @@ import {
   onSnapshot,
   query,
   orderBy,
-  increment,
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
@@ -62,6 +60,8 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
   ) {
     if (!user || !courseId) return
 
+    // Only writes the file document.
+    // storageUsed is handled in CourseFolder.tsx using raw file.size bytes.
     await addDoc(collection(db, 'users', user.uid, 'courses', courseId, 'files'), {
       fileName,
       fileUrl,
@@ -71,10 +71,6 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
       uid: user.uid,
       createdAt: Date.now(),
     })
-
-    await updateDoc(doc(db, 'users', user.uid), {
-      storageUsed: increment(parseFileSizeToBytes(fileSize))
-    })
   }
 
   async function renameCourseFile(fileId: string, newFileName: string) {
@@ -83,22 +79,25 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     await updateDoc(fileRef, { fileName: newFileName.trim() })
   }
 
-  async function deleteCourseFile(fileId: string) {
-    if (!user || !courseId) return
-    const file = files.find((f) => f.id === fileId)
-    if (!file) return
-    await softDelete(user.uid, {
-      name: file.fileName,
-      type: 'Course',
-      originalCollection: `users/${user.uid}/courses/${courseId}/files`,
-      originalDocId: fileId,
-      cloudinaryPublicId: file.publicId,  // ← this was missing
-      data: { ...file },
-    })
-    await updateDoc(doc(db, 'users', user.uid), {
-      storageUsed: increment(-parseFileSizeToBytes(file.fileSize))
-    })
-  }
+async function deleteCourseFile(fileId: string) {
+  if (!user || !courseId) return
+  const file = files.find((f) => f.id === fileId)
+  if (!file) return
+
+  // ← ADD THESE
+  console.log('[DELETE] originalCollection:', `users/${user.uid}/courses/${courseId}/files`)
+  console.log('[DELETE] originalDocId:', fileId)
+  console.log('[DELETE] file found in local state:', file.fileName)
+
+  await softDelete(user.uid, {
+    name: file.fileName,
+    type: 'Course',
+    originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+    originalDocId: fileId,
+    cloudinaryPublicId: file.publicId,
+    data: { ...file },
+  })
+}
 
   return { files, loading, addCourseFile, renameCourseFile, deleteCourseFile }
 }

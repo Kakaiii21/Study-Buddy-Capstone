@@ -58,6 +58,7 @@ export async function softDelete(
   })
 
   await deleteDoc(doc(db, params.originalCollection, params.originalDocId))
+  // ✅ No storageUsed change — file still exists on Cloudinary
 }
 
 // ─── Fetch Recently Deleted ───────────────────────────────────────────────────
@@ -91,41 +92,86 @@ export async function fetchRecentlyDeleted(uid: string): Promise<DeletedItem[]> 
 
 // ─── Restore ─────────────────────────────────────────────────────────────────
 export async function restoreItem(uid: string, item: DeletedItem): Promise<void> {
-  // Check if this is a course file (path contains /courses/.../files)
   const isCourseFile = item.originalCollection.includes('/courses/') &&
     item.originalCollection.endsWith('/files')
 
   if (isCourseFile) {
-    // Extract the course doc path: users/{uid}/courses/{courseId}
-    // originalCollection looks like: users/{uid}/courses/{courseId}/files
     const parts = item.originalCollection.split('/')
-    // parts: ['users', uid, 'courses', courseId, 'files']
     const courseId = parts[3]
     const coursePath = `users/${uid}/courses/${courseId}`
     const courseSnap = await getDoc(doc(db, coursePath))
 
     if (!courseSnap.exists()) {
-      throw new Error(
-        'PARENT_FOLDER_DELETED: The course folder this file belongs to has been deleted. Please restore the folder first.'
-      )
+      const coursesRef = collection(db, 'users', uid, 'courses')
+      const coursesSnap = await getDocs(coursesRef)
+      let restoredFolderId: string | null = null
+
+      coursesSnap.forEach(d => {
+        if (d.data().name === 'Restored Files') restoredFolderId = d.id
+      })
+
+      if (!restoredFolderId) {
+        const newFolder = await addDoc(coursesRef, {
+          name: 'Restored Files',
+          uid,
+          createdAt: Date.now(),
+        })
+        restoredFolderId = newFolder.id
+      }
+
+      const newFileRef = doc(collection(db, 'users', uid, 'courses', restoredFolderId, 'files'))
+      await setDoc(newFileRef, item.data)
+      await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
+      // ✅ No storageUsed change — file was never removed from Cloudinary,
+      // so storage was never decremented and must not be incremented here
+      return
     }
   }
 
   const originalRef = doc(db, item.originalCollection, item.originalDocId)
   await setDoc(originalRef, item.data)
   await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
+  // ✅ Same — no storageUsed change on restore
 }
 
+// ─── Permanent Delete ─────────────────────────────────────────────────────────
 // ─── Permanent Delete ─────────────────────────────────────────────────────────
 export async function permanentDelete(
   uid: string,
   item: DeletedItem,
   deleteFromCloudinary: (publicId: string) => Promise<void>
 ): Promise<void> {
-  console.log('[PERM DELETE] cloudinaryPublicId:', item.cloudinaryPublicId) // ← add this
+  console.log('[PERM DELETE] cloudinaryPublicId:', item.cloudinaryPublicId)
+
+  // 1. Delete from Cloudinary
   if (item.cloudinaryPublicId) {
     await deleteFromCloudinary(item.cloudinaryPublicId)
   }
+
+  // 2. Delete the live Firestore document if the file was already restored
+  //    When a file is restored, it gets written back to Firestore but the
+  //    recentlyDeleted entry keeps the OLD originalCollection/originalDocId.
+  //    We need to find and delete it from wherever it currently lives.
+  if (item.type === 'Course' && item.data?.fileUrl) {
+    // It might have been restored to "Restored Files" folder — search for it
+    const coursesSnap = await getDocs(collection(db, 'users', uid, 'courses'))
+    for (const courseDoc of coursesSnap.docs) {
+      const filesRef = collection(db, 'users', uid, 'courses', courseDoc.id, 'files')
+      const filesSnap = await getDocs(filesRef)
+      for (const fileDoc of filesSnap.docs) {
+        const data = fileDoc.data()
+        // Match by cloudinary publicId or fileUrl — both are unique per file
+        if (
+          data.publicId === item.cloudinaryPublicId ||
+          data.fileUrl === item.cloudinaryUrl
+        ) {
+          await deleteDoc(doc(db, 'users', uid, 'courses', courseDoc.id, 'files', fileDoc.id))
+        }
+      }
+    }
+  }
+
+  // 3. Delete from recentlyDeleted
   await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
 }
 
