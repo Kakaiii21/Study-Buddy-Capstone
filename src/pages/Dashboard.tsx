@@ -95,7 +95,7 @@ function Dashboard() {
             <main className='flex-[3] overflow-y-auto bg-white px-2 lg:px-8 xl:px-8 2xl:px-11'>
 
               {/* Welcome Banner */}
-              <div className='lg:px-10 xl:px-16 2xl:px-20 mt-10 lg:mt-5 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
+              <div className='lg:px-10 xl:px-16 2xl:px-20 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>
                     <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold leading-none'>
@@ -106,7 +106,7 @@ function Dashboard() {
                     </p>
                   </div>
                   <img
-                    className='h-28 w-28 lg:h-32 lg:w-32 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
+                    className='h-28 w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
                     src={profilePic}
                     alt="Profile"
                   />
@@ -114,94 +114,99 @@ function Dashboard() {
               </div>
 
               {/* Dashboard Header */}
-              <div className='mx-8 my-6'>
+              <div className='mx-8 my-6 2xl:my-10 xl:my-8 lg:my-6 '>
                 <div className='flex items-center gap-3'>
-                  <span className='text-md font-bold text-primary-600 tracking-widest uppercase'>
+                  <span className='text-md lg:text-lg xl:text-xl 2xl:text-2xl font-semibold text-primary-600 tracking-widest uppercase'>
                     Dashboard
                   </span>
                   <div className='flex-1 h-0.5 bg-primary-100' />
                 </div>
               </div>
 
-              {/* Stats Row */}
-              <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 2xl:grid-cols-5 gap-2 mx-2 lg:mx-20 2xl:mx-48 md:mx-5 mb-6'>
+            {/* Stats Row */}
+            <div className='flex flex-wrap sm:flex-nowrap items-stretch justify-center gap-3 lg:gap-4 xl:gap-6 2xl:gap-8 mx-6 lg:mx-10 xl:mx-16 2xl:mx-24 mb-6'>
 
-                {/* Current Time Spent */}
-                <div className='col-span-1 lg:col-span-2 p-3 border-2 border-primary-600 rounded-xl flex items-center gap-3'>
-                  <img
-                    src="/currentTime.png"
-                    alt="Timer"
-                    className='h-12 w-12 md:h-14 md:w-14 flex-shrink-0'
-                  />
-                  <div className='flex flex-col'>
-                    <p className='text-xs lg:text-xs font-bold text-primary-600'>Current Time Spent</p>
-                    <p className='text-sm lg:text-lg xl:text-xl font-orbitron font-bold text-primary-600'>
-                      {formatElapsed(elapsedSeconds)}
-                    </p>
-                  </div>
+              {/* Current Time Spent */}
+              <div className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px] 2xl:min-w-[340px]
+              lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+              p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
+                <img src="/currentTime.png" alt="Timer"
+                  className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
+                <div className='flex flex-col'>
+                  <p className='text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Time Spent</p>
+                  <p className='text-xs md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-orbitron text-center text-primary-600'>
+                    {formatElapsed(elapsedSeconds)}
+                  </p>
                 </div>
-
-                {/* Current Score */}
-                <div className='col-span-1 lg:col-span-2 p-3 border-2 border-primary-600 rounded-xl flex items-center gap-3'>
-                  <img
-                    src="/currentScore.png"
-                    alt="Score"
-                    className='h-12 w-12 md:h-14 md:w-14 flex-shrink-0'
-                  />
-                  <div className='flex flex-col'>
-                    <p className='text-xs font-bold text-primary-600'>Current Score</p>
-                    <p className='text-md sm:text-2xl font-bold text-primary-600'>
-                      {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total}` : '00/00'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Generated History */}
-                <button
-                  onClick={() => navigate('/history')}
-                  className='col-span-2 md:col-span-1 lg:col-span-1 p-3 border-2 border-primary-600 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-primary-50'
-                >
-                  <img src="/genHistory.png" alt="history" className='w-8 h-8' />
-                  <span className='text-sm font-bold text-primary-600 text-center'>
-                    Generated History
-                  </span>
-                </button>
-
               </div>
 
+              {/* Current Score */}
+              <div className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px] 2xl:min-w-[340px]
+              lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+              p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
+                <img src="/currentScore.png" alt="Score"
+                  className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
+                <div className='flex flex-col'>
+                  <p className='text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Score</p>
+                  <p className='text-sm md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl font-bold text-center text-primary-600'>
+                    {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total}` : '00/00'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Generated History */}
+              <button
+                onClick={() => navigate('/history')}
+                className='w-full sm:flex-1 min-w-0 lg:min-w-[140px] xl:min-w-[170px] 2xl:min-w-[200px]
+                lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex
+                flex-row sm:flex-col items-center justify-center gap-2 hover:bg-primary-50'
+              >
+                <img src="/genHistory.png" alt="history" className='w-6 h-6 md:w-6 md:h-6 lg:w-10 lg:h-10 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14' />
+                <span className='text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-bold text-primary-600 text-center'>
+                  Generated History
+                </span>
+              </button>
+
+            </div>
+
               {/* Activities Header */}
-              <div className='mx-8 my-6'>
+              <div className='mx-8 my-6 2xl:my-10 xl:my-8 lg:my-6'>
                 <div className='flex items-center gap-3'>
-                  <span className='text-md font-bold text-primary-600 tracking-widest uppercase'>
+                  <span className='text-md font-semibold lg:text-lg xl:text-xl 2xl:text-2xl text-primary-600 tracking-widest uppercase'>
                     Activities
                   </span>
                   <div className='flex-1 h-0.5 bg-primary-100' />
                 </div>
               </div>
-
               {/* Activities Grid */}
-              <div className='flex justify-center pb-8'>
-                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-x-6 2xl:gap-x-8 lg:max-w-2xl 2xl:max-w-3xl'>
+              <div className='flex justify-center pb-8 px-4 '>
+                <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-14 '>
                   {activities.map((activity) => (
-                    <button
-                      key={activity.label}
-                      onClick={() => navigate(activity.path)}
-                      className='flex flex-col items-center justify-center gap-1 py-1 px-1 md:gap-2 md:py-3 lg:py-3 lg:gap-0 lg:w-40 2xl:w-52 border-2 border-primary-600 rounded-xl hover:bg-primary-50'
-                    >
-                      <img
-                        src={activity.icon}
-                        alt={activity.label}
-                        className='w-full h-16 md:h-20 lg:h-20 object-contain'
-                      />
-                      <div className='border w-full border-primary-600' />
-                      <span className='text-xs md:text-sm lg:text-sm lg:pt-2 font-roboto font-bold text-primary-600 tracking-widest uppercase text-center'>
-                        {activity.label}
-                      </span>
-                    </button>
+                  <button
+                    key={activity.label}
+                    onClick={() => navigate(activity.path)}
+                    className='group flex flex-col items-center justify-center gap-1 py-2 px-2
+                      md:gap-2 md:py-3
+                      lg:py-4 lg:gap-2 lg:w-44
+                      xl:w-48 xl:py-4
+                      2xl:w-64 2xl:h-48 2xl:py-6
+                      border-2 border-primary-600 rounded-xl 
+                      hover:bg-primary-600 hover:text-white hover:border-white'
+                  >
+                    <img
+                      src={activity.icon}
+                      alt={activity.label}
+                      className='w-full  rounded-lg h-16 md:h-20 lg:h-24 xl:h-24 2xl:h-32 object-contain'
+                    />
+                    <div className='border w-full border-primary-600 group-hover:border-white' />
+                    <span className='text-xs md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl lg:pt-2 xl:pt-2 2xl:pt-3  font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
+                      {activity.label}
+                    </span>
+                  </button>
                   ))}
                 </div>
               </div>
-
             </main>
 
             {/* Mobile backdrop */}

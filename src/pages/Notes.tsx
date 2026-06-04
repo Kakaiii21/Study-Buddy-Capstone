@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
 
-  // paste this ONCE anywhere above your return()
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
@@ -38,31 +37,29 @@ function Notes() {
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
-
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
-
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
-async function handleSubjectDelete(subject: string) {
-  // Reset all notes with this subject to 'All Subject' in Firestore
-  const affectedNotes = notes.filter((n) => n.subject === subject)
-  await Promise.all(
-    affectedNotes.map((n) => updateNote(n.id, { subject: 'All Subject' }))
-  )
-
-  setSubjects((prev) => prev.filter((s) => s !== subject))
-  if (selectedSubject === subject) setSelectedSubject('All Subject')
-  setDeleteSubjectConfirm(null)
-
-}
-function handleCloseAttempt() {
-  if (modalMode === 'edit') {
-    setShowDiscardConfirm(true)
-  } else {
-    closeNoteModal()
+  async function handleSubjectDelete(subject: string) {
+    const affectedNotes = notes.filter((n) => n.subject === subject)
+    await Promise.all(
+      affectedNotes.map((n) => updateNote(n.id, { subject: 'All Subject' }))
+    )
+    setSubjects((prev) => prev.filter((s) => s !== subject))
+    if (selectedSubject === subject) setSelectedSubject('All Subject')
+    setDeleteSubjectConfirm(null)
   }
-}
-  const { schedules } = useClassSched(user)   
+
+  function handleCloseAttempt() {
+    if (modalMode === 'edit') {
+      setShowDiscardConfirm(true)
+    } else {
+      closeNoteModal()
+    }
+  }
+
+  const { schedules } = useClassSched(user)
+
   // ── Subject & filter state ──
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
@@ -81,36 +78,40 @@ function handleCloseAttempt() {
   const [noteContent, setNoteContent] = useState('')
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
-// ── 3-dot menu state ──
-const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  // ── 3-dot menu state ──
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
-// ── Close dropdowns on outside click ──
-useEffect(() => {
-  if (notes.length === 0) return
-  const schedSubjects = schedules.map((s) => s.subject)
-  const fromNotes = notes
-    .map((n) => n.subject)
-    .filter((s) => s !== 'All Subject' && !schedSubjects.includes(s))
-  setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
-}, [notes])
+  useEffect(() => {
+    if (notes.length === 0) return
+    const schedSubjects = schedules.map((s) => s.subject)
+    const fromNotes = notes
+      .map((n) => n.subject)
+      .filter((s) => s !== 'All Subject' && !schedSubjects.includes(s))
+    setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
+  }, [notes])
 
-// ── Close dropdowns on outside click ──
-useEffect(() => {
-  function handleOutsideClick(e: MouseEvent) {
-    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-      setIsDropdownOpen(false)
+  useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+      const clickedInsideMenu = Array.from(
+        document.querySelectorAll('[data-note-menu]')
+      ).some((el) => el.contains(e.target as Node))
+      if (!clickedInsideMenu) {
+        setOpenMenuId(null)
+      }
     }
-    const clickedInsideMenu = Array.from(
-      document.querySelectorAll('[data-note-menu]')
-    ).some((el) => el.contains(e.target as Node))
-    if (!clickedInsideMenu) {
-      setOpenMenuId(null)
-    }
-  }
-  document.addEventListener('mousedown', handleOutsideClick)
-  return () => document.removeEventListener('mousedown', handleOutsideClick)
-}, [])
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
+
+  function getUntitledTitle() {
+  const untitledNotes = notes.filter((n) => n.title === 'Untitled' || n.title.match(/^Untitled \(\d+\)$/))
+  if (untitledNotes.length === 0) return 'Untitled'
+  return `Untitled (${untitledNotes.length})`
+}
   // ── Subject handlers ──
   function handleSubjectSave() {
     if (subjectName.trim() === '') return
@@ -165,8 +166,9 @@ useEffect(() => {
 
   // ── Note CRUD handlers ──
   async function handleNoteSave() {
-    if (noteTitle.trim() === '' || noteContent.trim() === '') return
-    await addNote(noteTitle, noteSubject, noteContent)
+    if (noteContent.trim() === '') return
+    const title = noteTitle.trim() || getUntitledTitle()
+    await addNote(title, noteSubject, noteContent)
     setNoteTitle('')
     setNoteSubject('All Subject')
     setNoteContent('')
@@ -174,9 +176,10 @@ useEffect(() => {
   }
 
   async function handleNoteUpdate() {
-    if (!selectedNote || noteTitle.trim() === '') return
+    if (!selectedNote) return
+    const title = noteTitle.trim() || getUntitledTitle()
     await updateNote(selectedNote.id, {
-      title: noteTitle.trim(),
+      title,
       subject: noteSubject,
       content: noteContent.trim(),
     })
@@ -218,23 +221,19 @@ useEffect(() => {
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
   const isReadOnly     = modalMode === 'view'
 
-  // ── Merge local subjects + subjects already used in saved notes ──
-  // Ensures a note's subject always appears in the <select> even after page refresh
   const allSubjects = Array.from(
     new Set([
       ...subjects,
       ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject'),
-      ...schedules.map((s) => s.subject), // ← pulls class sched subjects automatically
+      ...schedules.map((s) => s.subject),
     ])
   )
 
-
-// inside your page component:
-async function handleConfirmDelete() {
-  if (!pendingDelete) return
-  await deleteNote(pendingDelete.id)  // ← change to your delete function
-  setPendingDelete(null)
-}
+  async function handleConfirmDelete() {
+    if (!pendingDelete) return
+    await deleteNote(pendingDelete.id)
+    setPendingDelete(null)
+  }
 
   return (
     <div className='flex h-screen'>
@@ -252,7 +251,7 @@ async function handleConfirmDelete() {
               {/* + Subject Button */}
               <button
                 onClick={() => setIsSubjectModalOpen(true)}
-                className='flex-shrink-0 flex items-center justify-center text-2xl h-8 w-8 leading-none bg-primary-600 text-white font-bold border rounded-full'
+                className='flex-shrink-0 flex items-center lg:pb-1.5 xl:pb-1.5 justify-center h-8 w-8 bg-primary-600 text-white text-2xl font-bold border rounded-full'
               >
                 +
               </button>
@@ -268,7 +267,7 @@ async function handleConfirmDelete() {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52  bg-white border rounded-md shadow-md z-50'>
+                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52 bg-white border rounded-md shadow-md z-50'>
                     <button
                       className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm font-semibold
                         ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
@@ -276,31 +275,29 @@ async function handleConfirmDelete() {
                     >
                       All Subject
                     </button>
-                      {allSubjects.map((subject, index) => (
-                        <div
-                          key={index}
-                          className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
-                            ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
+                    {allSubjects.map((subject, index) => (
+                      <div
+                        key={index}
+                        className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
+                          ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
+                      >
+                        <button
+                          className='flex-1 text-left text-xs lg:text-sm truncate font-semibold text-primary-600'
+                          onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
                         >
+                          {subject}
+                        </button>
+                        {subjects.includes(subject) && (
                           <button
-                            className={`flex-1 text-left text-xs lg:text-sm truncate font-semibold text-primary-600`}
-                            onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
+                            onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                            className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
+                            aria-label={`Delete ${subject}`}
                           >
-                            {subject}
+                            ✕
                           </button>
-
-                          {/* Only show ✕ for manually added subjects, not class sched ones */}
-                          {subjects.includes(subject) && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
-                              className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
-                              aria-label={`Delete ${subject}`}
-                            >
-                              ✕
-                            </button>
-                          )}
-                        </div>
-                      ))}
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -334,12 +331,12 @@ async function handleConfirmDelete() {
               Loading notes...
             </div>
           ) : (
-              <div className='grid grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-start lg:items-start gap-4 lg:p-5'>
+            <div className='grid grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-start lg:items-start gap-4 lg:p-5'>
               {/* Mobile new note button */}
-                <button
-                  onClick={openNoteModal}
-                  className='col-span-2 lg:hidden hover:bg-green-200 hover:text-green-500 border mx-14 md:mx-72 md:items-ce  py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
-                >
+              <button
+                onClick={openNoteModal}
+                className='col-span-2 lg:hidden hover:bg-green-200 hover:text-green-500 border mx-14 md:mx-72 md:items-ce py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
+              >
                 + New Note
               </button>
 
@@ -356,21 +353,17 @@ async function handleConfirmDelete() {
                 <div
                   key={note.id}
                   onClick={() => openViewModal(note)}
-                  className='relative bg-primary-700 border-2 border-primary-600 rounded-xl p-5 w-full lg:w-64 flex flex-col shadow-sm cursor-pointer hover:shadow-md transition-shadow'
+                  className='relative bg-primary-700 border-2 border-primary-600 rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col shadow-sm cursor-pointer hover:shadow-md transition-shadow'
                 >
-                  {/* ── Top: Title + 3-dot menu ── */}
                   <div className='flex justify-between items-center'>
                     <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
-
-                    {/* 3-dot menu wrapper */}
                     <div
-                      className='relative ml-2 '
-                      
+                      className='relative ml-2'
                       data-note-menu
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
-                      title='More Options'
+                        title='More Options'
                         onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
                         className='text-primary-600 hover:opacity-40 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
                         aria-label='Note options'
@@ -398,7 +391,6 @@ async function handleConfirmDelete() {
                             onClick={() => setPendingDelete({ id: note.id, name: note.title })}
                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                           >
-
                             <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
                           </button>
                         </div>
@@ -406,13 +398,8 @@ async function handleConfirmDelete() {
                     </div>
                   </div>
 
-                  {/* ── Divider line under title ── */}
                   <hr className='border-t border-primary-600 my-2' />
-
-                  {/* ── Bottom: content preview ── */}
                   <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{note.content}</p>
-
-                  {/* ── Footer: subject + date ── */}
                   <div className='flex justify-between items-center mt-3'>
                     <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
                     <p className='text-xs text-gray-400 shrink-0 ml-2'>
@@ -423,17 +410,17 @@ async function handleConfirmDelete() {
                   </div>
                 </div>
               ))}
-              
-              </div>
-              
+            </div>
           )}
-               {pendingDelete && (
-               <SoftDeleteModal
-                   itemName={pendingDelete.name}
-                onConfirm={handleConfirmDelete}
-             onCancel={() => setPendingDelete(null)}
-             />
-            )}
+
+          {pendingDelete && (
+            <SoftDeleteModal
+              itemName={pendingDelete.name}
+              onConfirm={handleConfirmDelete}
+              onCancel={() => setPendingDelete(null)}
+            />
+          )}
+
           {/* ── Download Confirmation Modal ── */}
           {confirmDownload && (
             <div
@@ -522,9 +509,9 @@ async function handleConfirmDelete() {
                 <p className='text-xl font-bold text-primary-600 uppercase text-center'>
                   Remove Subject?
                 </p>
-                  <p className='text-sm text-gray-500 text-center'>
-                    <span className='font-semibold text-primary-600'>"{deleteSubjectConfirm}"</span> will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
-                  </p>
+                <p className='text-sm text-gray-500 text-center'>
+                  <span className='font-semibold text-primary-600'>"{deleteSubjectConfirm}"</span> will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
+                </p>
                 <div className='flex gap-4 w-full mt-2'>
                   <button
                     onClick={() => setDeleteSubjectConfirm(null)}
@@ -542,34 +529,30 @@ async function handleConfirmDelete() {
               </div>
             </div>
           )}
+
           {/* ── Note Modal (create / view / edit) ── */}
           {isNoteModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
               onClick={handleCloseAttempt}
-
             >
               <div
-              className='bg-white w-full h-screen lg:rounded-2xl lg:h-[85vh] lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
-
+                className='bg-white w-full h-screen lg:rounded-2xl lg:h-[85vh] lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
                 onClick={(e) => e.stopPropagation()}
               >
 
                 {/* ── MOBILE layout ── */}
                 <div className='lg:hidden flex flex-col flex-1 p-6 pt-4 md:mt-24'>
-
-
                   <div className='flex justify-between items-start gap-2 mb-2'>
                     <input
-                      className='flex-1 min-w-0 text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200  py-2 focus:outline-none read-only:cursor-default'
+                      className='flex-1 min-w-0 text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 py-2 focus:outline-none read-only:cursor-default'
                       type='text'
-                      placeholder='UNTITLED'
+                      placeholder='Untitled'
                       value={displayTitle}
                       onChange={(e) => setNoteTitle(e.target.value)}
                       readOnly={isReadOnly}
                       autoFocus={!isReadOnly}
                     />
-
                     {isReadOnly ? (
                       <p className='text-sm text-right text-primary-600 font-semibold pt-2 shrink-0 max-w-[120px] truncate'>{displaySubject}</p>
                     ) : (
@@ -598,23 +581,22 @@ async function handleConfirmDelete() {
                   />
 
                   <div className='flex gap-4 mt-auto'>
-                  {modalMode === 'view' && (
-                    <>
-                      <button
-                        onClick={handleCloseAttempt}
+                    {modalMode === 'view' && (
+                      <>
+                        <button
+                          onClick={handleCloseAttempt}
                           className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-                      >
-                        CLOSE
-                      </button>
-
-                      <button
-                        onClick={() => { if (selectedNote) openEditModal(selectedNote)} }
-                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
-                      >
-                        EDIT
-                      </button>
+                        >
+                          CLOSE
+                        </button>
+                        <button
+                          onClick={() => { if (selectedNote) openEditModal(selectedNote) }}
+                          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
+                        >
+                          EDIT
+                        </button>
                       </>
-                  )}
+                    )}
                     {modalMode === 'edit' && (
                       <>
                         <button
@@ -625,8 +607,7 @@ async function handleConfirmDelete() {
                         </button>
                         <button
                           onClick={handleNoteUpdate}
-                          disabled={noteTitle.trim() === ''}
-                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-50'
+                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
                         >
                           SAVE
                         </button>
@@ -642,9 +623,8 @@ async function handleConfirmDelete() {
                         </button>
                         <button
                           onClick={handleNoteSave}
-                          disabled={noteTitle.trim() === '' || noteContent.trim() === ''
-                          }
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+                          disabled={noteContent.trim() === ''}
+                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
                         >
                           SAVE
                         </button>
@@ -655,32 +635,31 @@ async function handleConfirmDelete() {
 
                 {/* ── DESKTOP layout ── */}
                 <div className='hidden lg:flex flex-col flex-1 py-10 px-5 relative'>
-
-                  <div className='flex justify-between items-center gap-1 mb-2 '>
+                  <div className='flex justify-between items-center gap-1 mb-2'>
                     <input
-                      className='min-w-20   py-2 text-primary-600 text-2xl font-bold placeholder:text-primary-600 focus:outline-none read-only:cursor-default'
+                      className='min-w-20 py-2 text-primary-600 text-2xl font-bold placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
                       type='text'
-                      placeholder='UNTITLED'
+                      placeholder='Untitled'
                       value={displayTitle}
                       onChange={(e) => setNoteTitle(e.target.value)}
                       readOnly={isReadOnly}
                       autoFocus={!isReadOnly}
                     />
                     {isReadOnly ? (
-                    <p className=' text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
-                  ) : (
-                    <select
-                      aria-label='Select subject'
-                      value={displaySubject}
-                      onChange={(e) => setNoteSubject(e.target.value)}
-                      className='max-w-52 border-2 mr-2  border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
-                    >
-                      <option value='All Subject'>All Subject</option>
-                      {allSubjects.map((subject, index) => (
-                        <option key={index} value={subject}>{subject}</option>
-                      ))}
-                    </select>
-                  )}
+                      <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
+                    ) : (
+                      <select
+                        aria-label='Select subject'
+                        value={displaySubject}
+                        onChange={(e) => setNoteSubject(e.target.value)}
+                        className='max-w-52 border-2 mr-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
+                      >
+                        <option value='All Subject'>All Subject</option>
+                        {allSubjects.map((subject, index) => (
+                          <option key={index} value={subject}>{subject}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   <p className='text-sm text-primary-600 mb-2'>{modalTime.date} — {modalTime.time}</p>
@@ -695,52 +674,50 @@ async function handleConfirmDelete() {
                   />
 
                   <div className='flex gap-4 mt-auto'>
-                  {modalMode === 'view' && (
-                    <div className=' bottom-4 right-4 flex gap-2 ml-auto'>
-                      <button
-                        onClick={closeNoteModal}
-                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
-                      >
-                        CLOSE
-                      </button>
-
-                      <button
-                        onClick={() => { if (selectedNote) openEditModal(selectedNote)} }
-                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
-                      >
-                        EDIT
-                      </button>
-                    </div>
-                  )}
+                    {modalMode === 'view' && (
+                      <div className='flex gap-2 ml-auto'>
+                        <button
+                          onClick={closeNoteModal}
+                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
+                        >
+                          CLOSE
+                        </button>
+                        <button
+                          onClick={() => { if (selectedNote) openEditModal(selectedNote) }}
+                          className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
+                        >
+                          EDIT
+                        </button>
+                      </div>
+                    )}
                     {modalMode === 'edit' && (
-                      <div className='bottom-4 right-4 flex gap-2 ml-auto'>
+                      <div className='flex gap-2 ml-auto'>
                         <button
                           onClick={handleCloseAttempt}
-                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
+                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
                         <button
                           onClick={handleNoteUpdate}
-                          disabled={noteTitle.trim() === ''}
-                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
+                          className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
                         >
-                          save
+                          SAVE
                         </button>
                       </div>
                     )}
                     {modalMode === 'create' && (
-                      <div className='bottom-4 right-4 flex gap-2 ml-auto'>
+                      <div className='flex gap-2 ml-auto'>
                         <button
                           onClick={closeNoteModal}
-                        className='border  border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
+                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CANCEL
                         </button>
                         <button
                           onClick={handleNoteSave}
-                          disabled={noteTitle.trim() === ''}
-                        className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
+                          disabled={noteContent.trim() === ''}
+                          className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
                         >
                           SAVE
                         </button>
@@ -754,43 +731,41 @@ async function handleConfirmDelete() {
           )}
 
         </div>
-        
       </main>
 
-      
       {/* ── Discard Changes Confirmation Modal ── */}
-{showDiscardConfirm && (
-  <div
-    className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60]'
-    onClick={() => setShowDiscardConfirm(false)}
-  >
-    <div
-      className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
-      onClick={(e) => e.stopPropagation()}
-    >
-      <p className='text-xl font-bold text-primary-600 uppercase text-center'>
-        Discard Changes?
-      </p>
-      <p className='text-sm text-gray-500 text-center'>
-        You have unsaved changes. Are you sure you want to discard them?
-      </p>
-      <div className='flex gap-4 w-full mt-2'>
-        <button
+      {showDiscardConfirm && (
+        <div
+          className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60]'
           onClick={() => setShowDiscardConfirm(false)}
-          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
         >
-          KEEP EDITING
-        </button>
-        <button
-          onClick={() => { setShowDiscardConfirm(false); closeNoteModal() }}
-          className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600'
-        >
-          DISCARD
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+          <div
+            className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className='text-xl font-bold text-primary-600 uppercase text-center'>
+              Discard Changes?
+            </p>
+            <p className='text-sm text-gray-500 text-center'>
+              You have unsaved changes. Are you sure you want to discard them?
+            </p>
+            <div className='flex gap-4 w-full mt-2'>
+              <button
+                onClick={() => setShowDiscardConfirm(false)}
+                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+              >
+                KEEP EDITING
+              </button>
+              <button
+                onClick={() => { setShowDiscardConfirm(false); closeNoteModal() }}
+                className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600'
+              >
+                DISCARD
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

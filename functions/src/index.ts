@@ -7,7 +7,7 @@ import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
 
-admin.initializeApp()
+if (!admin.apps.length) admin.initializeApp()
 
 function setCors(res: any) {
   res.set('Access-Control-Allow-Origin', '*')
@@ -112,11 +112,23 @@ export const generateStudyMaterial = onRequest(
         return
       }
       const textSample = rawText.slice(0, 4000)
-      const languageInstruction = `IMPORTANT:
+
+      // ── LANGUAGE DETECTION ────────────────────────────────────────────────
+// After
+      const sampleWords = textSample.toLowerCase()
+      const tagalogMatches = (sampleWords.match(/\b(ang|mga|ay|ito|niya|hindi|kung|pero|kaya|dahil|siya|namin|tayo)\b/g) || []).length
+      const hasTagalog = tagalogMatches >= 3
+      const sourceLang = hasTagalog ? 'Filipino/Tagalog' : 'English'
+
+      const languageInstruction = `CRITICAL LANGUAGE RULE:
+        - The SOURCE TEXT is in ${sourceLang}.
+        - You MUST write ALL generated content strictly in ${sourceLang} ONLY.
         - Keep ALL format keywords in English exactly as shown (Question 1:, A), B), C), D), Correct:, Card 1 Front:, Card 1 Back:, etc.)
-        - Write the actual content (questions, options, terms, definitions) in the same language as the SOURCE TEXT below.
+        - Do NOT translate or switch to any other language under any circumstance.
         - Use ONLY the information provided in the SOURCE TEXT below. Do NOT use any external knowledge, assumptions, or information not found in the text.
         - If the text does not contain enough information for ${numItems} items, generate fewer items rather than making things up.`
+      // ─────────────────────────────────────────────────────────────────────
+
       let prompt = ''
       if (mode === 'quiz') {
         prompt = `${languageInstruction}
