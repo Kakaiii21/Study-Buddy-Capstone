@@ -166,16 +166,19 @@ const filtered = useMemo(() => {
 
           {/* Dropdown and Search Bar */}
           <div className='flex flex-row justify-end items-center gap-3 mb-7'>
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
-              className='border-2 border-primary-600 rounded-lg px-4 py-2 text-primary-600 font-semibold bg-white focus:outline-none text-sm'
-              aria-label='Filter by page type'
-            >
-              {PAGE_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm font-semibold text-primary-600 whitespace-nowrap'>Filter by:</span>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
+                className='border-2 border-primary-600 rounded-lg px-4 py-2 text-primary-600 font-semibold bg-white focus:outline-none text-sm'
+                aria-label='Filter by page type'
+              >
+                {PAGE_TYPES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
             <input
               type='text'
               placeholder='Search...'
@@ -185,39 +188,40 @@ const filtered = useMemo(() => {
             />
           </div>
 
-{/* Table header */}
-<div className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
-  <p>Name</p>
-  <p className='text-center'>Expires</p>
-  <p className='text-center'>Restore</p>
-  <p className='text-center'>Delete</p>
-</div>
+          {/* Table header */}
+          <div className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
+            <p>Name</p>
+            <p className='text-center'>Expires</p>
+            <p className='text-center'>Restore</p>
+            <p className='text-center'>Delete</p>
+          </div>
 
-{/* Rows */}
-{!loading && !error && (
-  <ul className='divide-y divide-gray-100'>
-    {filtered.map((item) => {
-      const days = daysRemaining(item.deletedAt)
-      const isActing = actionLoading === item.id
-      return (
-        <li
-          key={item.id}
-          className={`grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
-            isActing ? 'opacity-50 pointer-events-none' : ''
-          }`}
-        >
-<p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
-  {item.name}
-  {item.type === 'Course' && (
-    <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-      item.data?.fileUrl
-        ? 'bg-blue-100 text-blue-600'
-        : 'bg-orange-100 text-orange-600'
-    }`}>
-      {item.data?.fileUrl ? '📄 File' : '📁 Folder'}
-    </span>
-  )}
-</p>          <div className='flex justify-center'>
+          {/* Rows */}
+          {!loading && !error && (
+            <ul className='divide-y divide-gray-100'>
+              {filtered.map((item) => {
+                const days = daysRemaining(item.deletedAt)
+                const isActing = actionLoading === item.id
+                return (
+                  <li
+                    key={item.id}
+                    className={`grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
+                      isActing ? 'opacity-50 pointer-events-none' : ''
+                    }`}
+                  >
+          <p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
+            {item.name}
+            {item.type === 'Course' && (
+              <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                item.data?.fileUrl
+                  ? 'bg-blue-100 text-blue-600'
+                  : 'bg-orange-100 text-orange-600'
+              }`}>
+                {item.data?.fileUrl ? '📄 File' : '📁 Folder'}
+              </span>
+            )}
+          </p>          
+            <div className='flex justify-center'>
             <DaysBadge days={days} />
           </div>
               <div className='flex justify-center'>
