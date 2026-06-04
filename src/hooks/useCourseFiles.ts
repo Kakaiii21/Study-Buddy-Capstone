@@ -5,6 +5,7 @@ import {
   addDoc,
   updateDoc,
   doc,
+  deleteDoc,
   onSnapshot,
   query,
   orderBy,
@@ -84,11 +85,6 @@ async function deleteCourseFile(fileId: string) {
   const file = files.find((f) => f.id === fileId)
   if (!file) return
 
-  // ← ADD THESE
-  console.log('[DELETE] originalCollection:', `users/${user.uid}/courses/${courseId}/files`)
-  console.log('[DELETE] originalDocId:', fileId)
-  console.log('[DELETE] file found in local state:', file.fileName)
-
   await softDelete(user.uid, {
     name: file.fileName,
     type: 'Course',
@@ -97,7 +93,8 @@ async function deleteCourseFile(fileId: string) {
     cloudinaryPublicId: file.publicId,
     data: { ...file },
   })
-}
 
+  await deleteDoc(doc(db, 'users', user.uid, 'courses', courseId, 'files', fileId))
+}
   return { files, loading, addCourseFile, renameCourseFile, deleteCourseFile }
 }

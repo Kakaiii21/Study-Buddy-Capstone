@@ -120,10 +120,10 @@ export async function restoreItem(uid: string, item: DeletedItem): Promise<void>
       }
 
       const newFileRef = doc(collection(db, 'users', uid, 'courses', restoredFolderId, 'files'))
-      await setDoc(newFileRef, item.data)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _id, ...cleanData } = item.data as Record<string, unknown>
+      await setDoc(newFileRef, cleanData)
       await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
-      // ✅ No storageUsed change — file was never removed from Cloudinary,
-      // so storage was never decremented and must not be incremented here
       return
     }
   }
