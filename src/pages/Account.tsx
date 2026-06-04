@@ -87,29 +87,41 @@ function Account() {
   }
 
   // ─── Upload profile pic via Cloudinary, save URL to Firestore ────────────
-  const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !user) return
-    setUploading(true)
-    try {
-      const result = await uploadToCloudinary(file, undefined, user.uid)
-      await updateDoc(doc(db, 'users', user.uid), {
-        photoURL: result.url,
-        photoPublicId: result.publicId
-        
-      })
-        setProfilePic(result.url)
-        sessionStorage.setItem('profilePic', result.url)
-        sessionStorage.removeItem(`user_${user.uid}`)  
-        showToast('Profile picture updated successfully!')
-    } catch (err) {
-      console.error('Profile picture upload failed:', err)
-      showToast('Failed to upload picture. Please try again.')
-    } finally {
-      setUploading(false)
-    }
-  }
+ const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  if (!file || !user) return
+  setUploading(true)
+  try {
+    // Get old publicId before uploading new one
+    const userSnap = await getDoc(doc(db, 'users', user.uid))
+    const oldPublicId = userSnap.data()?.photoPublicId ?? null
 
+    const result = await uploadToCloudinary(file, undefined, user.uid)
+    await updateDoc(doc(db, 'users', user.uid), {
+      photoURL: result.url,
+      photoPublicId: result.publicId
+    })
+    setProfilePic(result.url)
+    sessionStorage.setItem('profilePic', result.url)
+    sessionStorage.removeItem(`user_${user.uid}`)
+
+    // Delete old profile pic from Cloudinary if it exists
+    if (oldPublicId) {
+      await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
+      }).catch((err) => console.warn('Old profile pic delete failed:', err))
+    }
+
+    showToast('Profile picture updated successfully!')
+  } catch (err) {
+    console.error('Profile picture upload failed:', err)
+    showToast('Failed to upload picture. Please try again.')
+  } finally {
+    setUploading(false)
+  }
+}
   return (
     <div className='flex h-screen'>
       <Sidebar />
