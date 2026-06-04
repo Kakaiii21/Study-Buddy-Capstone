@@ -113,8 +113,13 @@ const completedPercent = useMemo(() => {
         </button>
       </div>
 
-      {/* CIRCULAR PROGRESS — exact same as before */}
+    {/* CIRCULAR PROGRESS — exact same as before */}
+    <div className='flex flex-col items-center gap-2'>
+      <p className='text-xs font-roboto font-semibold text-white tracking-widest uppercase text-center mb-3'>
+        To-Do Task Progress
+      </p>
       <div className='relative flex items-center justify-center w-40 h-40'>
+        
         <svg className='w-full h-full -rotate-90' viewBox='0 0 36 36'>
           <circle cx='18' cy='18' r='15.9' fill='none' stroke='#e2e8f0' strokeWidth='3' />
           <circle
@@ -129,6 +134,8 @@ const completedPercent = useMemo(() => {
           {completedPercent}%
         </span>
       </div>
+
+    </div>
 
       {/* VIEW TASKS — exact same as before */}
       <button

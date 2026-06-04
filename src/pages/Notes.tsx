@@ -471,7 +471,7 @@ function Notes() {
                 <input
                   className='w-full border-2 border-primary-600 rounded-md px-3 py-3 mb-4'
                   type='text'
-                  placeholder='ex. Araling Panlipunan'
+                  placeholder='Enter Subject Name'
                   value={subjectName}
                   onChange={(e) => setSubjectName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
