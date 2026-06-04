@@ -21,6 +21,33 @@ function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
   return Math.max(10, Math.floor(wordCount / wordsPerItem))
 }
 
+function getTextSample(rawText: string): string {
+  const words = rawText.trim().split(/\s+/)
+  const start = Math.floor(words.length * 0.05) // skip first 5% (TOC/headers)
+  return words.slice(start).join(' ').slice(0, 3000)
+}
+
+function shuffleQuizOptions(items: any[]): any[] {
+  const letters = ['A', 'B', 'C', 'D']
+  return items.map((item) => {
+    const options = [item.a, item.b, item.c, item.d]
+    const correctIndex = letters.indexOf(item.correct?.toUpperCase())
+    if (correctIndex === -1) return item
+
+    // Fisher-Yates shuffle
+    const indices = [0, 1, 2, 3]
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]]
+    }
+
+    const shuffled = indices.map(i => options[i])
+    const newCorrectLetter = letters[indices.indexOf(correctIndex)]
+
+    return { ...item, a: shuffled[0], b: shuffled[1], c: shuffled[2], d: shuffled[3], correct: newCorrectLetter }
+  })
+}
+
 // ── EMAIL HELPER ─────────────────────────────────────────────────────────────
 function emailTemplate(content: string) {
   return `
@@ -99,10 +126,12 @@ export const generateStudyMaterial = onRequest(
         res.status(400).json({ error: 'Unsupported content type.' }); return
       }
       if (!fileBuffer) { res.status(400).json({ error: 'No file received.' }); return }
+
       const rawText = await extractText(fileBuffer, fileType)
       if (!rawText || rawText.trim().length < 50) {
         res.status(400).json({ error: 'Could not extract enough text from the file.' }); return
       }
+
       const estimatedMax = estimateMaxItems(rawText, mode)
       if (numItems > estimatedMax) {
         res.status(400).json({
@@ -111,85 +140,82 @@ export const generateStudyMaterial = onRequest(
         })
         return
       }
-      const textSample = rawText.slice(0, 4000)
+
+      // ── SMARTER TEXT SAMPLING ─────────────────────────────────────────────
+      const textSample = getTextSample(rawText)
+      // ─────────────────────────────────────────────────────────────────────
 
       // ── LANGUAGE DETECTION ────────────────────────────────────────────────
-// After
       const sampleWords = textSample.toLowerCase()
       const tagalogMatches = (sampleWords.match(/\b(ang|mga|ay|ito|niya|hindi|kung|pero|kaya|dahil|siya|namin|tayo)\b/g) || []).length
       const hasTagalog = tagalogMatches >= 3
       const sourceLang = hasTagalog ? 'Filipino/Tagalog' : 'English'
-
-      const languageInstruction = `CRITICAL LANGUAGE RULE:
-        - The SOURCE TEXT is in ${sourceLang}.
-        - You MUST write ALL generated content strictly in ${sourceLang} ONLY.
-        - Keep ALL format keywords in English exactly as shown (Question 1:, A), B), C), D), Correct:, Card 1 Front:, Card 1 Back:, etc.)
-        - Do NOT translate or switch to any other language under any circumstance.
-        - Use ONLY the information provided in the SOURCE TEXT below. Do NOT use any external knowledge, assumptions, or information not found in the text.
-        - If the text does not contain enough information for ${numItems} items, generate fewer items rather than making things up.`
       // ─────────────────────────────────────────────────────────────────────
 
       let prompt = ''
       if (mode === 'quiz') {
-        prompt = `${languageInstruction}
+        prompt = `You are a quiz generator. Use ONLY the text below to create ${numItems} multiple choice questions.
 
-Create exactly ${numItems} multiple choice questions based on the text below.
+RULES:
+- Test understanding, not just memorization
+- 4 options per question (A, B, C, D)
+- Only ONE correct answer
+- Wrong options must be related but clearly incorrect
+- IMPORTANT: Spread correct answers across A, B, C, D evenly — do NOT put correct answer in A every time
+- No repeated concepts
+- ${sourceLang} only, keep format keywords in English
+- Do NOT add any intro, outro, or explanations
 
-STRICT RULES:
-- Each question must have exactly 4 options (A, B, C, D)
-- All 4 options must be MEANINGFULLY DIFFERENT from each other
-- Do NOT create options that say the same thing in a different order or with minor word swaps
-- Each wrong option must be clearly distinct and plausible but incorrect
-- Only ONE option can be correct
-- You MUST include the "Correct:" line after EVERY question — do NOT skip it
-- Do NOT add any introduction, closing remarks, or explanations
-
-FORMAT (copy this pattern exactly for every question):
-Question 1: [question text]
+FORMAT — follow exactly:
+Question 1: [question]
 A) [option]
 B) [option]
 C) [option]
 D) [option]
-Correct: A
+Correct: B
 
-Question 2: [question text]
+Question 2: [question]
 A) [option]
 B) [option]
 C) [option]
 D) [option]
-Correct: C
+Correct: D
 
-SOURCE TEXT (use ONLY this, nothing else):
+TEXT:
 ${textSample}`
+
       } else {
-        prompt = `${languageInstruction}
+        prompt = `You are a flashcard generator. Use ONLY the text below to create ${numItems} flashcards.
 
-Create exactly ${numItems} flashcards based on the text below.
+RULES:
+- Each card must cover a unique concept — no repeats
+- Front: short term or question (max 10 words)
+- Back: clear concise definition or answer (1-2 sentences)
+- ${sourceLang} only, keep format keywords in English
+- Do NOT add any intro, outro, or explanations
 
-STRICT RULES:
-- DO NOT add introductions or summaries
-- DO NOT say 'Here are the flashcards'
-- Each term must be unique — do NOT repeat or rephrase the same concept twice
-- The definition must be clearly different from the term
-- Write ALL definitions in the SAME LANGUAGE as the source text
-- Use ONLY the format below
-- One blank line between cards
+FORMAT — follow exactly:
+Card 1 Front: [term or question]
+Card 1 Back: [definition or answer]
 
-FORMAT (STRICT):
-Card 1 Front: [short term or concept]
-Card 1 Back: [clear and concise definition]
+Card 2 Front: [term or question]
+Card 2 Back: [definition or answer]
 
-Card 2 Front: ...
-Card 2 Back: ...
-
-SOURCE TEXT (use ONLY this, nothing else):
+TEXT:
 ${textSample}`
       }
+
       const { text: aiResponse, usage, remainingTokens } = await callGroq(prompt, apiKey)
       console.log(`[Token Usage] prompt: ${usage.prompt_tokens} | completion: ${usage.completion_tokens} | total: ${usage.total_tokens}`)
       console.log(`[Remaining Tokens] ${remainingTokens}`)
       console.log('[Raw AI Response]', aiResponse)
-      const items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
+
+      let items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
+
+      // ── SHUFFLE QUIZ OPTIONS to fix answer-always-A bias ──────────────────
+      if (mode === 'quiz') items = shuffleQuizOptions(items)
+      // ─────────────────────────────────────────────────────────────────────
+
       console.log(`[Parsed Items Count] ${items.length}`)
       res.status(200).json({ mode, items, usage })
     } catch (err: unknown) {
@@ -313,15 +339,11 @@ export const sendChangeEmail = onRequest(
       const { Resend } = await import('resend')
       const { uid, newEmail } = req.body as { uid: string; newEmail: string }
       if (!uid || !newEmail) { res.status(400).json({ error: 'uid and newEmail are required' }); return }
-
-      // ✅ Get current user to retrieve their email
       const userRecord = await admin.auth().getUser(uid)
       if (!userRecord.email) { res.status(400).json({ error: 'User has no email' }); return }
-
       const verifyLink = await admin.auth().generateVerifyAndChangeEmailLink(userRecord.email, newEmail, {
         url: 'https://studybuddyph.site/login',
       })
-
       const resend = new Resend(process.env.RESEND_API_KEY!)
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
@@ -340,8 +362,7 @@ export const sendChangeEmail = onRequest(
     } catch (err: unknown) {
       console.error('sendChangeEmail error:', err)
       const error = err as { code?: string; message?: string }
-      // Pass through the original Firebase error code so the frontend can handle it
-      res.status(500).json({ 
+      res.status(500).json({
         error: error.message || 'Internal server error',
         code: error.code || 'auth/unknown'
       })

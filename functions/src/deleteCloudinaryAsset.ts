@@ -1,4 +1,4 @@
-import { onCall, HttpsError } from 'firebase-functions/v2/https'
+import { onRequest } from 'firebase-functions/v2/https'
 import { v2 as cloudinary } from 'cloudinary'
 
 cloudinary.config({
@@ -7,30 +7,32 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-export const deleteCloudinaryAsset = onCall(
-  {
-    cors: true,
-    secrets: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'], // 👈 add this
-  },
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'Must be logged in to delete files.')
-    }
+function setCors(res: any) {
+  res.set('Access-Control-Allow-Origin', '*')
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+}
 
-    const { publicId, resourceType = 'image' } = request.data as {
+export const deleteCloudinaryAsset = onRequest(
+  { secrets: ['CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'] },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+
+    const { publicId, resourceType = 'raw' } = req.body as {
       publicId: string
       resourceType?: 'image' | 'raw' | 'video'
     }
 
-    if (!publicId) {
-      throw new HttpsError('invalid-argument', 'publicId is required.')
-    }
+    if (!publicId) { res.status(400).json({ error: 'publicId is required.' }); return }
 
     try {
       await cloudinary.uploader.destroy(publicId, { resource_type: resourceType })
-      return { success: true }
+      res.status(200).json({ success: true })
     } catch (err) {
-      throw new HttpsError('internal', 'Failed to delete asset from Cloudinary.')
+      console.error('Cloudinary delete error:', err)
+      res.status(500).json({ error: 'Failed to delete asset from Cloudinary.' })
     }
   }
 )

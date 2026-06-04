@@ -87,15 +87,14 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     if (!user || !courseId) return
     const file = files.find((f) => f.id === fileId)
     if (!file) return
-
     await softDelete(user.uid, {
       name: file.fileName,
       type: 'Course',
       originalCollection: `users/${user.uid}/courses/${courseId}/files`,
       originalDocId: fileId,
+      cloudinaryPublicId: file.publicId,  // ← this was missing
       data: { ...file },
     })
-
     await updateDoc(doc(db, 'users', user.uid), {
       storageUsed: increment(-parseFileSizeToBytes(file.fileSize))
     })

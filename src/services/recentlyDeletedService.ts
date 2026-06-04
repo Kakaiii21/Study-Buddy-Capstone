@@ -122,6 +122,7 @@ export async function permanentDelete(
   item: DeletedItem,
   deleteFromCloudinary: (publicId: string) => Promise<void>
 ): Promise<void> {
+  console.log('[PERM DELETE] cloudinaryPublicId:', item.cloudinaryPublicId) // ← add this
   if (item.cloudinaryPublicId) {
     await deleteFromCloudinary(item.cloudinaryPublicId)
   }

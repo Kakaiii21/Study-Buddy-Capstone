@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getFunctions, httpsCallable } from 'firebase/functions'
 import {
   fetchRecentlyDeleted,
   restoreItem,
@@ -9,17 +8,30 @@ import {
 } from '../services/recentlyDeletedService'
 import { useAuth } from './useAuth'
 
-const functions = getFunctions()
-const deleteCloudinaryAsset = httpsCallable<
-  { publicId: string; resourceType?: string },
-  { success: boolean }
->(functions, 'deleteCloudinaryAsset')
+
+// Remove these lines:
+// const functions = getFunctions()
+// const deleteCloudinaryAsset = httpsCallable(...)
 
 async function deleteFromCloudinary(publicId: string): Promise<void> {
   const ext = publicId.split('.').pop()?.toLowerCase() ?? ''
   const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp']
   const resourceType = imageExts.includes(ext) ? 'image' : 'raw'
-  await deleteCloudinaryAsset({ publicId, resourceType })
+
+  console.log('[DELETE ATTEMPT] publicId:', publicId, '| resourceType:', resourceType)
+
+  const res = await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ publicId, resourceType }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(err.error || 'Failed to delete from Cloudinary')
+  }
+
+  console.log('[DELETE SUCCESS]')
 }
 
 type State = {
@@ -77,21 +89,40 @@ export function useRecentlyDeleted() {
     [uid]
   )
 
-  const handlePermanentDelete = useCallback(
-    async (item: DeletedItem) => {
-      if (!uid) return
-      setActionLoading(item.id)
-      try {
-        await permanentDelete(uid, item, deleteFromCloudinary)
-        setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
-      } catch {
-        setState((prev) => ({ ...prev, error: 'Failed to permanently delete item.' }))
-      } finally {
-        setActionLoading(null)
+const handlePermanentDelete = useCallback(
+  async (item: DeletedItem) => {
+    if (!uid) return
+    setActionLoading(item.id)
+    try {
+      await permanentDelete(uid, item, deleteFromCloudinary)
+
+      // Subtract storage if it's a file
+      if (item.data?.fileSize) {
+        const sizeStr = String(item.data.fileSize).trim().toLowerCase().replace(/\s/g, '')
+        let bytes = 0
+        if (sizeStr.endsWith('mb')) bytes = parseFloat(sizeStr) * 1024 * 1024
+        else if (sizeStr.endsWith('kb')) bytes = parseFloat(sizeStr) * 1024
+        else if (sizeStr.endsWith('gb')) bytes = parseFloat(sizeStr) * 1024 * 1024 * 1024
+        else bytes = parseFloat(sizeStr)
+
+        if (!isNaN(bytes) && bytes > 0) {
+          const { doc, updateDoc, increment } = await import('firebase/firestore')
+          const { db } = await import('../services/firebase')
+          await updateDoc(doc(db, 'users', uid), {
+            storageUsed: increment(-bytes)
+          })
+        }
       }
-    },
-    [uid]
-  )
+
+      setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
+    } catch {
+      setState((prev) => ({ ...prev, error: 'Failed to permanently delete item.' }))
+    } finally {
+      setActionLoading(null)
+    }
+  },
+  [uid]
+)
 
   const filteredByType = useCallback(
     (type: DeletedItemType) => state.items.filter((i) => i.type === type),

@@ -34,41 +34,51 @@ function DaysBadge({ days }: { days: number }) {
   )
 }
 
-function ConfirmModal({
-  itemName,
-  onConfirm,
-  onCancel,
-}: {
-  itemName: string
-  onConfirm: () => void
-  onCancel: () => void
-}) {
-  return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
-        <h2 className='text-lg font-bold text-gray-800 mb-2'>Permanently Delete?</h2>
-        <p className='text-sm text-gray-500 mb-6'>
-          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be permanently
-          deleted and cannot be recovered. Any associated files will also be removed.
-        </p>
-        <div className='flex gap-3 justify-end'>
-          <button
-            onClick={onCancel}
-            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'
-          >
-            Delete Forever
-          </button>
+  function ConfirmModal({
+    itemName,
+    onConfirm,
+    onCancel,
+  }: {
+    itemName: string
+    onConfirm: () => void
+    onCancel: () => void
+  }) {
+    const [confirming, setConfirming] = useState(false)
+
+    const handleConfirm = async () => {
+      if (confirming) return
+      setConfirming(true)
+      await onConfirm()
+    }
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+        <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+          <h2 className='text-lg font-bold text-gray-800 mb-2'>Permanently Delete?</h2>
+          <p className='text-sm text-gray-500 mb-6'>
+            <span className='font-semibold text-gray-700'>"{itemName}"</span> will be permanently
+            deleted and cannot be recovered. Any associated files will also be removed.
+          </p>
+          <div className='flex gap-3 justify-end'>
+            <button
+              onClick={onCancel}
+              disabled={confirming}
+              className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50'
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={confirming}
+              className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {confirming ? 'Deleting...' : 'Delete Forever'}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
 function RecentlyDeleted() {
   const [selectedType, setSelectedType] = useState<DeletedItemType>('To Do')

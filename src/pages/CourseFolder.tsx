@@ -7,7 +7,7 @@ import { uploadToCloudinary } from '../services/cloudinary'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/Page/AnnotationLayer.css'
 import 'react-pdf/dist/Page/TextLayer.css'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, increment } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { STORAGE_LIMIT } from '../utils/fileUtils'  // ← only STORAGE_LIMIT needed here now
 
@@ -36,6 +36,7 @@ function TxtPreview({ url }: { url: string }) {
   }, [url])
 
 
+
   return (
     <pre className='w-full h-full overflow-auto p-6 bg-white text-gray-800 font-mono text-sm whitespace-pre-wrap'>
       {text}
@@ -47,6 +48,14 @@ function TxtPreview({ url }: { url: string }) {
 
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+  const [confirming, setConfirming] = useState(false)
+
+  const handleConfirm = async () => {
+    if (confirming) return
+    setConfirming(true)
+    await onConfirm()
+  }
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
@@ -62,11 +71,11 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
           You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
         </p>
         <div className='flex gap-3 justify-end'>
-          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+          <button onClick={onCancel} disabled={confirming} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50'>
             Cancel
           </button>
-          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
-            Move to Trash
+          <button onClick={handleConfirm} disabled={confirming} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+            {confirming ? 'Moving...' : 'Move to Trash'}
           </button>
         </div>
       </div>
@@ -113,12 +122,14 @@ function CourseFolder() {
   window.addEventListener('beforeunload', handleBeforeUnload)
   return () => window.removeEventListener('beforeunload', handleBeforeUnload)
 }, [uploading])
-  useEffect(() => {
-    if (!user) return
-    getDoc(doc(db, 'users', user.uid)).then(snap => {
-      setStorageUsed(snap.data()?.storageUsed ?? 0)
-    })
-  }, [user, files])
+
+    useEffect(() => {
+      if (!user) return
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        const val = snap.data()?.storageUsed ?? 0
+        setStorageUsed(Math.max(0, val))  // ← clamp negative values
+      })
+    }, [user])
 
   const handleFileClick = (file: CourseFile) => {
     setPreviewFile(file)
@@ -173,7 +184,6 @@ const handleFiles = async (incoming: FileList | null) => {
   }
 
   if (messages.length > 0) setError(messages.join(' | '))
-
     for (const file of toUpload) {
       try {
         setUploading(true)
@@ -191,6 +201,10 @@ const handleFiles = async (incoming: FileList | null) => {
           result.fileType,
           result.fileSize,
         )
+
+        // ✅ Update storage bar immediately after each successful upload
+        setStorageUsed((prev) => prev + file.size)
+
       } catch (error) {
         console.error('Full upload error:', error)
         setError((prev) => prev ? `${prev} | Failed to upload ${file.name}. Please try again.` : `Failed to upload ${file.name}. Please try again.`)
@@ -202,11 +216,45 @@ const handleFiles = async (incoming: FileList | null) => {
     }
   }
 
-  async function handleDelete() {
-    if (!pendingDelete) return
-    await deleteCourseFile(pendingDelete.id)
-    setPendingDelete(null)
-  }
+    async function handleDelete() {
+      if (!pendingDelete) return
+
+      const fileToDelete = files.find(f => f.id === pendingDelete.id)
+      await deleteCourseFile(pendingDelete.id)
+
+      if (fileToDelete) {
+        const sizeStr = fileToDelete.fileSize.trim().toLowerCase().replace(/\s/g, '')
+        let sizeInBytes = 0
+
+        if (sizeStr.endsWith('mb')) {
+          sizeInBytes = parseFloat(sizeStr) * 1024 * 1024
+        } else if (sizeStr.endsWith('kb')) {
+          sizeInBytes = parseFloat(sizeStr) * 1024
+        } else if (sizeStr.endsWith('gb')) {
+          sizeInBytes = parseFloat(sizeStr) * 1024 * 1024 * 1024
+        } else if (sizeStr.endsWith('b')) {
+          sizeInBytes = parseFloat(sizeStr)
+        } else {
+          sizeInBytes = parseFloat(sizeStr) // assume raw bytes
+        }
+
+        console.log('[Delete] fileSize string:', fileToDelete.fileSize, '→ parsed bytes:', sizeInBytes)
+
+        if (!isNaN(sizeInBytes) && sizeInBytes > 0) {
+          setStorageUsed(prev => Math.max(0, prev - sizeInBytes))
+
+          // Also update Firestore so it's accurate on next page load
+          if (user) {
+            const userRef = doc(db, 'users', user.uid)
+            await updateDoc(userRef, {
+              storageUsed: increment(-sizeInBytes)
+            })
+          }
+        }
+      }
+
+      setPendingDelete(null)
+    }
 
   const handleEdit = (id: string) => {
     const file = files.find((f) => f.id === id)

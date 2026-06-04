@@ -184,7 +184,7 @@ const [passwordFocused, setPasswordFocused] = useState(false)
       setConfirmPassword('')
       setFieldErrors({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' })
       setTouched({ firstName: false, lastName: false, email: false, password: false, confirmPassword: false })
-      setSuccess('✅ Account created successfully! Redirecting to login...')
+      setSuccess(' Redirecting to Verify Email...')
       setTimeout(() => navigate('/verify-email'), 2000)
     } catch (err) {
       setLoading(false)

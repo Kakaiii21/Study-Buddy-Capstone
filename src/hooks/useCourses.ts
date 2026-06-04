@@ -79,6 +79,7 @@ export function useCourses(user: User | null) {
           type: 'Course',
           originalCollection: `users/${user.uid}/courses/${courseId}/files`,
           originalDocId: fileDoc.id,
+          cloudinaryPublicId: fileData.publicId,  // ← this was missing
           data: { ...fileData, id: fileDoc.id },
         })
       })
