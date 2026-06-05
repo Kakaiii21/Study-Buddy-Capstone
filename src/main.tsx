@@ -25,6 +25,7 @@ import Flashcard from './pages/StudyGenerator/Flashcard'
 import QuizView from './pages/StudyGenerator/QuizView'
 import FlashcardView from './pages/StudyGenerator/FlashcardView'
 import ChangePassword from './pages/ChangePassword'
+import { registerSW } from 'virtual:pwa-register'  // ← ADD THIS
 import VerifyEmail from './pages/VerifyEmail'
 import ChangeEmail from './pages/ChangeEmail'
 import { setInstallPrompt } from './utils/pwaPrompt'
@@ -35,6 +36,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
   setInstallPrompt(e)
 })
+registerSW({ immediate: true })
 
 const router = createBrowserRouter([
   {

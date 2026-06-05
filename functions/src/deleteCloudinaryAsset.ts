@@ -1,12 +1,6 @@
 import { onRequest } from 'firebase-functions/v2/https'
 import { v2 as cloudinary } from 'cloudinary'
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
-
 function setCors(res: any) {
   res.set('Access-Control-Allow-Origin', '*')
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -19,6 +13,13 @@ export const deleteCloudinaryAsset = onRequest(
     setCors(res)
     if (req.method === 'OPTIONS') { res.status(204).send(''); return }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+
+    // ← moved inside handler, secrets are available here
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    })
 
     const { publicId, resourceType = 'raw' } = req.body as {
       publicId: string

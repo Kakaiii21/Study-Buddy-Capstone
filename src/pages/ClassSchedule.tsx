@@ -32,6 +32,40 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
   )
 }
 
+function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <img src="/delete.png" alt="delete icon" className='w-7 h-7' />
+          <h2 className='text-lg font-bold text-gray-800'>Clear All Schedules?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          This will permanently delete{' '}
+          <span className='font-semibold text-gray-700'>all subjects</span> from your class schedule.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          This action <span className='font-semibold text-red-400'>cannot be undone</span>.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button
+            onClick={onCancel}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'
+          >
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ClassSchedule() {
   const { user } = useAuth()
   const { schedules, loading, addSchedule, updateSchedule, deleteSchedule } = useClassSched(user)
@@ -48,6 +82,7 @@ function ClassSchedule() {
   const [menuOpenIndex, setMenuOpenIndex] = useState<string | null>(null)
   const [editTargetId, setEditTargetId] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
+  const [showClearModal, setShowClearModal] = useState(false)
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const typeRoom = ['Lecture', 'Laboratory']
@@ -69,6 +104,7 @@ function ClassSchedule() {
     const errClass = (field: string) =>
   fieldErrors[field] ? 'border-2 border-red-400 bg-red-50' : ''
 
+    
 const handleSave = async () => {
   const errors: Record<string, string> = {}
   if (!selectedDay) errors.selectedDay = 'Required'
@@ -121,6 +157,12 @@ const handleSave = async () => {
     await deleteSchedule(pendingDelete.id)
     setPendingDelete(null)
   }
+
+    async function handleClearAll() {
+      await Promise.all(schedules.map(s => deleteSchedule(s.id)))
+      setShowClearModal(false)
+    }
+
 
   const handleEditOpen = (s: { id: string; day: string; subject: string; timeStart: string; timeEnd: string; room: string; roomType: string; instructor: string }) => {
     setSelectedDay(s.day)
@@ -209,14 +251,22 @@ const handleSave = async () => {
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
             <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
             <hr className='lg:hidden md:hidden w-full border-t mt-3 border-primary-600' />
+            <div className='flex flex-row gap-10'>
+            <button
+              onClick={() => setShowClearModal(true)}
+              className='bg-white text-sm text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-4 text-primary-600 uppercase font-roboto rounded-md'
+            >
+              Clear Schedule
+            </button>
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-4 mt-2 md:mt-0 lg:mt-0 px-8 text-white uppercase font-roboto text-sm rounded-md'
+              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-sm rounded-md'
             >
               + Add Schedule
             </button>
+            </div>
           </div>
-          <hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
+          <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 
           {/* Add / Edit Modal */}
           {isAddSubOpen && (
@@ -315,6 +365,12 @@ const handleSave = async () => {
             onCancel={() => setPendingDelete(null)}
           />
         )}
+        {showClearModal && (
+            <ClearScheduleModal
+              onConfirm={handleClearAll}
+              onCancel={() => setShowClearModal(false)}
+            />
+          )}
       </main>
     </div>
   )

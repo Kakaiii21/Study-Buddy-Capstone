@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { onAuthChange } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
@@ -17,6 +18,12 @@ type TouchedFields = {
 
 function Login() {
   const navigate = useNavigate()
+  useEffect(() => {
+  const unsubscribe = onAuthChange((user) => {
+    if (user) navigate('/dashboard', { replace: true })
+  })
+  return () => unsubscribe()
+}, [])
 
   const [emailUpdated] = useState(() => {
     const val = new URLSearchParams(window.location.search).get('emailUpdated')

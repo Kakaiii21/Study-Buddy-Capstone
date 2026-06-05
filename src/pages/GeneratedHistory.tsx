@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useFlashcardHistory } from '../hooks/useFlashcardHistory'
+import { useNetworkStatus } from '../hooks/useNetworkStatus'
 
 function formatDate(date: Date): string {
   return date.toLocaleString('en-US', {
@@ -55,6 +56,7 @@ function GeneratedHistory() {
   const navigate = useNavigate()
   const [selectedGen, setSelectedGen] = useState('Quiz')
   const [searchQuery, setSearchQuery] = useState('')
+  const isOnline = useNetworkStatus()
 
   const { quizHistory, loading: quizLoading, deleteQuiz } = useQuizHistory(user)
   const { flashcardHistory, loading: flashLoading, deleteFlashcard } = useFlashcardHistory(user)
@@ -166,6 +168,12 @@ function GeneratedHistory() {
             <p className='whitespace-nowrap text-primary-600 font-semibold'>Recent</p>
             <hr className='flex-1 border-t border-primary-100' />
           </div>
+          {!isOnline && (
+              <div className='mb-4 px-4 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-xs text-yellow-700 font-roboto text-center'>
+                You're offline — viewing cached history. Delete is unavailable until reconnected.
+              </div>
+            )}
+
 
           {/* Loading */}
           {loading && (
@@ -218,13 +226,16 @@ function GeneratedHistory() {
                             />
                           </div>
                           <div className='flex justify-center'>
-                            <img
-                              src='/delete.png'
-                              alt='Delete'
-                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
-                              onClick={() => setPendingDelete({ id: item.id, name: item.fileName })}
-
-                            />
+                          <img
+                            src='/delete.png'
+                            alt='Delete'
+                            className={`lg:w-7 lg:h-7 w-5 h-5 transition
+                              ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
+                            onClick={() => isOnline
+                              ? setPendingDelete({ id: item.id, name: item.fileName })
+                              : undefined
+                            }
+                          />
                           </div>
                         </div>
                       </div>
@@ -265,13 +276,16 @@ function GeneratedHistory() {
                             />
                           </div>
                           <div className='flex justify-center'>
-                            <img
-                              src='/delete.png'
-                              alt='Delete'
-                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
-                              onClick={() => setPendingDelete({ id: item.id, name: item.fileName })}
-
-                            />
+                              <img
+                                src='/delete.png'
+                                alt='Delete'
+                                className={`lg:w-7 lg:h-7 w-5 h-5 transition
+                                  ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
+                                onClick={() => isOnline
+                                  ? setPendingDelete({ id: item.id, name: item.fileName })
+                                  : undefined
+                                }
+                              />
                           </div>
                         </div>
                       </div>

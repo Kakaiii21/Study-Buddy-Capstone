@@ -10,6 +10,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import { doc, getDoc, setDoc, increment } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { STORAGE_LIMIT } from '../utils/fileUtils'
+import { useNetworkStatus } from '../hooks/useNetworkStatus'
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
@@ -106,6 +107,7 @@ function CourseFolder() {
   const [editError, setEditError] = useState('')
   const [storageUsed, setStorageUsed] = useState(0)
 
+  const isOnline = useNetworkStatus()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { files, loading, addCourseFile, renameCourseFile, deleteCourseFile } = useCourseFiles(user, courseId)
@@ -145,9 +147,12 @@ function CourseFolder() {
     setPreviewFile(file)
   }
 
-  const handleFiles = async (incoming: FileList | null) => {
-    if (!incoming) return
-    setError('')
+const handleFiles = async (incoming: FileList | null) => {
+  if (!incoming) return
+  if (!isOnline) {
+    setError('You are offline. Please reconnect to upload files.')
+    return
+  }
 
     const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
     const messages: string[] = []
@@ -384,10 +389,10 @@ function CourseFolder() {
 
               <button
                 onClick={() => fileInputRef.current?.click()}
-                disabled={uploading || isRestoredFolder}
+                disabled={uploading || isRestoredFolder || !isOnline}  // ← add !isOnline
                 className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md lg:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                + Upload Files
+                {!isOnline ? '📶 Offline' : '+ Upload Files'}
               </button>
             </div>
           </div>

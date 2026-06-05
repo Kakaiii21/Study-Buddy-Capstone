@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useCourses } from '../hooks/useCourses'
 import { useCourseFiles } from '../hooks/useCourseFiles'
 import type { User } from 'firebase/auth'
+import { useNetworkStatus } from '../hooks/useNetworkStatus'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -205,7 +206,7 @@ function StudyGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null) // ── NEW
   const items = [10, 20, 30, 40, 50]
-
+  const isOnline = useNetworkStatus()
   // ── NEW: initialize cooldown from localStorage on mount ──────────────────
   useEffect(() => {
     const stored = localStorage.getItem(COOLDOWN_KEY)
@@ -288,6 +289,7 @@ function StudyGenerator() {
   const handleGenerate = async () => {
     if (!uploadedFile) { setFileError('Please upload or select a file first.'); return }
     if (!selectItems) { setFileError('Please select the number of items.'); return }
+    if (!isOnline) { setFileError('You are offline. Please reconnect to generate.'); return }
     if (cooldownSeconds > 0) return // ── NEW: block if on cooldown
     setFileError('')
     setSuggestedMax(null)
@@ -350,8 +352,7 @@ function StudyGenerator() {
   }
 
   const isCoolingDown = cooldownSeconds > 0 // ── NEW
-  const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCoolingDown // ── NEW
-
+const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCoolingDown && isOnline
   const fileIconSrc = uploadedFile
     ? uploadedFile.type === 'pdf' ? '/pdfIcon.png'
       : ['doc', 'docx'].includes(uploadedFile.type) ? '/docsIcon.png'
@@ -389,6 +390,12 @@ function StudyGenerator() {
                 <span>You can generate again in <span className='font-bold text-yellow-800'>{formatCountdown(cooldownSeconds)}</span></span>
               </div>
             )}
+            {!isOnline && (
+              <div className='mt-6 flex items-center gap-3 bg-red-50 border border-red-300 text-red-700 font-roboto text-sm font-semibold px-5 py-3 rounded-xl'>
+                <span>📶</span>
+                <span>You're offline. Connect to the internet to use the Study Generator.</span>
+              </div>
+            )}
             {/* ─────────────────────── */}
 
             {/* File Source Panel */}
@@ -401,9 +408,9 @@ function StudyGenerator() {
                 <div className='flex flex-col gap-3 justify-start items-center'>
                   <img className='w-20 md:w-32 lg:w-32' src='Localbtn.png' alt='localbtnicon' />
                   <button
-                    className='bg-primary-600 text-white rounded-md text-sm md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                     onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
-                    disabled={isGenerating}
+                    disabled={isGenerating || !isOnline}
+                    className='bg-primary-600 text-white rounded-md text-sm md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                   >
                     Local Files
                   </button>
@@ -414,9 +421,9 @@ function StudyGenerator() {
                 <div className='flex flex-col gap-3 justify-start items-center'>
                   <img className='w-20 md:w-32 lg:w-32' src='Coursesbtn.png' alt='coursesbtnicon' />
                   <button
-                    className='bg-primary-600 text-sm text-white rounded-md md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                     onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
-                    disabled={coursesLoading || isGenerating}
+                    disabled={coursesLoading || isGenerating || !isOnline}
+                    className='bg-primary-600 text-sm text-white rounded-md md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                   >
                     {coursesLoading ? 'Loading...' : 'Course Files'}
                   </button>

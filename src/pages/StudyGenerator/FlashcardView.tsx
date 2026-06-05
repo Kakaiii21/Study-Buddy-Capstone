@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar'
 import { db, auth } from '../../services/firebase'
 import { doc, updateDoc } from 'firebase/firestore'
+import { useNetworkStatus } from '../../hooks/useNetworkStatus'
 
 interface FlashcardItem {
   term: string
@@ -21,6 +22,8 @@ const FLASHCARD_VIEW_KEY = 'flashcard_view_state'
 function FlashcardView() {
   const location = useLocation()
   const navigate = useNavigate()
+  const isOnline = useNetworkStatus()
+
 
   const rawState = location.state as FlashcardViewState | null
 
@@ -201,7 +204,7 @@ function FlashcardView() {
                       >
                         <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
                       </button>
-                    </div>
+                      </div>
                   )}
                 </div>
 
@@ -273,12 +276,13 @@ function FlashcardView() {
             >
               Back
             </button>
-            <button
-              className='hover:opacity-50 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'
-              onClick={() => persistCards(cards)}
-            >
-              Save
-            </button>
+              <button
+                className={`hover:opacity-50 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase transition
+                  ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
+                onClick={() => isOnline ? persistCards(cards) : undefined}
+              >
+                Save
+              </button>
           </div>
         </div>
 

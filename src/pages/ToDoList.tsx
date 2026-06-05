@@ -14,6 +14,7 @@ import {
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks, type Task, type Status } from '../hooks/useTasks'
+import { useTaskNotifications } from '../hooks/useTaskNotification'
 
 const COLUMNS: { id: Status; label: string }[] = [
   { id: 'todo',        label: 'TO DO' },
@@ -518,6 +519,8 @@ function ToDoList() {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+
+  useTaskNotifications(tasks)
 
   const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
     'todo': false,

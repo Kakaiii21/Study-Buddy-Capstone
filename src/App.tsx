@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect ,useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { onAuthChange } from './services/authService'
 import { signup } from './services/authService'
 import './index.css'
 import { googleLogin } from './services/authService'
@@ -48,7 +49,14 @@ function PasswordRequirements({ password }: { password: string }) {
   )
 }
 function App() {
-  const navigate = useNavigate()
+    const navigate = useNavigate()
+
+  useEffect(() => {
+    const unsubscribe = onAuthChange((user) => {
+      if (user) navigate('/dashboard', { replace: true })
+    })
+    return () => unsubscribe()
+  }, [])
   const [activeTab, setActiveTab] = useState('signup')
 const [passwordFocused, setPasswordFocused] = useState(false)
 

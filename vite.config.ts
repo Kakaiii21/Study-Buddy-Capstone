@@ -2,18 +2,20 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest',
+      srcDir: 'src',        // ← changed from 'public'
+      filename: 'sw.js',
+      injectManifest: {
+        injectionPoint: 'self.__WB_MANIFEST',
+      },
       manifest: {
         name: 'Study Buddy',
         short_name: 'StudyBuddy',
-        start_url: '/',
-        display: 'standalone',
-        background_color: '#ffffff',
         theme_color: '#ffffff',
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

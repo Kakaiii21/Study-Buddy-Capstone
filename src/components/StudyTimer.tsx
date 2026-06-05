@@ -31,8 +31,9 @@ const completedPercent = useMemo(() => {
   // ↓ from context now — replaces useTimer + totalTimeInSeconds + showExpiredMsg
   const {
     seconds, minutes, hours,
-    isRunning, totalSeconds,
-    setTimer, pause, resume,
+    isRunning, isActive,  
+    setTimer, pause, resume, stop,  
+    
   } = useTimerContext()
 
   // ↓ these stay local — only used inside the modal
@@ -60,14 +61,6 @@ const completedPercent = useMemo(() => {
     closeModal()
   }
 
-      const handleStartPause = (): void => {
-        if (isRunning) {
-          pause()
-        } else {
-          if (totalSeconds === 0) { setShowModal(true); return }  // ← this already handles it
-          resume()
-        }
-      }
 
   return (
 <div className='flex flex-col min-h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3 py-6 gap-24 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
@@ -97,21 +90,33 @@ const completedPercent = useMemo(() => {
         ))}
       </div>
 
-      {/* BUTTONS — exact same as before */}
-      <div className='flex gap-3'>
-        <button
-          onClick={() => setShowModal(true)}
-          className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl text-primary-600 font-bold text-sm bg-white hover:bg-primary-100'
-        >
-          Set Time
-        </button>
-        <button
-          onClick={handleStartPause}
-          className='px-8 py-2 rounded-xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700'
-        >
-          {isRunning ? 'Pause' : 'Start'}
-        </button>
-      </div>
+        {/* BUTTONS */}
+        <div className='flex gap-3'>
+          {!isActive ? (
+            <>
+              <button onClick={() => setShowModal(true)}
+                className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm hover:bg-primary-100'>
+                Set Time
+              </button>
+              <button onClick={() => setShowModal(true)}
+                className='px-8 py-2 rounded-xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700'>
+                Start
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => stop()}
+                className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-white text-red-500 font-bold text-sm hover:bg-red-50'>
+                Stop
+              </button>
+              <button
+                onClick={() => { if (isRunning) { pause(); return } resume() }}
+                className='px-8 py-2 rounded-xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700'>
+                {isRunning ? 'Pause' : 'Resume'}
+              </button>
+            </>
+          )}
+        </div>
 
     {/* CIRCULAR PROGRESS — exact same as before */}
     <div className='flex flex-col items-center gap-2'>

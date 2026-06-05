@@ -13,45 +13,22 @@ interface TimerContextType {
   setTimer: (h: number, m: number, s: number) => void
   pause: () => void
   resume: () => void
+  stop: () => void 
+  isActive: boolean 
 }
 
 const TimerContext = createContext<TimerContextType | null>(null)
-const STORAGE_KEY = 'studyTimer'
 const INITIAL_EXPIRY = new Date(Date.now() - 1000)
 
-// ── Read persisted state from sessionStorage on startup ──────────────────────
-function loadPersistedTimer(): {
-  expiryTimestamp: Date
-  totalSeconds: number
-  elapsedSeconds: number
-  wasRunning: boolean
-} {
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (!raw) return { expiryTimestamp: INITIAL_EXPIRY, totalSeconds: 0, elapsedSeconds: 0, wasRunning: false }
-
-    const { expiryMs, totalSeconds, elapsedSeconds, wasRunning } = JSON.parse(raw)
-    const expiryTimestamp = new Date(expiryMs)
-
-    // If the timer already expired while the page was closed, treat as fresh
-    if (expiryTimestamp <= new Date()) {
-      sessionStorage.removeItem(STORAGE_KEY)
-      return { expiryTimestamp: INITIAL_EXPIRY, totalSeconds: 0, elapsedSeconds: 0, wasRunning: false }
-    }
-
-    return { expiryTimestamp, totalSeconds, elapsedSeconds, wasRunning }
-  } catch {
-    return { expiryTimestamp: INITIAL_EXPIRY, totalSeconds: 0, elapsedSeconds: 0, wasRunning: false }
-  }
-}
-
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const persisted = loadPersistedTimer()
-
-  const [totalSeconds,   setTotalSeconds]   = useState(persisted.totalSeconds)
-  const [elapsedSeconds, setElapsedSeconds] = useState(persisted.elapsedSeconds)
-  const [showExpired,    setShowExpired]     = useState(false)
+  const [totalSeconds,   setTotalSeconds]   = useState(0)
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [lockedElapsed,  setLockedElapsed]  = useState(0)  // ← no persisted ref
+  const [showExpired,    setShowExpired]    = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+
+  const [isActive, setIsActive] = useState(false)
 
   useEffect(() => {
     if (Notification.permission === 'default') {
@@ -66,12 +43,12 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   }
 
   const { seconds, minutes, hours, isRunning, pause, resume, restart } = useTimer({
-    expiryTimestamp: persisted.expiryTimestamp,
-    autoStart: persisted.wasRunning,
+    expiryTimestamp: INITIAL_EXPIRY,
+    autoStart: false,
     onExpire: () => {
       setShowExpired(true)
       setTotalSeconds(0)
-      sessionStorage.removeItem(STORAGE_KEY)
+      setIsActive(false) 
 
       const audio = new Audio('/alarm.mp3')
       audio.play()
@@ -92,7 +69,6 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     },
   })
 
-  // ── Elapsed seconds ticker ────────────────────────────────────────────────
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
@@ -106,38 +82,31 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isRunning])
 
-  // ── Persist to sessionStorage on every tick ───────────────────────────────
-  useEffect(() => {
-    if (totalSeconds === 0) return // nothing to persist
-    const expiryMs = new Date(
-      Date.now() + (hours * 3600 + minutes * 60 + seconds) * 1000
-    ).getTime()
-    sessionStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ expiryMs, totalSeconds, elapsedSeconds, wasRunning: isRunning })
-    )
-  }, [seconds, minutes, hours, isRunning, totalSeconds, elapsedSeconds])
+const stop = useCallback(() => {
+  setLockedElapsed(elapsedSeconds)
+  pause()
+  setTotalSeconds(0)
+  setElapsedSeconds(0)
+  setIsActive(false)       // ← mark inactive
+  restart(INITIAL_EXPIRY, false)
+}, [pause, elapsedSeconds, restart])
 
-  const setTimer = useCallback((h: number, m: number, s: number) => {
-    setShowExpired(false)
-    setElapsedSeconds(0)
-    const total = h * 3600 + m * 60 + s
-    setTotalSeconds(total)
-    const expiry = getExpiry(h, m, s)
-    restart(expiry, false)
-    // Persist immediately so a quick refresh before the first tick still works
-    sessionStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ expiryMs: expiry.getTime(), totalSeconds: total, elapsedSeconds: 0, wasRunning: false })
-    )
-  }, [restart])
+const setTimer = useCallback((h: number, m: number, s: number) => {
+  setShowExpired(false)
+  setElapsedSeconds(0)
+  setTotalSeconds(h * 3600 + m * 60 + s)
+  setIsActive(true)        // ← mark active
+  restart(getExpiry(h, m, s), true)
+}, [restart])
 
   return (
     <TimerContext.Provider value={{
       seconds, minutes, hours, isRunning,
-      totalSeconds, elapsedSeconds,
+      totalSeconds,isActive,
+      elapsedSeconds: lockedElapsed,  // ← dashboard always reads locked value
       showExpired, setShowExpired,
       setTimer, pause, resume,
+      stop,
     }}>
       {children}
     </TimerContext.Provider>
