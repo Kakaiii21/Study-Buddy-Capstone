@@ -467,10 +467,12 @@ const handleFiles = async (incoming: FileList | null) => {
               <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
-                onClick={() => fileInputRef.current?.click()}
-                onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
-                className={`flex flex-col items-center mt-3 justify-center border-2 border-dashed rounded-xl py-24 cursor-pointer transition-colors
-                  ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-300 hover:border-primary-600'}`}
+                onClick={() => isOnline && fileInputRef.current?.click()}
+                onDrop={(e) => { e.preventDefault(); setDragOver(false); if (isOnline) handleFiles(e.dataTransfer.files) }}
+                className={`flex flex-col items-center mt-3 justify-center border-2 border-dashed rounded-xl py-24 transition-colors
+                  ${!isOnline ? 'opacity-50 cursor-not-allowed border-gray-200' :
+                    dragOver ? 'border-primary-600 bg-primary-50 cursor-pointer' : 
+                    'border-gray-300 hover:border-primary-600 cursor-pointer'}`}
               >
                 <p className='text-5xl mb-4'>📂</p>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
@@ -560,8 +562,8 @@ const handleFiles = async (incoming: FileList | null) => {
                 <div
                   onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
-                  onClick={() => fileInputRef.current?.click()}
-                  onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
+                    onClick={() => isOnline && fileInputRef.current?.click()}
+                    onDrop={(e) => { e.preventDefault(); setDragOver(false); if (isOnline) handleFiles(e.dataTransfer.files) }}
                   className={`flex items-center justify-center border-2 border-dashed rounded-xl py-6 cursor-pointer transition-colors
                     ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-600'}`}
                 >

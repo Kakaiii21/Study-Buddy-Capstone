@@ -4,12 +4,25 @@ import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
 
-function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
+
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
+  itemName: string
+  onConfirm: () => void
+  onCancel: () => void 
+}) {
+  const [confirming, setConfirming] = useState(false)  // ← add this
+
+  const handleConfirm = () => {
+    if (confirming) return          // ← block double click
+    setConfirming(true)
+    onConfirm()
+  }
+
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="delteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
@@ -20,11 +33,19 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
           You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
         </p>
         <div className='flex gap-3 justify-end'>
-          <button onClick={onCancel} className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+          <button 
+            onClick={onCancel} 
+            disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'
+          >
             Cancel
           </button>
-          <button onClick={onConfirm} className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
-            Move to Trash
+          <button 
+            onClick={handleConfirm}
+            disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
+          >
+            {confirming ? 'Deleting...' : 'Move to Trash'}
           </button>
         </div>
       </div>
@@ -168,22 +189,28 @@ function Notes() {
   async function handleNoteSave() {
     if (noteContent.trim() === '') return
     const title = noteTitle.trim() || getUntitledTitle()
-    await addNote(title, noteSubject, noteContent)
-    setNoteTitle('')
-    setNoteSubject('All Subject')
-    setNoteContent('')
-    setIsNoteModalOpen(false)
+    try {
+      await addNote(title, noteSubject, noteContent)
+    } finally {
+      setNoteTitle('')
+      setNoteSubject('All Subject')
+      setNoteContent('')
+      setIsNoteModalOpen(false)
+    }
   }
 
   async function handleNoteUpdate() {
     if (!selectedNote) return
     const title = noteTitle.trim() || getUntitledTitle()
-    await updateNote(selectedNote.id, {
-      title,
-      subject: noteSubject,
-      content: noteContent.trim(),
-    })
-    closeNoteModal()
+    try {
+      await updateNote(selectedNote.id, {
+        title,
+        subject: noteSubject,
+        content: noteContent.trim(),
+      })
+    } finally {
+      closeNoteModal()
+    }
   }
 
   // ── Download as .txt ──

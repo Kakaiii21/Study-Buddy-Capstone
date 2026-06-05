@@ -8,10 +8,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
-      srcDir: 'src',        // ← changed from 'public'
+      srcDir: 'src',
       filename: 'sw.js',
       injectManifest: {
         injectionPoint: 'self.__WB_MANIFEST',
+        globPatterns: [
+          '**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}'
+        ],
       },
       manifest: {
         name: 'Study Buddy',
