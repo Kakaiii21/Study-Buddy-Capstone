@@ -61,11 +61,9 @@ function Notes() {
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
-  async function handleSubjectDelete(subject: string) {
+  function handleSubjectDelete(subject: string) {
     const affectedNotes = notes.filter((n) => n.subject === subject)
-    await Promise.all(
-      affectedNotes.map((n) => updateNote(n.id, { subject: 'All Subject' }))
-    )
+    affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Subject' }))
     setSubjects((prev) => prev.filter((s) => s !== subject))
     if (selectedSubject === subject) setSelectedSubject('All Subject')
     setDeleteSubjectConfirm(null)
@@ -189,28 +187,22 @@ function Notes() {
   async function handleNoteSave() {
     if (noteContent.trim() === '') return
     const title = noteTitle.trim() || getUntitledTitle()
-    try {
-      await addNote(title, noteSubject, noteContent)
-    } finally {
-      setNoteTitle('')
-      setNoteSubject('All Subject')
-      setNoteContent('')
-      setIsNoteModalOpen(false)
-    }
+    setNoteTitle('')
+    setNoteSubject('All Subject')
+    setNoteContent('')
+    setIsNoteModalOpen(false)   // close immediately
+    addNote(title, noteSubject, noteContent)  // fire and forget
   }
 
   async function handleNoteUpdate() {
     if (!selectedNote) return
     const title = noteTitle.trim() || getUntitledTitle()
-    try {
-      await updateNote(selectedNote.id, {
-        title,
-        subject: noteSubject,
-        content: noteContent.trim(),
-      })
-    } finally {
-      closeNoteModal()
-    }
+    closeNoteModal()            // close immediately
+    updateNote(selectedNote.id, {
+      title,
+      subject: noteSubject,
+      content: noteContent.trim(),
+    })                          // fire and forget
   }
 
   // ── Download as .txt ──

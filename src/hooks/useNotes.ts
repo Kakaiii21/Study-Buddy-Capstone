@@ -27,33 +27,40 @@ export function useNotes(user: User | null) {
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user) {
-      const timer = setTimeout(() => {
-        setNotes([])
-        setLoading(false)
-      }, 0)
-      return () => clearTimeout(timer)
-    }
+useEffect(() => {
+  if (!user) {
+    const timer = setTimeout(() => {
+      setNotes([])
+      setLoading(false)
+    }, 0)
+    return () => clearTimeout(timer)
+  }
 
-    const notesRef = collection(db, 'users', user.uid, 'notes')
-    const q = query(notesRef, orderBy('createdAt', 'asc'))
+  const notesRef = collection(db, 'users', user.uid, 'notes')
+  const q = query(notesRef, orderBy('createdAt', 'asc'))
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  const unsubscribe = onSnapshot(q,
+    (snapshot) => {
       const fetched: Note[] = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...(doc.data() as Omit<Note, 'id'>),
       }))
       setNotes(fetched)
       setLoading(false)
-    })
+    },
+    (error) => {
+      console.warn('Notes snapshot error:', error)
+      setLoading(false)
+    }
+  )
 
-    return () => unsubscribe()
-  }, [user])
+  return () => unsubscribe()
+}, [user])
 
-  async function addNote(title: string, subject: string, content: string) {
+
+   function addNote(title: string, subject: string, content: string) {
     if (!user || !title.trim()) return
-    await addDoc(collection(db, 'users', user.uid, 'notes'), {
+     addDoc(collection(db, 'users', user.uid, 'notes'), {
       title: title.trim(),
       subject,
       content: content.trim(),
@@ -68,18 +75,20 @@ async function deleteNote(noteId: string) {
   const note = notes.find((n) => n.id === noteId)
   if (!note) return
   await softDelete(user.uid, {
-    name: note.title,         // ← change to your name field
-    type: 'Notes',            // ← change per hook
-    originalCollection: `users/${user.uid}/notes`, // ← change path
+    name: note.title,
+    type: 'Notes',
+    originalCollection: `users/${user.uid}/notes`,
     originalDocId: noteId,
     data: { ...note },
   })
 }
-  async function updateNote(noteId: string, fields: Partial<Pick<Note, 'title' | 'subject' | 'content'>>) {
+   function updateNote(noteId: string, fields: Partial<Pick<Note, 'title' | 'subject' | 'content'>>) {
     if (!user) return
     const noteRef = doc(db, 'users', user.uid, 'notes', noteId)
-    await updateDoc(noteRef, fields)
+     updateDoc(noteRef, fields)
   }
+
+
 
 
 
