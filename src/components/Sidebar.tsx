@@ -4,36 +4,44 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 type Props = {
   uploading?: boolean
-   quizActive?: boolean  
+  quizActive?: boolean
+  isOpenExternal?: boolean
+  onExternalClose?: () => void
 }
 
-function Sidebar({ uploading = false, quizActive = false }: Props) {
-  const isBlocked = uploading || quizActive  // ← combine both
-  const [isOpen, setIsOpen] = useState(false)
+function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false, onExternalClose }: Props) {
+  const isBlocked = uploading || quizActive
+  const [isOpenInternal, setIsOpenInternal] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
-const handleLogout = async () => {
-  sessionStorage.clear()
-  sessionStorage.setItem('intentionalLogout', 'true')  // ← set AFTER clear
-  await logout()
-  setShowLogoutModal(false)
-  navigate('/login')
-  window.history.replaceState(null, '', '/login')
-}
+  const isOpen = isOpenInternal || isOpenExternal   // ← merged state
+
+  const close = () => {
+    setIsOpenInternal(false)
+    onExternalClose?.()
+  }
+
+  const handleLogout = async () => {
+    sessionStorage.clear()
+    sessionStorage.setItem('intentionalLogout', 'true')
+    await logout()
+    setShowLogoutModal(false)
+    navigate('/login')
+    window.history.replaceState(null, '', '/login')
+  }
 
   const handleNavigate = (path: string) => {
-    if (isBlocked) return  // ← block navigation
+    if (isBlocked) return
     navigate(path)
-    setIsOpen(false)
+    close()   // ← was setIsOpen(false)
   }
+
   const navSections = [
     {
       heading: 'Home',
-      items: [
-        { label: 'Dashboard', path: '/dashboard' },
-      ]
+      items: [{ label: 'Dashboard', path: '/dashboard' }]
     },
     {
       heading: 'Activities',
@@ -49,9 +57,7 @@ const handleLogout = async () => {
     },
     {
       heading: 'More',
-      items: [
-        { label: 'Account', path: '/account' },
-      ]
+      items: [{ label: 'Account', path: '/account' }]
     },
   ]
 
@@ -59,7 +65,11 @@ const handleLogout = async () => {
     <>
       {/* BURGER BUTTON */}
       <button
-        onClick={() => !isBlocked && setIsOpen(!isOpen)}
+        id="sidebar-btn"
+        onClick={() => {
+          if (isBlocked) return
+          setIsOpenInternal(!isOpenInternal)   // ← fixed syntax
+        }}
         className={`lg:hidden fixed top-5 left-3 z-50 bg-transparent p-4 flex flex-col items-center
           ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}
           ${isOpen ? 'hidden' : ''}
@@ -73,7 +83,7 @@ const handleLogout = async () => {
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setIsOpen(false)}
+          onClick={close}   // ← was setIsOpen(false)
         />
       )}
 
@@ -94,11 +104,9 @@ const handleLogout = async () => {
         </div>
 
         {/* NAV SECTIONS */}
-        <nav className="flex-1 overflow-y-auto pb-4">
+        <nav id='sidebar' className="flex-1 overflow-y-auto pb-4 ">
           {navSections.map((section) => (
-            <div key={section.heading} className="mb-4">
-
-              {/* SECTION HEADER */}
+            <div  key={section.heading} className="mb-4 ">
               <div className="flex items-center gap-2 px-6 lg:px-6 xl:px-8 2xl:px-14 mb-2">
                 <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
                   {section.heading}
@@ -106,14 +114,13 @@ const handleLogout = async () => {
                 <div className="flex-1 h-px bg-primary-100" />
               </div>
 
-              {/* SECTION ITEMS */}
               {section.items.map((item) => (
                 <button
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
                   className={`
-                    w-full text-left py-2 px-4 pl-14  lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
-                    font-medium text-lg lg:text-md xl:text-md 2xl:text-xl 
+                    w-full text-left py-2 px-4 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
+                    font-medium text-lg lg:text-md xl:text-md 2xl:text-xl
                     transition-colors duration-200
                     ${location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/') ||
@@ -127,14 +134,13 @@ const handleLogout = async () => {
                   {item.label}
                 </button>
               ))}
-
             </div>
           ))}
 
           {/* LOGOUT */}
           <button
             onClick={() => !isBlocked && setShowLogoutModal(true)}
-            className="w-full text-left py-2 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4 text-lg lg:text-md xl:text-md 2xl:text-xl mb-1 font-medium  font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
+            className="w-full text-left py-2 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4 text-lg lg:text-md xl:text-md 2xl:text-xl mb-1 font-medium font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
           >
             Logout
           </button>
@@ -147,12 +153,8 @@ const handleLogout = async () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="bg-white rounded-xl shadow-xl p-8 w-80 text-center">
-              <h2 className="text-xl font-bold text-primary-600 font-roboto mb-2">
-                Logout
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to logout?
-              </p>
+              <h2 className="text-xl font-bold text-primary-600 font-roboto mb-2">Logout</h2>
+              <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowLogoutModal(false)}

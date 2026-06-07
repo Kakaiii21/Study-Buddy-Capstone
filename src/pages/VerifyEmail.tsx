@@ -28,6 +28,20 @@ function VerifyEmail() {
 
     return () => clearInterval(interval)
   }, [])
+  const handleContinue = async () => {
+  const user = auth.currentUser
+  if (!user) return
+
+  setChecking(true)
+  await reload(user)
+
+  if (user.emailVerified) {
+    navigate('/dashboard')
+  } else {
+    setError('Email not verified yet. Please check your inbox and click the link.')
+  }
+  setChecking(false)
+}
 
   const handleResend = async () => {
     const user = auth.currentUser
@@ -70,6 +84,13 @@ function VerifyEmail() {
         >
           {loading ? 'Resending...' : 'Resend Verification Email'}
         </button>
+        <button
+            onClick={handleContinue}
+            disabled={checking}
+            className="w-full border-2 border-primary-600 bg-primary-50 text-primary-600 font-bold p-4 rounded-xl mb-4 disabled:opacity-50"
+          >
+            {checking ? 'Checking...' : "I've verified my email — Continue"}
+          </button>
 
         <button
           onClick={() => navigate('/login')}

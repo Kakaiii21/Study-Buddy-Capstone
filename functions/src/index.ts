@@ -329,7 +329,6 @@ export const sendVerificationEmail = onRequest(
 )
 
 // ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
-// ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
 export const sendChangeEmail = onRequest(
   { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
   async (req, res) => {
@@ -344,13 +343,34 @@ export const sendChangeEmail = onRequest(
       const userRecord = await admin.auth().getUser(uid)
       if (!userRecord.email) { res.status(400).json({ error: 'User has no email' }); return }
 
-      // ── Directly update email via Admin SDK (no Firebase notification email) ──
-      await admin.auth().updateUser(uid, { email: newEmail, emailVerified: false })
+      // ✅ Check if newEmail is already taken by another account
+      try {
+        const existing = await admin.auth().getUserByEmail(newEmail)
+        if (existing.uid !== uid) {
+          res.status(400).json({ error: 'This email is already in use by another account.', code: 'auth/email-already-in-use' })
+          return
+        }
+      } catch (e: any) {
+        // getUserByEmail throws if not found — that's fine, means email is available
+        if (e.code !== 'auth/user-not-found') throw e
+      }
 
-      // ── Generate verification link for the new email via Resend ──
-      const verifyLink = await admin.auth().generateEmailVerificationLink(newEmail, {
-        url: 'https://studybuddyph.site/login?emailUpdated=true',
+      // ✅ DO NOT call updateUser here — just store pendingEmail in Firestore
+      await admin.firestore().doc(`users/${uid}`).update({ pendingEmail: newEmail })
+
+      // ✅ Generate a custom verification link using a Cloud Function URL
+      //    We'll sign it with a simple token stored in Firestore
+      const crypto = await import('crypto')
+      const token = crypto.randomBytes(32).toString('hex')
+      const expiresAt = Date.now() + 1000 * 60 * 60 // 1 hour
+
+      await admin.firestore().doc(`emailChangeTokens/${token}`).set({
+        uid,
+        newEmail,
+        expiresAt,
       })
+
+      const verifyLink = `https://us-central1-study-buddy-cbaa8.cloudfunctions.net/confirmEmailChange?token=${token}`
 
       const resend = new Resend(process.env.RESEND_API_KEY!)
       await resend.emails.send({
@@ -362,7 +382,7 @@ export const sendChangeEmail = onRequest(
           <p style="font-size:15px; line-height:1.6; color:#444;">
             We received a request to update the email address on your <strong style="color:#195791;">Study Buddy</strong> account to <strong style="color:#195791;">${newEmail}</strong>.
           </p>
-          <p style="font-size:15px; line-height:1.6; color:#444;">Click the button below to verify your new email address.</p>
+          <p style="font-size:15px; line-height:1.6; color:#444;">Click the button below to verify your new email address. This link expires in 1 hour.</p>
           ${actionButton(verifyLink, 'Verify New Email')}
         `),
       })
@@ -375,6 +395,56 @@ export const sendChangeEmail = onRequest(
         error: error.message || 'Internal server error',
         code: error.code || 'auth/unknown'
       })
+    }
+  }
+)
+
+// ── Confirm CHANGE EMAIL ────────────────────────────────────────────────────────
+
+export const confirmEmailChange = onRequest(
+  { timeoutSeconds: 60, memory: '256MiB' },
+  async (req, res) => {
+    setCors(res)
+    const { token } = req.query as { token: string }
+
+    if (!token) {
+      res.status(400).send('Missing token.')
+      return
+    }
+
+    try {
+      const tokenDoc = await admin.firestore().doc(`emailChangeTokens/${token}`).get()
+
+      if (!tokenDoc.exists) {
+        res.status(400).send('Invalid or already used verification link.')
+        return
+      }
+
+      const { uid, newEmail, expiresAt } = tokenDoc.data()!
+
+      if (Date.now() > expiresAt) {
+        await tokenDoc.ref.delete()
+        res.status(400).send('This verification link has expired. Please request a new one.')
+        return
+      }
+
+      // ✅ NOW we update the email — only after user clicked the link
+      await admin.auth().updateUser(uid, { email: newEmail, emailVerified: true })
+
+      // ✅ Update Firestore user doc
+      await admin.firestore().doc(`users/${uid}`).update({
+        email: newEmail,
+        pendingEmail: admin.firestore.FieldValue.delete(),
+      })
+
+      // ✅ Delete the used token
+      await tokenDoc.ref.delete()
+
+      // ✅ Redirect to login with success message
+      res.redirect('https://studybuddyph.site/login?emailUpdated=true')
+    } catch (err) {
+      console.error('confirmEmailChange error:', err)
+      res.status(500).send('Something went wrong. Please try again.')
     }
   }
 )

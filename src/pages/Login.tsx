@@ -19,11 +19,13 @@ type TouchedFields = {
 function Login() {
   const navigate = useNavigate()
   useEffect(() => {
-  const unsubscribe = onAuthChange((user) => {
-    if (user) navigate('/dashboard', { replace: true })
-  })
-  return () => unsubscribe()
-}, [])
+    const unsubscribe = onAuthChange((user) => {
+      if (user && user.emailVerified) {   // 👈 only redirect verified users
+        navigate('/dashboard', { replace: true })
+      }
+    })
+    return () => unsubscribe()
+  }, [])
 
   const [emailUpdated] = useState(() => {
     const val = new URLSearchParams(window.location.search).get('emailUpdated')

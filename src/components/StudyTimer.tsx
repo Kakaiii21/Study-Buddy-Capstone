@@ -65,14 +65,14 @@ const completedPercent = useMemo(() => {
   return (
 <div className='flex flex-col min-h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3 py-6 gap-24 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
 
-    <p className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-0 lg:text-2xl 2xl:text-3xl uppercase'>
+    <p  className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-0 lg:text-2xl 2xl:text-3xl uppercase'>
         Study Timer
       </p>
 
 
 
       {/* TIMER DISPLAY — exact same as before */}
-      <div className='flex items-end gap-2'>
+      <div  id='timer' className='flex  items-end gap-2'>
         {[
           { val: formatTime(hours),   label: 'HOUR' },
           { val: formatTime(minutes), label: 'MIN'  },
@@ -94,7 +94,7 @@ const completedPercent = useMemo(() => {
         <div className='flex gap-3'>
           {!isActive ? (
             <>
-              <button onClick={() => setShowModal(true)}
+              <button id='setTime' onClick={() => setShowModal(true)}
                 className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm hover:bg-primary-100'>
                 Set Time
               </button>
@@ -119,7 +119,7 @@ const completedPercent = useMemo(() => {
         </div>
 
     {/* CIRCULAR PROGRESS — exact same as before */}
-    <div className='flex flex-col items-center gap-2'>
+    <div id='progressC' className='flex flex-col items-center gap-2'>
       <p className='text-xs font-roboto font-semibold text-white tracking-widest uppercase text-center mb-3'>
         To-Do Task Progress
       </p>
@@ -143,7 +143,7 @@ const completedPercent = useMemo(() => {
     </div>
 
       {/* VIEW TASKS — exact same as before */}
-      <button
+      <button id='viewBtn'
         onClick={() => navigate('/todolist')}
         className='px-8 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm'
       >

@@ -51,12 +51,20 @@ function PasswordRequirements({ password }: { password: string }) {
 function App() {
     const navigate = useNavigate()
 
-  useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
-      if (user) navigate('/dashboard', { replace: true })
-    })
-    return () => unsubscribe()
-  }, [])
+    useEffect(() => {
+      const unsubscribe = onAuthChange((user) => {
+        if (user) {
+          if (user.emailVerified) {
+            navigate('/dashboard', { replace: true })
+          } else {
+            navigate('/verify-email', { replace: true })
+          }
+        }
+      })
+      return () => unsubscribe()
+    }, [])
+
+
   const [activeTab, setActiveTab] = useState('signup')
 const [passwordFocused, setPasswordFocused] = useState(false)
 
@@ -85,19 +93,19 @@ const [passwordFocused, setPasswordFocused] = useState(false)
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
-    const handleGoogleSignup = async () => {
-      try {
-        setLoading(true)
-        await googleLogin()
-        navigate('/dashboard')
-      } catch (err) {
-        const firebaseError = err as { code: string }
-        if (firebaseError.code === 'auth/popup-closed-by-user') return
-        setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
-      } finally {
-        setLoading(false)
-      }
+  const handleGoogleSignup = async () => {
+    try {
+      setLoading(true)
+      await googleLogin()
+      navigate('/dashboard')   // Google users are always verified ✓
+    } catch (err) {
+      const firebaseError = err as { code: string }
+      if (firebaseError.code === 'auth/popup-closed-by-user') return
+      setFieldErrors(prev => ({ ...prev, email: 'Google sign-in failed. Please try again.' }))
+    } finally {
+      setLoading(false)
     }
+  }
 
   const touch = (field: keyof TouchedFields) =>
     setTouched(prev => ({ ...prev, [field]: true }))
