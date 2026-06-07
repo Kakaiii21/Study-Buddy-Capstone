@@ -124,7 +124,7 @@ function ClassSchedule() {
   fieldErrors[field] ? 'border-2 border-red-400 bg-red-50' : ''
 
     
-const handleSave = async () => {
+const handleSave = () => {
   const errors: Record<string, string> = {}
   if (!selectedDay) errors.selectedDay = 'Required'
   if (!subjectName.trim()) errors.subjectName = 'Required'
@@ -134,10 +134,7 @@ const handleSave = async () => {
   if (!selectedRoomType) errors.selectedRoomType = 'Required'
   if (!instructor.trim()) errors.instructor = 'Required'
 
-  if (Object.keys(errors).length > 0) {
-    setFieldErrors(errors)
-    return
-  }
+  if (Object.keys(errors).length > 0) { setFieldErrors(errors); return }
 
   if (timeEnd <= timeStart) {
     setFieldErrors({ timeEnd: 'Must be later than start time' })
@@ -156,23 +153,19 @@ const handleSave = async () => {
     return
   }
 
-  setFieldErrors({})
+  // ✅ capture before resetForm clears it
+  const targetId = editTargetId
+  const snap = { day: selectedDay, subject: subjectName, timeStart, timeEnd, room: roomAssigned, roomType: selectedRoomType, instructor }
 
-  try {
-    if (editTargetId) {
-      await updateSchedule(editTargetId, {
-        day: selectedDay, subject: subjectName, timeStart, timeEnd,
-        room: roomAssigned, roomType: selectedRoomType, instructor,
-      })
-    } else {
-      await addSchedule(selectedDay, subjectName, timeStart, timeEnd, roomAssigned, selectedRoomType, instructor)
-    }
-  } finally {
-    setIsAddSubOpen(false)
-    resetForm()
+  setIsAddSubOpen(false)
+  resetForm()
+
+  if (targetId) {
+    updateSchedule(targetId, snap)
+  } else {
+    addSchedule(snap.day, snap.subject, snap.timeStart, snap.timeEnd, snap.room, snap.roomType, snap.instructor)
   }
 }
-
   async function handleDelete() {
     if (!pendingDelete) return
     await deleteSchedule(pendingDelete.id)

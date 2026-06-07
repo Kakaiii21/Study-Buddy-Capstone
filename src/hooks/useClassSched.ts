@@ -42,50 +42,46 @@ export function useClassSched(user: User | null) {
     const schedRef = collection(db, 'users', user.uid, 'schedules')
     const q = query(schedRef, orderBy('createdAt', 'asc'))
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetched: Schedule[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Schedule, 'id'>),
-      }))
-      setSchedules(fetched)
-      setLoading(false)
-    })
+    const unsubscribe = onSnapshot(q,
+      (snapshot) => {
+        const fetched: Schedule[] = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Schedule, 'id'>),
+        }))
+        setSchedules(fetched)
+        setLoading(false)
+      },
+      (error) => {
+        console.warn('Schedules snapshot error:', error)
+        setLoading(false)
+      }
+    )
 
     return () => unsubscribe()
   }, [user])
 
-  async function addSchedule(
-    day: string,
-    subject: string,
-    timeStart: string,
-    timeEnd: string,
-    room: string,
-    roomType: string,
-    instructor: string
+  function addSchedule(
+    day: string, subject: string, timeStart: string, timeEnd: string,
+    room: string, roomType: string, instructor: string
   ) {
     if (!user) return
-    await addDoc(collection(db, 'users', user.uid, 'schedules'), {
-      day,
-      subject: subject.trim(),
-      timeStart,
-      timeEnd,
-      room: room.trim(),
-      roomType,
-      instructor: instructor.trim(),
-      uid: user.uid,
-      createdAt: Date.now(),
+    addDoc(collection(db, 'users', user.uid, 'schedules'), {
+      day, subject: subject.trim(), timeStart, timeEnd,
+      room: room.trim(), roomType, instructor: instructor.trim(),
+      uid: user.uid, createdAt: Date.now(),
     })
   }
 
-  async function updateSchedule(
+  function updateSchedule(
     scheduleId: string,
     fields: Partial<Pick<Schedule, 'day' | 'subject' | 'timeStart' | 'timeEnd' | 'room' | 'roomType' | 'instructor'>>
   ) {
     if (!user) return
     const schedRef = doc(db, 'users', user.uid, 'schedules', scheduleId)
-    await updateDoc(schedRef, fields)
+    updateDoc(schedRef, fields)
   }
 
+  // keep deleteSchedule with await — softDelete needs to complete
   async function deleteSchedule(scheduleId: string) {
     if (!user) return
     const schedule = schedules.find((s) => s.id === scheduleId)
