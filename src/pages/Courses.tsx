@@ -1,4 +1,4 @@
-import  { useState } from 'react'
+import  { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
@@ -48,6 +48,18 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
 }
 
 function Courses() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+useEffect(() => {
+  const handleOnline = () => setIsOnline(true)
+  const handleOffline = () => setIsOnline(false)
+  window.addEventListener('online', handleOnline)
+  window.addEventListener('offline', handleOffline)
+  return () => {
+    window.removeEventListener('online', handleOnline)
+    window.removeEventListener('offline', handleOffline)
+  }
+}, [])
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const { user } = useAuth()
   const { courses, loading, addCourse, updateCourse, deleteCourse } = useCourses(user)
@@ -145,6 +157,8 @@ function Courses() {
 
             <button
               onClick={() => setShowModal(true)}
+              disabled={!isOnline}
+              title={!isOnline ? 'You are offline' : undefined}
               className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
             >
               + Course Folder

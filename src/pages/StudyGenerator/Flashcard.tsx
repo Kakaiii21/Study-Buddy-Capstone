@@ -302,7 +302,7 @@ function Flashcard() {
               className='hover:opacity-50 bg-primary-600 text-white py-2 md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'
               onClick={handleSubmit}
             >
-              Submit
+              Save
             </button>
           </div>
         </div>

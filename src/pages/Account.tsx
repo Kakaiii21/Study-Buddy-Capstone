@@ -33,7 +33,6 @@ function Account() {
   }
 
   // ─── Load user data from Firestore ───────────────────────────────────────
-  // Also checks if email was verified and updates Firestore if needed
 useEffect(() => {
   if (!user) return
   const fetchUser = async () => {
@@ -46,7 +45,7 @@ useEffect(() => {
       setLastName(data.lastName || '')
       setProfilePic(data.photoURL || '/profile.png')
       setEmail(data.email || user.email || '')
-      return  // ← skip Firestore fetch
+      return  // ✅ use cache — no delay
     }
 
     await user.reload()
@@ -56,18 +55,18 @@ useEffect(() => {
       setFirstName(data.firstName || '')
       setLastName(data.lastName || '')
       setProfilePic(data.photoURL || '/profile.png')
-
       const authEmail = auth.currentUser?.email
       if (data.pendingEmail && authEmail === data.pendingEmail) {
         await updateDoc(doc(db, 'users', user.uid), {
           email: data.pendingEmail,
           pendingEmail: null
         })
-        sessionStorage.setItem(cacheKey, JSON.stringify({ ...data, email: data.pendingEmail, pendingEmail: null }))
+        const updated = { ...data, email: data.pendingEmail, pendingEmail: null }
+        sessionStorage.setItem(cacheKey, JSON.stringify(updated))
         setEmail(data.pendingEmail)
         showToast('Email updated successfully!')
       } else {
-        sessionStorage.setItem(cacheKey, JSON.stringify(data))  // ← write cache
+        sessionStorage.setItem(cacheKey, JSON.stringify(data))
         setEmail(data.email || user.email || '')
       }
     }
