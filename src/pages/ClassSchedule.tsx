@@ -275,13 +275,13 @@ const handleSave = async () => {
             <div className='flex flex-row gap-10'>
             <button
               onClick={() => setShowClearModal(true)}
-              className='bg-white text-sm text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-4 text-primary-600 uppercase font-roboto rounded-md'
+              className='bg-white text-xs text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-1 text-primary-600 uppercase font-roboto rounded-md'
             >
               Clear Schedule
             </button>
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-sm rounded-md'
+              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-xs rounded-md'
             >
               + Add Schedule
             </button>

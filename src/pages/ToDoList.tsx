@@ -98,6 +98,7 @@ function TaskModal({
   initialName: string
   initialDeadline: string
   requireDeadline?: boolean
+  saving?: boolean
   onSave: (name: string, deadline: string) => void
   onClose: () => void
 }) {
@@ -263,7 +264,7 @@ function TaskModal({
           </button>
           <button
             onClick={handleSave}
-            disabled={!canSave}
+            disabled={!canSave }
             className="flex-1 bg-primary-600 border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-white font-roboto hover:bg-primary-50 hover:text-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             SAVE
@@ -565,19 +566,14 @@ function ToDoList() {
   }
 
   async function handleAddSave(name: string, deadline: string) {
-    try {
-      await addTask(name, deadline)
-    } finally {
-      setIsAddModalOpen(false)
-    }
+    setIsAddModalOpen(false)  // close immediately
+    addTask(name, deadline)   // fire and forget
   }
+
   async function handleEditSave(name: string, deadline: string) {
     if (!editingTask) return
-    try {
-      await updateTask(editingTask.id, { name, deadline })
-    } finally {
-      setEditingTask(null)
-    }
+    setEditingTask(null)      // close immediately
+    updateTask(editingTask.id, { name, deadline })  // fire and forget
   }
 
   function handleDeleteClick(id: string, name: string) {

@@ -51,28 +51,29 @@ export function useTasks(user: User | null) {
     return () => unsubscribe()
   }, [user])
 
-  async function addTask(name: string, deadline: string) {
-    if (!user || !name.trim()) return
-    await addDoc(collection(db, 'users', user.uid, 'tasks'), {
-      name: name.trim(),
-      deadline,
-      status: 'todo' as Status,
-      uid: user.uid,
-      createdAt: Date.now(),
-    })
-  }
+     function addTask(name: string, deadline: string) {
+      if (!user || !name.trim()) return
+      // don't await — write is queued locally, Firebase syncs when online
+      addDoc(collection(db, 'users', user.uid, 'tasks'), {
+        name: name.trim(),
+        deadline,
+        status: 'todo' as Status,
+        uid: user.uid,
+        createdAt: Date.now(),
+      })
+    }
 
-  async function updateTask(taskId: string, fields: Partial<Pick<Task, 'name' | 'deadline'>>) {
-    if (!user) return
-    const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
-    await updateDoc(taskRef, fields)
-  }
-
-  async function updateTaskStatus(taskId: string, newStatus: Status) {
-    if (!user) return
-    const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
-    await updateDoc(taskRef, { status: newStatus })
-  }
+     function updateTask(taskId: string, fields: Partial<Pick<Task, 'name' | 'deadline'>>) {
+      if (!user) return
+      const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
+      // don't await — same reason
+      updateDoc(taskRef, fields)
+    }
+    function updateTaskStatus(taskId: string, newStatus: Status) {
+      if (!user) return
+      const taskRef = doc(db, 'users', user.uid, 'tasks', taskId)
+      updateDoc(taskRef, { status: newStatus })
+    }
 
   async function deleteTask(taskId: string) {
     if (!user) return
