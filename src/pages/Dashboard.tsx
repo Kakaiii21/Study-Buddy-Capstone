@@ -146,28 +146,25 @@ function Dashboard() {
             {/* Scrollable Main Content */}
             <main ref={mainRef} className='flex-[3] overflow-y-auto bg-white px-2 lg:px-8 xl:px-8 2xl:px-11'>
 
-      {/* Welcome Banner */}
-<div className='lg:px-10 xl:px-16 2xl:px-12 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
-  <div className='flex items-center justify-between'>
-    <div className='flex flex-col gap-0 text-left'>
-      <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl font-bold leading-none'>
-        Welcome, {firstName ?? ''}
-      </h1>
-      <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px] 2xl:text-[18px]  -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
-        Start your day by being productive.
-      </p>
+              {/* Welcome Banner */}
+              <div className='lg:px-10 xl:px-16 2xl:px-12 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex flex-col gap-0 text-left'>
+                    <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl font-bold leading-none'>
+                      Welcome, {firstName ?? ''}
+                    </h1>
+                    <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px] 2xl:text-[18px]  -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
+                      Start your day by being productive.
+                    </p>
 
-
-        
-
-    </div>
-    <img
-      className='h-28 w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
-      src={profilePic}
-      alt="Profile"
-    />
-  </div>
-</div>
+                  </div>
+                  <img
+                    className='h-28 w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
+                    src={profilePic}
+                    alt="Profile"
+                  />
+                </div>
+              </div>
 
 
 

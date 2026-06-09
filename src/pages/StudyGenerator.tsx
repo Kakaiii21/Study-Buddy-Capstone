@@ -469,7 +469,6 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                 className='mt-2 text-sm font-roboto font-bold text-white bg-primary-600 hover:bg-primary-500 px-4 py-2 rounded-md transition'
                 onClick={() => {
                   setSelectItems(suggestedMax)
-                  setSuggestedMax(null)
                   setFileError('')
                 }}
               >
@@ -519,13 +518,18 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                     {items.map((item) => (
                       <option key={item} value={item}>{item}</option>
                     ))}
+                    {/* Add suggested max as an option if it's not already in the list */}
+                    {suggestedMax && !items.includes(suggestedMax) && (
+                      <option key={`suggested-${suggestedMax}`} value={suggestedMax}>
+                        {suggestedMax}
+                      </option>
+                    )}
                   </select>
 
                   <button
                     className='sm:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md px-4 py-3'
                     onClick={() => {
                       setSelectItems(items[Math.floor(Math.random() * items.length)])
-                      setSuggestedMax(null)
                       setFileError('')
                     }}
                     disabled={isGenerating}
