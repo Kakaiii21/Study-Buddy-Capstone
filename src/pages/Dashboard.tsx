@@ -147,7 +147,7 @@ function Dashboard() {
             <main ref={mainRef} className='flex-[3] overflow-y-auto bg-white px-2 lg:px-8 xl:px-8 2xl:px-11'>
 
       {/* Welcome Banner */}
-<div className='lg:px-10 xl:px-16 2xl:px-20 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 lg:bg-pink-600 xl:bg-yellow-600 2xl:bg-green-600 bg-primary-600 p-6 rounded-xl'>
+<div className='lg:px-10 xl:px-16 2xl:px-20 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
   <div className='flex items-center justify-between'>
     <div className='flex flex-col gap-0 text-left'>
       <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold leading-none'>
@@ -194,14 +194,11 @@ function Dashboard() {
               <div id='dash_stats'>                
                 {/* Dashboard Header */}
                 <div className='mx-8 my-6 2xl:my-10 xl:my-8 lg:my-6'>
-                  <div className='flex items-center gap-3 lg:bg-pink-600'>
+                  <div className='flex items-center gap-3'>
                     <span className='text-md  lg:text-lg xl:text-xl 2xl:text-2xl font-semibold text-primary-600 tracking-widest uppercase'>
                       Dashboard
                     </span>
                     <div className='flex-1 h-0.5 bg-primary-100' />
-                    <p className='fixed top-0 left-0 z-50 text-xs bg-black text-white p-1'>
-  {window.innerWidth}px
-</p>
                   </div>
                 </div>
                 
@@ -243,7 +240,7 @@ function Dashboard() {
                   <button
                     id='genHistory'               
                     onClick={() => navigate('/history')}
-                    className='w-full sm:flex-1 min-w-0 lg:min-w-[140px] xl:min-w-[170px] 2xl:min-w-[180px]
+                    className='w-full sm:flex-1 min-w-0 lg:min-w-[140px] xl:min-w-[170px] 2xl:min-w-[180px] 2xl:max-w-[200px]
                     lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex
                     flex-row sm:flex-col items-center justify-center gap-2 hover:bg-primary-50'
