@@ -21,14 +21,12 @@ const TimerContext = createContext<TimerContextType | null>(null)
 const INITIAL_EXPIRY = new Date(Date.now() - 1000)
 
 export function TimerProvider({ children }: { children: React.ReactNode }) {
-  const [totalSeconds,   setTotalSeconds]   = useState(0)
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [lockedElapsed,  setLockedElapsed]  = useState(0)  // ← no persisted ref
-  const [showExpired,    setShowExpired]    = useState(false)
+  const [totalSeconds,  setTotalSeconds]  = useState(0)
+  const [lockedElapsed, setLockedElapsed] = useState(0)
+  const [showExpired,   setShowExpired]   = useState(false)
+  const [isActive,      setIsActive]      = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-
-  const [isActive, setIsActive] = useState(false)
+  const elapsedRef  = useRef(0)
 
   useEffect(() => {
     if (Notification.permission === 'default') {
@@ -46,9 +44,11 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     expiryTimestamp: INITIAL_EXPIRY,
     autoStart: false,
     onExpire: () => {
+      setLockedElapsed(totalSeconds) 
+      elapsedRef.current = 0
       setShowExpired(true)
       setTotalSeconds(0)
-      setIsActive(false) 
+      setIsActive(false)
 
       const audio = new Audio('/alarm.mp3')
       audio.play()
@@ -72,7 +72,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1)
+        elapsedRef.current += 1
       }, 1000)
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current)
@@ -82,28 +82,28 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isRunning])
 
-const stop = useCallback(() => {
-  setLockedElapsed(elapsedSeconds)
-  pause()
-  setTotalSeconds(0)
-  setElapsedSeconds(0)
-  setIsActive(false)       // ← mark inactive
-  restart(INITIAL_EXPIRY, false)
-}, [pause, elapsedSeconds, restart])
+  const stop = useCallback(() => {
+    setLockedElapsed(elapsedRef.current)
+    elapsedRef.current = 0
+    pause()
+    setTotalSeconds(0)
+    setIsActive(false)
+    restart(INITIAL_EXPIRY, false)
+  }, [pause, restart])
 
-const setTimer = useCallback((h: number, m: number, s: number) => {
-  setShowExpired(false)
-  setElapsedSeconds(0)
-  setTotalSeconds(h * 3600 + m * 60 + s)
-  setIsActive(true)        // ← mark active
-  restart(getExpiry(h, m, s), true)
-}, [restart])
+  const setTimer = useCallback((h: number, m: number, s: number) => {
+    setShowExpired(false)
+    elapsedRef.current = 0
+    setTotalSeconds(h * 3600 + m * 60 + s)
+    setIsActive(true)
+    restart(getExpiry(h, m, s), true)
+  }, [restart])
 
   return (
     <TimerContext.Provider value={{
       seconds, minutes, hours, isRunning,
-      totalSeconds,isActive,
-      elapsedSeconds: lockedElapsed,  // ← dashboard always reads locked value
+      totalSeconds, isActive,
+      elapsedSeconds: lockedElapsed,
       showExpired, setShowExpired,
       setTimer, pause, resume,
       stop,
