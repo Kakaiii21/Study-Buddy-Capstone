@@ -20,7 +20,7 @@ function Login() {
   const navigate = useNavigate()
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
-      if (user && user.emailVerified) {   // 👈 only redirect verified users
+      if (user && user.emailVerified) {   //  only redirect verified users
         navigate('/dashboard', { replace: true })
       }
     })
@@ -237,12 +237,12 @@ const [passwordUpdated] = useState<boolean>(() => {
       </div>
 
       {/* LOGO + TEXT */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start order-1 lg:order-2 text-center lg:gap-1 xl:gap-1 2xl:gap-5 lg:pr-20 xl:pr-10 2xl:pr-40 px-6 py-10">
-        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[400px] xl:w-[400px] 2xl:w-[650px] h-auto mb-6" />
-        <p className="text-[#132442] text-center text-lg lg:text-sm xl:text-sm 2xl:text-lg max-w-xl">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start order-1 lg:order-2 text-center lg:gap-1 xl:gap-1 2xl:gap-3 lg:pr-20 xl:pr-10 2xl:pr-60 px-6 py-10">
+        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[400px] xl:w-[400px] 2xl:min-w-[500px] h-auto mb-6" />
+        <p className="text-[#132442] text-center text-lg lg:text-sm xl:text-sm 2xl:text-lg max-w-xl ">
           Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.
         </p>
-        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:w-[300px] h-auto mb-6" />
+        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:min-w-[250px] h-auto mb-6" />
       </div>
 
     </div>

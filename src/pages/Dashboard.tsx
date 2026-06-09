@@ -147,36 +147,17 @@ function Dashboard() {
             <main ref={mainRef} className='flex-[3] overflow-y-auto bg-white px-2 lg:px-8 xl:px-8 2xl:px-11'>
 
       {/* Welcome Banner */}
-<div className='lg:px-10 xl:px-16 2xl:px-20 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
+<div className='lg:px-10 xl:px-16 2xl:px-12 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
   <div className='flex items-center justify-between'>
     <div className='flex flex-col gap-0 text-left'>
-      <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold leading-none'>
+      <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl font-bold leading-none'>
         Welcome, {firstName ?? ''}
       </h1>
-      <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px] -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
+      <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px] 2xl:text-[18px]  -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
         Start your day by being productive.
       </p>
 
-      {/* Tour button — matches banner style */}
-        <button
-          onClick={() => startTour()}
-          className='mt-4 self-start flex items-center gap-2 
-            px-4 py-2 rounded-xl 
-            bg-white text-primary-600 
-            font-roboto font-bold text-xs md:text-sm
-            hover:bg-primary-50 transition-colors relative'
-        >
-          {/* Pulsing indicator dot */}
-          <span className='absolute -top-1 -right-1 flex h-3 w-3'>
-            <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75' />
-            <span className='relative inline-flex rounded-full h-3 w-3 bg-yellow-400' />
-          </span>
 
-          <span className='w-4 h-4 rounded-full border-2 border-primary-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0'>
-            ?
-          </span>
-          Need help?
-        </button>
         
 
     </div>
@@ -204,11 +185,11 @@ function Dashboard() {
                 
 
                 {/* Stats Row */}
-                <div className='flex flex-wrap sm:flex-nowrap items-stretch justify-center gap-3 lg:gap-4 xl:gap-6 2xl:gap-8 mx-6 lg:mx-10 xl:mx-10 2xl:mx-24 mb-6'>
+                <div className='flex flex-wrap sm:flex-nowrap items-stretch justify-center gap-3 lg:gap-4 xl:gap-6 2xl:gap-6 mx-6 lg:mx-10 xl:mx-10 2xl:mx-24 mb-6'>
 
                   {/* Current Time Spent */}
                   <div id='currentTime'           
-                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px] 2xl:min-w-[280px]
+                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px]  2xl:min-w-[280px] 
                     lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
                     <img src="/currentTime.png" alt="Timer"
