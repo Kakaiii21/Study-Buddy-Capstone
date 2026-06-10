@@ -1,4 +1,3 @@
-
 function TermsOfService() {
   return (
     <div className="min-h-screen bg-white">
@@ -64,6 +63,7 @@ function TermsOfService() {
               <li>Provide accurate account information</li>
               <li>Keep your login credentials secure</li>
               <li>Report unauthorized account access immediately</li>
+              <li>You have 7 days to undo an email address change after it is confirmed</li>
             </ul>
           </section>
 
@@ -199,36 +199,37 @@ function TermsOfService() {
               AI-generated content.
             </p>
           </section>
-            <section>
-            <h2 className="text-xl font-semibold mb-3">
-                12. Account Termination and Deletion
-            </h2>
-
-            <p className="mb-3">
-                You may stop using the Service and request deletion of your account at any
-                time.
-            </p>
-
-            <p className="mb-3">
-                We reserve the right to suspend or terminate accounts that:
-            </p>
-
-            <ul className="list-disc ml-6 space-y-2">
-                <li>Violate these Terms of Service</li>
-                <li>Engage in fraudulent or abusive activities</li>
-                <li>Threaten the security or operation of the Service</li>
-            </ul>
-
-            <p className="mt-3">
-                Upon account deletion or termination, access to your data and uploaded
-                content may be permanently removed from our systems, subject to applicable
-                legal retention requirements.
-            </p>
-            </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              12. Changes to Terms
+              12. Account Termination and Deletion
+            </h2>
+
+            <p className="mb-3">
+              You may stop using the Service and request deletion of your account at any
+              time.
+            </p>
+
+            <p className="mb-3">
+              We reserve the right to suspend or terminate accounts that:
+            </p>
+
+            <ul className="list-disc ml-6 space-y-2">
+              <li>Violate these Terms of Service</li>
+              <li>Engage in fraudulent or abusive activities</li>
+              <li>Threaten the security or operation of the Service</li>
+            </ul>
+
+            <p className="mt-3">
+              Upon account deletion or termination, access to your data and uploaded
+              content may be permanently removed from our systems, subject to applicable
+              legal retention requirements.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              13. Changes to Terms
             </h2>
 
             <p>
@@ -240,7 +241,7 @@ function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              13. Contact Us
+              14. Contact Us
             </h2>
 
             <p>

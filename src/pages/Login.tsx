@@ -32,6 +32,11 @@ function Login() {
     if (val) window.history.replaceState({}, '', '/login')
     return val
   })
+  const [cancelResult] = useState(() => {
+  const val = new URLSearchParams(window.location.search).get('cancelResult')
+  if (val) window.history.replaceState({}, '', '/login')
+  return val
+})
 
 const [passwordUpdated] = useState<boolean>(() => {
   const fromQuery = new URLSearchParams(window.location.search).get('passwordUpdated') === 'true'
@@ -173,6 +178,23 @@ const [passwordUpdated] = useState<boolean>(() => {
           {passwordUpdated && (
             <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
               Password updated! Please sign in with your new password.
+            </div>
+          )}
+
+          {/* ✅ ADD THESE */}
+          {cancelResult === 'success' && (
+            <div className="bg-green-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              Email change cancelled. Your account email remains unchanged.
+            </div>
+          )}
+          {cancelResult === 'expired' && (
+            <div className="bg-red-500 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              This undo link has expired. Contact support if you need help recovering your account.
+            </div>
+          )}
+          {cancelResult === 'already-used' && (
+            <div className="bg-yellow-500 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              This link has already been used.
             </div>
           )}
 

@@ -1,4 +1,3 @@
-
 function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-white">
@@ -40,6 +39,7 @@ function PrivacyPolicy() {
               <li>Files uploaded by users</li>
               <li>Device and browser information</li>
               <li>Usage and performance data</li>
+              <li>Temporary email change tokens for account recovery purposes</li>
             </ul>
           </section>
 
@@ -185,30 +185,30 @@ function PrivacyPolicy() {
             </p>
           </section>
 
-        <section>
-        <h2 className="text-xl font-semibold mb-3">
-            11. Account Deletion
-        </h2>
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              11. Account Deletion
+            </h2>
 
-        <p className="mb-3">
-            Users may request deletion of their Study Buddy account at any time through
-            the application settings or by contacting support.
-        </p>
+            <p className="mb-3">
+              Users may request deletion of their Study Buddy account at any time through
+              the application settings or by contacting support.
+            </p>
 
-        <p className="mb-3">
-            Upon account deletion:
-        </p>
+            <p className="mb-3">
+              Upon account deletion:
+            </p>
 
-        <ul className="list-disc ml-6 space-y-2">
-            <li>Your account information will be permanently removed.</li>
-            <li>Your notes, schedules, tasks, and uploaded files may be deleted.</li>
-            <li>AI-generated study materials associated with your account may be deleted.</li>
-            <li>
-            Certain information may be retained when required by law, security
-            obligations, or legitimate business purposes.
-            </li>
-        </ul>
-        </section>
+            <ul className="list-disc ml-6 space-y-2">
+              <li>Your account information will be permanently removed.</li>
+              <li>Your notes, schedules, tasks, and uploaded files may be deleted.</li>
+              <li>AI-generated study materials associated with your account may be deleted.</li>
+              <li>
+                Certain information may be retained when required by law, security
+                obligations, or legitimate business purposes.
+              </li>
+            </ul>
+          </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
