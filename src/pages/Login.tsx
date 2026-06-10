@@ -206,7 +206,7 @@ const [passwordUpdated] = useState<boolean>(() => {
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
             className={inputClass('email')}
-            placeholder="juandelacruz@gmail.com"
+            placeholder="Enter Your Email"
           />
           {touched.email && fieldErrors.email && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
@@ -220,7 +220,7 @@ const [passwordUpdated] = useState<boolean>(() => {
             onChange={(e) => handleChange('password', e.target.value)}
             onBlur={() => handleBlur('password')}
             className={inputClass('password')}
-            placeholder="Your password"
+            placeholder="Enter Your password"
           />
           {touched.password && fieldErrors.password && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>

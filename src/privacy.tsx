@@ -1,16 +1,26 @@
+import { useNavigate } from "react-router-dom";
+
+
 function PrivacyPolicy() {
+      const navigate = useNavigate()
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+
+
+
+
+      <div className="max-w-5xl mx-auto px-2  py-12">
+        <h1 className="text-4xl text-center font-bold text-gray-900 mb-2">
           Privacy Policy
         </h1>
 
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 text-center mb-8">
           Last Updated: June 2026
         </p>
+                  <hr className='w-full border-t mb-2 border-primary-600 ' />
 
-        <div className="space-y-8 text-gray-700 leading-relaxed">
+
+        <div className="space-y-8 text-gray-700 mx-5 leading-relaxed">
           <section>
             <h2 className="text-xl font-semibold mb-3">
               1. Introduction
@@ -224,9 +234,26 @@ function PrivacyPolicy() {
               support@studybuddyph.site
             </p>
           </section>
+          <hr className='w-full border-t border-primary-600 ' />
+
+          <section>
+
+            <div className="flex justify-center">
+           <button onClick={() => navigate(-1)}
+            className="  border text-sm  font-roboto rounded-md text-white bg-green-500 px-6 py-2 uppercase hover:opacity-50 "
+            title="Go Back"
+           >
+              I Understand</button>
+            </div>
+
+
+
+
+          </section>
         </div>
       </div>
-    </div>
+      
+ 
   );
 }
 

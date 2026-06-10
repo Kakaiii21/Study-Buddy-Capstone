@@ -246,27 +246,29 @@ function Dashboard() {
               <div className='flex justify-center pb-8 px-4'>
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-14'>
                   {activities.map((activity) => (
-                    <button
-                      key={activity.label}
-                      onClick={() => navigate(activity.path)}
-                      className='group flex flex-col items-center justify-center gap-1 py-2 px-2
-                        md:gap-2 md:py-3
-                        lg:py-4 lg:gap-2 lg:w-44
-                        xl:w-48 xl:py-4
-                        2xl:w-64 2xl:h-48 2xl:py-6
-                        border-2 border-primary-600 rounded-xl 
-                        hover:bg-primary-600 hover:text-white hover:border-white'
-                    >
-                      <img
-                        src={activity.icon}
-                        alt={activity.label}
-                        className='w-full rounded-lg h-16 md:h-20 lg:h-24 xl:h-24 2xl:h-32 object-contain'
-                      />
-                      <div className='border w-full border-primary-600 group-hover:border-white' />
-                      <span className='text-xs md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
+                  <button
+                    key={activity.label}
+                    onClick={() => navigate(activity.path)}
+                    className='group flex flex-col items-center justify-center 
+                      md:gap-2
+                      lg:gap-2 lg:w-44
+                      xl:w-48
+                      2xl:w-64 2xl:h-48
+                      border-2 border-primary-600 rounded-xl overflow-hidden
+                      hover:border-primary-600'
+                  >
+                    <img
+                      src={activity.icon}
+                      alt={activity.label}
+                      className='w-full rounded-lg h-16 md:h-20 lg:h-24 xl:h-24 2xl:h-32 object-cover'
+                    />
+                    <div className='w-full group-hover:bg-primary-600  pb-3'>
+                      <div className='border w-full border-primary-600 ' />
+                      <span className='block text-xs md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
                         {activity.label}
                       </span>
-                    </button>
+                    </div>
+                  </button>
                   ))}
                 </div>
               </div>

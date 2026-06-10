@@ -60,7 +60,7 @@ function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; on
           <h2 className='text-lg font-bold text-gray-800'>Clear All Schedules?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
-          This will permanently delete{' '}
+          This will  delete{' '}
           <span className='font-semibold text-gray-700'>all subjects</span> from your class schedule.
         </p>
         <p className='text-xs text-gray-400 mb-6'>
