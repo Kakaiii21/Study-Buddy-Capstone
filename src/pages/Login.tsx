@@ -32,6 +32,11 @@ function Login() {
     if (val) window.history.replaceState({}, '', '/login')
     return val
   })
+  const [cancelResult] = useState(() => {
+  const val = new URLSearchParams(window.location.search).get('cancelResult')
+  if (val) window.history.replaceState({}, '', '/login')
+  return val
+})
 
 const [passwordUpdated] = useState<boolean>(() => {
   const fromQuery = new URLSearchParams(window.location.search).get('passwordUpdated') === 'true'
@@ -176,6 +181,23 @@ const [passwordUpdated] = useState<boolean>(() => {
             </div>
           )}
 
+          {/* ✅ ADD THESE */}
+          {cancelResult === 'success' && (
+            <div className="bg-green-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              Email change cancelled. Your account email remains unchanged.
+            </div>
+          )}
+          {cancelResult === 'expired' && (
+            <div className="bg-red-500 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              This undo link has expired. Contact support if you need help recovering your account.
+            </div>
+          )}
+          {cancelResult === 'already-used' && (
+            <div className="bg-yellow-500 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
+              This link has already been used.
+            </div>
+          )}
+
           {/* EMAIL */}
           <p className="text-primary-600 font-bold p-2">EMAIL</p>
           <input
@@ -184,7 +206,7 @@ const [passwordUpdated] = useState<boolean>(() => {
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
             className={inputClass('email')}
-            placeholder="juandelacruz@gmail.com"
+            placeholder="Enter Your Email"
           />
           {touched.email && fieldErrors.email && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
@@ -198,7 +220,7 @@ const [passwordUpdated] = useState<boolean>(() => {
             onChange={(e) => handleChange('password', e.target.value)}
             onBlur={() => handleBlur('password')}
             className={inputClass('password')}
-            placeholder="Your password"
+            placeholder="Enter Your password"
           />
           {touched.password && fieldErrors.password && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>

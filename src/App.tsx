@@ -66,13 +66,17 @@ function App() {
 
 
   const [activeTab, setActiveTab] = useState('signup')
-const [passwordFocused, setPasswordFocused] = useState(false)
+  const [passwordFocused, setPasswordFocused] = useState(false)
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+
+  // ✅ Terms agreement state
+  const [agreed, setAgreed] = useState(false)
+  const [agreedTouched, setAgreedTouched] = useState(false)
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({
     firstName: '',
@@ -182,7 +186,8 @@ const [passwordFocused, setPasswordFocused] = useState(false)
     fields.forEach(f => { errors[f] = validateField(f, currentValues) })
     setFieldErrors(errors)
     setTouched({ firstName: true, lastName: true, email: true, password: true, confirmPassword: true })
-    return Object.values(errors).every(e => e === '')
+    setAgreedTouched(true)
+    return Object.values(errors).every(e => e === '') && agreed
   }
 
   const handleSignup = async () => {
@@ -198,6 +203,8 @@ const [passwordFocused, setPasswordFocused] = useState(false)
       setEmail('')
       setPassword('')
       setConfirmPassword('')
+      setAgreed(false)
+      setAgreedTouched(false)
       setFieldErrors({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' })
       setTouched({ firstName: false, lastName: false, email: false, password: false, confirmPassword: false })
       setSuccess(' Redirecting to Verify Email...')
@@ -296,10 +303,9 @@ const [passwordFocused, setPasswordFocused] = useState(false)
             type="password"
             value={password}
             onChange={(e) => handleChange('password', e.target.value)}
-            onFocus={() => setPasswordFocused(true)}      // 👈 add
-
+            onFocus={() => setPasswordFocused(true)}
             onBlur={() => {
-              setPasswordFocused(false)                   // 👈 add
+              setPasswordFocused(false)
               handleBlur('password')
             }}            
             className={inputClass('password')}
@@ -314,6 +320,7 @@ const [passwordFocused, setPasswordFocused] = useState(false)
           {!passwordFocused && touched.password && fieldErrors.password && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
+
           {/* CONFIRM PASSWORD */}
           <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
           <input
@@ -328,7 +335,41 @@ const [passwordFocused, setPasswordFocused] = useState(false)
             <p className="text-red-500 text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
           )}
 
-          <div className="mb-4" />
+          {/* ✅ TERMS & PRIVACY CHECKBOX */}
+          <div className="mb-4 mt-2">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => {
+                  setAgreed(e.target.checked)
+                  setAgreedTouched(true)
+                }}
+                className="mt-1 accent-primary-600"
+              />
+              <span className="text-xs text-gray-600">
+                I have read and agree to the{' '}
+                <span
+                  onClick={() => navigate('/terms')}
+                  className="text-primary-600 font-semibold cursor-pointer hover:underline"
+                >
+                  Terms of Service
+                </span>{' '}
+                and{' '}
+                <span
+                  onClick={() => navigate('/privacy')}
+                  className="text-primary-600 font-semibold cursor-pointer hover:underline"
+                >
+                  Privacy Policy
+                </span>
+                .
+              </span>
+            </label>
+            {/* ✅ Show error if they try to sign up without checking */}
+            {agreedTouched && !agreed && (
+              <p className="text-red-500 text-xs mt-1 px-1">⚠ You must agree to the Terms of Service and Privacy Policy.</p>
+            )}
+          </div>
 
           <button
             onClick={handleSignup}
@@ -338,16 +379,16 @@ const [passwordFocused, setPasswordFocused] = useState(false)
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
-        <div className="flex justify-center">
-          <button
-            onClick={handleGoogleSignup}
-            disabled={loading}
-            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 lg:py-1 xl:py-1 2xl:py-3 lg:mt-3 xl:mt-3 2xl:mt-6 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
-          >
-            <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
-            Google
-          </button>
-        </div>
+          <div className="flex justify-center">
+            <button
+              onClick={handleGoogleSignup}
+              disabled={loading}
+              className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 lg:py-1 xl:py-1 2xl:py-3 lg:mt-3 xl:mt-3 2xl:mt-6 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
+            >
+              <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
+              Google
+            </button>
+          </div>
 
         </div>
       </div>
@@ -360,8 +401,6 @@ const [passwordFocused, setPasswordFocused] = useState(false)
         </p>
         <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:min-w-[250px] h-auto mb-6" />
       </div>
-
-
 
     </div>
   )

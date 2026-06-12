@@ -159,12 +159,12 @@ useEffect(() => {
               onClick={() => setShowModal(true)}
               disabled={!isOnline}
               title={!isOnline ? 'You are offline' : undefined}
-              className='bg-primary-600 px-10 py-2 rounded-md mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
+              className='bg-primary-600 px-10 py-2 rounded-md border mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
             >
               + Course Folder
             </button>
           </div>
-<hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
+            <hr className='hidden sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 
           {/* Folder Area */}
           {loading ? (

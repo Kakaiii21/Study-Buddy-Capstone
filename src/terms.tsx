@@ -1,17 +1,21 @@
+import { useNavigate } from "react-router-dom";
 
 function TermsOfService() {
+  const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+      <div className="max-w-5xl mx-auto px-2  py-12">
+        <h1 className="text-4xl  text-center font-bold text-gray-900 mb-2">
           Terms of Service
         </h1>
 
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 text-center  mb-8">
           Last Updated: June 2026
         </p>
+                            <hr className='w-full border-t mb-3 border-primary-600 ' />
 
-        <div className="space-y-8 text-gray-700 leading-relaxed">
+
+        <div className="space-y-8 text-gray-700 mx-5 leading-relaxed">
           <section>
             <h2 className="text-xl font-semibold mb-3">
               1. Acceptance of Terms
@@ -64,6 +68,7 @@ function TermsOfService() {
               <li>Provide accurate account information</li>
               <li>Keep your login credentials secure</li>
               <li>Report unauthorized account access immediately</li>
+              <li>You have 7 days to undo an email address change after it is confirmed</li>
             </ul>
           </section>
 
@@ -199,36 +204,37 @@ function TermsOfService() {
               AI-generated content.
             </p>
           </section>
-            <section>
-            <h2 className="text-xl font-semibold mb-3">
-                12. Account Termination and Deletion
-            </h2>
-
-            <p className="mb-3">
-                You may stop using the Service and request deletion of your account at any
-                time.
-            </p>
-
-            <p className="mb-3">
-                We reserve the right to suspend or terminate accounts that:
-            </p>
-
-            <ul className="list-disc ml-6 space-y-2">
-                <li>Violate these Terms of Service</li>
-                <li>Engage in fraudulent or abusive activities</li>
-                <li>Threaten the security or operation of the Service</li>
-            </ul>
-
-            <p className="mt-3">
-                Upon account deletion or termination, access to your data and uploaded
-                content may be permanently removed from our systems, subject to applicable
-                legal retention requirements.
-            </p>
-            </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              12. Changes to Terms
+              12. Account Termination and Deletion
+            </h2>
+
+            <p className="mb-3">
+              You may stop using the Service and request deletion of your account at any
+              time.
+            </p>
+
+            <p className="mb-3">
+              We reserve the right to suspend or terminate accounts that:
+            </p>
+
+            <ul className="list-disc ml-6 space-y-2">
+              <li>Violate these Terms of Service</li>
+              <li>Engage in fraudulent or abusive activities</li>
+              <li>Threaten the security or operation of the Service</li>
+            </ul>
+
+            <p className="mt-3">
+              Upon account deletion or termination, access to your data and uploaded
+              content may be permanently removed from our systems, subject to applicable
+              legal retention requirements.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mb-3">
+              13. Changes to Terms
             </h2>
 
             <p>
@@ -240,7 +246,7 @@ function TermsOfService() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              13. Contact Us
+              14. Contact Us
             </h2>
 
             <p>
@@ -251,6 +257,22 @@ function TermsOfService() {
             <p className="mt-2 font-medium">
               support@studybuddyph.site
             </p>
+          </section>
+                    <hr className='w-full border-t border-primary-600 ' />
+
+          <section>
+
+            <div className="flex justify-center">
+           <button onClick={() => navigate(-1)}
+            className="  border text-sm  font-roboto px-6 py-2 rounded-md text-white bg-green-500  uppercase hover:opacity-50 "
+            title="Go Back"
+           >
+              I Understand</button>
+            </div>
+
+
+
+
           </section>
         </div>
       </div>

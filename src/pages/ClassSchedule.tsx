@@ -60,7 +60,7 @@ function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; on
           <h2 className='text-lg font-bold text-gray-800'>Clear All Schedules?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
-          This will permanently delete{' '}
+          This will  delete{' '}
           <span className='font-semibold text-gray-700'>all subjects</span> from your class schedule.
         </p>
         <p className='text-xs text-gray-400 mb-6'>
@@ -268,13 +268,17 @@ const handleSave = () => {
             <div className='flex flex-row gap-10'>
             <button
               onClick={() => setShowClearModal(true)}
-              className='bg-white text-xs text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-1 text-primary-600 uppercase font-roboto rounded-md'
+              className='bg-white text-xs text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-1 text-primary-600 uppercase font-roboto 
+              lg:px-4 xl:px-4 2xl:px-4 lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
+              rounded-md'
             >
               Clear Schedule
             </button>
             <button
               onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-xs rounded-md'
+              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-xs 
+              lg:px-4 xl:px-4 2xl:px-4 lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
+              rounded-md'
             >
               + Add Schedule
             </button>

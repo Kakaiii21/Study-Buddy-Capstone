@@ -358,21 +358,35 @@ export const sendChangeEmail = onRequest(
       // ✅ DO NOT call updateUser here — just store pendingEmail in Firestore
       await admin.firestore().doc(`users/${uid}`).update({ pendingEmail: newEmail })
 
-      // ✅ Generate a custom verification link using a Cloud Function URL
-      //    We'll sign it with a simple token stored in Firestore
       const crypto = await import('crypto')
-      const token = crypto.randomBytes(32).toString('hex')
+
+      // ✅ Generate both tokens
+      const verifyToken = crypto.randomBytes(32).toString('hex')
+      const cancelToken = crypto.randomBytes(32).toString('hex')
       const expiresAt = Date.now() + 1000 * 60 * 60 // 1 hour
 
-      await admin.firestore().doc(`emailChangeTokens/${token}`).set({
+      await admin.firestore().doc(`emailChangeTokens/${verifyToken}`).set({
         uid,
         newEmail,
+        oldEmail: userRecord.email,
+        cancelToken, // ✅ link them so confirmEmailChange can delete the cancel token too
         expiresAt,
       })
 
-      const verifyLink = `https://us-central1-study-buddy-cbaa8.cloudfunctions.net/confirmEmailChange?token=${token}`
+      await admin.firestore().doc(`emailCancelTokens/${cancelToken}`).set({
+        uid,
+        newEmail,
+        oldEmail: userRecord.email,
+        verifyToken, // ✅ link them so cancel can delete the verify token too
+        expiresAt,
+      })
+
+      const verifyLink = `https://us-central1-study-buddy-cbaa8.cloudfunctions.net/confirmEmailChange?token=${verifyToken}`
+      const cancelLink = `https://us-central1-study-buddy-cbaa8.cloudfunctions.net/cancelEmailChange?token=${cancelToken}`
 
       const resend = new Resend(process.env.RESEND_API_KEY!)
+
+      // ✅ To new email — verify link
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
         to: newEmail,
@@ -384,6 +398,26 @@ export const sendChangeEmail = onRequest(
           </p>
           <p style="font-size:15px; line-height:1.6; color:#444;">Click the button below to verify your new email address. This link expires in 1 hour.</p>
           ${actionButton(verifyLink, 'Verify New Email')}
+        `),
+      })
+
+      // ✅ To old email — cancel link (1 hour window before confirm)
+      await resend.emails.send({
+        from: 'Study Buddy <support@studybuddyph.site>',
+        to: userRecord.email,
+        subject: 'Your Study Buddy email address is being changed',
+        html: emailTemplate(`
+          <p style="font-size:16px; margin-bottom:8px;">Hello there! 👋</p>
+          <p style="font-size:15px; line-height:1.6; color:#444;">
+            A request was made to change the email on your <strong style="color:#195791;">Study Buddy</strong> account to <strong style="color:#195791;">${newEmail}</strong>.
+          </p>
+          <p style="font-size:15px; line-height:1.6; color:#444;">
+            If this was you, no action is needed — just verify via the email sent to <strong>${newEmail}</strong>.
+          </p>
+          <p style="font-size:15px; line-height:1.6; color:#444;">
+            If you did <strong>not</strong> request this, click below to cancel the change and keep your current email.
+          </p>
+          ${actionButton(cancelLink, 'Cancel Email Change')}
         `),
       })
 
@@ -399,10 +433,9 @@ export const sendChangeEmail = onRequest(
   }
 )
 
-// ── Confirm CHANGE EMAIL ────────────────────────────────────────────────────────
-
+// ── CONFIRM CHANGE EMAIL ─────────────────────────────────────────────────────
 export const confirmEmailChange = onRequest(
-  { timeoutSeconds: 60, memory: '256MiB' },
+  { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
   async (req, res) => {
     setCors(res)
     const { token } = req.query as { token: string }
@@ -420,7 +453,7 @@ export const confirmEmailChange = onRequest(
         return
       }
 
-      const { uid, newEmail, expiresAt } = tokenDoc.data()!
+      const { uid, newEmail, oldEmail, cancelToken, expiresAt } = tokenDoc.data()!
 
       if (Date.now() > expiresAt) {
         await tokenDoc.ref.delete()
@@ -437,13 +470,109 @@ export const confirmEmailChange = onRequest(
         pendingEmail: admin.firestore.FieldValue.delete(),
       })
 
-      // ✅ Delete the used token
+      // ✅ Extend cancel token to 7 days as a recovery token (don't delete it yet)
+      if (cancelToken) {
+        await admin.firestore().doc(`emailCancelTokens/${cancelToken}`).update({
+          expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
+          confirmed: true, // flag so cancelEmailChange knows to revert the auth email too
+        })
+      }
+
+      // ✅ Delete the used verify token
       await tokenDoc.ref.delete()
+
+      // ✅ Notify old email that the change is now live, with a 7-day undo link
+      if (oldEmail && cancelToken) {
+        const { Resend } = await import('resend')
+        const resend = new Resend(process.env.RESEND_API_KEY!)
+        const cancelLink = `https://us-central1-study-buddy-cbaa8.cloudfunctions.net/cancelEmailChange?token=${cancelToken}`
+
+        await resend.emails.send({
+          from: 'Study Buddy <support@studybuddyph.site>',
+          to: oldEmail,
+          subject: 'Your Study Buddy email has been changed',
+          html: emailTemplate(`
+            <p style="font-size:16px; margin-bottom:8px;">Heads up! ⚠️</p>
+            <p style="font-size:15px; line-height:1.6; color:#444;">
+              The email on your <strong style="color:#195791;">Study Buddy</strong> account has been changed from <strong style="color:#195791;">${oldEmail}</strong> to <strong style="color:#195791;">${newEmail}</strong>.
+            </p>
+            <p style="font-size:15px; line-height:1.6; color:#444;">
+              If this was you, no action is needed.
+            </p>
+            <p style="font-size:15px; line-height:1.6; color:#444;">
+              If you did <strong>not</strong> do this, click below to revert to your original email immediately. This link is valid for <strong>7 days</strong>.
+            </p>
+            ${actionButton(cancelLink, 'Undo Email Change')}
+          `),
+        })
+      }
 
       // ✅ Redirect to login with success message
       res.redirect('https://studybuddyph.site/login?emailUpdated=true')
     } catch (err) {
       console.error('confirmEmailChange error:', err)
+      res.status(500).send('Something went wrong. Please try again.')
+    }
+  }
+)
+
+// ── CANCEL EMAIL CHANGE ──────────────────────────────────────────────────────
+export const cancelEmailChange = onRequest(
+  { timeoutSeconds: 60, memory: '256MiB' },
+  async (req, res) => {
+    setCors(res)
+    const { token } = req.query as { token: string }
+
+    if (!token) {
+      res.status(400).send('Missing token.')
+      return
+    }
+
+    try {
+      const cancelDoc = await admin.firestore().doc(`emailCancelTokens/${token}`).get()
+
+      if (!cancelDoc.exists) {
+        res.redirect('https://studybuddyph.site/login?cancelResult=already-used')
+        return
+      }
+
+      const { uid, oldEmail, verifyToken, expiresAt, confirmed } = cancelDoc.data()!
+
+      if (Date.now() > expiresAt) {
+        await cancelDoc.ref.delete()
+        res.redirect('https://studybuddyph.site/login?cancelResult=expired')
+        return
+      }
+
+      if (confirmed) {
+        // ✅ Change already went through — fully revert auth email back to oldEmail
+        await admin.auth().updateUser(uid, {
+          email: oldEmail,
+          emailVerified: true,
+        })
+
+        await admin.firestore().doc(`users/${uid}`).update({
+          email: oldEmail,
+          pendingEmail: admin.firestore.FieldValue.delete(),
+        })
+      } else {
+        // ✅ Change not yet confirmed — just clear pendingEmail
+        await admin.firestore().doc(`users/${uid}`).update({
+          pendingEmail: admin.firestore.FieldValue.delete(),
+        })
+
+        // ✅ Delete the verify token so the new email link no longer works
+        if (verifyToken) {
+          await admin.firestore().doc(`emailChangeTokens/${verifyToken}`).delete()
+        }
+      }
+
+      // ✅ Delete the cancel token — it's been used
+      await cancelDoc.ref.delete()
+
+      res.redirect('https://studybuddyph.site/login?cancelResult=success')
+    } catch (err) {
+      console.error('cancelEmailChange error:', err)
       res.status(500).send('Something went wrong. Please try again.')
     }
   }

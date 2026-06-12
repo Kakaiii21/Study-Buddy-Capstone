@@ -273,6 +273,32 @@ useEffect(() => {
               </div>
               <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
 
+              {/* ✅ Legal Section */}
+              <div className='flex items-center gap-3 mb-4'>
+                <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
+                  Legal
+                </span>
+                <div className='flex-1 h-0.5 bg-primary-600' />
+              </div>
+
+              <div className='flex flex-row justify-between items-center hover:opacity-35 cursor-pointer' onClick={() => navigate('/terms')}>
+                <div className='flex flex-row items-center gap-4'>
+                  <img src="/terms.png" alt="terms icon" className='w-8 h-8' />
+                  <p className='text-primary-600 font-bold font-roboto text-xl'>Terms of Service</p>
+                </div>
+                <span className='text-primary-600 text-xl'>›</span>
+              </div>
+              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
+
+              <div className='flex flex-row justify-between items-center hover:opacity-35 cursor-pointer' onClick={() => navigate('/privacy')}>
+                <div className='flex flex-row items-center gap-4'>
+                  <img src="/privacy.png" alt="privacy icon" className='w-8 h-8' />
+                  <p className='text-primary-600 font-bold font-roboto text-xl'>Privacy Policy</p>
+                </div>
+                <span className='text-primary-600 text-xl'>›</span>
+              </div>
+              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
+
             </div>
           </div>
         </div>
