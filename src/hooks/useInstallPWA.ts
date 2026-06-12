@@ -5,6 +5,12 @@ export const useInstallPWA = () => {
   const [isInstallable, setIsInstallable] = useState(() => !!getInstallPrompt())
   const [isIOS] = useState(() => /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()))
   const [isStandalone] = useState(() => window.matchMedia('(display-mode: standalone)').matches)
+  const [isMacSafari] = useState(() => {
+    const ua = navigator.userAgent
+    return /^((?!chrome|android|crios|fxios).)*safari/i.test(ua) &&
+      navigator.platform === 'MacIntel' &&
+      navigator.maxTouchPoints <= 1
+  })
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -27,5 +33,6 @@ export const useInstallPWA = () => {
     }
   }
 
-  return { isInstallable, installApp, isIOS, isStandalone }
+  return { isInstallable, installApp, isIOS, isStandalone, isMacSafari }
 }
+
