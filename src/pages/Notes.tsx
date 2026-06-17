@@ -242,9 +242,9 @@ function Notes() {
 
   const allSubjects = Array.from(
     new Set([
-      ...subjects,
-      ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject'),
-      ...schedules.map((s) => s.subject),
+      ...subjects.map((s) => s.trim()),
+      ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject').map((s) => s.trim()),
+      ...schedules.map((s) => s.subject.trim()),
     ])
   )
 

@@ -264,7 +264,7 @@ function Dashboard() {
                     />
                     <div className='w-full group-hover:bg-primary-600  pb-3'>
                       <div className='border w-full border-primary-600 ' />
-                      <span className='block text-xs md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
+                      <span className='block text-xs  md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl pt-2 lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
                         {activity.label}
                       </span>
                     </div>
@@ -272,20 +272,20 @@ function Dashboard() {
                   ))}
                 </div>
               </div>
-              {/* Floating Tour Button — add just before the closing </main> tag */}
-              <button
-                onClick={() => startTour()}
-                className='fixed bottom-6 right-6 z-50 
-                  bg-primary-600 text-white 
-                  w-14 h-14 rounded-full shadow-lg
-                  flex items-center justify-center
-                  hover:bg-primary-700 active:scale-95 transition-all
-                  text-2xl font-bold
-                  lg:bottom-8 lg:right-8'
-                title='Take a Tour'
-              >
+
+            <button
+              onClick={() => startTour()}
+              className='fixed bottom-6 right-6 z-50 
+                flex flex-col items-center gap-1
+                hover:opacity-80 active:scale-95 transition-all
+                lg:bottom-8 lg:right-8'
+              title='Take a Tour'
+            >
+              <div className='bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
                 ?
-              </button>
+              </div>
+              <p className='text-xs text-white font-semibold'>Need Help?</p>
+            </button>
             </main>
 
             {/* Mobile backdrop */}
