@@ -41,7 +41,8 @@ function Dashboard() {
     () => setShowTimer(true),   // onOpenTimer
     () => setShowTimer(false),  // onCloseTimer
     () => setShowSidebar(true), // onOpenSidebar
-    () => setShowSidebar(false) // onCloseSidebar
+    () => setShowSidebar(false), // onCloseSidebar
+    user
   )
   const { elapsedSeconds } = useTimerContext() 
 
@@ -274,6 +275,7 @@ function Dashboard() {
               </div>
 
             <button
+            id='tour-btn'
               onClick={() => startTour()}
               className='fixed bottom-6 right-6 z-50 
                 flex flex-col items-center gap-1
@@ -284,7 +286,7 @@ function Dashboard() {
               <div className='bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
                 ?
               </div>
-              <p className='text-xs text-white font-semibold'>Need Help?</p>
+              <p className='text-xs text-primary-600 lg:text-white md:text-primary-600 xl:text-white 2xl:text-white font-bold '>Need Help?</p>
             </button>
             </main>
 

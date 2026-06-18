@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { startTour, tourSteps } from "../lib/tours"
+import type { User } from "firebase/auth"
 
 const TOUR_KEY = 'study_buddy_tour_seen'
 
@@ -9,19 +10,21 @@ export function useTour(
   onOpenTimer?: () => void,
   onCloseTimer?: () => void,
   onOpenSidebar?: () => void,
-  onCloseSidebar?: () => void
+  onCloseSidebar?: () => void,
+  user?: User | null   // ← add this
 ) {
   useEffect(() => {
     if (!auto) return
-    const seen = localStorage.getItem(`${TOUR_KEY}_${page}`)
+    const key = `${TOUR_KEY}_${page}_${user?.uid ?? 'guest'}`  // ← scoped key
+    const seen = localStorage.getItem(key)
     if (!seen) {
       const timeout = setTimeout(() => {
         startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar)
-        localStorage.setItem(`${TOUR_KEY}_${page}`, 'true')
+        localStorage.setItem(key, 'true')
       }, 600)
       return () => clearTimeout(timeout)
     }
-  }, [page, auto])
+  }, [page, auto, user?.uid])  // ← add user?.uid to deps
 
   return { startTour: () => startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar) }
 }

@@ -5,6 +5,14 @@ import 'driver.js/dist/driver.css'
 // ─── Desktop (lg and above, 1024px+) ───────────────────────────────────────
 const dashboardDesktop: DriveStep[] = [
   {
+  element: '#tour-btn',
+  popover: {
+    title: '❓ Need Help Anytime?',
+    description: 'Click this button whenever you need a tour of the current page.',
+    side: 'top',
+  },
+  },
+  {
     element: '#dash_stats',
     popover: {
       title: '📊 Your Stats at a Glance',
@@ -72,6 +80,14 @@ const dashboardDesktop: DriveStep[] = [
 
 // ─── Tablet (md, 768px–1023px) ─────────────────────────────────────────────
 const dashboardTablet: DriveStep[] = [
+  {
+  element: '#tour-btn',
+  popover: {
+    title: '❓ Need Help Anytime?',
+    description: 'Click this button whenever you need a tour of the current page.',
+    side: 'top',
+  },
+  },
   {
     element: '#sidebar-btn',
     popover: {
@@ -164,6 +180,14 @@ const dashboardTablet: DriveStep[] = [
 
 // ─── Mobile (below 768px) ───────────────────────────────────────────────────
 const dashboardMobile: DriveStep[] = [
+  {
+  element: '#tour-btn',
+  popover: {
+    title: '❓ Need Help Anytime?',
+    description: 'Click this button whenever you need a tour of the current page.',
+    side: 'top',
+  },
+  },
   {
     element: '#sidebar-btn',
     popover: {
@@ -284,18 +308,29 @@ export function startTour(
 
   if (!steps?.length) return
 
-  const driverObj = driver({
-    showProgress: true,
-    animate: true,
-    smoothScroll: true,
-    overlayOpacity: 0.4,
-    popoverClass: 'study-buddy-tour',
-    nextBtnText: 'Next →',
-    prevBtnText: '← Back',
-    doneBtnText: 'Done',
-    allowClose: true,
-    stagePadding: 9,
-    stageRadius: 12,
+const driverObj = driver({
+  showProgress: true,
+  animate: true,
+  smoothScroll: true,
+  overlayOpacity: 0.4,
+  popoverClass: 'study-buddy-tour',
+  nextBtnText: 'Next →',
+  prevBtnText: '← Back',
+  doneBtnText: 'Done',
+  allowClose: false,
+  stagePadding: 9,
+  stageRadius: 12,
+  onPopoverRender: (popover) => {
+    const closeBtn = document.createElement('button')
+    closeBtn.innerText = '✕'
+    closeBtn.style.cssText = `
+      position: absolute; top: 10px; right: 10px;
+      background: none; border: none; font-size: 16px;
+      cursor: pointer; color: #666; line-height: 1;
+    `
+    closeBtn.onclick = () => driverObj.destroy()
+    popover.wrapper.appendChild(closeBtn)
+  },
     onNextClick: (_element, step) => {
       if (step.element === '#sidebar-btn' && onOpenSidebar) {
         onOpenSidebar()

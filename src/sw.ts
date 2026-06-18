@@ -14,8 +14,6 @@ precacheAndRoute(self.__WB_MANIFEST)
 
 // ── Runtime caching ───────────────────────────────────────────
 
-// Firestore REST API — NetworkFirst so live data is preferred,
-// but falls back to cached response when offline
 registerRoute(
   ({ url }) => url.hostname.includes('firestore.googleapis.com'),
   new NetworkFirst({
@@ -27,7 +25,6 @@ registerRoute(
   })
 )
 
-// Google Fonts / static assets — serve from cache, refresh in background
 registerRoute(
   ({ url }) =>
     url.hostname.includes('fonts.googleapis.com') ||
@@ -35,11 +32,18 @@ registerRoute(
   new StaleWhileRevalidate({ cacheName: 'fonts-cache' })
 )
 
-// ── Everything below is unchanged ────────────────────────────
+// ── Lifecycle ─────────────────────────────────────────────────
 
 self.addEventListener('install', () => self.skipWaiting())
 
-// ... (rest of your existing code stays exactly as-is)
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    (async () => {
+      await self.clients.claim()
+      await restoreTimersFromDB()
+    })()
+  )
+})
 
 // ── IndexedDB helpers ─────────────────────────────────────────
 
@@ -92,61 +96,71 @@ async function getAllDeadlines(): Promise<{ taskId: string; taskName: string; de
 self._notifTimers = {}
 
 function scheduleTimer(taskId: string, taskName: string, deadline: string) {
-  clearTimeout(self._notifTimers[taskId])
+  // Clear any existing timer for this task first
+  if (self._notifTimers[taskId]) {
+    clearTimeout(self._notifTimers[taskId])
+    delete self._notifTimers[taskId]
+  }
 
+  // Parse deadline — stored as "YYYY-MM-DDTHH:MM:SS" (local time, with seconds)
   const deadlineMs = new Date(deadline).getTime()
-  const notifAt = deadlineMs - 60 * 60 * 1000  // 1 hour before
-  const msUntilNotif = notifAt - Date.now()
+  const notifAt    = deadlineMs - 60 * 60 * 1000   // 1 hour before deadline
+  const msUntil    = notifAt - Date.now()
 
-  if (msUntilNotif <= 0) return
+  if (msUntil <= 0) {
+    // 1-hour window already passed — clean up, no notification
+    removeDeadline(taskId)
+    return
+  }
 
-  self._notifTimers[taskId] = setTimeout(() => {
+  self._notifTimers[taskId] = setTimeout(async () => {
+    delete self._notifTimers[taskId]
+    await removeDeadline(taskId)
+
     self.registration.showNotification('⏰ Task Due Soon!', {
       body: `"${taskName}" is due in 1 hour.`,
       icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      //badge: '/icon-192.png',
       tag: `task-deadline-${taskId}`,
       data: { taskId, deadline },
       requireInteraction: true,
     })
-  }, msUntilNotif)
+  }, msUntil)
 }
 
-// ── Single activate listener ──────────────────────────────────
-
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    (async () => {
-      await self.clients.claim()
-      const all = await getAllDeadlines()
-      const now = Date.now()
-      for (const { taskId, taskName, deadline } of all) {
-        const deadlineMs = new Date(deadline).getTime()
-        const notifAt = deadlineMs - 60 * 60 * 1000
-        if (notifAt <= now) {
-          await removeDeadline(taskId)
-          continue
-        }
-        scheduleTimer(taskId, taskName, deadline)
-      }
-    })()
-  )
-})
+// Re-schedule all persisted tasks — called on activate AND when the page
+// sends RESTORE_TIMERS (handles SW restart without re-activate)
+async function restoreTimersFromDB() {
+  const all = await getAllDeadlines()
+  for (const { taskId, taskName, deadline } of all) {
+    scheduleTimer(taskId, taskName, deadline)
+  }
+}
 
 // ── Message handler ───────────────────────────────────────────
 
 self.addEventListener('message', async (event) => {
-  if (event.data?.type === 'SCHEDULE_NOTIFICATION') {
-    const { taskId, taskName, deadline } = event.data
+  const data = event.data
+  if (!data?.type) return
+
+  if (data.type === 'SCHEDULE_NOTIFICATION') {
+    const { taskId, taskName, deadline } = data
     await saveDeadline(taskId, taskName, deadline)
     scheduleTimer(taskId, taskName, deadline)
   }
 
-  if (event.data?.type === 'CANCEL_NOTIFICATION') {
-    const { taskId } = event.data
-    clearTimeout(self._notifTimers[taskId])
-    delete self._notifTimers[taskId]
+  if (data.type === 'CANCEL_NOTIFICATION') {
+    const { taskId } = data
+    if (self._notifTimers[taskId]) {
+      clearTimeout(self._notifTimers[taskId])
+      delete self._notifTimers[taskId]
+    }
     await removeDeadline(taskId)
+  }
+
+  // Called by the hook on every page load to recover timers lost on SW restart
+  if (data.type === 'RESTORE_TIMERS') {
+    await restoreTimersFromDB()
   }
 })
 
@@ -157,7 +171,7 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: 'window' }).then((clients) => {
       if (clients.length > 0) return clients[0].focus()
-      return self.clients.openWindow('/')
+      return self.clients.openWindow('/todolist')
     })
   )
 })
