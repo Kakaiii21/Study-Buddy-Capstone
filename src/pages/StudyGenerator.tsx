@@ -399,7 +399,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
             {/* ─────────────────────── */}
 
             {/* File Source Panel */}
-            <div className='flex flex-col justify-center mt-10 gap-5 items-center w-full max-w-[800px] border-4 bg-primary-700 border-primary-600 rounded-3xl px-6 py-8'>
+            <div className='flex flex-col justify-center mt-10 gap-5 items-center w-full max-w-[800px] border-4 bg-slate-100 border-primary-600 shadow-[0_4px_8px_rgba(100,100,100,1)] rounded-3xl px-6 py-8'>
               <p className='lg:text-xl md:text-xl text-primary-600 font-bold font-fustat'>
                 Choose where to access your files
               </p>

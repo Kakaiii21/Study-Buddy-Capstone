@@ -197,7 +197,16 @@ const handleSave = () => {
   const DayCard = ({ day }: { day: string }) => {
     const daySchedules = byDay(day)
     return (
-      <div className='flex flex-col mt-7 pb-2 bg-primary-600 rounded-xl self-start w-full'>
+      <div className='flex flex-col mt-7 pb-2 bg-primary-600
+      bg-gradient-to-br from-[#0f1f3a] to-[#0b1730]
+        shadow-[0_10px_30px_rgba(0,0,0,0.35)]
+        rounded-2xl
+        backdrop-blur-xl
+      bg-white/5
+      border border-white/10
+        hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
+        transition-all duration-300
+        self-start w-full'>
         <p className='text-white text-center text-3xl uppercase mt-4 font-fustat'>{day}</p>
         <div className='space-y-2 pb-5'>
           {daySchedules.length > 0 ? (
@@ -265,24 +274,37 @@ const handleSave = () => {
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
             <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
             <hr className='lg:hidden md:hidden w-full border-t mt-3 border-primary-600' />
-            <div className='flex flex-row gap-10'>
-            <button
-              onClick={() => setShowClearModal(true)}
-              className='bg-white text-xs text-left hover:bg-primary-100 border border-primary-600 font-bold hover:text-primary-600 py-0 md:py-4 mt-2 md:mt-0 lg:mt-0 px-1 text-primary-600 uppercase font-roboto 
-              lg:px-4 xl:px-4 2xl:px-4 lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
-              rounded-md'
-            >
-              Clear Schedule
-            </button>
-            <button
-              onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-              className='bg-primary-600 hover:bg-primary-100 font-bold hover:text-primary-600 py-4 md:py-0 mt-2 md:mt-0 lg:mt-0 px-4 text-white uppercase font-roboto text-xs 
-              lg:px-4 xl:px-4 2xl:px-4 lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
-              rounded-md'
-            >
-              + Add Schedule
-            </button>
-            </div>
+              <div className='flex flex-row gap-3 lg:gap-10'>
+                <button
+                  onClick={() => setShowClearModal(true)}
+                  className='bg-red-700 text-xs hover:bg-red-500 border border-red-400/30 font-bold hover:text-white 
+                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
+                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
+                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
+                  text-white uppercase font-roboto 
+                  shadow-[0_4px_8px_rgba(220,38,38,0.35)]
+                  rounded-md backdrop-blur-xs
+                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(220,38,38,0.5)]
+                  transition-all duration-300'
+                >
+                  Clear Schedule
+                </button>
+
+                <button
+                  onClick={() => { resetForm(); setIsAddSubOpen(true) }}
+                  className='bg-primary-600 hover:bg-white font-bold hover:text-primary-600 
+                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
+                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
+                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
+                  text-white uppercase font-roboto text-xs
+                  shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+                  rounded-md backdrop-blur-xs
+                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)]
+                  transition-all duration-300'
+                >
+                  + Add Schedule
+                </button>
+              </div>
           </div>
           <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' />
 

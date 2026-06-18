@@ -79,17 +79,17 @@ function buildStorageValue(dateDisplay: string, time: string): string {
 }
 
 function getCardStyle(task: Task, nowISO: string): string {
-  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
-  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 
   if (task.deadline) {
     const msUntil = new Date(task.deadline).getTime() - Date.now()
     if (msUntil > 0 && msUntil <= 60 * 60 * 1000) {
-      return 'bg-amber-300 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+      return 'bg-amber-300 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
     }
   }
 
-  return 'bg-primary-700 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+  return 'bg-primary-700 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 }
 
 // ── Task Modal ────────────────────────────────
@@ -626,7 +626,11 @@ function ToDoList() {
               onClick={() => setIsAddModalOpen(true)}
               className="bg-green-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-white font-roboto font-bold mx-10
                text-md py-3 px-9 rounded-md
-               hover:opacity-90"
+               hover:opacity-90
+               shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+               backdrop-blur-xs
+               hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
+               transition-all duration-300'"
             >
               + New Task
             </button>

@@ -142,12 +142,40 @@ useEffect(() => {
     <div className='flex h-screen'>
       <Sidebar />
 
+          {/* Loader styles */}
+    <style>{`
+      .upload-loader {
+        width: fit-content;
+        font-size: 40px;
+        font-family: system-ui, sans-serif;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #0000;
+        -webkit-text-stroke: 1px #fff;
+        background:
+          radial-gradient(0.71em at 50% 1em, #fff 99%, #0000 101%) calc(50% - 1em) 1em/2em 200% repeat-x text,
+          radial-gradient(0.71em at 50% -0.5em, #0000 99%, #fff 101%) 50% 1.5em/2em 200% repeat-x text;
+        animation: l10-0 .8s linear infinite alternate, l10-1 4s linear infinite;
+      }
+      .upload-loader:before { content: "Loading"; }
+      @keyframes l10-0 { to { background-position-x: 50%, calc(50% + 1em); } }
+      @keyframes l10-1 { to { background-position-y: -.5em, 0; } }
+    `}</style>
+
+    {/* Full-screen upload loader */}
+    {uploading && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="upload-loader" />
+      </div>
+    )}
+
       {/* Toast */}
       {toast && (
         <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-primary-600 text-white px-6 py-3 rounded-xl shadow-lg font-roboto text-sm transition-all'>
           {toast}
         </div>
       )}
+
 
       <main className='flex-1 overflow-auto p-8 mt-1'>
         <div className='min-h-screen flex flex-col'>
@@ -167,8 +195,9 @@ useEffect(() => {
               <img
                 src={profilePic}
                 alt="Profile"
-                className="w-40 h-40 border-2 border-primary-600 rounded-full object-cover"
+                className={`w-40 h-40 border-2 border-primary-600 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
               />
+
               <input
                 ref={fileInputRef}
                 aria-label='img'
@@ -207,12 +236,21 @@ useEffect(() => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder='First name'
-                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
+                    className='border border-primary-600 
+                    hover:shadow-[0_2px_6px_rgba(0,0,0,0.5)]
+                    transition-all duration-300
+                    rounded-md bg-slate-50 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
                   />
                   <button
                     onClick={() => handleSave('firstName')}
                     disabled={saving === 'firstName'}
-                    className='bg-primary-600 text-white p-2 lg:px-10 px-5 rounded-md font-roboto uppercase disabled:opacity-50'
+                    className='bg-primary-600
+                   shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+                    rounded-md backdrop-blur-xs
+                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
+                    transition-all duration-300
+                    hover:bg-white hover:text-primary-600
+                    text-white p-2 lg:px-10 px-5 font-roboto uppercase disabled:opacity-50'
                   >
                     {saving === 'firstName' ? 'Saving...' : 'Save'}
                   </button>
@@ -229,12 +267,21 @@ useEffect(() => {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder='Last name'
-                    className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
+                    className='border border-primary-600 rounded-md bg-slate-50
+                    hover:shadow-[0_2px_6px_rgba(0,0,0,0.5)]
+                    transition-all duration-300
+                    text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
                   />
                   <button
                     onClick={() => handleSave('lastName')}
                     disabled={saving === 'lastName'}
-                    className='bg-primary-600 text-white p-2 lg:px-10 px-5 rounded-md font-roboto uppercase disabled:opacity-50'
+                    className='bg-primary-600
+                    shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+                    rounded-md backdrop-blur-xs
+                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
+                    transition-all duration-300
+                    hover:bg-white hover:text-primary-600
+                    text-white p-2 lg:px-10 px-5  font-roboto uppercase disabled:opacity-50'
                   >
                     {saving === 'lastName' ? 'Saving...' : 'Save'}
                   </button>
@@ -246,12 +293,18 @@ useEffect(() => {
               <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
                 <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>Email:</p>
                 <div className='flex flex-row gap-3 lg:gap-5 lg:ml-12 md:ml-12 items-center'>
-                  <p className='border border-primary-600 rounded-md bg-primary-700 text-primary-600 min-w-[220px] lg:w-[500px] md:w-[500px] px-2 py-2 tracking-widest'>
+                  <p className='border border-primary-600 rounded-md bg-slate-50 text-primary-600 min-w-[220px] lg:w-[500px] md:w-[500px] px-2 py-2 tracking-widest'>
                     {maskEmail(email)}
                   </p>
                   <button
                     onClick={() => navigate('/changeEmail')}
-                    className='bg-primary-600 text-white p-2 lg:px-10 px-3 rounded-md font-roboto uppercase'
+                    className='bg-primary-600
+                   shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+                    rounded-md backdrop-blur-xs
+                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
+                    transition-all duration-300
+                    hover:bg-white hover:text-primary-600
+                    text-white p-2 lg:px-10 px-3  font-roboto uppercase'
                   >
                     Change
                   </button>
