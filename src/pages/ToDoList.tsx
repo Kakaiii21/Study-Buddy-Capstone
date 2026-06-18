@@ -79,9 +79,17 @@ function buildStorageValue(dateDisplay: string, time: string): string {
 }
 
 function getCardStyle(task: Task, nowISO: string): string {
-  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62'
-  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62'
-  return 'bg-primary-700 lg:max-h-32 lg:max-w-62'
+  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+
+  if (task.deadline) {
+    const msUntil = new Date(task.deadline).getTime() - Date.now()
+    if (msUntil > 0 && msUntil <= 60 * 60 * 1000) {
+      return 'bg-amber-300 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
+    }
+  }
+
+  return 'bg-primary-700 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)]'
 }
 
 // ── Task Modal ────────────────────────────────
@@ -465,7 +473,7 @@ function Column({
       ref={setNodeRef}
       className={`
         w-full lg:flex-1
-        md:px-20
+        md:px-20 
         flex flex-col items-center p-4 sm:p-6 lg:p-10 rounded-3xl
         transition-colors duration-200
         ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
@@ -523,6 +531,12 @@ function ToDoList() {
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
 
   useTaskNotifications(tasks)
+
+  const [, forceUpdate] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => forceUpdate(n => n + 1), 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
     'todo': false,
@@ -604,11 +618,13 @@ function ToDoList() {
         <div className="min-h-screen flex flex-col">
 
           <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
-            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex  text-primary-600 font-roboto">TO DO LIST</p>
+            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex   text-primary-600 font-roboto">TO DO LIST</p>
             <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-500 text-white font-roboto font-bold mx-10 text-md py-3 px-9 rounded-md"
+              className="bg-green-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-white font-roboto font-bold mx-10
+               text-md py-3 px-9 rounded-md
+               hover:opacity-90"
             >
               + New Task
             </button>
@@ -648,7 +664,7 @@ function ToDoList() {
               onDragEnd={handleDragEnd}
               autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
-              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 border-2 rounded-3xl">
+              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 shadow-2xl border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}
