@@ -268,15 +268,20 @@ function Notes() {
 
             <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto md:gap-4 md:ml-auto'>
               {/* + Subject Button */}
-              <button
-                onClick={() => setIsSubjectModalOpen(true)}
-                className='flex-shrink-0 flex items-center lg:pb-1.5 xl:pb-1.5 justify-center h-8 w-8 bg-primary-600 text-white text-2xl font-bold border rounded-full'
-              >
-                +
-              </button>
+                <button
+                aria-label='add Sub'
+                  onClick={() => setIsSubjectModalOpen(true)}
+                  className='flex-shrink-0 flex items-center justify-center h-8 w-8 bg-primary-600 text-white font-bold border rounded-full'
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
 
               {/* Subject Dropdown */}
-              <div className='relative' ref={dropdownRef}>
+              <div className='relative
+              ' ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
                   className='flex justify-between items-center border-primary-600 w-36 lg:w-52 md:w-52 border-2 shadow-md text-primary-600 px-3 lg:px-5 md:px-5 py-2 rounded-md text-sm lg:text-md font-bold'
@@ -328,7 +333,12 @@ function Notes() {
                   placeholder='Search...'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className='w-32 lg:w-72 md:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
+                  className='
+                shadow-[0_0px_2px_rgba(0,0,0,1)]
+                hover:opacity-80
+                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
+                  
+                  w-32 lg:w-72 md:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
                 />
                 {searchQuery && (
                   <button
@@ -354,7 +364,11 @@ function Notes() {
               {/* Mobile new note button */}
               <button
                 onClick={openNoteModal}
-                className='col-span-2 lg:hidden hover:bg-green-200 hover:text-green-500 border mx-14 md:mx-72 md:items-ce py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
+                className='col-span-2 lg:hidden
+                shadow-[0_0px_2px_rgba(0,0,0,1)]
+                hover:opacity-80
+                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
+                hover:text-green-500 border mx-14 md:mx-72 md:items-ce py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
               >
                 + New Note
               </button>
@@ -362,7 +376,11 @@ function Notes() {
               {/* Desktop new note button */}
               <button
                 onClick={openNoteModal}
-                className='hidden lg:flex items-center justify-center border px-12 py-16 rounded-xl bg-green-500 font-bold font-roboto text-7xl text-white'
+                className='hidden lg:flex 
+                shadow-[0_0px_4px_rgba(0,0,0,1)]
+                hover:opacity-80
+                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
+                items-center justify-center border px-12 py-16 rounded-xl bg-green-500 font-bold font-roboto text-7xl text-white'
               >
                 +
               </button>
@@ -372,7 +390,7 @@ function Notes() {
                 <div
                   key={note.id}
                   onClick={() => openViewModal(note)}
-                  className='relative bg-primary-700 border-2 border-primary-600 rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col shadow-sm cursor-pointer hover:shadow-md transition-shadow'
+                  className='relative bg-slate-50 border-2 border-primary-600 shadow-[0_1px_2px_rgba(0,0,0,1)] rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
                 >
                   <div className='flex justify-between items-center'>
                     <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
@@ -579,7 +597,10 @@ function Notes() {
                         aria-label='Select subject'
                         value={displaySubject}
                         onChange={(e) => setNoteSubject(e.target.value)}
-                        className='shrink-0 max-w-[100px] border-2 border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
+                        className='shrink-0 max-w-[100px] border-2
+                        
+                        
+                        border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
                       >
                         <option value='All Subject'>All Subject</option>
                         {allSubjects.map((subject, index) => (

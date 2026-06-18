@@ -480,7 +480,9 @@ function Column({
         ${isOver ? 'bg-primary-50' : ''}
       `}
     >
-      <div className="bg-primary-600 max-w-full w-full p-3 flex items-center justify-between">
+      <div className="bg-primary-600 
+      shadow-[0_0px_5px_rgba(0,0,0,.75)]
+      max-w-full w-full p-3 flex items-center justify-between">
         <p className="text-white pl-5 lg:pl-0 text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
           onClick={onToggleCollapse}
@@ -664,7 +666,7 @@ function ToDoList() {
               onDragEnd={handleDragEnd}
               autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
-              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 shadow-2xl border-2 rounded-3xl">
+              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 shadow-[0_0px_5px_rgba(0,0,0,0.50)] border-2 rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}

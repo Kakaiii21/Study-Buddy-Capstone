@@ -148,7 +148,12 @@ function Dashboard() {
             <main ref={mainRef} className='flex-[3] overflow-y-auto bg-white px-2 lg:px-8 xl:px-8 2xl:px-11'>
 
               {/* Welcome Banner */}
-              <div className='lg:px-10 xl:px-16 2xl:px-12 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl'>
+              <div className='lg:px-10 xl:px-16 2xl:px-12 mt-10 lg:mt-5 2xl:mt-10 mb-10 mx-2 bg-primary-600 p-6 rounded-xl
+                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    2xl:shadow-[0_4px_5px_rgba(0,0,0,.32)]'>
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>
                     <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl font-bold leading-none'>
@@ -183,13 +188,19 @@ function Dashboard() {
                 
 
                 {/* Stats Row */}
-                <div className='flex flex-wrap sm:flex-nowrap items-stretch justify-center gap-3 lg:gap-4 xl:gap-6 2xl:gap-6 mx-6 lg:mx-10 xl:mx-10 2xl:mx-24 mb-6'>
+                <div className='flex  flex-wrap sm:flex-nowrap items-stretch justify-center gap-3 lg:gap-4 xl:gap-6 2xl:gap-6 mx-6 lg:mx-10 xl:mx-10 2xl:mx-24 mb-6'>
 
                   {/* Current Time Spent */}
                   <div id='currentTime'           
                     className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px]  2xl:min-w-[280px] 
+                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
                     lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
-                    p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
+                    p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3
+                    '>
                     <img src="/currentTime.png" alt="Timer"
                       className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
                     <div className='flex flex-col'>
@@ -203,7 +214,11 @@ function Dashboard() {
                   {/* Current Score */}
                   <div id='currentScore'          
                     className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px] 2xl:min-w-[280px]
-                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
                     <img src="/currentScore.png" alt="Score"
                       className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
@@ -220,7 +235,11 @@ function Dashboard() {
                     id='genHistory'               
                     onClick={() => navigate('/history')}
                     className='w-full sm:flex-1 min-w-0 lg:min-w-[140px] xl:min-w-[170px] 2xl:min-w-[180px] 2xl:max-w-[200px]
-                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex
                     flex-row sm:flex-col items-center justify-center gap-2 hover:bg-primary-50'
                   >
@@ -253,6 +272,11 @@ function Dashboard() {
                     className='group flex flex-col items-center justify-center 
                       md:gap-2
                       lg:gap-2 lg:w-44
+                      shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                      md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
                       xl:w-48
                       2xl:w-64 2xl:h-48
                       border-2 border-primary-600 rounded-xl overflow-hidden
