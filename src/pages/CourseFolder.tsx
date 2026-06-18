@@ -586,9 +586,9 @@ const handleFiles = async (incoming: FileList | null) => {
             <p className='text-white font-roboto font-semibold truncate'>{previewFile.fileName}</p>
             <div className='flex items-center gap-5'>
               {previewFile.fileType === 'pdf' ? (
-                <a href={previewFile.fileUrl} target="_blank" rel="noopener noreferrer" className="text-white text-md font-roboto hover:opacity-70" title="Open PDF in new tab">
+                <a href={previewFile.fileUrl} target="_blank" rel="noopener noreferrer" className="text-white text-xs md:text-md lg:text-[16px] xl:text-[16px] 2xl:text-[16px] font-roboto hover:opacity-70" title="Open PDF in new tab">
                   <div className="flex flex-row gap-3 items-center">
-                    <img className="w-5 h-5" src="/ViewIcon.png" alt="view icon" />
+                    <img className="w-5 h-5 " src="/ViewIcon.png" alt="view icon" />
                     View in New Tab
                   </div>
                 </a>
