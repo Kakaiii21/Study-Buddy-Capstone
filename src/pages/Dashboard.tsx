@@ -310,7 +310,7 @@ function Dashboard() {
               <div className='bg-white  w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
               </div>
-              <p className='text-xs text-primary-600 lg:text-white md:text-primary-600 xl:text-white 2xl:text-white font-bold '>Need Help?</p>
+              <p className='text-xs text-primary-600 lg:text-white md:text-primary-600 xl:text-white 2xl:text-white font-inter font-medium '>Need Help?</p>
             </button>
             </main>
 

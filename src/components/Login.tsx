@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
 import { googleLogin } from '../services/authService'
-import InstallPWA from '../components/InstallPWA'
+import InstallPWA from './InstallPWA'
 
 type FieldErrors = {
   email: string

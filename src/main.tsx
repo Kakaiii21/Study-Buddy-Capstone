@@ -4,7 +4,7 @@ import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './index.css'
 import App from './App'
-import Login from './pages/Login'
+import Login from './components/Login'
 import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -31,6 +31,7 @@ import ChangeEmail from './pages/ChangeEmail'
 import { setInstallPrompt } from './utils/pwaPrompt'
 import PrivacyPolicy from './privacy'
 import TermsOfService from './terms'
+import Signup from './components/Signup'
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+  },
+  {
+    path: '/signup',
+    element: <Signup />
   },
   {
     path: '/login',
