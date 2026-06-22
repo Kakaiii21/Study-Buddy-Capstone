@@ -307,8 +307,8 @@ function Dashboard() {
                 lg:bottom-8 lg:right-8'
               title='Take a Tour'
             >
-              <div className='bg-primary-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
-                ?
+              <div className='bg-white  w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
               </div>
               <p className='text-xs text-primary-600 lg:text-white md:text-primary-600 xl:text-white 2xl:text-white font-bold '>Need Help?</p>
             </button>

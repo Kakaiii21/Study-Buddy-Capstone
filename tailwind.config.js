@@ -10,6 +10,7 @@ export default {
         primary: {
           50: '#EFF3FB',
           100: '#929CB7',
+          300: '#9DB9FF',
           500: '#195791',
           600: '#132442',
           700: '#D9D9D9'
@@ -19,6 +20,7 @@ export default {
         roboto: ['Roboto', 'sans-serif'],
         orbitron:['Orbitron', 'sans-serif'],
         fustat:['Fustat', 'sans-serif'],
+        inter:['Inter', 'sans-serif'],
       }
     },
   },

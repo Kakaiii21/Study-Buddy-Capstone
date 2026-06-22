@@ -63,9 +63,9 @@ const completedPercent = useMemo(() => {
 
 
   return (
-<div className='flex flex-col min-h-screen w-full bg-gradient-to-t from-primary-500 to-primary-50 p-4 lg:p-3 py-6 gap-24 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
+<div className='flex flex-col min-h-screen w-full bg-primary-600 p-4 lg:p-3 py-6 gap-24 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
 
-    <p  className='font-orbitron text-center font-semibold text-primary-600 tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-10 lg:text-2xl 2xl:text-3xl uppercase'>
+    <p  className='font-roboto font-light text-center  text-white tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-10 lg:text-2xl 2xl:text-4xl uppercase'>
         Study Timer
       </p>
 
@@ -80,11 +80,11 @@ const completedPercent = useMemo(() => {
         ].map((item, i) => (
           <div key={i} className='flex items-end gap-2'>
             <div className='flex flex-col items-center'>
-              <span className='font-orbitron font-bold text-primary-600 text-4xl lg:text-4xl 2xl:text-5xl'>{item.val}</span>
-              <span className='text-md font-bold text-primary-600 tracking-widest'>{item.label}</span>
+              <span className='font-orbitron  text-white text-4xl lg:text-4xl 2xl:text-5xl'>{item.val}</span>
+              <span className='text-lg font-roboto font-medium text-white tracking-widest'>{item.label}</span>
             </div>
             {i < 2 && (
-              <span className='font-orbitron font-bold text-primary-600 text-3xl mb-4'>:</span>
+              <span className='font-orbitron font-bold text-white text-3xl mb-4'>:</span>
             )}
           </div>
         ))}
@@ -95,11 +95,11 @@ const completedPercent = useMemo(() => {
           {!isActive ? (
             <>
               <button id='setTime' onClick={() => setShowModal(true)}
-                className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm hover:bg-primary-100'>
+                className='px-4 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-primary-300 uppercase text-primary-600 font-inter font-extrabold text-sm hover:bg-primary-100'>
                 Set Time
               </button>
               <button onClick={() => setShowModal(true)}
-                className='px-8 py-2 rounded-xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700'>
+                className='px-4 py-2 rounded-xl bg-white text-primary-600 uppercase font-extrabold font-inter text-sm hover:bg-primary-700'>
                 Start
               </button>
             </>
@@ -111,7 +111,7 @@ const completedPercent = useMemo(() => {
               </button>
               <button
                 onClick={() => { if (isRunning) { pause(); return } resume() }}
-                className='px-8 py-2 rounded-xl bg-primary-600 text-white font-bold text-sm hover:bg-primary-700'>
+                className='px-8 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm hover:bg-primary-700'>
                 {isRunning ? 'Pause' : 'Resume'}
               </button>
             </>
@@ -119,23 +119,23 @@ const completedPercent = useMemo(() => {
         </div>
 
     {/* CIRCULAR PROGRESS — exact same as before */}
-    <div id='progressC' className='flex flex-col items-center gap-2'>
-      <p className='text-xs font-roboto font-semibold text-white tracking-widest uppercase text-center mb-3'>
-        To-Do Task Progress
+    <div id='progressC' className='flex flex-col items-center gap-3'>
+      <p className='text-xs lg:text-lg xl:text-xl 2xl:text-2xl font-light font-roboto  text-white tracking-widest uppercase text-center mb-3'>
+       Task Progress
       </p>
-      <div className='relative flex items-center justify-center w-40 h-40'>
+      <div className='relative flex items-center justify-center w-52 h-52'>
         
         <svg className='w-full h-full -rotate-90' viewBox='0 0 36 36'>
-          <circle cx='18' cy='18' r='15.9' fill='none' stroke='#e2e8f0' strokeWidth='3' />
+          <circle cx='18' cy='18' r='14.90' fill='none' stroke='#e2e8f0' strokeWidth='5' />
           <circle
-            cx='18' cy='18' r='15.9'
-            fill='none' stroke='currentColor' strokeWidth='3' strokeLinecap='round'
-            className='text-primary-600'
+            cx='18' cy='18' r='14.90'
+            fill='none' stroke='currentColor' strokeWidth='5' strokeLinecap='butt'
+            className='text-gray-500'
             strokeDasharray='100'
             strokeDashoffset={100 - completedPercent}
           />
         </svg>
-        <span className='absolute font-orbitron font-bold text-primary-700 text-xl'>
+        <span className='absolute font-inter font-extrabold  text-white text-3xl'>
           {completedPercent}%
         </span>
       </div>
@@ -145,9 +145,9 @@ const completedPercent = useMemo(() => {
       {/* VIEW TASKS — exact same as before */}
       <button id='viewBtn'
         onClick={() => navigate('/todolist')}
-        className='px-8 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm'
+        className='px-8 py-2 rounded-xl bg-white font-inter font-extrabold uppercase text-primary-600 text-sm'
       >
-        View Tasks
+        View
       </button>
 
       {/* MODAL — exact same as before, portal still works fine */}
