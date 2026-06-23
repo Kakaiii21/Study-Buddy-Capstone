@@ -1,12 +1,13 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import Signup from './components/Signup'
 
 
 function App() {
   const navigate = useNavigate()
   return (
   <>
-    <section className="min-h-screen">
+    <section className="h-screen border">
       <nav className=" px-6 py-2 flex items-center justify-between ">
         {/* LOGO */}
         <img src="./logo.png" alt="logo" className="pl-5 h-16 w-auto" />
@@ -76,8 +77,90 @@ function App() {
 
       </div>
     </section>
+    {/*First*/}
+    <section className='min-h-screen border'>
+      <div className='flex flex-col w-screen px-56 border border-green-600 mb-10'>
+        <p className='flex justify-center items-center font-fustat text-primary-600 text-2xl mb-20'>
+          Your all-in-one study companion{' '}<b>— plan, organize,</b>{' '}and{' '}<b>{' '}learn smarter.{' '}</b>
+        </p>
+        <div className='flex flex-row gap-x-10'>
+          <img src="./assets/sTimer.png" alt="Timergif" className='w-[250px] h-[250px]' />
+          <div className='text-primary-600 font-inter'>
+            <p className='font-bold text-[54px]'>Study Timer</p>
+            <p className='text-[18px]'>Track how much time you actually spend studying.</p>
+            <p className='text-[18px]'>Start the timer whenever you sit down to work,</p>
+            <p className='text-[18px]'>and watch your study hours add up.</p>
+          </div>
+        </div>
+
+        <div className='flex flex-row gap-4 justify-end '>
+          <div className='text-right text-primary-600 font-inter'>
+             <p className='font-bold text-[54px]'>To Do List</p>
+            <p className='text-[18px]'>Keep track of everything you need to get done.</p>
+            <p className='text-[18px]'>Add, check off, and manage your tasks so </p>
+            <p className='text-[18px]'>nothing slips through the cracks.</p>
+          </div>
+          <img src="./assets/todolist.png" alt="Todo list gif" className='w-[250px] h-[250px]' />
+
+        </div>
+      </div>
+
+    {/*Second*/}
+      <div className='flex flex-col w-screen px-56 border border-blue-600 mb-10 '>
+        <div className='flex flex-row gap-x-10'>
+          <img src="./assets/notes.png" alt="Notesgif" className='w-[250px] h-[250px]' />
+          <div className='text-primary-600 font-inter'>
+            <p className='font-bold text-[54px]'>Notes</p>
+            <p className='text-[18px]'>Keep all your study notes in one organized</p>
+            <p className='text-[18px]'>place. Create, edit, and revisit your notes</p>
+            <p className='text-[18px]'>anytime, so nothing gets lost between </p>
+            <p className='text-[18px]'>subjects and deadlines.</p>
+
+          </div>
+        </div>
+
+        <div className='flex flex-row gap-4 justify-end '>
+          <div className='text-right text-primary-600 font-inter'>
+             <p className='font-bold text-[54px]'>Class Schedule</p>
+            <p className='text-[18px]'>See your classes and study sessions at a</p>
+            <p className='text-[18px]'>glance. Plan your week and stay on top</p>
+            <p className='text-[18px]'>of where you need to be and when.</p>
+          </div>
+          <img src="./assets/classschedule.png" alt="Class Schedgif" className='w-[250px] h-[250px]' />
+
+        </div>
+      </div>
+
+    {/*Third*/}
+      <div className='flex flex-col w-screen px-56 border border-pink-600 mb-10 '>
+        <div className='flex flex-row gap-x-10'>
+          <img src="./assets/courses.png" alt="coursesgif" className='w-[250px] h-[250px]' />
+          <div className='text-primary-600 font-inter'>
+            <p className='font-bold text-[54px]'>Course</p>
+            <p className='text-[18px]'>Organize your subjects and</p>
+            <p className='text-[18px]'>materials by course. Keep </p>
+            <p className='text-[18px]'>everything related to each class  </p>
+            <p className='text-[18px]'>neatly grouped and easy to find.</p>
+
+          </div>
+        </div>
+
+        <div className='flex flex-row gap-4 justify-end '>
+          <div className='text-right text-primary-600 font-inter'>
+             <p className='font-bold text-[54px]'>Study Generator</p>
+            <p className='text-[18px]'>Turn your notes and files into quizzes and</p>
+            <p className='text-[18px]'>flashcards in seconds. A smarter, faster way</p>
+            <p className='text-[18px]'>to review and test what you've learned.</p>
+          </div>
+          <img src="./assets/classschedule.png" alt="Class Schedgif" className='w-[250px] h-[250px]' />
+
+        </div>
+      </div>
+
+    </section>
     <section className="min-h-screen bg-primary-600">
       <div >
+        <Signup />
 
       </div>
     </section>
