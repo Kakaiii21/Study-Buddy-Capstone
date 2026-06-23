@@ -64,7 +64,6 @@ function Signup() {
     }, [])
 
 
-  const [activeTab, setActiveTab] = useState('signup')
   const [passwordFocused, setPasswordFocused] = useState(false)
 
   const [firstName, setFirstName] = useState('')
@@ -220,34 +219,70 @@ function Signup() {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 p-2 border rounded ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600">
 
-      {/* FORM */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 ">
-        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
-          {/* TABS */}
-          <div className="flex justify-center space-x-12 mb-5 lg:mb-3 xl:mb-3 2xl:mb-5">
+
+{/* LEFT PANEL */}
+    <div className="hidden lg:flex lg:w-1/2 bg-primary-600 items-center justify-center px-16">
+
+      <div className="max-w-xl">
+
+        <h1 className="text-white font-inter font-extrabold text-6xl ">
+            Welcome To
+          <br />
+            Study Buddy!
+        </h1>
+
+        <div className="mt-12 space-y-10">
+
+          <p className="text-white text-2xl font-fustat max-w-md">
+            Start your learning journey and stay on track with your goals.
+          </p>
+
+          <p className="text-white text-2xl font-fustat max-w-md">
+            Create your account and start learning smarter.
+          </p>
+
+          <div>
+            <p className="text-white text-2xl mb-5 font-fustat">
+              Already have an account?
+            </p>
+
             <button
-              onClick={() => setActiveTab('signup')}
-              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4 ${
-                activeTab === 'signup' ? 'bg-primary-600 text-white' : 'bg-white text-primary-600'
-              }`}
-            >
-              SIGN UP
-            </button>
-            <button
-              onClick={() => { setActiveTab('login'); navigate('/login') }}
-              className={`text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4 ${
-                activeTab === 'login' ? 'bg-primary-500 text-primary-100' : 'bg-white text-primary-600'
-              }`}
+              onClick={() => navigate('/login')}
+              className="
+                bg-white
+                text-primary-600
+                px-10 py-3
+                rounded-full
+                font-bold
+                flex items-center
+                gap-6
+                shadow-lg
+                hover:-translate-y-1
+                transition-all
+              "
             >
               LOG IN
+              <span className="text-xl">→</span>
             </button>
           </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    {/*FORM*/}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 ">
+        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
+
+          <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Sign UP</p>
 
           {/* SUCCESS MESSAGE */}
           {success && (
@@ -255,21 +290,21 @@ function Signup() {
           )}
 
           {/* FIRST NAME */}
-          <p className="text-primary-600 font-bold  p-2 lg:p-1 xl:p-1 2xl:pl-2">FIRST NAME</p>
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">FIRST NAME</p>
           <input
             type="text"
             value={firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
             className={inputClass('firstName')}
-            placeholder="Enter Your Name"
+            placeholder="Enter Your First Name"
           />
           {touched.firstName && fieldErrors.firstName && (
             <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.firstName}</p>
           )}
 
           {/* LAST NAME */}
-          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">LAST NAME</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">LAST NAME</p>
           <input
             type="text"
             value={lastName}
@@ -283,7 +318,7 @@ function Signup() {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -297,7 +332,7 @@ function Signup() {
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -321,13 +356,13 @@ function Signup() {
           )}
 
           {/* CONFIRM PASSWORD */}
-          <p className="text-primary-600 font-bold p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-2 p-2 border rounded ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-2 p-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
@@ -336,7 +371,7 @@ function Signup() {
 
           {/* ✅ TERMS & PRIVACY CHECKBOX */}
           <div className="mb-4 mt-2">
-            <label className="flex items-start gap-2 cursor-pointer">
+            <label className="flex font-inter items-start gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -373,7 +408,13 @@ function Signup() {
           <button
             onClick={handleSignup}
             disabled={loading}
-            className="w-full bg-primary-600 font-bold text-white p-6 lg:p-3 xl:p-3 2xl:p-6 border rounded-xl disabled:opacity-50"
+            className="w-full bg-primary-600 
+              hover:opacity-90
+               
+               backdrop-blur-xs
+               hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
+               transition-all duration-300
+            font-normal font-inter text-white p-6 lg:p-3 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
           >
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
@@ -382,23 +423,28 @@ function Signup() {
             <button
               onClick={handleGoogleSignup}
               disabled={loading}
-              className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 lg:py-1 xl:py-1 2xl:py-3 lg:mt-3 xl:mt-3 2xl:mt-6 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
-            >
+                className="
+                flex items-center gap-4
+                m-2 mt-6
+                px-10 py-3
+                rounded-full
+                font-bold uppercase
+                text-primary-600
+                disabled:opacity-50
+
+                hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)]
+
+                hover:-translate-y-1.5
+                active:translate-y-0
+
+                transition-all duration-300
+                ">
               <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
-              Google
+              
             </button>
           </div>
 
         </div>
-      </div>
-
-      {/* LOGO + TEXT */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start order-1 lg:order-2 text-center lg:gap-1 xl:gap-1 2xl:gap-3 lg:pr-20 xl:pr-10 2xl:pr-60 px-6 py-10">
-        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[400px] xl:w-[400px] 2xl:min-w-[500px] h-auto mb-6" />
-        <p className="text-[#132442] text-center text-lg lg:text-sm xl:text-sm 2xl:text-lg max-w-xl ">
-          Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.
-        </p>
-        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:min-w-[250px] h-auto mb-6" />
       </div>
 
     </div>

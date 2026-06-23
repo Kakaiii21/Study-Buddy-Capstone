@@ -7,7 +7,7 @@ function App() {
   const navigate = useNavigate()
   return (
   <>
-    <section className="h-screen border">
+    <section className="h-screen ">
       <nav className=" px-6 py-2 flex items-center justify-between ">
         {/* LOGO */}
         <img src="./logo.png" alt="logo" className="pl-5 h-16 w-auto" />
@@ -78,8 +78,8 @@ function App() {
       </div>
     </section>
     {/*First*/}
-    <section className='min-h-screen border'>
-      <div className='flex flex-col w-screen px-56 border border-green-600 mb-10'>
+    <section className='min-h-screen '>
+      <div className='flex flex-col w-screen px-56 0 mb-10'>
         <p className='flex justify-center items-center font-fustat text-primary-600 text-2xl mb-20'>
           Your all-in-one study companion{' '}<b>— plan, organize,</b>{' '}and{' '}<b>{' '}learn smarter.{' '}</b>
         </p>
@@ -106,7 +106,7 @@ function App() {
       </div>
 
     {/*Second*/}
-      <div className='flex flex-col w-screen px-56 border border-blue-600 mb-10 '>
+      <div className='flex flex-col w-screen px-56  mb-10 '>
         <div className='flex flex-row gap-x-10'>
           <img src="./assets/notes.png" alt="Notesgif" className='w-[250px] h-[250px]' />
           <div className='text-primary-600 font-inter'>
@@ -132,7 +132,7 @@ function App() {
       </div>
 
     {/*Third*/}
-      <div className='flex flex-col w-screen px-56 border border-pink-600 mb-10 '>
+      <div className='flex flex-col w-screen px-56  mb-10 '>
         <div className='flex flex-row gap-x-10'>
           <img src="./assets/courses.png" alt="coursesgif" className='w-[250px] h-[250px]' />
           <div className='text-primary-600 font-inter'>
