@@ -47,7 +47,7 @@ function PasswordRequirements({ password }: { password: string }) {
     </div>
   )
 }
-function Signup() {
+function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -253,12 +253,14 @@ function Signup() {
             </p>
 
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => onSwitchToLogin ? onSwitchToLogin() : navigate('/login')}
               className="
                 bg-white
                 text-primary-600
+                text-xl
                 px-10 py-3
                 rounded-full
+                font-fustat
                 font-bold
                 flex items-center
                 gap-6
@@ -268,7 +270,7 @@ function Signup() {
               "
             >
               LOG IN
-              <span className="text-xl">→</span>
+              <img src="./Arrow.png" alt="arrow" className='w-8' />
             </button>
           </div>
 
@@ -279,7 +281,7 @@ function Signup() {
     </div>
 
     {/*FORM*/}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 ">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 mt-10">
         <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
           <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Sign UP</p>
@@ -409,8 +411,7 @@ function Signup() {
             onClick={handleSignup}
             disabled={loading}
             className="w-full bg-primary-600 
-              hover:opacity-90
-               
+              hover:opacity-90   
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
                transition-all duration-300
@@ -419,13 +420,16 @@ function Signup() {
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
+          <p className='text-center pt-5 font-inter text-primary-600'>OR</p>
+
+
           <div className="flex justify-center">
             <button
               onClick={handleGoogleSignup}
               disabled={loading}
                 className="
                 flex items-center gap-4
-                m-2 mt-6
+                m-2 mt-3
                 px-10 py-3
                 rounded-full
                 font-bold uppercase

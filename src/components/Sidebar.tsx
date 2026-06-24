@@ -28,8 +28,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
     sessionStorage.setItem('intentionalLogout', 'true')
     await logout()
     setShowLogoutModal(false)
-    navigate('/login')
-    window.history.replaceState(null, '', '/login')
+    navigate('/')
+    window.history.replaceState(null, '', '/')
   }
 
   const handleNavigate = (path: string) => {

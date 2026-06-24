@@ -1,10 +1,17 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRef, useState } from 'react'
 import Signup from './components/Signup'
+import Login from './components/Login'
+import InstallPWA from './components/InstallPWA'
+
+
 
 
 function App() {
-  const navigate = useNavigate()
+  const [activeForm, setActiveForm] = useState<'signup' | 'login'>('signup')
+
+  const signupRef = useRef<HTMLDivElement>(null)
+
+
   return (
   <>
     <section className="h-screen ">
@@ -26,20 +33,31 @@ function App() {
           hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full px-4'>
             About Us
           </button>
-          <button onClick={() => navigate('/signup')}
+          <button onClick={() => {
+              setActiveForm('signup')
+              setTimeout(() => {
+                signupRef.current?.scrollIntoView({ behavior: 'smooth' })
+              }, 50)
+            }}
             className='text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase
             hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full px-4'>      
             Sign Up
           </button>
           <p className='text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase'>|</p>
-          <button onClick={() => navigate('/login')}
+          <button 
+                onClick={() => {
+                  setActiveForm('login')
+                  setTimeout(() => {
+                    signupRef.current?.scrollIntoView({ behavior: 'smooth' })
+                  }, 0)
+                }}
             className='text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase
             hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full px-4'>
             Log In
           </button>
         </div>
       </nav>
-      <div className='flex flex-row justify-evenly'>
+      <div className='flex px-0 2xl:px-28  flex-row justify-evenly'>
         <div className='flex flex-col w-full lg:h-screen md:h-auto  xl:h-screen 2xl:h-screen  justify-start items-start 
         md:px-12 md:pt-12 
         lg:px-20 lg:pt-16 
@@ -58,13 +76,8 @@ function App() {
           xl:text-[16px] xl:pr-0 xl:mt-4
           2xl:text-[18px] 2xl:pr-0 '
           >Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.</p>
-          <button
-          className='text-white  font-fustat font-bold bg-primary-600 uppercase px-8 py-2 rounded-full mb-5 md:mb-6 lg:mb-8 xl:mb-10 2xl:mb-12
-          md:mt-10 md:text-md
-          lg:mt-12 lg:text-lg
-          xl:mt-14 xl:text-xl
-          2xl:mt-16 2xl:text-2xl'
-          >download</button>
+          <InstallPWA />
+
         </div>
         <div className='flex flex-col w-full h-screen justify-start items-center   2xl:pt-18 '>
             <img src="./landImg.png" alt="landing img" 
@@ -158,11 +171,11 @@ function App() {
       </div>
 
     </section>
-    <section className="min-h-screen bg-primary-600">
-      <div >
-        <Signup />
-
-      </div>
+    <section ref={signupRef} className="min-h-screen bg-primary-600">
+      {activeForm === 'signup'
+        ? <Signup onSwitchToLogin={() => setActiveForm('login')} />
+        : <Login onSwitchToSignup={() => setActiveForm('signup')} />
+      }
     </section>
   </>
 

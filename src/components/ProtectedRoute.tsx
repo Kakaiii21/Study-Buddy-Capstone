@@ -25,7 +25,7 @@ function ProtectedRoute({ children }: Props) {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   // ↓ wrap children with the watcher

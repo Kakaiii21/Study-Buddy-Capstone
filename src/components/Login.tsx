@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import { login } from '../services/authService'
 import { getAuth } from 'firebase/auth'
 import { googleLogin } from '../services/authService'
-import InstallPWA from './InstallPWA'
 
 type FieldErrors = {
   email: string
@@ -16,7 +15,7 @@ type TouchedFields = {
   password: boolean
 }
 
-function Login() {
+function Login({ onSwitchToSignup} : {onSwitchToSignup?: () => void}) {
   const navigate = useNavigate()
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
@@ -144,30 +143,73 @@ const [passwordUpdated] = useState<boolean>(() => {
         }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 p-2 border rounded ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-t from-primary-500 to-primary-50">
+      <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600">
+
+
+
+{/* LEFT PANEL */}
+    <div className="hidden lg:flex lg:w-1/2 bg-primary-600 items-center justify-center px-16">
+
+      <div className="max-w-xl">
+
+        <h1 className="text-white font-inter font-extrabold text-6xl ">
+            Welcome Back,
+          <br />
+            Buddy!
+        </h1>
+
+        <div className="mt-12 space-y-10">
+
+          <p className="text-white text-2xl font-fustat max-w-md">
+            Continue your learning journey and stay on track with your goals.
+          </p>
+
+          <p className="text-white text-2xl font-fustat max-w-md">
+            Log in to access your notes, quizzes, and personalized learning tools.
+          </p>
+
+          <div>
+            <p className="text-white text-2xl mb-5 font-fustat">
+             Don’t have an account?
+            </p>
+
+            <button
+              onClick={() => onSwitchToSignup  ? onSwitchToSignup() : navigate('/signup')}
+              className="
+                bg-white
+                text-primary-600
+                px-10 py-3
+                rounded-full
+                font-bold
+                text-xl
+                font-fustat
+                flex items-center
+                gap-6
+                shadow-lg
+                hover:-translate-y-1
+                transition-all
+                uppercase
+              "
+            >
+             Sign Up
+              <img src="./Arrow.png" alt="arrow" className='w-8' />
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
 
       {/* FORM */}
         <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 ">
         <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
-          {/* TABS */}
-          <div className="flex justify-center space-x-12 mb-5 lg:mb-3 xl:mb-3 2xl:mb-5">
-            <button
-              onClick={() => navigate('/')}
-              className="text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4"
-            >
-              SIGN UP
-            </button>
-            <button
-              className="text-md font-bold border-2 border-primary-600 py-4 rounded-md w-[190px] lg:py-1 xl:py-1 2xl:py-4 bg-primary-600 text-white"
-            >
-              LOG IN
-            </button>
-          </div>
-
+          <p className='text-primary-600 mb-12 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Log In</p>
 
 
           {emailUpdated && (
@@ -199,7 +241,7 @@ const [passwordUpdated] = useState<boolean>(() => {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600 font-bold p-2">EMAIL</p>
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -213,7 +255,7 @@ const [passwordUpdated] = useState<boolean>(() => {
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600 font-bold p-2">PASSWORD</p>
+          <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -228,7 +270,7 @@ const [passwordUpdated] = useState<boolean>(() => {
 
           <div className="flex justify-end">
             <button
-              className="mb-8 mt-1 text-sm text-primary-600 font-bold hover:underline"
+              className="mb-8 mt-2 text-sm text-primary-600 font-inter font-semibold hover:underline"
               onClick={() => navigate('/forgotPassword')}
             >
               FORGOT PASSWORD
@@ -238,34 +280,45 @@ const [passwordUpdated] = useState<boolean>(() => {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-primary-600 font-bold text-white p-6 lg:p-3 xl:p-3 2xl:p-6 border rounded-xl disabled:opacity-50"
+            className="w-full bg-primary-600 
+              hover:opacity-90   
+               backdrop-blur-xs
+               hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
+               transition-all duration-300
+            font-normal font-inter text-white p-6 lg:p-3 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
           >
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
+          <p className='text-center pt-5 font-inter text-primary-600'>OR</p>
 
         <div className="flex justify-center">
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="flex items-center gap-4 m-2 mt-6 bg-white px-10 py-3 lg:py-1 xl:py-1 2xl:py-3 lg:mt-3 xl:mt-3 2xl:mt-6 border-2 border-primary-600 rounded-xl font-bold uppercase text-primary-600 disabled:opacity-50"
-          >
+                className="
+                flex items-center gap-4
+                m-2 mt-3
+                px-10 py-3
+                rounded-full
+                font-bold uppercase
+                text-primary-600
+                disabled:opacity-50
+
+                hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)]
+
+                hover:-translate-y-1.5
+                active:translate-y-0
+
+                transition-all duration-300
+                ">
             <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
-            Google
+            
           </button>
         </div>
-        <InstallPWA />
 
         </div>
       </div>
 
-      {/* LOGO + TEXT */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start order-1 lg:order-2 text-center lg:gap-1 xl:gap-1 2xl:gap-3 lg:pr-20 xl:pr-10 2xl:pr-60 px-6 py-10">
-        <img src="/logo.png" alt="Study Buddy logo" className="w-[500px] lg:w-[400px] xl:w-[400px] 2xl:min-w-[500px] h-auto mb-6" />
-        <p className="text-[#132442] text-center text-lg lg:text-sm xl:text-sm 2xl:text-lg max-w-xl ">
-          Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.
-        </p>
-        <img src="/read.png" alt="Reading" className="hidden lg:block w-[200px] lg:w-[200px] xl:w-[200px] 2xl:min-w-[250px] h-auto mb-6" />
-      </div>
 
     </div>
   )
