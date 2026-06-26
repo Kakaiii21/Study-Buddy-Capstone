@@ -143,7 +143,7 @@ const [passwordUpdated] = useState<boolean>(() => {
         }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 xl:text-sm p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
       <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600">
@@ -155,24 +155,24 @@ const [passwordUpdated] = useState<boolean>(() => {
 
       <div className="max-w-xl">
 
-        <h1 className="text-white font-inter font-extrabold text-6xl ">
+        <h1 className="text-white font-inter font-extrabold text-6xl xl:text-5xl 2xl:text-6xl ">
             Welcome Back,
           <br />
             Buddy!
         </h1>
 
-        <div className="mt-12 space-y-10">
+        <div className="mt-12 space-y-10 xl:space-y-5">
 
-          <p className="text-white text-2xl font-fustat max-w-md">
+          <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Continue your learning journey and stay on track with your goals.
           </p>
 
-          <p className="text-white text-2xl font-fustat max-w-md">
+          <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Log in to access your notes, quizzes, and personalized learning tools.
           </p>
 
           <div>
-            <p className="text-white text-2xl mb-5 font-fustat">
+            <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl mb-5 font-fustat">
              Don’t have an account?
             </p>
 
@@ -182,6 +182,7 @@ const [passwordUpdated] = useState<boolean>(() => {
                 bg-white
                 text-primary-600
                 px-10 py-3
+                xl:px-8 xl:py-2
                 rounded-full
                 font-bold
                 text-xl
@@ -195,7 +196,7 @@ const [passwordUpdated] = useState<boolean>(() => {
               "
             >
              Sign Up
-              <img src="./Arrow.png" alt="arrow" className='w-8' />
+              <img src="./Arrow.png" alt="arrow" className='w-8 xl:w-6' />
             </button>
           </div>
 
@@ -241,7 +242,9 @@ const [passwordUpdated] = useState<boolean>(() => {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -255,7 +258,9 @@ const [passwordUpdated] = useState<boolean>(() => {
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
+          <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -289,7 +294,7 @@ const [passwordUpdated] = useState<boolean>(() => {
           >
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
-          <p className='text-center pt-5 font-inter text-primary-600'>OR</p>
+          <p className='text-center pt-5 font-inter text-primary-600 xl:text-[12px] '>OR</p>
 
         <div className="flex justify-center">
           <button

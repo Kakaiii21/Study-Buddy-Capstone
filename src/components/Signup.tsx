@@ -219,10 +219,10 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600">
+    <div className="min-h-screen flex flex-col  lg:flex-row bg-primary-600">
 
 
 
@@ -231,24 +231,24 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
       <div className="max-w-xl">
 
-        <h1 className="text-white font-inter font-extrabold text-6xl ">
+        <h1 className="text-white font-inter font-extrabold text-6xl xl:text-5xl 2xl:text-6xl">
             Welcome To
           <br />
             Study Buddy!
         </h1>
 
-        <div className="mt-12 space-y-10">
+        <div className="mt-12 space-y-10 xl:space-y-5">
 
-          <p className="text-white text-2xl font-fustat max-w-md">
+          <p className="text-white text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Start your learning journey and stay on track with your goals.
           </p>
 
-          <p className="text-white text-2xl font-fustat max-w-md">
+          <p className="text-white text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Create your account and start learning smarter.
           </p>
 
           <div>
-            <p className="text-white text-2xl mb-5 font-fustat">
+            <p className="text-white text-2xl xl:text-lg 2xl:text-2xl mb-5 font-fustat">
               Already have an account?
             </p>
 
@@ -259,6 +259,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 text-primary-600
                 text-xl
                 px-10 py-3
+                xl:px-8 xl:py-2
                 rounded-full
                 font-fustat
                 font-bold
@@ -270,7 +271,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
               "
             >
               LOG IN
-              <img src="./Arrow.png" alt="arrow" className='w-8' />
+              <img src="./Arrow.png" alt="arrow" className='w-8 xl:w-6' />
             </button>
           </div>
 
@@ -292,7 +293,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* FIRST NAME */}
-          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">FIRST NAME</p>
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">FIRST NAME</p>
           <input
             type="text"
             value={firstName}
@@ -306,7 +309,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* LAST NAME */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">LAST NAME</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">LAST NAME</p>
           <input
             type="text"
             value={lastName}
@@ -320,7 +325,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">EMAIL</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">EMAIL</p>
           <input
             type="email"
             value={email}
@@ -334,7 +341,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">PASSWORD</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">PASSWORD</p>
           <input
             type="password"
             value={password}
@@ -358,7 +367,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* CONFIRM PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2">CONFIRM PASSWORD</p>
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          xl:text-[13px]
+          ">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
@@ -420,7 +431,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
-          <p className='text-center pt-5 font-inter text-primary-600'>OR</p>
+          <p className='text-center xl:text-[12px] pt-5 font-inter text-primary-600'>OR</p>
 
 
           <div className="flex justify-center">
@@ -431,7 +442,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 flex items-center gap-4
                 m-2 mt-3
                 px-10 py-3
-                rounded-full
+                rounded-full 
                 font-bold uppercase
                 text-primary-600
                 disabled:opacity-50
