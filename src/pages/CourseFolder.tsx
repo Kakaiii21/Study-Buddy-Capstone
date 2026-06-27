@@ -336,6 +336,8 @@ const handleFiles = async (incoming: FileList | null) => {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
+      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
+
       <div className='hidden lg:block md:block'>
         <Sidebar uploading={uploading} />
       </div>
@@ -550,7 +552,7 @@ const handleFiles = async (incoming: FileList | null) => {
                     )}
                   </div>
 
-                  <p className='text-center font-roboto font-semibold text-primary-600 text-xs md:text-sm mt-1 w-full truncate px-1'>
+                  <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm 2xl:text-md mt-1 w-full truncate px-1'>
                     {file.fileName}
                   </p>
                   <p className='text-center font-roboto text-gray-400 text-xs'>{file.fileSize}</p>

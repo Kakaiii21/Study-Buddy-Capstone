@@ -18,6 +18,7 @@ export interface Course {
   name: string
   uid: string
   createdAt: number
+  fileCount?: number
 }
 
 export function useCourses(user: User | null) {
@@ -54,6 +55,7 @@ export function useCourses(user: User | null) {
       name: name.trim(),
       uid: user.uid,
       createdAt: Date.now(),
+      fileCount : 0,
     })
   }
 

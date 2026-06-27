@@ -9,6 +9,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  increment,
 } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
@@ -58,6 +59,7 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     publicId: string,
     fileType: string,
     fileSize: string,
+
   ) {
     if (!user || !courseId) return
 
@@ -72,6 +74,8 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
       uid: user.uid,
       createdAt: Date.now(),
     })
+    const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
+    await updateDoc(courseRef, { fileCount: increment(1) })
   }
 
   async function renameCourseFile(fileId: string, newFileName: string) {
@@ -93,6 +97,9 @@ async function deleteCourseFile(fileId: string) {
     cloudinaryPublicId: file.publicId,
     data: { ...file },
   })
+
+  const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
+  await updateDoc(courseRef, { fileCount: increment(-1) })
 
   await deleteDoc(doc(db, 'users', user.uid, 'courses', courseId, 'files', fileId))
 }

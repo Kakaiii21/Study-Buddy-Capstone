@@ -149,7 +149,7 @@ function GeneratedHistory() {
 
   return (
     <div className='flex h-screen'>
-      <div className='flex bg-gray-600 h-screen w-16'></div>
+      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
 
       <Sidebar />
 

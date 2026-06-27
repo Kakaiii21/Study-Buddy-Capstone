@@ -144,7 +144,7 @@ useEffect(() => {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveMenu(null)}>
-      <div className='flex bg-gray-600 h-screen w-16'></div>
+      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-8 mt-0">
         <div className='min-h-screen flex flex-col'>
@@ -160,7 +160,7 @@ useEffect(() => {
               onClick={() => setShowModal(true)}
               disabled={!isOnline}
               title={!isOnline ? 'You are offline' : undefined}
-              className='bg-primary-600 px-10 py-2 rounded-md border mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
+              className='bg-primary-600 px-10 py-3 rounded-md border uppercase mx-10 lg:mx-0 md:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md'
             >
               + Course Folder
             </button>
@@ -188,7 +188,11 @@ useEffect(() => {
                         title={`Open ${course.name} Folder`}
                         onClick={() => navigate(`/courses/${course.id}`, { state: { folderName: course.name } })}
                       >
-                        <img src="folder.png" alt="folder" className='hover:opacity-90' />
+                      <img
+                        src={course.fileCount && course.fileCount > 0 ? "storefolder.png" : "folder.png"}
+                        alt="folder"
+                        className='hover:opacity-90'
+                      />                      
                       </button>
 
                       <button
@@ -196,15 +200,14 @@ useEffect(() => {
                           e.stopPropagation()
                           setActiveMenu(activeMenu === course.id ? null : course.id)
                         }}
-                        className="absolute hover:{setActivemenu} top-2 right-2 w-8 mr-1 md:w-10 md:mr-4 md:mt-2 lg:w-10 lg:mr-4 lg:mt-2"
+                        className="absolute bottom-2 right-2 w-8 h-6 flex items-center justify-center transition group"
+                        title='More Options'
                       >
-                        <img
-                        
-                          src="folderbtn.png"
-                          alt="menu"
-                          title='More Options'
-                          className="brightness-200 contrast-200 hover:scale-110 transition"
-                        />
+                        <div className="flex flex-row items-center justify-center gap-[8px] pr-5">
+                          <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
+                          <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
+                          <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
+                        </div>
                       </button>
 
                       {/* Dropdown Menu */}
@@ -230,7 +233,7 @@ useEffect(() => {
                       )}
                     </div>
 
-                    <p className='text-center font-bold font-roboto text-md md:text-2xl lg:text-2xl text-primary-600'>
+                    <p className='text-center 2xl:text-lg font-normal font-inter text-md md:text-2xl lg:text-2xl text-primary-600'>
                       {course.name}
                     </p>
                   </div>
