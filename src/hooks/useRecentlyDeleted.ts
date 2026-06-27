@@ -9,10 +9,9 @@ import {
 } from '../services/recentlyDeletedService'
 import { useAuth } from './useAuth'
 
-async function deleteFromCloudinary(publicId: string): Promise<void> {
-  const ext = publicId.split('.').pop()?.toLowerCase() ?? ''
+async function deleteFromCloudinary(publicId: string, fileType?: string): Promise<void> {
   const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp']
-  const resourceType = imageExts.includes(ext) ? 'image' : 'raw'
+  const resourceType = imageExts.includes(fileType ?? '') ? 'image' : 'raw'
 
   console.log('[DELETE ATTEMPT] publicId:', publicId, '| resourceType:', resourceType)
 
@@ -85,7 +84,9 @@ export function useRecentlyDeleted() {
       if (!uid) return
       setActionLoading(item.id)
       try {
-        await permanentDelete(uid, item, deleteFromCloudinary)
+        await permanentDelete(uid, item, (publicId) =>
+          deleteFromCloudinary(publicId, item.data?.fileType as string)
+        )
 
         // ✅ Only decrement storage on permanent delete (file is truly gone from Cloudinary)
         if (item.data?.fileSize) {

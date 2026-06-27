@@ -23,7 +23,7 @@ interface CourseFile {
   fileSize: string
 }
 
-const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.txt'
+const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.txt'
 
 
 function TxtPreview({ url }: { url: string }) {
@@ -154,7 +154,7 @@ const handleFiles = async (incoming: FileList | null) => {
     return
   }
 
-    const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt']
+    const allowed = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'txt']
     const messages: string[] = []
     const rejected: string[] = []
     const duplicates: string[] = []
@@ -321,7 +321,10 @@ const handleFiles = async (incoming: FileList | null) => {
       ? files.filter((f) => ['doc', 'docx'].includes(f.fileType))
       : filter === 'powerpoint'
       ? files.filter((f) => ['ppt', 'pptx'].includes(f.fileType))
+      : filter === 'excel'
+      ? files.filter((f) => ['xls', 'xlsx'].includes(f.fileType))
       : files.filter((f) => f.fileType === filter)
+      
 
   const pdfFile = useMemo(
     () => previewFile?.fileType === 'pdf' ? { url: previewFile.fileUrl } : null,
@@ -374,6 +377,7 @@ const handleFiles = async (incoming: FileList | null) => {
                   <option value='word'>Word Documents</option>
                   <option value='powerpoint'>PowerPoint</option>
                   <option value='txt'>TXT</option>
+                  <option value='excel'>Excel</option>
                   <option value='images'>Images (PNG / JPG)</option>
                 </select>
               </div>
@@ -504,6 +508,7 @@ const handleFiles = async (incoming: FileList | null) => {
                           ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
                           file.fileType === 'pdf' ? '/pdfIcon.png' :
                           ['ppt', 'pptx'].includes(file.fileType) ? '/pptIcon.png' :
+                          ['xls', 'xlsx'].includes(file.fileType) ? '/xlsIcon.png' :
                           file.fileType === 'txt' ? '/txtIcon.png' :
                           ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/ImageIcon.png' :
                           '/fileIcon.png'
@@ -655,6 +660,13 @@ const handleFiles = async (incoming: FileList | null) => {
                 title={previewFile.fileName}
               />
             )}
+              {['xls', 'xlsx'].includes(previewFile.fileType) && (
+                <iframe
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(previewFile.fileUrl)}`}
+                  className='w-full h-full'
+                  title={previewFile.fileName}
+                />
+              )}
           </div>
         </div>
       )}
