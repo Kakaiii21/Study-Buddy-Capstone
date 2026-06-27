@@ -143,10 +143,10 @@ const [passwordUpdated] = useState<boolean>(() => {
         }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 xl:text-sm p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 xl:text-sm p-2 lg:text-[12px]  border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-      <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600">
+      <div className="min-h-screen flex flex-col lg:flex-row bg-primary-600 2xl:px-[28px]">
 
 
 
@@ -155,24 +155,24 @@ const [passwordUpdated] = useState<boolean>(() => {
 
       <div className="max-w-xl">
 
-        <h1 className="text-white font-inter font-extrabold text-6xl xl:text-5xl 2xl:text-6xl ">
+        <h1 className="text-white font-inter font-extrabold text-6xl lg:text-4xl xl:text-5xl 2xl:text-6xl ">
             Welcome Back,
           <br />
             Buddy!
         </h1>
 
-        <div className="mt-12 space-y-10 xl:space-y-5">
+        <div className="mt-12 space-y-10 lg:space-y-5xl:space-y-5">
 
-          <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
+          <p className="text-white  text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Continue your learning journey and stay on track with your goals.
           </p>
 
-          <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
+          <p className="text-white  text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Log in to access your notes, quizzes, and personalized learning tools.
           </p>
 
           <div>
-            <p className="text-white  text-2xl xl:text-lg 2xl:text-2xl mb-5 font-fustat">
+            <p className="text-white  text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl mb-5 font-fustat">
              Don’t have an account?
             </p>
 
@@ -182,6 +182,8 @@ const [passwordUpdated] = useState<boolean>(() => {
                 bg-white
                 text-primary-600
                 px-10 py-3
+                lg:px-6 lg:py-1
+                lg:text-lg
                 xl:px-8 xl:py-2
                 rounded-full
                 font-bold
@@ -196,7 +198,7 @@ const [passwordUpdated] = useState<boolean>(() => {
               "
             >
              Sign Up
-              <img src="./Arrow.png" alt="arrow" className='w-8 xl:w-6' />
+              <img src="./Arrow.png" alt="arrow" className='w-8 lg:w-6 xl:w-6' />
             </button>
           </div>
 
@@ -243,6 +245,7 @@ const [passwordUpdated] = useState<boolean>(() => {
 
           {/* EMAIL */}
           <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">EMAIL</p>
           <input
@@ -259,6 +262,7 @@ const [passwordUpdated] = useState<boolean>(() => {
 
           {/* PASSWORD */}
           <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">PASSWORD</p>
           <input
@@ -275,7 +279,7 @@ const [passwordUpdated] = useState<boolean>(() => {
 
           <div className="flex justify-end">
             <button
-              className="mb-8 mt-2 text-sm text-primary-600 font-inter font-semibold hover:underline"
+              className="mb-8 mt-2 text-sm lg:text-xs text-primary-600 font-inter font-semibold hover:underline"
               onClick={() => navigate('/forgotPassword')}
             >
               FORGOT PASSWORD
@@ -290,11 +294,11 @@ const [passwordUpdated] = useState<boolean>(() => {
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
                transition-all duration-300
-            font-normal font-inter text-white p-6 lg:p-3 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
+            font-normal font-inter text-white p-6 lg:text-[12px] lg:p-3 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
           >
             {loading ? 'LOGGING IN...' : 'LOG IN'}
           </button>
-          <p className='text-center pt-5 font-inter text-primary-600 xl:text-[12px] '>OR</p>
+          <p className='text-center pt-5 font-inter text-primary-600 lg:text-[11px] xl:text-[12px] '>OR</p>
 
         <div className="flex justify-center">
           <button
@@ -304,6 +308,7 @@ const [passwordUpdated] = useState<boolean>(() => {
                 flex items-center gap-4
                 m-2 mt-3
                 px-10 py-3
+                lg:px-1
                 rounded-full
                 font-bold uppercase
                 text-primary-600
@@ -316,7 +321,7 @@ const [passwordUpdated] = useState<boolean>(() => {
 
                 transition-all duration-300
                 ">
-            <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
+            <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-5 lg:w-5 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
             
           </button>
         </div>

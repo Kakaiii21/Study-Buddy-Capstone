@@ -120,6 +120,8 @@ const filtered = useMemo(() => {
 
   return (
     <div className='flex h-screen'>
+      <div className='flex bg-gray-600 h-screen w-16'></div>
+
       <Sidebar />
 
       {confirmItem && (

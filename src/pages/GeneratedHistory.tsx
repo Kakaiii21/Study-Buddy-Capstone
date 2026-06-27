@@ -149,6 +149,8 @@ function GeneratedHistory() {
 
   return (
     <div className='flex h-screen'>
+      <div className='flex bg-gray-600 h-screen w-16'></div>
+
       <Sidebar />
 
       <main className='flex-1 overflow-auto p-4 md:p-8 mt-1 lg:mt-0'>

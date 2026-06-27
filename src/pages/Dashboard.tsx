@@ -116,7 +116,8 @@ function Dashboard() {
   return (
     <div className='h-screen overflow-hidden bg-white'>
       <div className='flex h-full'>
-        
+      <div className='flex bg-gray-600 h-screen w-16'>
+      </div>
         {/* Sidebar */}
         <Sidebar
           isOpenExternal={showSidebar}

@@ -219,36 +219,35 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm lg:text-[12px] p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen flex flex-col  lg:flex-row bg-primary-600">
+    <div className="min-h-screen flex flex-col  lg:flex-row bg-primary-600 2xl:px-[150px]">
 
 
 
 {/* LEFT PANEL */}
-    <div className="hidden lg:flex lg:w-1/2 bg-primary-600 items-center justify-center px-16">
+    <div className="hidden lg:flex lg:w-1/2 bg-primary-600 items-center justify-center px-16 ">
 
       <div className="max-w-xl">
 
-        <h1 className="text-white font-inter font-extrabold text-6xl xl:text-5xl 2xl:text-6xl">
+        <h1 className="text-white font-inter font-extrabold text-6xl lg:text-4xl xl:text-5xl 2xl:text-6xl ">
             Welcome To
-          <br />
             Study Buddy!
         </h1>
 
-        <div className="mt-12 space-y-10 xl:space-y-5">
+        <div className="mt-12 space-y-10 lg:space-y-5 xl:space-y-5">
 
-          <p className="text-white text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
+          <p className="text-white text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Start your learning journey and stay on track with your goals.
           </p>
 
-          <p className="text-white text-2xl xl:text-lg 2xl:text-2xl font-fustat max-w-md">
+          <p className="text-white text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl font-fustat max-w-md">
             Create your account and start learning smarter.
           </p>
 
           <div>
-            <p className="text-white text-2xl xl:text-lg 2xl:text-2xl mb-5 font-fustat">
+            <p className="text-white text-2xl lg:text-[18px] xl:text-lg 2xl:text-2xl mb-5 font-fustat">
               Already have an account?
             </p>
 
@@ -258,7 +257,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 bg-white
                 text-primary-600
                 text-xl
+                lg:text-lg
                 px-10 py-3
+                lg:px-6 lg:py-1
                 xl:px-8 xl:py-2
                 rounded-full
                 font-fustat
@@ -271,7 +272,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
               "
             >
               LOG IN
-              <img src="./Arrow.png" alt="arrow" className='w-8 xl:w-6' />
+              <img src="./Arrow.png" alt="arrow" className='w-8 lg:w-5 xl:w-6 ' />
             </button>
           </div>
 
@@ -294,6 +295,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* FIRST NAME */}
           <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">FIRST NAME</p>
           <input
@@ -310,6 +312,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* LAST NAME */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">LAST NAME</p>
           <input
@@ -326,6 +329,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* EMAIL */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">EMAIL</p>
           <input
@@ -342,6 +346,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* PASSWORD */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">PASSWORD</p>
           <input
@@ -368,6 +373,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* CONFIRM PASSWORD */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          lg:text-[12px]
           xl:text-[13px]
           ">CONFIRM PASSWORD</p>
           <input
@@ -375,7 +381,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-2 p-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-2 p-2 border lg:text-[12px] border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
@@ -394,18 +400,18 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 }}
                 className="mt-1 accent-primary-600"
               />
-              <span className="text-xs text-gray-600">
+              <span className="text-xs lg:text-[12px] text-gray-600">
                 I have read and agree to the{' '}
                 <span
                   onClick={() => navigate('/terms')}
-                  className="text-primary-600 font-semibold cursor-pointer hover:underline"
+                  className="text-primary-600 lg:text-[12px] font-semibold cursor-pointer hover:underline"
                 >
                   Terms of Service
                 </span>{' '}
                 and{' '}
                 <span
                   onClick={() => navigate('/privacy')}
-                  className="text-primary-600 font-semibold cursor-pointer hover:underline"
+                  className="text-primary-600 lg:text-[12px] font-semibold cursor-pointer hover:underline"
                 >
                   Privacy Policy
                 </span>
@@ -426,12 +432,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
                transition-all duration-300
-            font-normal font-inter text-white p-6 lg:p-3 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
+            font-normal font-inter text-white p-6  lg:text-[12px] lg:p-2 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
           >
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
-          <p className='text-center xl:text-[12px] pt-5 font-inter text-primary-600'>OR</p>
+          <p className='text-center lg:text-[10px] xl:text-[12px] pt-5 font-inter text-primary-600'>OR</p>
 
 
           <div className="flex justify-center">
@@ -442,6 +448,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 flex items-center gap-4
                 m-2 mt-3
                 px-10 py-3
+                lg:px-1
                 rounded-full 
                 font-bold uppercase
                 text-primary-600
@@ -454,7 +461,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
                 transition-all duration-300
                 ">
-              <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-6 lg:w-6 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
+              <img src="/google.png" alt="Google Logo" className="w-8 h-8 lg:h-5 lg:w-5 xl:h-6 xl:w-6 2xl:h-8 2xl:w-8" />
               
             </button>
           </div>

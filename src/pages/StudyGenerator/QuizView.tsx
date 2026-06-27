@@ -40,6 +40,8 @@ function QuizView() {
   if (!viewState?.items || viewState.items.length === 0) {
     return (
       <div className='flex h-screen'>
+      <div className='flex bg-gray-600 h-screen w-16'></div>
+
         <Sidebar />
         <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
           <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No quiz data found.</p>
@@ -75,6 +77,8 @@ function QuizView() {
 
   return (
     <div className='flex h-screen'>
+      <div className='flex bg-gray-600 h-screen w-16'></div>
+
       <Sidebar />
       <main className='flex-1 overflow-auto p-4 md:p-8'>
 

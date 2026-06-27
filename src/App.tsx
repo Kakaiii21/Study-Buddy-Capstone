@@ -65,12 +65,12 @@ function App() {
       <div className='flex px-0 xl:px-18 2xl:px-32  flex-row justify-evenly'>
         <div className='flex flex-col w-full lg:h-screen md:h-auto  xl:h-screen 2xl:h-screen  justify-start items-start 
         md:px-12 md:pt-12 
-        lg:px-20 lg:pt-16 
+        lg:px-28 lg:pt-16 
         xl:px-32 xl:pt-20 
         2xl:px-34 2xl:pt-24'>
           <p className='text-primary-600 font-inter font-extrabold 
           md:text-[35px]
-          lg:text-[45px]
+          lg:text-[40px]
           xl:text-[55px]
           2xl:text-[65px] 
           uppercase '
@@ -97,7 +97,7 @@ function App() {
             <img src="./landImg.png" alt="landing img" 
             className=' w-[150px] h-[100px] 
             md:min-w-[350px] md:min-h-[380px] md:pt-12
-            lg:min-w-[350px] lg:min-h-[380px] lg:pt-14
+            lg:min-w-[290px] lg:min-h-[320px] lg:pt-14
             xl:min-w-[400px] xl:min-h-[450px] xl:pt-16
             2xl:min-w-[550px] 2xl:min-h-[580px] object-center' />
         </div>
@@ -106,93 +106,113 @@ function App() {
     </section>
     {/*First*/}
     <section className='min-h-screen  '>
-      <div className='flex flex-col  md:px-10 px-56 xl:px-[180px]  2xl:px-[250px] 0 mb-10'>
-        <p className='flex justify-center items-center font-fustat text-primary-600  text-2xl md:text-lg 2xl:text-2xl mb-20'>
-          Your all-in-one study companion{' '}<b>— plan, organize,</b>{' '}and{' '}<b>{' '}learn smarter.{' '}</b>
+      <div className='flex flex-col  md:px-10 px-56 lg:px-[110px] xl:px-[180px]  2xl:px-[350px] 0 mb-10'>
+        <p className='flex justify-center items-center gap-x-1 font-fustat text-primary-600 text-2xl md:text-lg 2xl:text-2xl mb-20'>
+          <span>Your all-in-one study companion &mdash;</span>
+          <b>plan, organize,</b>
+          <span>and</span>
+          <b>learn smarter.</b>
         </p>
-        <div className='flex flex-row gap-x-10 justify-start items-center lg:bg-pink-600 xl:bg-blue-600 2xl:bg-green-600'>
-          <img src="./assets/sTimer.png" alt="Timergif" className='w-[250px] h-[250px] md:w-[150px] md:h-[150px] 
+        <div className='flex flex-row gap-x-10 justify-start items-center '>
+          <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] 
+          md:w-[150px] md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px] 
-          2xl:w-[250px] 2xl:h-[250px]' />
+          2xl:w-[200px] 2xl:h-[200px]' />
           <div className='text-primary-600 font-inter'>
-            <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px] '>Study Timer</p>
-            <p className='text-[18px] md:text-[14px] 2xl:text-[18px]'>Track how much time you actually spend studying.</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px] '>Start the timer whenever you sit down to work,</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px] '>and watch your study hours add up.</p>
+            <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px]  2xl:text-[44px] '>Study Timer</p>
+            <p className='text-[18px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying.</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px] '>Start the timer whenever you sit down to work,</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px] '>and watch your study hours add up.</p>
           </div>
         </div>
 
         <div className='flex flex-row gap-4 justify-end items-center  '>
           <div className='text-right text-primary-600 font-inter'>
-             <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px]'>To Do List</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>Keep track of everything you need to get done.</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>Add, check off, and manage your tasks so </p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>nothing slips through the cracks.</p>
+             <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Add, check off, and manage your tasks so </p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>nothing slips through the cracks.</p>
           </div>
-          <img src="./assets/todolist.png" alt="Todo list gif" className='w-[250px] h-[250px] md:w-[150px] md:h-[150px] 
-          xl:w-[140px] xl:h-[140px] 
-          2xl:w-[250px] 2xl:h-[250px]' />
+          <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] 
+          md:w-[150px] md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px] 
+          2xl:w-[200px] 2xl:h-[200px]' />
 
         </div>
       </div>
 
     {/*Second*/}
-      <div className='flex flex-col  md:px-10 px-56 xl:px-[180px] 2xl:px-[250px] 0 mb-10'>
+      <div className='flex flex-col  md:px-10 px-56 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] 0 mb-10'>
         <div className='flex flex-row gap-x-10 justify-start items-center'>
-          <img src="./assets/notes.png" alt="Notesgif" className='w-[250px] h-[250px] 
+          <img src="./assets/notes.gif" alt="Notesgif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] 
           md:w-[150px] md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px] 
-          2xl:w-[250px] 2xl:h-[250px] ' />
+          2xl:w-[200px] 2xl:h-[200px] ' />
           <div className='text-primary-600 font-inter'>
-            <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px]'>Notes</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>Keep all your study notes in one organized</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>place. Create, edit, and revisit your notes</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>anytime, so nothing gets lost between </p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>subjects and deadlines.</p>
+            <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px] 2xl:text-[44px]'>Notes</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>place. Create, edit, and revisit your notes</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>anytime, so nothing gets lost between </p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>subjects and deadlines.</p>
 
           </div>
         </div>
 
         <div className='flex flex-row gap-4 justify-end items-center'>
           <div className='text-right text-primary-600 font-inter'>
-             <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px]'>Class Schedule</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>See your classes and study sessions at a</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>glance. Plan your week and stay on top</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>of where you need to be and when.</p>
+             <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px] 2xl:text-[44px]'>Class Schedule</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>glance. Plan your week and stay on top</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>of where you need to be and when.</p>
           </div>
-          <img src="./assets/classschedule.png" alt="Class Schedgif" className='w-[250px] h-[250px] md:w-[150px] md:h-[150px]  
-          xl:w-[130px] xl:h-[130px] 
-          2xl:w-[250px] 2xl:h-[250px]' />
+          <img src="./assets/classschedule.gif" alt="Class Schedgif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] 
+          md:w-[150px] md:h-[150px]  
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px]
+          2xl:w-[200px] 2xl:h-[200px]' />
 
         </div>
       </div>
 
     {/*Third*/}
-      <div className='flex flex-col  md:px-10 px-56 xl:px-[180px]  2xl:px-[250px] 0 mb-10'>
+      <div className='flex flex-col  md:px-10 px-56 lg:px-[110px] xl:px-[180px]  2xl:px-[350px] 0 mb-10'>
         <div className='flex flex-row gap-x-10 justify-start items-center'>
-          <img src="./assets/courses.png" alt="coursesgif" className='w-[250px] h-[250px] md:w-[150px] md:h-[150px]  
-          xl:w-[130px] xl:h-[130px] 
-          2xl:w-[250px] 2xl:h-[250px]' />
+          <img src="./assets/courses.gif" alt="coursesgif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] 
+          md:w-[150px] md:h-[150px]  
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px]
+          2xl:w-[200px] 2xl:h-[200px]' />
           <div className='text-primary-600 font-inter'>
-            <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px]'>Course</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>Organize your subjects and</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>materials by course. Keep </p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>everything related to each class  </p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>neatly grouped and easy to find.</p>
+            <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px] 2xl:text-[44px]'>Course</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>materials by course. Keep </p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>everything related to each class  </p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>neatly grouped and easy to find.</p>
 
           </div>
         </div>
 
         <div className='flex flex-row gap-4 justify-end items-center'>
           <div className='text-right text-primary-600 font-inter'>
-             <p className='font-bold text-[54px] md:text-[34px] 2xl:text-[54px]'>Study Generator</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>Turn your notes and files into quizzes and</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>flashcards in seconds. A smarter, faster way</p>
-            <p className='text-[18px]  md:text-[14px] 2xl:text-[18px]'>to review and test what you've learned.</p>
+             <p className='font-bold text-[54px] md:text-[34px]  lg:text-[28px] 2xl:text-[44px]'>Study Generator</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>flashcards in seconds. A smarter, faster way</p>
+            <p className='text-[18px]  md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>to review and test what you've learned.</p>
           </div>
-          <img src="./assets/classschedule.png" alt="Class Schedgif" className='w-[250px] h-[250px] md:w-[150px] md:h-[150px] 2xl:w-[250px] 
-          xl:w-[130px] xl:h-[130px] 
-          2xl:h-[250px]' />
+          <img src="./assets/studygen.gif" alt="Class Schedgif" className='border border-black rounded-2xl
+          w-[250px] h-[250px] md:w-[150px] 
+          md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px]
+          2xl:w-[200px] 2xl:h-[200px]' />
 
         </div>
       </div>
@@ -204,25 +224,27 @@ function App() {
         : <Login onSwitchToSignup={() => setActiveForm('signup')} />
       }
     </section>
+
+
     {/* Download Section */}
     <section ref={downloadRef} className="py-10">
       <div className='flex flex-col mt-10 gap-10 justify-start items-center'>
         <p className='text-center font-fustat text-2xl font-medium text-primary-600 uppercase'>download study buddy</p>
         <p className='text-center font-fustat text-lg font-normal text-primary-600'>Get Study Buddy on any device:</p>
-        <div className='flex flex-row gap-5 mt-10'>
+        <div className='flex flex-row gap-5 2xl:gap-x-8  mt-10'>
 
           {/* Android */}
           <button
             className={`flex flex-col justify-start items-center group ${!isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
             onClick={isInstallable ? installApp : undefined}
           >
-            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52'>
+            <div className='relative border rounded-2xl border-black  group-hover:bg-black p-3 w-52 h-52 lg:w-44 lg:h-44  2xl:w-48 2xl:h-48'>
               <div className='flex items-center justify-center h-full'>
-                <img src="./android.png" alt="android icon" className='w-32 mb-8 group-hover:hidden' />
-                <img src="./androidH.png" alt="android icon hover" className='w-32 mb-8 hidden group-hover:block' />
+                <img src="./android.png" alt="android icon" className='w-24 lg:w-24 2xl:w-30 mb-8 group-hover:hidden' />
+                <img src="./androidH.png" alt="android icon hover" className='w-24 lg:w-24 2xl:w-30 mb-8 hidden group-hover:block' />
               </div>
-              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-10 group-hover:hidden' />
-              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-10 hidden group-hover:block' />
+              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-7 group-hover:hidden' />
+              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-7 hidden group-hover:block' />
             </div>
             <p className='mt-3 font-fustat font-bold text-primary-600'>Android</p>
           </button>
@@ -232,13 +254,13 @@ function App() {
             className='flex flex-col justify-start items-center group'
             onClick={() => setShowIOSModal(true)}
           >
-            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52'>
+            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
               <div className='flex items-center justify-center h-full'>
-                <img src="./iphone.png" alt="iphone icon" className='w-24 mb-5 group-hover:hidden' />
-                <img src="./iphoneH.png" alt="iphone icon hover" className='w-24 mb-5 hidden group-hover:block' />
+                <img src="./iphone.png" alt="iphone icon" className='w-24 lg:w-24 2xl:w-30 mb-5 group-hover:hidden' />
+                <img src="./iphoneH.png" alt="iphone icon hover" className='w-24 lg:w-24 2xl:w-30 mb-5 hidden group-hover:block' />
               </div>
-              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-10 group-hover:hidden' />
-              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-10 hidden group-hover:block' />
+              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-7 group-hover:hidden' />
+              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-7 hidden group-hover:block' />
             </div>
             <p className='mt-3 font-fustat font-bold text-primary-600'>iOS</p>
           </button>
@@ -248,13 +270,13 @@ function App() {
             className={`flex flex-col justify-start items-center group ${!isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
             onClick={isInstallable ? installApp : undefined}
           >
-            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52'>
+            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
               <div className='flex items-center justify-center h-full'>
-                <img src="./windows.png" alt="windows icon" className='w-24 mb-5 group-hover:hidden' />
-                <img src="./windowsH.png" alt="windows icon hover" className='w-24 mb-5 hidden group-hover:block' />
+                <img src="./windows.png" alt="windows icon" className='w-20 mb-5 group-hover:hidden' />
+                <img src="./windowsH.png" alt="windows icon hover" className='w-20 mb-5 hidden group-hover:block' />
               </div>
-              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-10 group-hover:hidden' />
-              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-10 hidden group-hover:block' />
+              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-7 group-hover:hidden' />
+              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-7 hidden group-hover:block' />
             </div>
             <p className='mt-3 font-fustat font-bold text-primary-600'>Windows</p>
           </button>
@@ -264,13 +286,13 @@ function App() {
             className={`flex flex-col justify-start items-center group ${!isMacSafari && !isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
             onClick={isMacSafari ? () => setShowMacModal(true) : isInstallable ? installApp : undefined}
           >
-            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52'>
+            <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-52 h-52 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
               <div className='flex items-center justify-center h-full'>
-                <img src="./mac.png" alt="mac icon" className='w-28 mb-5 group-hover:hidden' />
-                <img src="./macH.png" alt="mac icon hover" className='w-28 mb-5 hidden group-hover:block' />
+                <img src="./mac.png" alt="mac icon" className='w-24 mb-5 group-hover:hidden' />
+                <img src="./macH.png" alt="mac icon hover" className='w-24 mb-5 hidden group-hover:block' />
               </div>
-              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-10 group-hover:hidden' />
-              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-10 hidden group-hover:block' />
+              <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-7 group-hover:hidden' />
+              <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-7 hidden group-hover:block' />
             </div>
             <p className='mt-3 font-fustat font-bold text-primary-600'>MacOS</p>
           </button>
@@ -315,26 +337,31 @@ function App() {
     {/*Developers Section*/}
     <section className="py-10  ">
       <div className='flex flex-col mt-10 gap-2 justify-start items-start '>
-        <h1 className='  text-primary-600  px-[320px] md:px-[50px] xl:px-[180px] 2xl:px-[250px] w-full font-inter font-extrabold '>Developers</h1>
-        <p className='text-primary-600 font-inter px-[320px] md:px-[50px]  xl:px-[180px] 2xl:px-[250px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
+        <h1 className='  text-primary-600  
+        px-[320px] 
+        md:px-[50px] 
+        lg:px-[130px]
+        xl:px-[180px] 
+        2xl:px-[350px] w-full font-inter font-extrabold '>Developers</h1>
+        <p className='text-primary-600 font-inter px-[320px] md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
         {/*Proponents*/}
-        <div className='flex flex-col mt-2 gap-10 px-[500px] md:px-[50px] xl:px-[200px] 2xl:px-[450px] w-full'>
+        <div className='flex flex-col mt-2 gap-10 px-[500px] md:px-[50px] lg:px-[160px] xl:px-[200px] 2xl:px-[450px] w-full'>
           {/*Programmer & Project Manager*/}
           <div className='flex flex-row justify-between w-full'>
             <div className='flex flex-row gap-5'>
-              <img src="./profile.png" alt="Programmer" className='w-32 border border-primary-600 rounded-full'/>
+              <img src="./profile.png" alt="Programmer" className='w-32 lg:w-20 2xl:w-28  border border-primary-600 rounded-full'/>
               <div className='flex flex-col justify-center items-start'>
-                <p className='text-primary-600 text-lg font-fustat font-extrabold uppercase'>Programmer</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>Casey P. Dellamas</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>dellamascasey@gmail.com</p>
+                <p className='text-primary-600 text-lg lg:text-[16px] 2xl:text-[20px]  font-fustat font-extrabold uppercase'>Programmer</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px]  font-fustat font-medium'>Casey P. Dellamas</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>dellamascasey@gmail.com</p>
               </div>
             </div>
             <div className='flex flex-row gap-5'>
-              <img src="./profile.png" alt="Project Manager" className='w-32 border border-primary-600 rounded-full'/>
+              <img src="./profile.png" alt="Project Manager" className='w-32 lg:w-20 2xl:w-28 border border-primary-600 rounded-full'/>
               <div className='flex flex-col justify-center items-start'>
-                <p className='text-primary-600 text-lg font-fustat font-extrabold uppercase'>Project Manager</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>Eunice Jayce F. De Vero</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>eunicejayce03@gmail.com</p>
+                <p className='text-primary-600 text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>Project Manager</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Eunice Jayce F. De Vero</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>eunicejayce03@gmail.com</p>
               </div>
             </div>
           </div>
@@ -342,19 +369,19 @@ function App() {
           {/*QA Tester & UI designer*/}
           <div className='flex flex-row justify-between w-full'>
             <div className='flex flex-row gap-5'>
-              <img src="./profile.png" alt="QA Tester" className='w-32 border border-primary-600 rounded-full'/>
+              <img src="./profile.png" alt="QA Tester" className='w-32 lg:w-20 2xl:w-28 border border-primary-600 rounded-full'/>
               <div className='flex flex-col justify-center items-start'>
-                <p className='text-primary-600 text-lg font-fustat font-extrabold uppercase'>QA Tester</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>Casey P. Dellamas</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>dellamascasey@gmail.com</p>
+                <p className='text-primary-600 text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>QA Tester</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Casey P. Dellamas</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>dellamascasey@gmail.com</p>
               </div>
             </div>
             <div className='flex flex-row gap-5'>
-              <img src="./profile.png" alt="UI Designer" className='w-32 border border-primary-600 rounded-full'/>
+              <img src="./profile.png" alt="UI Designer" className='w-32 lg:w-20 2xl:w-28 border border-primary-600 rounded-full'/>
               <div className='flex flex-col justify-center items-start'>
-                <p className='text-primary-600 text-lg font-fustat font-extrabold uppercase'>UI Designer</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>Eunice Jayce F. De Vero</p>
-                <p className='text-primary-600 text-md font-fustat font-medium'>eunicejayce03@gmail.com</p>
+                <p className='text-primary-600 text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>UI Designer</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Eunice Jayce F. De Vero</p>
+                <p className='text-primary-600 text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>eunicejayce03@gmail.com</p>
               </div>
             </div>
           </div>
@@ -364,23 +391,29 @@ function App() {
     {/*Contact Us Section*/}
     <section className='py-10 w-screen'>
       <div className='flex flex-col items-start mt-10 gap-2 justify-start '>
-        <h1 className='text-primary-600 px-[320px] md:px-[50px] xl:px-[180px] 2xl:px-[250px] w-full font-inter font-extrabold'>Contact Us!</h1>
-        <p className='text-primary-600  font-inter px-[320px] md:px-[50px]  xl:px-[180px] 2xl:px-[250px] mb-10 font-medium'>
+        <h1 className='text-primary-600 px-[320px] md:px-[50px] lg:px-[130px] xl:px-[180px]  2xl:px-[350px] w-full font-inter font-extrabold'>Contact Us!</h1>
+        <p className='text-primary-600  font-inter px-[320px] md:px-[50px]  lg:px-[130px] xl:px-[180px] 2xl:px-[350px] mb-10 font-medium'>
           Have questions about StudyBuddy? We'd love to hear from you — reach us at:
         </p>
         <div className='flex flex-row w-full justify-center items-center gap-20 2xl:gap-52'>
           {/*MAIL*/}
           <div className='flex flex-row justify-center items-center gap-5'>
             <div className='bg-primary-600 rounded-full border border-primary-600  w-20 h-20 
-            xl:w-16 xl:h-16 items-center justify-center flex'>
-              <img src="./mail.png" alt="mail icon" className='w-12 h-12 xl:w-10 xl:h-10' />
+            lg:w-14 lg:h-14
+            xl:w-16 xl:h-16
+            2xl:w-18 2xl:h-18
+            items-center justify-center flex'>
+              <img src="./mail.png" alt="mail icon" className='w-12 h-12 
+              lg:w-8 lg:h-8
+              xl:w-10 xl:h-10
+              2xl:w-12 2xl:h-12' />
             </div>
-            <p className='text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
+            <p className='text-lg lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
           </div>
           {/*Facebook*/}
           <div className='flex flex-row justify-center items-center gap-5'>
-            <img src="./fb.png" alt="" className='w-[80px] h-[80px] xl:w-[65px] xl:h-[65px]  ' />
-            <p className='text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
+            <img src="./fb.png" alt="" className='w-[80px] h-[80px] lg:w-[55px] lg:h-[55px]  xl:w-[65px] xl:h-[65px] 2xl:w-[65px] 2xl:h-[65px]  ' />
+            <p className='text-lg lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
           </div>
         </div>
       </div>
