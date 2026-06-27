@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions'
-const GROQ_MODEL = 'llama-3.1-8b-instant'
+const GROQ_MODEL = 'openai/gpt-oss-20b'
 
 export interface GroqUsage {
   prompt_tokens: number
@@ -26,7 +26,13 @@ export async function callGroq(
       GROQ_API_URL,
       {
         model: GROQ_MODEL,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          {
+            role: 'system',
+            content: 'Be concise. Output only the requested format with no extra explanation or commentary.'
+          },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0.3,
         max_tokens: 4000,
       },

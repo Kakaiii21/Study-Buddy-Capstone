@@ -285,15 +285,15 @@ function StudyGenerator() {
   }
 
   // ── Generate ──────────────────────────────────────────────────────────────
-
   const handleGenerate = async () => {
     if (!uploadedFile) { setFileError('Please upload or select a file first.'); return }
     if (!selectItems) { setFileError('Please select the number of items.'); return }
     if (!isOnline) { setFileError('You are offline. Please reconnect to generate.'); return }
-    if (cooldownSeconds > 0) return // ── NEW: block if on cooldown
+    if (cooldownSeconds > 0) return
     setFileError('')
     setSuggestedMax(null)
     setIsGenerating(true)
+    sessionStorage.removeItem(SESSION_KEY_RESULT) 
 
     try {
       let body: BodyInit
