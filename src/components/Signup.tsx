@@ -301,7 +301,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
     {/*FORM*/}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-8 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 mt-2">
-        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5  px-2 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
+        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5  px-2  2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
           <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Sign UP</p>
 
