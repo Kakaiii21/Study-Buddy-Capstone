@@ -4,10 +4,14 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
 import { auth } from '../services/firebase'
+interface BasicInfoProps {
+  setActiveTab: (tab: string) => void
+}
 
-function BasicInfo() {
+function BasicInfo({ setActiveTab }: BasicInfoProps) {
   const { user } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
+
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -280,17 +284,28 @@ return (
         />
       </div>
 
-      {/* Email */}
-      <div className='flex flex-col gap-1 mb-4 md:mb-6'>
-        <label className='text-primary-600 font-inter text-sm md:text-md'>Email</label>
-        <input
-          aria-label='Email'
-          type="text"
-          value={maskEmail(email)}
-          readOnly
-          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
-        />
-      </div>
+{/* Email */}
+<div className='flex flex-col gap-1 mb-4 md:mb-6'>
+  <label className='text-primary-600 font-inter text-sm md:text-md'>Email</label>
+  <div className='flex flex-row gap-2 items-stretch'>
+    <input
+      aria-label='Email'
+      type="text"
+      value={maskEmail(email)}
+      readOnly
+      className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 flex-1 px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
+    />
+    <button
+        onClick={() => setActiveTab('changeEmail')}
+      className='bg-primary-600 text-white px-4 md:px-6 rounded-md font-inter font-medium text-sm md:text-base
+      shadow-[0_2px_4px_rgba(0,0,0,0.25)]
+      hover:bg-white hover:text-primary-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.3)]
+      transition-all duration-300 whitespace-nowrap uppercase'
+    >
+      Change
+    </button>
+  </div>
+</div>
 
       {/* Save Changes */}
       <div className='flex justify-center'>

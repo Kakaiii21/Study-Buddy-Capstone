@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 
-function TermsOfService() {
+interface TermsOfServiceProps {
+  hideButton?: boolean;
+}
+
+function TermsOfService({ hideButton = false }: TermsOfServiceProps) {
   const navigate = useNavigate()
   return (
     <div className="min-h-screen bg-white">
@@ -260,20 +264,18 @@ function TermsOfService() {
           </section>
                     <hr className='w-full border-t border-primary-600 ' />
 
-          <section>
-
-            <div className="flex justify-center">
-           <button onClick={() => navigate(-1)}
-            className="  border text-sm  font-roboto px-6 py-2 rounded-md text-white bg-green-500  uppercase hover:opacity-50 "
-            title="Go Back"
-           >
-              I Understand</button>
-            </div>
-
-
-
-
-          </section>
+          {!hideButton && (
+            <section>
+              <div className="flex justify-center">
+                <button onClick={() => navigate(-1)}
+                  className="border text-sm font-roboto px-6 py-2 rounded-md text-white bg-green-500 uppercase hover:opacity-50"
+                  title="Go Back"
+                >
+                  I Understand
+                </button>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>
