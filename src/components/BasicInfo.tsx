@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
@@ -7,7 +6,6 @@ import { uploadToCloudinary } from '../services/cloudinary'
 import { auth } from '../services/firebase'
 
 function BasicInfo() {
-  const navigate = useNavigate()
   const { user } = useAuth()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -137,9 +135,44 @@ useEffect(() => {
     setUploading(false)
   }
 }
-    return (
-        <>
-          {/* Loader styles */}
+
+const handleRemoveProfilePic = async () => {
+  if (!user) return
+  try {
+    const userSnap = await getDoc(doc(db, 'users', user.uid))
+    const oldPublicId = userSnap.data()?.photoPublicId ?? null
+
+    await updateDoc(doc(db, 'users', user.uid), {
+      photoURL: null,
+      photoPublicId: null
+    })
+
+    setProfilePic('/profile.png')
+    sessionStorage.setItem('profilePic', '/profile.png')
+    window.dispatchEvent(new Event('profilePicUpdated'))
+
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: null, photoPublicId: null }))
+    }
+
+    if (oldPublicId) {
+      await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
+      }).catch((err) => console.warn('Old profile pic delete failed:', err))
+    }
+
+    showToast('Profile picture removed.')
+  } catch (err) {
+    console.error('Failed to remove profile picture:', err)
+    showToast('Failed to remove picture. Please try again.')
+  }
+}
+return (
+  <>
     <style>{`
       .upload-loader {
         width: fit-content;
@@ -159,190 +192,124 @@ useEffect(() => {
       @keyframes l10-1 { to { background-position-y: -.5em, 0; } }
     `}</style>
 
-    {/* Full-screen upload loader */}
     {uploading && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
         <div className="upload-loader" />
       </div>
     )}
 
-      {/* Toast */}
-      {toast && (
-        <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-primary-600 text-white px-6 py-3 rounded-xl shadow-lg font-roboto text-sm transition-all'>
-          {toast}
-        </div>
-      )}
+    {toast && (
+      <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-primary-600 text-white px-6 py-3 rounded-xl shadow-lg font-inter text-sm transition-all'>
+        {toast}
+      </div>
+    )}
 
-    <div>
-              <div className='flex items-center  gap-3'>
-                <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
-                  Account Settings
-                </span>
-                <div className='flex-1 h-0.5 bg-primary-600' />
-              </div>
+    <div className='w-full px-4 md:px-16 lg:px-24 xl:px-40 py-6'>
 
-              {/* First Name */}
-              <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-                <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>First Name:</p>
-                <div className='flex flex-row gap-3 lg:gap-5'>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder='First name'
-                    className='border border-primary-600 
-                    hover:shadow-[0_2px_6px_rgba(0,0,0,0.5)]
-                    transition-all duration-300
-                    rounded-md bg-slate-50 text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
-                  />
-                  <button
-                    onClick={() => handleSave('firstName')}
-                    disabled={saving === 'firstName'}
-                    className='bg-primary-600
-                   shadow-[0_4px_8px_rgba(0,0,0,0.35)]
-                    rounded-md backdrop-blur-xs
-                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
-                    transition-all duration-300
-                    hover:bg-white hover:text-primary-600
-                    text-white p-2 lg:px-10 px-5 font-roboto uppercase disabled:opacity-50'
-                  >
-                    {saving === 'firstName' ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
+      {/* Title */}
+      <h1 className='text-primary-600 font-semibold font-inter text-xl md:text-2xl lg:text-[28px] xl:text-[30px] mb-4 md:mb-6'>Basic Info</h1>
+      <p className='text-primary-600 font-inter text-sm md:text-[15px] xl:text-[16px] w-28 shrink-0'>Profile Picture</p>
 
-              {/* Last Name */}
-              <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-                <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>Last Name:</p>
-                <div className='flex flex-row gap-3 lg:gap-5'>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder='Last name'
-                    className='border border-primary-600 rounded-md bg-slate-50
-                    hover:shadow-[0_2px_6px_rgba(0,0,0,0.5)]
-                    transition-all duration-300
-                    text-primary-600 min-w-[250px] lg:w-[500px] md:w-[500px] px-5'
-                  />
-                  <button
-                    onClick={() => handleSave('lastName')}
-                    disabled={saving === 'lastName'}
-                    className='bg-primary-600
-                    shadow-[0_4px_8px_rgba(0,0,0,0.35)]
-                    rounded-md backdrop-blur-xs
-                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
-                    transition-all duration-300
-                    hover:bg-white hover:text-primary-600
-                    text-white p-2 lg:px-10 px-5  font-roboto uppercase disabled:opacity-50'
-                  >
-                    {saving === 'lastName' ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
-
-              {/* Email — masked display + Change Email button */}
-              <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-                <p className='text-primary-600 font-bold font-roboto lg:text-xl text-xl'>Email:</p>
-                <div className='flex flex-row gap-3 lg:gap-5 lg:ml-12 md:ml-12 items-center'>
-                  <p className='border border-primary-600 rounded-md bg-slate-50 text-primary-600 min-w-[220px] lg:w-[500px] md:w-[500px] px-2 py-2 tracking-widest'>
-                    {maskEmail(email)}
-                  </p>
-                  <button
-                    onClick={() => navigate('/changeEmail')}
-                    className='bg-primary-600
-                   shadow-[0_4px_8px_rgba(0,0,0,0.35)]
-                    rounded-md backdrop-blur-xs
-                    hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
-                    transition-all duration-300
-                    hover:bg-white hover:text-primary-600
-                    text-white p-2 lg:px-10 px-3  font-roboto uppercase'
-                  >
-                    Change
-                  </button>
-                </div>
-              </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
-          <div className='flex flex-col w-full justify-start items-center'>
-
-            {/* Profile Pic */}
-            <div className="relative w-fit">
+      {/* Profile Picture */}
+      <div className='flex flex-row items-center justify-center gap-6 mb-6'>
+        <div className='flex flex-col items-center gap-1'>
+          <div className='relative w-fit'>
+            <button
+              aria-label="change profile picture"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="relative rounded-full overflow-hidden group disabled:opacity-40"
+            >
               <img
                 src={profilePic}
                 alt="Profile"
-                className={`w-40 h-40 border-2 border-primary-600 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+                className={`w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
               />
-
-              <input
-                ref={fileInputRef}
-                aria-label='img'
-                type="file"
-                accept="image/png, image/jpg, image/jpeg"
-                className="hidden"
-                onChange={handleProfilePicChange}
-              />
-              <button
-                aria-label="add"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-2 right-2 bg-primary-600 rounded-full shadow-md hover:opacity-70 disabled:opacity-40"
-              >
-                {uploading
-                  ? <span className="w-10 h-10 flex items-center justify-center text-white text-xs">...</span>
-                  : <img src="/profileAdd.png" alt="" className="w-10 h-10" />
-                }
-              </button>
-            </div>
-
-            <div className='w-full my-2 mt-10'>
-  
-              {/* Change Password */}
-              <div className='flex flex-row justify-start items-center gap-4'>
-                <div className='hover:opacity-35 flex-row flex items-center justify-start gap-4'>
-                  <img src="/changePass.png" alt="forgot icon" className='w-8 h-8' />
-                  <button
-                    className='text-primary-600 font-bold font-roboto text-xl'
-                    onClick={() => navigate('/changePassword')}
-                  >
-                    Change Password
-                  </button>
-                </div>
+              <div className='absolute bottom-0 left-0 right-0 h-1/4 flex items-end justify-center pb-1 transition-opacity rounded-b-full'>
+                <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7" />
               </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
-
-              {/* ✅ Legal Section */}
-              <div className='flex items-center gap-3 mb-4'>
-                <span className='lg:text-md text-sm text-primary-600 tracking-widest uppercase'>
-                  Legal
-                </span>
-                <div className='flex-1 h-0.5 bg-primary-600' />
-              </div>
-
-              <div className='flex flex-row justify-between items-center hover:opacity-35 cursor-pointer' onClick={() => navigate('/terms')}>
-                <div className='flex flex-row items-center gap-4'>
-                  <img src="/terms.png" alt="terms icon" className='w-8 h-8' />
-                  <p className='text-primary-600 font-bold font-roboto text-xl'>Terms of Service</p>
-                </div>
-                <span className='text-primary-600 text-xl'>›</span>
-              </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
-
-              <div className='flex flex-row justify-between items-center hover:opacity-35 cursor-pointer' onClick={() => navigate('/privacy')}>
-                <div className='flex flex-row items-center gap-4'>
-                  <img src="/privacy.png" alt="privacy icon" className='w-8 h-8' />
-                  <p className='text-primary-600 font-bold font-roboto text-xl'>Privacy Policy</p>
-                </div>
-                <span className='text-primary-600 text-xl'>›</span>
-              </div>
-              <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
-
-            </div>
+            </button>
+            <input
+              ref={fileInputRef}
+              aria-label='img'
+              type="file"
+              accept="image/png, image/jpg, image/jpeg"
+              className="hidden"
+              onChange={handleProfilePicChange}
+            />
           </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className='text-primary-600 text-xs md:text-sm font-inter font-medium hover:underline'
+          >
+            Upload a new photo.
+          </button>
+          <button
+            onClick={handleRemoveProfilePic}
+            className='text-red-500 text-xs md:text-sm font-inter hover:underline'
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <hr className='border-t border-gray-300 mb-4 md:mb-6' />
+
+      {/* First Name */}
+      <div className='flex flex-col gap-1 mb-3 md:mb-4'>
+        <label className='text-primary-600 font-inter text-sm md:text-md'>First Name</label>
+        <input
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder='First name'
+          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base'
+        />
+      </div>
+
+      {/* Last Name */}
+      <div className='flex flex-col gap-1 mb-3 md:mb-4'>
+        <label className='text-primary-600 font-inter text-sm md:text-md'>Last Name</label>
+        <input
+          type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          placeholder='Last name'
+          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base'
+        />
+      </div>
+
+      {/* Email */}
+      <div className='flex flex-col gap-1 mb-4 md:mb-6'>
+        <label className='text-primary-600 font-inter text-sm md:text-md'>Email</label>
+        <input
+          aria-label='Email'
+          type="text"
+          value={maskEmail(email)}
+          readOnly
+          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
+        />
+      </div>
+
+      {/* Save Changes */}
+      <div className='flex justify-center'>
+        <button
+          onClick={() => { handleSave('firstName'); handleSave('lastName') }}
+          disabled={saving !== null}
+          className='w-full md:w-[400px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-3 
+          disabled:opacity-50
+          shadow-[0_2px_1px_rgba(0,0,0,0.35)]
+          rounded-md backdrop-blur-xs
+          hover:-translate-y-1 hover:shadow-[0_4px_8px_rgba(0,0,0,0.35)]'
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+
     </div>
-    </>
-  )
+  </>
+)
 }
 
 export default BasicInfo

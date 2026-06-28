@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { getAuth } from 'firebase/auth'
 import { resetPassword } from '../services/authService'
 
 function ChangePassword() {
-  const navigate = useNavigate()
   const auth = getAuth()
   const currentEmail = auth.currentUser?.email || ''
 
@@ -38,57 +36,45 @@ function ChangePassword() {
   }
 
 
-  return (
-    <div className='h-screen w-full'>
-      <div className='flex flex-row mt-3 ml-5'>
-              <button
-                title="Go Back to Account"
-                onClick={() => navigate('/account')}
-                className="flex flex-col items-center md:ml-16 lg:ml-16 lg:mt-0 xl:ml-16 xl:mt-0 2xl:ml-16 2xl:mt-0 px-3 py-1 rounded hover:bg-gray-100 transition"
-              >
-                <span className="text-5xl leading-none">←</span>
-                <span className="text-sm">Back</span>
-              </button>
-      </div>
+return (
+  <div className='w-full px-4 md:px-16 lg:px-24 xl:px-40 py-6'>
+    <h1 className='text-primary-600 font-semibold font-inter text-xl md:text-2xl lg:text-[28px] xl:text-[30px] 2xl:text-[32px] mb-4 md:mb-6'>Password</h1>
+    <h1 className='text-primary-600 font-semibold font-inter mt-5 md:mt-12 lg:mt-14 xl:mt-16 2xl:mt-20 text-center text-xl md:text-2xl lg:text-[28px] xl:text-[30px] uppercase 2xl:text-[28px] mb-4 md:mb-6'>Change Password</h1>
+    <p className='text-primary-600 text-sm text-center font-inter font-normal mb-6'>
+      We'll send a password reset link to your registered email.
+    </p>
 
-      <div className='flex flex-col justify-center items-center'>
-        <img src="logo.png" alt="" className='w-64 h-42 ' />
+    {error && <p className='text-red-500 text-center text-sm font-semibold mb-4'>{error}</p>}
+    {success && <p className='text-green-500 text-center text-sm font-semibold mb-4'>{success}</p>}
 
-        <div className='flex flex-col border-2 border-primary-600 rounded-xl w-[90%] lg:w-[850px] mt-10 lg:mt-2 xl:mt-2 2xl:mt-2 gap-6 justify-start items-center px-5 py-10'>
-          <p className='font-roboto font-bold text-primary-600 uppercase text-xl lg:text-3xl'>
-            Change Password
-          </p>
-
-          <p className='text-gray-500 text-sm text-center max-w-md'>
-            We'll send a password reset link to your registered email.
-          </p>
-
-          {error && <p className='text-red-500 text-sm font-semibold'>{error}</p>}
-          {success && <p className='text-green-500 text-sm font-semibold text-center'>{success}</p>}
-
-          {/* Shows their email, read-only */}
-          <div className='w-full max-w-sm'>
-            <p className='font-roboto font-bold text-primary-600 text-md mb-1'>Email</p>
-            <input
-            aria-label='email'
-              type="email"
-              value={currentEmail}
-              readOnly
-              className='w-full px-3 py-2 border border-primary-600 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed'
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={handleSendLink}
-          disabled={loading}
-          className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 mt-10 lg:mt-5 xl:mt-5 2xl:mt-10 rounded-md uppercase disabled:opacity-50'
-        >
-          {loading ? 'Sending...' : 'Send Link'}
-        </button>
-      </div>
+    {/* Email */}
+    <div className='flex flex-col gap-1 mb-6 mt-5 md:mt-12 lg:mt-14 xl:mt-16 2xl:mt-20'>
+      <label className='text-primary-600 font-inter text-sm  md:text-md lg:text-lg xl:text-lg 2xl:text-lg'>Email</label>
+      <input
+        aria-label='email'
+        type="email"
+        value={currentEmail}
+        readOnly
+        className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
+      />
     </div>
-  )
+
+    {/* Send Link Button */}
+    <div className='flex justify-center'>
+      <button
+        onClick={handleSendLink}
+        disabled={loading}
+        className='w-full md:w-[400px] flex items-center justify-center bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 text-black font-inter font-semibold uppercase py-3
+        disabled:opacity-50
+        shadow-[0_2px_1px_rgba(0,0,0,0.35)]
+        rounded-md
+        hover:-translate-y-1 hover:shadow-[0_4px_8px_rgba(0,0,0,0.35)]'
+      >
+        {loading ? 'Sending...' : 'Send Link'}
+      </button>
+    </div>
+  </div>
+)
 }
 
 export default ChangePassword

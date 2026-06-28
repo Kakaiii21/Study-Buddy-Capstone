@@ -1,21 +1,21 @@
 import Sidebar from '../components/Sidebar'
 import BasicInfo from '../components/BasicInfo'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { signOut } from 'firebase/auth'
-import { auth } from '../services/firebase'
+//import { useNavigate } from 'react-router-dom'
+//import { signOut } from 'firebase/auth'
+//import { auth } from '../services/firebase'
 import Terms from '../terms'
 import Privacy from '../privacy'
 import ChangePassword from './ChangePassword'
 
 function Account() {
   const [activeTab, setActiveTab] = useState('basicinfo')
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
-  const handleLogout = async () => {
+  {/*const handleLogout = async () => {
     await signOut(auth)
     navigate('/')
-  }
+  }*/}
 
   return (
     <div className='flex h-screen'>
@@ -29,8 +29,9 @@ function Account() {
           
 
           {/* Left — nav menu */}
-          <div className='flex-1 overflow-auto pt-0 border-r border-gray-200'>
-            <h1 className='font-roboto font-bold uppercase pl-7 '>Account</h1>
+          <div className='flex-1 overflow-auto pt-0 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.15)] relative z-10'>
+
+            <h1 className='font-roboto font-bold uppercase text-[40px] pl-7 '>Account</h1>
             <p className='text-sm font-inter font-medium text-primary-600 pl-10  tracking-widest mb-5'>Account Settings</p>
             <nav className='flex flex-col'>
               <button
@@ -54,7 +55,9 @@ function Account() {
                 </div>
                <img src="./arrowA.png" alt="nextArrow " className='w-2' />              
               </button>
-            <hr className=' border-t border-gray-400  ml-10' />
+<div className="relative ml-10 h-px bg-gray-400">
+  <div className="absolute right-0 top-1/2 h-2 w-10 -translate-y-1/2 bg-gray-400 blur-md opacity-50"></div>
+</div>
 
             <button
               onClick={() => setActiveTab('terms')}
@@ -78,7 +81,7 @@ function Account() {
             </button>
             <hr className='border-t border-gray-400 ml-10' />
 
-            <button
+           {/* <button
               onClick={handleLogout}
               className='flex items-center justify-between w-full pr-3 py-3 text-left font-medium transition text-gray-600 hover:bg-red-50 mt-2'>
               <div className='flex items-center gap-3 pl-10'>
@@ -86,7 +89,7 @@ function Account() {
                 <span className='font-inter text-lg font-medium text-red-500'>Log out</span>
               </div>
               <img src="./arrowA.png" alt="nextArrow" className='w-2' />
-            </button>
+            </button>*/}
             </nav>
           </div>
 
