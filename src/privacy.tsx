@@ -9,7 +9,7 @@ function PrivacyPolicy() {
 
 
 
-      <div className="max-w-5xl mx-auto px-2  py-12">
+      <div className="max-w-5xl mx-auto px-2  py-1">
         <h1 className="text-4xl text-center font-bold text-gray-900 mb-2">
           Privacy Policy
         </h1>

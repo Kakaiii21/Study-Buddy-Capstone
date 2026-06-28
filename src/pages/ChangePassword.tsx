@@ -64,7 +64,7 @@ return (
       <button
         onClick={handleSendLink}
         disabled={loading}
-        className='w-full md:w-[400px] flex items-center justify-center bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 text-black font-inter font-semibold uppercase py-3
+        className='w-full md:w-[400px] flex items-center justify-center bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 text-black font-inter font-semibold uppercase py-2 lg:py-3  xl:py-3 2xl:py-3
         disabled:opacity-50
         shadow-[0_2px_1px_rgba(0,0,0,0.35)]
         rounded-md

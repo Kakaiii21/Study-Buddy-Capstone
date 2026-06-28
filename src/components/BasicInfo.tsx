@@ -223,7 +223,7 @@ return (
               <img
                 src={profilePic}
                 alt="Profile"
-                className={`w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+                className={`w-28 h-28 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
               />
               <div className='absolute bottom-0 left-0 right-0 h-1/4 flex items-end justify-center pb-1 transition-opacity rounded-b-full'>
                 <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7" />
@@ -297,7 +297,7 @@ return (
         <button
           onClick={() => { handleSave('firstName'); handleSave('lastName') }}
           disabled={saving !== null}
-          className='w-full md:w-[400px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-3 
+          className='w-full md:w-[400px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-3  xl:py-3 2xl:py-3
           disabled:opacity-50
           shadow-[0_2px_1px_rgba(0,0,0,0.35)]
           rounded-md backdrop-blur-xs
