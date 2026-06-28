@@ -82,7 +82,7 @@ function App() {
           lg:text-[12px] lg:pr-0 lg:mt-4
           xl:text-[14px] xl:pr-0 xl:mt-4
           2xl:text-[18px] 2xl:pr-0 '
-          >Study Buddy is a web-based learning support application designed to help students manage their study time, improve focus, and enhance learning efficiency.</p>
+          >Study Buddy is a Progressive Web App (PWA) that helps students manage their study time, organize notes, track tasks, and enhance learning efficiency.</p>
           <button 
           onClick={() => downloadRef.current?.scrollIntoView({ behavior: 'smooth'})}
           className='flex flex-row mt-5 justify-center items-center gap-4 
