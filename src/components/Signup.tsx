@@ -219,11 +219,28 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm lg:text-[12px] p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm text-[13px] lg:text-[12px] p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen flex flex-col  lg:flex-row bg-primary-600 2xl:px-[150px]">
-
+    <div className="min-h-screen md:h-auto flex flex-col  lg:flex-row bg-primary-600 2xl:px-[150px]">
+{/* MOBILE HEADER - visible only on mobile */}
+<div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
+  <h1 className="text-white font-inter font-extrabold text-3xl">
+    Welcome To Study Buddy!
+  </h1>
+  <p className="text-white font-fustat text-sm mt-3">
+    Create your account and start learning smarter.
+  </p>
+  <p className="text-white font-fustat text-sm mt-2">
+    Already have an account?{' '}
+    <button
+      onClick={() => onSwitchToLogin ? onSwitchToLogin() : navigate('/login')}
+      className="font-bold underline"
+    >
+      Log In
+    </button>
+  </p>
+</div>
 
 
 {/* LEFT PANEL */}
@@ -283,8 +300,8 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     </div>
 
     {/*FORM*/}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-2 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 mt-10">
-        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-2 mt-2">
+        <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5  px-2 2xl:mt-0 2xl:w-full max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 rounded-xl shadow-md border-4 border-primary-600">
 
           <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Sign UP</p>
 
@@ -295,6 +312,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* FIRST NAME */}
           <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          text-[13px]
           lg:text-[12px]
           xl:text-[13px]
           ">FIRST NAME</p>
@@ -312,6 +330,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* LAST NAME */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          text-[13px]
           lg:text-[12px]
           xl:text-[13px]
           ">LAST NAME</p>
@@ -329,6 +348,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* EMAIL */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          text-[13px]
           lg:text-[12px]
           xl:text-[13px]
           ">EMAIL</p>
@@ -346,6 +366,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* PASSWORD */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          text-[13px]
           lg:text-[12px]
           xl:text-[13px]
           ">PASSWORD</p>
@@ -373,6 +394,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
           {/* CONFIRM PASSWORD */}
           <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          text-[13px]
           lg:text-[12px]
           xl:text-[13px]
           ">CONFIRM PASSWORD</p>
@@ -381,7 +403,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-2 p-2 border lg:text-[12px] border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-2 p-2 border text-[13px] lg:text-[12px] border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
@@ -432,12 +454,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
                transition-all duration-300
-            font-normal font-inter text-white p-6  lg:text-[12px] lg:p-2 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
+            font-normal font-inter text-white p-2  lg:text-[12px] lg:p-2 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
           >
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 
-          <p className='text-center lg:text-[10px] xl:text-[12px] pt-5 font-inter text-primary-600'>OR</p>
+          <p className='text-center text-[13px] lg:text-[10px] xl:text-[12px] pt-5 font-inter text-primary-600'>OR</p>
 
 
           <div className="flex justify-center">
@@ -447,15 +469,21 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 className="
                 flex items-center gap-4
                 m-2 mt-3
-                px-10 py-3
-                lg:px-1
+                px-2 py-2
+                md:px-10 md:py-3
+                lg:px-10 lg:py-3
+                xl:px-10 xl:py-3
+                2xl:px-10 2xl:py-3
                 rounded-full 
                 font-bold uppercase
                 text-primary-600
                 disabled:opacity-50
-
+                shadow-[0_0px_2px_rgba(0,0,0,0.28)]
                 hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)]
-
+                md:shadow-none
+                lg:shadow-none
+                xl:shadow-none
+                2xl:shadow-none
                 hover:-translate-y-1.5
                 active:translate-y-0
 
