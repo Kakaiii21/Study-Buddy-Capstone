@@ -266,7 +266,6 @@ const handleSave = () => {
 
   return (
     <div className='flex h-screen'>
-      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
       <Sidebar />
       <main className='flex-1 overflow-auto p-8'>
         <div className='min-h-screen flex flex-col items-center justify-start'>

@@ -116,7 +116,6 @@ function Dashboard() {
   return (
     <div className='h-screen overflow-hidden bg-white'>
       <div className='flex h-full'>
-      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
 
         {/* Sidebar */}
         <Sidebar

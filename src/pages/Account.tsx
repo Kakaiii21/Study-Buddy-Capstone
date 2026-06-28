@@ -14,7 +14,6 @@ function Account() {
 
   return (
     <div className='flex h-screen'>
-      <div className='hidden lg:flex bg-gray-600 h-screen w-16'></div>
       <Sidebar />
 
       <div className='flex-1 flex flex-col overflow-hidden'>

@@ -144,7 +144,6 @@ useEffect(() => {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveMenu(null)}>
-      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
       <Sidebar />
       <main className="flex-1 overflow-y-auto p-8 mt-0">
         <div className='min-h-screen flex flex-col'>

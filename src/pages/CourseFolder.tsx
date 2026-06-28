@@ -339,7 +339,6 @@ const handleFiles = async (incoming: FileList | null) => {
 
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
-      <div className='hidden lg:flex xl:flex 2xl:flex bg-gray-600 h-screen w-16'></div>
 
       <div className='hidden lg:block md:block'>
         <Sidebar uploading={uploading} />
