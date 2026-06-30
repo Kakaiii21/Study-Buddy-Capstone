@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Signup from './components/Signup'
 import Login from './components/Login'
 import { useInstallPWA } from './hooks/useInstallPWA'
@@ -9,7 +10,20 @@ function App() {
   const [activeForm, setActiveForm] = useState<'signup' | 'login'>('signup')
 
   const signupRef = useRef<HTMLDivElement>(null)
-
+  const aboutRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const [showPoliciesMenu, setShowPoliciesMenu] = useState(false)
+  const policiesRef = useRef<HTMLDivElement>(null)
+useEffect(() => {
+  if (!showPoliciesMenu) return
+  function handleOutsideClick(e: MouseEvent) {
+    if (policiesRef.current && !policiesRef.current.contains(e.target as Node)) {
+      setShowPoliciesMenu(false)
+    }
+  }
+  document.addEventListener('mousedown', handleOutsideClick)
+  return () => document.removeEventListener('mousedown', handleOutsideClick)
+}, [showPoliciesMenu])
 
   const { isInstallable, installApp, isMacSafari} = useInstallPWA();
   const [showIOSModal, setShowIOSModal] = useState(false);
@@ -30,11 +44,30 @@ function App() {
         lg:mr-20
         xl:mr-20
         2xl:mr-20">
-          <button className='hidden md:flex lg:flex xl:flex 2xl:flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg px-4 uppercase
-          hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full'>
-            Policies
-          </button>
-          <button className='hidden md:flex lg:flex xl:flex 2xl:flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase
+          <div ref={policiesRef} className='relative hidden md:block lg:block xl:block 2xl:block'>
+            <button
+              onClick={() => setShowPoliciesMenu(prev => !prev)}
+              className='flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg px-4 uppercase
+              hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full'>
+              Policies
+            </button>
+            {showPoliciesMenu && (
+              <div className='absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-48 py-1'>
+                <button
+                  onClick={() => { navigate('/terms'); setShowPoliciesMenu(false) }}
+                  className='block w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'>
+                  Terms of Service
+                </button>
+                <button
+                  onClick={() => { navigate('/privacy'); setShowPoliciesMenu(false) }}
+                  className='block w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'>
+                  Privacy Policy
+                </button>
+              </div>
+            )}
+          </div>
+          <button onClick={() => aboutRef.current?.scrollIntoView({behavior:'smooth'})} 
+          className='hidden md:flex lg:flex xl:flex 2xl:flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase
           hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full px-4'>
             About Us
           </button>
@@ -347,7 +380,7 @@ function App() {
       </div>
     )}
  {/*Developers Section*/}
-<section className="py-10 w-full flex flex-col justify-center">
+<section ref={aboutRef} className="py-10 w-full flex flex-col justify-center">
     <div className='flex flex-col mt-10 gap-2 justify-center items-center'>
     <h1 className='text-primary-600 px-4 text-center md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] w-full font-inter font-extrabold'>Developers</h1>
     <p className='text-primary-600 font-inter px-4 text-center md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
@@ -447,21 +480,27 @@ function App() {
     <div className='flex flex-row justify-center gap-6 md:gap-8 lg:gap-16'>
 
       <div className='flex flex-col items-start gap-3'>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>policies</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Terms & Conditions</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Privacy Policy</button>
+        <p className=' text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>policies</p>
+        <button onClick={()=> navigate('/terms')}
+        className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Terms of Services</button>
+        <button onClick={() => navigate('/privacy')}
+         className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Privacy Policy</button>
       </div>
 
       <div className='flex flex-col items-start gap-3'>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>DOWNLOAD</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>iOS & Android</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Mac & Windows</button>
+        <p className='text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>DOWNLOAD</p>
+        <button onClick={() => downloadRef.current?.scrollIntoView({behavior: 'smooth'})}
+        className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>iOS & Android</button>
+        <button  onClick={()=> downloadRef.current?.scrollIntoView({behavior: 'smooth'})}
+        className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Mac & Windows</button>
       </div>
 
       <div className='flex flex-col items-start gap-3'>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>About us</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Developers</button>
-        <button className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Contact Us</button>
+        <p className='text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>About us</p>
+        <button onClick={() => aboutRef.current?.scrollIntoView({behavior: 'smooth'})}
+         className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Developers</button>
+        <button onClick={() => aboutRef.current?.scrollIntoView({behavior: 'smooth'})}
+         className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Contact Us</button>
       </div>
 
     </div>
