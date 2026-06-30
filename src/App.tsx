@@ -19,7 +19,7 @@ function App() {
 
   return (
   <>
-    <section className="h-auto xl:h-screen w-screen">
+    <section className="h-auto xl:h-screen w-full">
       <nav className=" px-2 md:px-6 lg:px-6 xl:px-6 2xl:px-6 py-2 flex items-center justify-between mt-3 md:mt-3 lg:mt-0 xl:mt-0 2xl:mt-0 ">
         {/* LOGO */}
         <img src="./logo.png" alt="logo" className="pl-2 h-10 md:pl-5 md:h-16 lg:pl-5 lg:h-16 xl:pl-5 xl:h-16 2xl:pl-5 2xl:h-16 w-auto" />
@@ -120,9 +120,11 @@ function App() {
       </div>
     </section>
     {/*First*/}
-      <section className='w-screen mt-4 md:mt-10'>
+      <hr className='lg:hidden md:hidden mt-4  w-full border-t opacity-5 border-primary-600 ' />
+
+      <section className='w-full mt-4 md:mt-10'>
         <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
-          <p className='flex flex-wrap justify-center items-center gap-x-1 font-fustat text-primary-600 text-xs md:text-lg 2xl:text-2xl mb-10 px-4 text-center'>
+          <p className='flex flex-wrap justify-center items-center gap-x-1 font-fustat text-primary-600 text-sm md:text-lg 2xl:text-2xl mb-10 px-4 text-center'>
             <span>Your all-in-one study companion &mdash;</span>
             <b>plan, organize,</b>
             <span>and</span>
@@ -228,9 +230,9 @@ function App() {
       </div>
 
       </section>
-    <section ref={signupRef} className="h-auto bg-primary-600">
+    <section ref={signupRef} className="w-full h-auto bg-primary-600">
       {activeForm === 'signup'
-        ? <Signup onSwitchToLogin={() => setActiveForm('login')} />
+        ? <Signup onSwitchToLogin={() => setActiveForm('login')}  />
         : <Login onSwitchToSignup={() => setActiveForm('signup')} />
       }
     </section>

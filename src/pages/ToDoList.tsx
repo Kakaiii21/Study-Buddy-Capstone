@@ -373,6 +373,7 @@ function TaskCard({
         w-full select-none relative
         ${getCardStyle(task, nowISO)}
         ${isDragging ? 'cursor-grabbing' : ''}
+        ${showMenu ? 'z-30' : 'z-0'}
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
