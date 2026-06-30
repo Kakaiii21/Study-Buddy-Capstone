@@ -203,17 +203,18 @@ const handleSave = () => {
         rounded-2xl
         backdrop-blur-xl
       bg-white/5
+      
       border border-white/10
         hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
         transition-all duration-300
         self-start w-full'>
-        <p className='text-white text-center text-3xl uppercase mt-4 font-fustat'>{day}</p>
+        <p className='text-white text-center text-[25px] md:text-3xl lg:text-[29px] xl:text-[30px] 2xl:text-3xl uppercase mt-4 font-fustat'>{day}</p>
         <div className='space-y-2 pb-5'>
           {daySchedules.length > 0 ? (
             daySchedules.map((s) => (
-              <div key={s.id} className='bg-white mt-2 p-4 mx-4 mb-1 rounded-md relative'>
+              <div key={s.id} className='bg-white  mt-2 p-4 mx-4 mb-1 rounded-md relative'>
                 <div className='flex flex-row'>
-                  <p className='text-[20px] font-roboto font-bold text-primary-600'>{s.subject}</p>
+                  <p className=' text-[18px] md:text-[20px] lg:text-[21px] xl:text-[22px] 2xl:text-[23px] font-roboto font-bold text-primary-600'>{s.subject}</p>
 
                   <div data-note-menu className='relative ml-auto '>
                     <button
@@ -250,14 +251,14 @@ const handleSave = () => {
                   </div>
                 </div>
 
-                <p className='text-[18px] font-roboto text-primary-600'>
+                <p className='text-[16px] md:text-[16px] lg:text-[16px] xl:text-[18px] 2xl:text-[20px] font-roboto text-primary-600'>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
-                <p className='text-sm text-gray-600'>{s.instructor}</p>
+                <p className='text-sm   text-gray-600'>{s.instructor}</p>
               </div>
             ))
           ) : (
-            <p className='text-white text-center mt-4 lg:mt-10 mb-5 lg:mb-0 font-fustat'>No scheduled class here.</p>
+            <p className='text-white  text-center mt-4 lg:mt-10 mb-5 lg:mb-0 font-fustat'>No scheduled class here.</p>
           )}
         </div>
       </div>
@@ -391,7 +392,7 @@ const handleSave = () => {
               Loading schedules...
             </div>
           ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full items-start'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6 w-full  items-start'>
               {days.map((day) => <DayCard key={day} day={day} />)}
             </div>
           )}
