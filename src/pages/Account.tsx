@@ -1,15 +1,25 @@
 import Sidebar from '../components/Sidebar'
 import BasicInfo from '../components/BasicInfo'
-import { useState } from 'react'
+import { useState ,useEffect , useRef} from 'react'
 import Terms from '../terms'
 import Privacy from '../privacy'
 import ChangeEmail from './ChangeEmail' 
 import ChangePassword from './ChangePassword'
+import { Player, } from '@lordicon/react'
 
 
 
 function Account() {
   const [activeTab, setActiveTab] = useState('basicinfo')
+  const playerRef = useRef<Player>(null);
+  const [iconData, setIconData] = useState<object | null>(null);
+
+
+  useEffect(() => {
+    fetch('/assets/icons/profile.json')
+      .then(res => res.json())
+      .then(setIconData);
+  }, []);
 
 
   return (
@@ -31,10 +41,30 @@ function Account() {
 
   <nav className='flex flex-col'>
     <button
+      onMouseEnter={() => {
+      playerRef.current?.playFromBeginning();
+      }}
       onClick={() => setActiveTab('basicinfo')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
-        <img src='/basicInfo.png' alt='Profleicon' className='w-8 h-8 xl:w-10 xl:h-10 2xl:w-11 2xl:h-11 object-cover' />
+      <div className='flex md:hidden'>
+        {iconData && (
+          <Player
+            ref={playerRef}
+            icon={iconData}
+            size={30}
+          />
+        )}
+      </div>
+      <div className='flex md:flex lg:flex xl:flex 2xl:flex'>
+        {iconData && (
+          <Player
+            ref={playerRef}
+            icon={iconData}
+            size={45}
+          />
+        )}
+      </div>
         <span className='font-inter text-base xl:text-lg 2xl:text-xl font-medium text-primary-600'>Basic Info</span>
       </div>
       <img src="./arrowA.png" alt="nextArrow" className='w-2 xl:w-2.5 2xl:w-3' />

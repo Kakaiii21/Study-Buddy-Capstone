@@ -29,6 +29,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const elapsedRef  = useRef(0)
 
   useEffect(() => {
+    if (typeof Notification === 'undefined') return
     if (Notification.permission === 'default') {
       Notification.requestPermission()
     }
@@ -60,7 +61,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
             icon: '/timer.png',
           })
         })
-      } else if (Notification.permission === 'granted') {
+      } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         new Notification('Study Timer ⏰', {
           body: "Time's up! Great study session! 🎉",
           icon: '/timer.png',

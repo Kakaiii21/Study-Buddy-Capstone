@@ -29,6 +29,11 @@ useEffect(() => {
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [showMacModal, setShowMacModal] = useState(false);
 
+  
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
+  const isAndroid = /Android/.test(navigator.userAgent)
+  const isWindows = /Win/.test(navigator.platform || navigator.userAgent)
+  const isMac = /Mac/.test(navigator.platform || navigator.userAgent) && !isIOS
   const downloadRef = useRef<HTMLElement>(null)
 
   return (
@@ -229,7 +234,7 @@ useEffect(() => {
       </div>
 
       {/*Third*/}
-      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
+      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-32'>
         <div className='flex flex-row gap-x-4 justify-start items-center mb-6'>
           <img src="./assets/courses.gif" alt="coursesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
@@ -279,10 +284,10 @@ useEffect(() => {
     <div className='grid grid-cols-2 md:flex md:flex-row gap-5 2xl:gap-x-8 mt-10 px-6'>
 
       {/* Android */}
-      <button
-        className={`flex flex-col justify-start items-center group ${!isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
-        onClick={isInstallable ? installApp : undefined}
-      >
+        <button
+          className={`flex flex-col justify-start items-center group ${!(isAndroid && isInstallable) ? 'opacity-40 cursor-not-allowed' : ''}`}
+          onClick={isAndroid && isInstallable ? installApp : undefined}
+        >
         <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
             <img src="./android.png" alt="android icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-8 group-hover:hidden' />
@@ -295,10 +300,10 @@ useEffect(() => {
       </button>
 
       {/* iOS */}
-      <button
-        className='flex flex-col justify-start items-center group'
-        onClick={() => setShowIOSModal(true)}
-      >
+          <button
+            className={`flex flex-col justify-start items-center group ${!isIOS ? 'opacity-40 cursor-not-allowed' : ''}`}
+            onClick={() => isIOS && setShowIOSModal(true)}
+          >
         <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
             <img src="./iphone.png" alt="iphone icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-5 group-hover:hidden' />
@@ -311,10 +316,10 @@ useEffect(() => {
       </button>
 
       {/* Windows */}
-      <button
-        className={`flex flex-col justify-start items-center group ${!isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
-        onClick={isInstallable ? installApp : undefined}
-      >
+        <button
+          className={`flex flex-col justify-start items-center group ${!(isWindows && isInstallable) ? 'opacity-40 cursor-not-allowed' : ''}`}
+          onClick={isWindows && isInstallable ? installApp : undefined}
+        >
         <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
             <img src="./windows.png" alt="windows icon" className='w-14 md:w-20 mb-5 group-hover:hidden' />
@@ -327,11 +332,11 @@ useEffect(() => {
       </button>
 
       {/* Mac */}
-      <button
-        className={`flex flex-col justify-start items-center group ${!isMacSafari && !isInstallable ? 'opacity-40 cursor-not-allowed' : ''}`}
-        onClick={isMacSafari ? () => setShowMacModal(true) : isInstallable ? installApp : undefined}
-      >
-        <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
+          <button
+            className={`flex flex-col justify-start items-center group ${!isMac ? 'opacity-40 cursor-not-allowed' : ''}`}
+            onClick={isMacSafari ? () => setShowMacModal(true) : (isMac && isInstallable) ? installApp : undefined}
+          >
+          <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
             <img src="./mac.png" alt="mac icon" className='w-16 md:w-24 mb-5 group-hover:hidden' />
             <img src="./macH.png" alt="mac icon hover" className='w-16 md:w-24 mb-5 hidden group-hover:block' />
@@ -501,6 +506,9 @@ useEffect(() => {
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Developers</button>
         <button onClick={() => aboutRef.current?.scrollIntoView({behavior: 'smooth'})}
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Contact Us</button>
+         <a href="https://lordicon.com/" className="text-xs text-gray-400 hover:underline">
+          Icons by Lordicon.com
+        </a>
       </div>
 
     </div>

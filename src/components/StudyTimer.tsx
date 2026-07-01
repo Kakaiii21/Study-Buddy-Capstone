@@ -63,7 +63,7 @@ const completedPercent = useMemo(() => {
 
 
   return (
-<div className='flex flex-col min-h-screen w-full bg-primary-600 p-4 lg:p-3 py-6 gap-24 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
+<div className='flex flex-col min-h-screen w-full bg-primary-600 p-4 lg:p-3 py-6 gap-14 md:gap-16 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
 
     <p  className='font-roboto font-light text-center  text-white tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-10 lg:text-2xl 2xl:text-4xl uppercase'>
         Study Timer
@@ -80,11 +80,11 @@ const completedPercent = useMemo(() => {
         ].map((item, i) => (
           <div key={i} className='flex items-end gap-2'>
             <div className='flex flex-col items-center'>
-              <span className='font-orbitron  text-white text-4xl lg:text-4xl 2xl:text-5xl'>{item.val}</span>
+              <span className='font-orbitron  text-white text-3xl md:text-3xl lg:text-4xl 2xl:text-[40px]'>{item.val}</span>
               <span className='text-lg font-roboto font-medium text-white tracking-widest'>{item.label}</span>
             </div>
             {i < 2 && (
-              <span className='font-orbitron font-bold text-white text-3xl mb-4'>:</span>
+              <span className='font-orbitron font-bold text-white md:text-3xl text-3xl mb-4'>:</span>
             )}
           </div>
         ))}
@@ -123,13 +123,19 @@ const completedPercent = useMemo(() => {
       <p className='text-xs lg:text-lg xl:text-xl 2xl:text-2xl font-light font-roboto  text-white tracking-widest uppercase text-center mb-3'>
        Task Progress
       </p>
-      <div className='relative flex items-center justify-center w-52 h-52'>
+      <div className='relative flex items-center justify-center 
+      w-44 h-44
+      md:w-48 md:h-48
+      lg:w-52 lg:h-52
+      xl:w-52 xl:h-52
+      2xl:w-52 2xl:h-52
+      '>
         
         <svg className='w-full h-full -rotate-90' viewBox='0 0 36 36'>
-          <circle cx='18' cy='18' r='14.90' fill='none' stroke='#e2e8f0' strokeWidth='5' />
+          <circle cx='18' cy='18' r='14' fill='none' stroke='#e2e8f0' strokeWidth='4'   />
           <circle
-            cx='18' cy='18' r='14.90'
-            fill='none' stroke='currentColor' strokeWidth='5' strokeLinecap='butt'
+            cx='18' cy='18' r='14'
+            fill='none' stroke='currentColor' strokeWidth='4'   strokeLinecap='butt'
             className='text-gray-500'
             strokeDasharray='100'
             strokeDashoffset={100 - completedPercent}

@@ -10,8 +10,23 @@ import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
+import { Player } from '@lordicon/react';
+
 
 function Dashboard() {
+  const playerRef = useRef<Player>(null);
+  const [iconData, setIconData] = useState<object | null>(null);
+
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    fetch('/assets/icons/history-document.json')
+      .then(res => res.json())
+      .then(setIconData);
+  }, []);
+
+
   const [showTimer, setShowTimer] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)  
@@ -156,16 +171,16 @@ function Dashboard() {
                     2xl:shadow-[0_4px_5px_rgba(0,0,0,.32)]'>
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>
-                    <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-5xl font-bold leading-none'>
+                    <h1 className='font-roboto text-white text-xl md:text-5xl lg:text-[30px] xl:text-5xl 2xl:text-5xl font-bold leading-none'>
                       Welcome, {firstName ?? ''}
                     </h1>
-                    <p className='font-roboto text-white text-sm md:text-xl lg:text-[20px] 2xl:text-[18px]  -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
+                    <p className='font-roboto text-white text-sm md:text-xl lg:text-[16px] 2xl:text-[18px]  -mt-2 md:-mt-3 2xl:pb-3 lg:-mt-4'>
                       Start your day by being productive.
                     </p>
 
                   </div>
                   <img
-                    className='h-28 w-28 lg:h-32 lg:w-32 2xl:h-36 2xl:w-36 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
+                    className='h-28 w-28 lg:h-24 lg:w-24 2xl:h-36 2xl:w-36 md:h-32 md:w-32 rounded-full object-cover border-2 border-white bg-white'
                     src={profilePic}
                     alt="Profile"
                   />
@@ -192,20 +207,15 @@ function Dashboard() {
 
                   {/* Current Time Spent */}
                   <div id='currentTime'           
-                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px]  2xl:min-w-[280px] 
-                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
-                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[180px] xl:min-w-[250px]  2xl:min-w-[280px] 
                     lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3
                     '>
                     <img src="/currentTime.png" alt="Timer"
-                      className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
+                      className='h-10 w-10 md:h-12 md:w-12 lg:h-[50px] lg:w-[40px] xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
                     <div className='flex flex-col'>
-                      <p className='text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Time Spent</p>
-                      <p className='text-xs md:text-base lg:text-lg xl:text-xl 2xl:text-2xl font-orbitron text-center text-primary-600'>
+                      <p className='text-[10px] md:text-xs lg:text-[12px] xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Time Spent</p>
+                      <p className='text-xs md:text-base lg:text-[16px] xl:text-xl 2xl:text-2xl font-orbitron text-center text-primary-600'>
                         {formatElapsed(elapsedSeconds)}
                       </p>
                     </div>
@@ -213,38 +223,62 @@ function Dashboard() {
 
                   {/* Current Score */}
                   <div id='currentScore'          
-                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[200px] xl:min-w-[250px] 2xl:min-w-[280px]
-                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
-                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                    className='w-[calc(50%-6px)] sm:flex-1 min-w-0 lg:min-w-[180px] xl:min-w-[250px] 2xl:min-w-[280px]
+                  lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex items-center justify-center gap-3'>
                     <img src="/currentScore.png" alt="Score"
-                      className='h-10 w-10 md:h-12 md:w-12 lg:h-16 lg:w-16 xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
+                      className='h-10 w-10 md:h-12 md:w-12 lg:h-[50px] lg:w-[50px] xl:h-20 xl:w-20 2xl:h-24 2xl:w-24 flex-shrink-0' />
                     <div className='flex flex-col'>
-                      <p className='text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Score</p>
-                      <p className='text-sm md:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl font-bold text-center text-primary-600'>
+                      <p className='text-[10px] md:text-xs lg:text-[12px] xl:text-base 2xl:text-lg font-semibold text-center text-primary-600'>Current Score</p>
+                      <p className='text-sm md:text-2xl lg:text-[20px] xl:text-3xl 2xl:text-3xl font-bold text-center text-primary-600'>
                         {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total}` : '00/00'}
                       </p>
                     </div>
                   </div>
 
                   {/* Generated History */}
+
                   <button
+                    onMouseEnter={() => {
+                      playerRef.current?.playFromBeginning();
+                      setIsHovered(true);
+                    }}
+                    onMouseLeave={() => setIsHovered(false)}
                     id='genHistory'               
                     onClick={() => navigate('/history')}
-                    className='w-full sm:flex-1 min-w-0 lg:min-w-[140px] xl:min-w-[170px] 2xl:min-w-[180px] 2xl:max-w-[200px]
-                    shadow-[0_1px_1px_rgba(0,0,0,0.2)]
-                    md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                    2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                    className='w-full sm:flex-1 min-w-0 lg:min-w-[100px] xl:min-w-[170px] 2xl:min-w-[180px] 2xl:max-w-[200px]
+                    hover:shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                    hover:md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    hover:lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    hover:xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    hover:2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]                    
+                    lg:h-[120px] xl:h-[140px] 2xl:h-[160px]
+                    hover:bg-primary-600
+                    group
                     p-3 lg:p-4 xl:p-5 border-2 border-primary-600 rounded-xl flex
-                    flex-row sm:flex-col items-center justify-center gap-2 hover:bg-primary-50'
+                    flex-row sm:flex-col items-center justify-center gap-2 '
                   >
-                    <img src="/genHistory.png" alt="history" className='w-6 h-6 md:w-6 md:h-6 lg:w-10 lg:h-10 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14' />
-                    <span className='text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg font-bold text-primary-600 text-center'>
+                    <div className='flex md:hidden'>
+                    {iconData && (
+                      <Player
+                        ref={playerRef}
+                        icon={iconData}
+                        size={30}
+                        colorize={isHovered ? '#FFFFFF' : undefined}
+                      />
+                    )}
+                    </div>
+                    <div className='hidden md:flex'>
+                    {iconData && (
+                      <Player
+                        ref={playerRef}
+                        icon={iconData}
+                        size={50}
+                        colorize={isHovered ? '#FFFFFF' : undefined}
+                      />
+                    )}
+                    </div>
+                    <span className='text-xs md:text-sm lg:text-sm xl:text-base group-hover:text-white 2xl:text-lg font-bold text-primary-600 text-center'>
                       Generated History
                     </span>
                   </button>
@@ -263,7 +297,7 @@ function Dashboard() {
               </div>
 
               {/* Activities Grid */}
-              <div className='flex justify-center pb-8 px-4'>
+              <div className='flex justify-center pb-8 px-0'>
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-14'>
                   {activities.map((activity) => (
                   <button
@@ -271,25 +305,25 @@ function Dashboard() {
                     onClick={() => navigate(activity.path)}
                     className='group flex flex-col items-center justify-center 
                       md:gap-2
-                      lg:gap-2 lg:w-44
-                      shadow-[0_1px_1px_rgba(0,0,0,0.2)]
-                      md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                      lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                      xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                      2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      lg:gap-2 lg:w-[150px]
+                      hover:shadow-[0_1px_1px_rgba(0,0,0,0.2)]
+                      hover:md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      hover:lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      hover:xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                      hover:2xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
                       xl:w-48
-                      2xl:w-64 2xl:h-48
+                      2xl:w-[220px] 2xl:h-[155px]
                       border-2 border-primary-600 rounded-xl overflow-hidden
                       hover:border-primary-600'
                   >
                     <img
                       src={activity.icon}
                       alt={activity.label}
-                      className='w-full rounded-lg h-16 md:h-20 lg:h-24 xl:h-24 2xl:h-32 object-cover'
+                      className='w-full rounded-lg h-16 md:h-20 lg:h-20 xl:h-24 2xl:h-28 object-cover'
                     />
                     <div className='w-full group-hover:bg-primary-600  pb-3'>
                       <div className='border w-full border-primary-600 ' />
-                      <span className='block text-xs  md:text-[14px] lg:text-[14px] xl:text-[16px] 2xl:text-xl pt-2 lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
+                      <span className='block text-xs  md:text-[14px] lg:text-[13px] xl:text-[16px] 2xl:text-xl pt-2 lg:pt-2 xl:pt-2 2xl:pt-3 font-roboto font-bold text-primary-600 group-hover:text-white tracking-widest uppercase text-center'>
                         {activity.label}
                       </span>
                     </div>
