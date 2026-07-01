@@ -396,19 +396,43 @@ useEffect(() => {
       {/*Programmer & Project Manager*/}
       <div className='flex flex-col md:flex-row justify-between items-center w-full gap-8 md:gap-0'>
         <div className='flex flex-row gap-5'>
-          <img src="./profile.png" alt="Programmer" className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0'/>
+          <img src="./profile.png" alt="Programmer"   className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0 select-none'
+            onContextMenu={(e) => e.preventDefault()}
+            draggable={false}/>
           <div className='flex flex-col justify-center items-start'>
             <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>Programmer</p>
             <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Casey P. Dellamas</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>dellamascasey@gmail.com</p>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=dellamascasey@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              title='Email Programmer'
+              className='flex flex-row hover:underline  mt-1 justify-center items-center gap-5'
+            >
+
+              <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>
+              dellamascasey@gmail.com
+              </p>
+            </a>
           </div>
         </div>
         <div className='flex flex-row gap-5'>
-          <img src="./profile.png" alt="Project Manager" className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0'/>
+          <img src="./profile.png" alt="Project Manager"   className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0 select-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}/>
           <div className='flex flex-col justify-center items-start'>
             <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>Project Manager</p>
             <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Eunice Jayce F. De Vero</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>eunicejayce03@gmail.com</p>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=eunicedevero@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              title='Email Project Manager'
+              className='flex flex-row hover:underline  mt-1 justify-center items-center gap-5'
+            >
+
+              <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>
+              eunicedevero@gmail.com
+              </p>
+            </a>
           </div>
         </div>
       </div>
@@ -416,19 +440,43 @@ useEffect(() => {
       {/*QA Tester & UI Designer*/}
       <div className='flex flex-col md:flex-row justify-between items-center md:items-end lg:items-end 2xl:items-end w-full gap-8 md:gap-0'>
         <div className='flex flex-row gap-5'>
-          <img src="./profile.png" alt="QA Tester" className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0'/>
+          <img src="./QATester.jpg" alt="QA Tester"   className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0 select-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}/>
           <div className='flex flex-col justify-center items-start'>
             <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>QA Tester</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Casey P. Dellamas</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>dellamascasey@gmail.com</p>
+            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Joshua L. Mejia</p>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=joshuamejia2266@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              title='Email QA Tester'
+              className='flex flex-row hover:underline  mt-1 justify-center items-center gap-5'
+            >
+
+              <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>
+              joshuamejia2266@gmail.com
+              </p>
+            </a>
           </div>
         </div>
         <div className='flex flex-row gap-5'>
-          <img src="./profile.png" alt="UI Designer" className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0'/>
+          <img src="./UIDesigner.jpg" alt="UI Designer"   className='w-16 md:w-24 lg:w-20 2xl:w-28 border border-primary-600 rounded-full shrink-0 select-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}/>
           <div className='flex flex-col justify-center items-start'>
             <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>UI Designer</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Eunice Jayce F. De Vero</p>
-            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>eunicejayce03@gmail.com</p>
+            <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Jerwin L. Zamorao</p>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=zamorajerwin0@gmail.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              title='Email UI Designer'
+              className='flex flex-row hover:underline   mt-1 justify-center items-center gap-5'
+            >
+
+              <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>
+              zamorajerwin0@gmail.com
+              </p>
+            </a>
           </div>
         </div>
       </div>
@@ -445,24 +493,44 @@ useEffect(() => {
       Have questions about StudyBuddy? We'd love to hear from you — reach us at:
     </p>
     <div className='flex flex-col md:flex-row w-full justify-center items-center gap-8 md:gap-10 lg:gap-20 2xl:gap-52'>
-      {/*MAIL*/}
-      <div className='flex flex-row justify-center items-center gap-5'>
-        <div className='bg-primary-600 rounded-full border border-primary-600 w-14 h-14 md:w-14 md:h-14
-        lg:w-14 lg:h-14
-        xl:w-16 xl:h-16
-        2xl:w-18 2xl:h-18
-        items-center justify-center flex shrink-0'>
-          <img src="./mail.png" alt="mail icon" className='w-8 h-8 md:w-10 md:h-10
-          lg:w-8 lg:h-8
-          xl:w-10 xl:h-10
-          2xl:w-12 2xl:h-12' />
-        </div>
-        <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
+    {/*MAIL*/}
+
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@studybuddyph.site"
+      target="_blank"
+      rel="noopener noreferrer"
+      className='flex flex-row justify-center hover:underline items-center gap-5'
+    >
+      <div className='bg-primary-600 rounded-full border border-primary-600 w-14 h-14 md:w-14 md:h-14
+      lg:w-14 lg:h-14
+      xl:w-16 xl:h-16
+      2xl:w-18 2xl:h-18
+      items-center justify-center flex shrink-0'>
+        <img src="./mail.png" alt="mail icon" className='w-8 h-8 md:w-10 md:h-10
+        lg:w-8 lg:h-8
+        xl:w-10 xl:h-10
+        2xl:w-12 2xl:h-12' />
       </div>
+      <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>
+        support@studybuddyph.site
+      </p>
+    </a>
       {/*Facebook*/}
       <div className='flex flex-row justify-center items-center gap-5'>
-        <img src="./fb.png" alt="" className='w-[55px] h-[55px] md:w-[55px] md:h-[55px] lg:w-[55px] lg:h-[55px] xl:w-[65px] xl:h-[65px] 2xl:w-[65px] 2xl:h-[65px]' />
-        <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>support@studybuddyph.site</p>
+        
+        <a   href="https://www.facebook.com/profile.php?id=61591712304009"
+        target="_blank"
+        rel="noopener noreferrer"
+        className='flex flex-row hover:underline justify-center items-center gap-5'
+      >
+        <img
+          src="./fb.png"
+          alt="Facebook"
+          className='w-[55px] h-[55px] md:w-[55px] md:h-[55px] lg:w-[55px] lg:h-[55px] xl:w-[65px] xl:h-[65px] 2xl:w-[65px] 2xl:h-[65px]'
+        />
+        <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>
+          support@studybuddyph.site
+        </p>
+      </a>
       </div>
     </div>
   </div>
