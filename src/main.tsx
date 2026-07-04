@@ -30,6 +30,7 @@ import ChangeEmail from './pages/ChangeEmail'
 import { setInstallPrompt } from './utils/pwaPrompt'
 import PrivacyPolicy from './privacy'
 import TermsOfService from './terms'
+import AuthGate from './components/AuthGate'
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
@@ -40,9 +41,12 @@ registerSW({ immediate: true })
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: (
+      <AuthGate>
+        <App />
+      </AuthGate>
+    ),
   },
-
   {
   path: '/terms',
   element: <TermsOfService />
