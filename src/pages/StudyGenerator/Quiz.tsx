@@ -99,7 +99,6 @@ function Quiz() {
     if (!result?.items || result.items.length === 0) {
           return (
           <div className='flex h-screen'>
-          <div className='flex bg-gray-600 h-screen w-16'></div>
 
             <Sidebar quizActive={!submitted} />
             <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>

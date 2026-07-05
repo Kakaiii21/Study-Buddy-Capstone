@@ -138,7 +138,6 @@ function FlashcardView() {
 
   return (
     <div className='flex h-screen'>
-      <div className='flex bg-gray-600 h-screen w-16'></div>
 
       <Sidebar />
       <main className='flex-1 overflow-auto p-4 md:p-8'>
@@ -172,7 +171,7 @@ function FlashcardView() {
         <div className='flex flex-col lg:mx-20 gap-8 md:mx-10'>
           {cards.map((card, index) => (
             <div key={index} className='flex justify-center'>
-              <div className='perspective flex-1 lg:mx-20 md:mx-10 relative'>
+              <div className='perspective w-full max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl relative'>
 
                 {/* ── Menu Button ── */}
                 <div className='absolute top-3 right-3 z-20'>

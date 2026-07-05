@@ -16,10 +16,16 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
+
+  const [originalFirstName, setOriginalFirstName] = useState('')
+  const [originalLastName, setOriginalLastName] = useState('')
   const [profilePic, setProfilePic] = useState('/profile.png')
   const [saving, setSaving] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+
+  const [firstNameError, setFirstNameError] = useState(false)
+  const [lastNameError, setLastNameError] = useState(false)
 
   const showToast = (message: string) => {
     setToast(message)
@@ -44,9 +50,11 @@ useEffect(() => {
       const data = JSON.parse(cached)
       setFirstName(data.firstName || '')
       setLastName(data.lastName || '')
+      setOriginalFirstName(data.firstName || '')
+      setOriginalLastName(data.lastName || '')
       setProfilePic(data.photoURL || '/profile.png')
       setEmail(data.email || user.email || '')
-      return  // ✅ use cache — no delay
+      return
     }
 
     await user.reload()
@@ -55,6 +63,8 @@ useEffect(() => {
       const data = docSnap.data()
       setFirstName(data.firstName || '')
       setLastName(data.lastName || '')
+      setOriginalFirstName(data.firstName || '')
+      setOriginalLastName(data.lastName || '')
       setProfilePic(data.photoURL || '/profile.png')
       const authEmail = auth.currentUser?.email
       if (data.pendingEmail && authEmail === data.pendingEmail) {
@@ -77,16 +87,25 @@ useEffect(() => {
 
   const handleSave = async (field: 'firstName' | 'lastName') => {
     if (!user) return
+
+    const value = field === 'firstName' ? firstName : lastName
+    const trimmed = value.trim()
+
+    if (!trimmed) {
+      if (field === 'firstName') setFirstNameError(true)
+      else setLastNameError(true)
+      return
+    }
+
     setSaving(field)
     try {
-      const value = field === 'firstName' ? firstName : lastName
-      await updateDoc(doc(db, 'users', user.uid), { [field]: value })
+      await updateDoc(doc(db, 'users', user.uid), { [field]: trimmed })
 
       const cacheKey = `user_${user.uid}`
       const cached = sessionStorage.getItem(cacheKey)
       if (cached) {
-        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
-      } 
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: trimmed }))
+      }
 
       const label = field === 'firstName' ? 'First name' : 'Last name'
       showToast(`${label} updated successfully!`)
@@ -98,6 +117,21 @@ useEffect(() => {
     }
   }
 
+  const handleSaveAll = async () => {
+    const trimmedFirst = firstName.trim()
+    const trimmedLast = lastName.trim()
+
+    setFirstNameError(!trimmedFirst)
+    setLastNameError(!trimmedLast)
+
+    if (!trimmedFirst || !trimmedLast) return
+
+    await handleSave('firstName')
+    await handleSave('lastName')
+
+    setOriginalFirstName(trimmedFirst)
+    setOriginalLastName(trimmedLast)
+  }
   // ─── Upload profile pic via Cloudinary, save URL to Firestore ────────────
     const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
@@ -266,10 +300,13 @@ return (
         <input
           type="text"
           value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          onChange={(e) => { setFirstName(e.target.value); setFirstNameError(false) }}
           placeholder='First name'
-          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base'
+          className={`border rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
         />
+        {firstNameError && (
+          <span className='text-red-500 text-xs font-inter'>First name is required</span>
+        )}
       </div>
 
       {/* Last Name */}
@@ -278,10 +315,13 @@ return (
         <input
           type="text"
           value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          onChange={(e) => { setLastName(e.target.value); setLastNameError(false) }}
           placeholder='Last name'
-          className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base'
+          className={`border rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
         />
+        {lastNameError && (
+          <span className='text-red-500 text-xs font-inter'>Last name is required</span>
+        )}
       </div>
 
 {/* Email */}
@@ -310,8 +350,13 @@ return (
       {/* Save Changes */}
       <div className='flex justify-center'>
         <button
-          onClick={() => { handleSave('firstName'); handleSave('lastName') }}
-          disabled={saving !== null}
+          onClick={handleSaveAll}
+          disabled={
+            saving !== null ||
+            !firstName.trim() ||
+            !lastName.trim() ||
+            (firstName.trim() === originalFirstName.trim() && lastName.trim() === originalLastName.trim())
+          }
           className='w-full md:w-[400px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-3  xl:py-3 2xl:py-3
           disabled:opacity-50
           shadow-[0_2px_1px_rgba(0,0,0,0.35)]
