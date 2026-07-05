@@ -6,6 +6,7 @@ import { useCourses } from '../hooks/useCourses'
 import { useCourseFiles } from '../hooks/useCourseFiles'
 import type { User } from 'firebase/auth'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
+import { useTour } from '../hooks/useTour'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -373,7 +374,15 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
       : ['ppt', 'pptx'].includes(uploadedFile.type) ? '/pptIcon.png'
       : '/txtIcon.png'
     : ''
-
+const { startTour } = useTour(
+  'studygenerator',
+  true,
+  () => {},
+  () => {},
+  () => {},
+  () => {},
+  user
+)
   return (
     <div className='flex h-screen'>
       <Sidebar />
@@ -422,6 +431,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                 <div className='flex flex-col gap-3 justify-start items-center border-2 md:border-4  border-primary-600 rounded-xl md:rounded-3xl px-7 py-4 md:px-12 md:py-8 '>
                   <img className='w-16 h-16 md:w-32 md:h-32  lg:w-32' src='Localbtn.png' alt='localbtnicon' />
                   <button
+                   id='localFilesBtn'
                     onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
                     disabled={isGenerating || !isOnline}
                     className='bg-primary-600 w-24  md:w-44 text-xs text-white rounded-md md:text-xl lg:text-sm font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
@@ -435,6 +445,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                 <div className='flex flex-col gap-3 justify-start items-center border-2 md:border-4  border-primary-600 rounded-xl md:rounded-3xl px-7 py-4 md:px-12 md:py-8 '>
                   <img className='w-16 h-16 md:w-32 md:h-32  lg:w-32 ' src='Coursesbtn.png' alt='coursesbtnicon' />
                   <button
+                  id='courseFilesBtn'
                     onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
                     disabled={coursesLoading || isGenerating || !isOnline}
                     className='bg-primary-600 w-24  md:w-44 text-xs text-white rounded-md md:text-xl lg:text-sm font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
@@ -501,6 +512,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
               <div className='mt-8 flex flex-col justify-start items-center min-w-full'>
                 <div className='flex flex-row gap-2 lg:gap-8 md:gap-14'>
                   <button
+                  id='quizTabBtn'
                     className={`border-primary-600 border-2 font-roboto font-bold min-w-44 py-2 rounded-md uppercase transition
                       ${activeTab === 'quiz' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
                     onClick={() => setActiveTab('quiz')}
@@ -509,6 +521,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                     Quiz
                   </button>
                   <button
+                  id='flashcardTabBtn'
                     className={`border-2 border-primary-600 font-roboto font-bold min-w-44 py-2 rounded-md uppercase transition
                       ${activeTab === 'flashcard' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
                     onClick={() => setActiveTab('flashcard')}
@@ -520,6 +533,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
 
                 <div className='mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
                   <select
+                  id='itemsSelect'
                     className='w-52 border-2 border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center py-3 px-2'
                     aria-label='Select Number of Items'
                     value={selectItems}
@@ -543,6 +557,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                   </select>
 
                   <button
+                  id='randomItemsBtn'
                     className='sm:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md px-4 py-3'
                     onClick={() => {
                       setSelectItems(items[Math.floor(Math.random() * items.length)])
@@ -556,6 +571,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
                 </div>
 
                 <button
+                id='generateNowBtn'
                   className={`mt-8 border font-bold font-roboto uppercase px-5 py-2 rounded-md mb-20 transition
                     ${canGenerate
                       ? 'bg-green-500 text-white hover:bg-green-400 cursor-pointer'
@@ -573,6 +589,20 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
             )}
           </div>
         </div>
+        <button
+  id='tour-btn'
+  onClick={() => startTour()}
+  className='fixed bottom-6 right-6 z-50
+    flex flex-col items-center gap-1
+    hover:opacity-80 active:scale-95 transition-all
+    lg:bottom-8 lg:right-8'
+  title='Take a Tour'
+>
+  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+  </div>
+  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+</button>
       </main>
 
       {showCoursePicker && (
@@ -584,6 +614,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
           onError={(msg) => { setFileError(msg); setShowCoursePicker(false) }}
         />
       )}
+      
     </div>
   )
 }

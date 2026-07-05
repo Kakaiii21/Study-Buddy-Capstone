@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTour } from '../hooks/useTour'
 import {
   DndContext,
   useDroppable,
@@ -171,6 +172,7 @@ function TaskModal({
   }
 
   const calendarValue = isValidDate(taskDeadline) ? toStorageDateOnly(taskDeadline) : ''
+
 
   return (
     <div
@@ -364,12 +366,14 @@ function TaskCard({
 
   return (
     <div
+    id='taskCard'
       ref={setNodeRef}
       style={style}
       {...attributes}
       className={`
         rounded-xl p-4 mb-3
         hover:shadow-md
+      
         w-full select-none relative
         ${getCardStyle(task, nowISO)}
         ${isDragging ? 'cursor-grabbing' : ''}
@@ -397,6 +401,7 @@ function TaskCard({
 
       <div className="absolute bottom-3 right-3">
         <button
+        id='taskOptionsBtn'
           title='More Options'
           onClick={() => setShowMenu((prev) => !prev)}
           className="text-primary-600 hover:text-primary-800 text-lg"
@@ -535,17 +540,29 @@ function ToDoList() {
 
   useTaskNotifications(tasks)
 
+  const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
+    'todo': false,
+    'in-progress': false,
+    'done': false,
+  })
+
+  const { startTour } = useTour(
+    'todolist',
+    true,
+    () => {},   // no-op
+    () => {},   // no-op
+    () => {},   // no-op — don't need to open the sidebar
+    () => {},   // no-op — don't need to close the sidebar
+    user
+)
+
   const [, forceUpdate] = useState(0)
   useEffect(() => {
     const interval = setInterval(() => forceUpdate(n => n + 1), 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
-  const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
-    'todo': false,
-    'in-progress': false,
-    'done': false,
-  })
+
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -625,6 +642,7 @@ function ToDoList() {
             <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex   text-primary-600 font-roboto">TO DO LIST</p>
             <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
             <button
+            id='newTaskBtn'
               onClick={() => setIsAddModalOpen(true)}
               className="bg-green-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-white font-roboto font-bold mx-10
                text-md py-3 px-9 rounded-md
@@ -662,7 +680,7 @@ function ToDoList() {
           )}
 
           {loading ? (
-            <div className="flex-1 flex items-center justify-center text-primary-400 text-xl mt-10">
+            <div className="flex-1 flex items-center  justify-center text-primary-400 text-xl mt-10">
               Loading your tasks...
             </div>
           ) : (
@@ -673,7 +691,9 @@ function ToDoList() {
               onDragEnd={handleDragEnd}
               autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
-              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-2  rounded-3xl">
+              <div 
+              id='todoColumns'
+              className="w-full  flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-2  rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}
@@ -696,8 +716,22 @@ function ToDoList() {
               </DragOverlay>
             </DndContext>
           )}
-
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='fixed bottom-6 right-6 z-50
+                flex flex-col items-center gap-1
+                hover:opacity-80 active:scale-95 transition-all
+                lg:bottom-8 lg:right-8'
+              title='Take a Tour'
+            >
+              <div className='bg-white  w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              </div>
+              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
         </div>
+
       </main>
     </div>
   )

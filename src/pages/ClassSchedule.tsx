@@ -2,7 +2,7 @@ import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useClassSched } from '../hooks/useClassSched'
-
+import { useTour } from '../hooks/useTour'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
@@ -105,7 +105,15 @@ function ClassSchedule() {
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   const typeRoom = ['Lecture', 'Laboratory']
-
+  const { startTour } = useTour(
+    'classschedule',
+    true,
+    () => {},
+    () => {},
+    () => {},
+    () => {},
+    user
+  )
   const formatTime = (time: string) => {
     if (!time) return ''
     const [hourStr, minute] = time.split(':')
@@ -197,7 +205,8 @@ const handleSave = () => {
   const DayCard = ({ day }: { day: string }) => {
     const daySchedules = byDay(day)
     return (
-      <div className='flex flex-col mt-7 pb-2 bg-primary-600
+      <div id='scheduleGrid'
+      className='flex flex-col mt-7 pb-2 bg-primary-600 
       bg-gradient-to-br from-[#0f1f3a] to-[#0b1730]
         rounded-2xl
 
@@ -216,6 +225,7 @@ const handleSave = () => {
 
                   <div data-note-menu className='relative ml-auto '>
                     <button
+                    id='scheduleOptionsBtn'
                     className='hover:opacity-50'
                       title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
@@ -274,7 +284,25 @@ const handleSave = () => {
             <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
             <hr className='lg:hidden md:hidden w-full border-t mt-3 border-primary-600' />
               <div className='flex flex-row gap-3 lg:gap-10'>
+
                 <button
+                  id='addScheduleBtn'
+                  onClick={() => { resetForm(); setIsAddSubOpen(true) }}
+                  className='bg-primary-600 hover:bg-white font-bold hover:text-primary-600 
+                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
+                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
+                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
+                  text-white uppercase font-roboto text-xs
+                  shadow-[0_4px_8px_rgba(0,0,0,0.35)]
+                  rounded-md backdrop-blur-xs
+                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)]
+                  transition-all duration-300'
+                >
+                  + Add Schedule
+                </button>
+
+                <button
+                  id='clearScheduleBtn'
                   onClick={() => setShowClearModal(true)}
                   className='bg-red-700 text-xs hover:bg-red-500 border border-red-400/30 font-bold hover:text-white 
                   py-2 px-3 mt-2 md:mt-0 lg:mt-0 
@@ -289,20 +317,7 @@ const handleSave = () => {
                   Clear Schedule
                 </button>
 
-                <button
-                  onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-                  className='bg-primary-600 hover:bg-white font-bold hover:text-primary-600 
-                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
-                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
-                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
-                  text-white uppercase font-roboto text-xs
-                  shadow-[0_4px_8px_rgba(0,0,0,0.35)]
-                  rounded-md backdrop-blur-xs
-                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)]
-                  transition-all duration-300'
-                >
-                  + Add Schedule
-                </button>
+
               </div>
           </div>
           <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' />
@@ -410,6 +425,21 @@ const handleSave = () => {
               onCancel={() => setShowClearModal(false)}
             />
           )}
+
+          <button
+            id='tour-btn'
+            onClick={() => startTour()}
+            className='fixed bottom-6 right-6 z-50
+              flex flex-col items-center gap-1
+              hover:opacity-80 active:scale-95 transition-all
+              lg:bottom-8 lg:right-8'
+            title='Take a Tour'
+          >
+            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+            </div>
+            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+          </button>
       </main>
     </div>
   )

@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
-
+import { useTour } from '../hooks/useTour'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
@@ -17,6 +17,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
     setConfirming(true)
     onConfirm()
   }
+  
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
@@ -46,7 +47,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
             className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
           >
             {confirming ? 'Deleting...' : 'Move to Trash'}
-          </button>
+          </button>pendingDelete
         </div>
       </div>
     </div>
@@ -61,6 +62,15 @@ function Notes() {
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
+    const { startTour } = useTour(
+    'notes',
+    true,
+    () => {},
+    () => {},
+    () => {},
+    () => {},
+    user
+  )
   function handleSubjectDelete(subject: string) {
     const affectedNotes = notes.filter((n) => n.subject === subject)
     affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Subject' }))
@@ -269,6 +279,7 @@ function Notes() {
             <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto md:gap-4 md:ml-auto'>
               {/* + Subject Button */}
                 <button
+                id='addSubjectBtn'
                 aria-label='add Sub'
                   onClick={() => setIsSubjectModalOpen(true)}
                   className='flex-shrink-0 flex items-center justify-center h-8 w-8 bg-primary-600 text-white font-bold border rounded-full'
@@ -280,7 +291,9 @@ function Notes() {
                 </button>
 
               {/* Subject Dropdown */}
-              <div className='relative
+              <div
+              id='subjectDropdown'
+              className='relative
               ' ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen((prev) => !prev)}
@@ -327,7 +340,8 @@ function Notes() {
               </div>
 
               {/* Search Bar */}
-              <div className='relative'>
+              <div id='notesSearchBar'
+               className='relative'>
                 <input
                   type='text'
                   placeholder='Search...'
@@ -363,6 +377,7 @@ function Notes() {
             <div className='grid grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-start lg:items-start gap-4 lg:p-5'>
               {/* Mobile new note button */}
               <button
+              id='newNoteBtnMobile'
                 onClick={openNoteModal}
                 className='col-span-2 lg:hidden
                 shadow-[0_0px_2px_rgba(0,0,0,1)]
@@ -375,6 +390,7 @@ function Notes() {
 
               {/* Desktop new note button */}
               <button
+              id='newNoteBtnDesktop'
                 onClick={openNoteModal}
                 className='hidden lg:flex 
                 shadow-[0_0px_4px_rgba(0,0,0,1)]
@@ -388,6 +404,7 @@ function Notes() {
               {/* ── Note Cards ── */}
               {filteredNotes.map((note) => (
                 <div
+                id='notesGrid'
                   key={note.id}
                   onClick={() => openViewModal(note)}
                   className='relative bg-slate-50 rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
@@ -400,6 +417,7 @@ function Notes() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
+                      id='noteOptionsBtn'
                         title='More Options'
                         onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
                         className='text-primary-600 hover:opacity-40 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
@@ -769,7 +787,20 @@ function Notes() {
               </div>
             </div>
           )}
-
+          <button
+            id='tour-btn'
+            onClick={() => startTour()}
+            className='fixed bottom-6 right-6 z-50
+              flex flex-col items-center gap-1
+              hover:opacity-80 active:scale-95 transition-all
+              lg:bottom-8 lg:right-8'
+            title='Take a Tour'
+          >
+            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+            </div>
+            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+          </button>
         </div>
       </main>
 

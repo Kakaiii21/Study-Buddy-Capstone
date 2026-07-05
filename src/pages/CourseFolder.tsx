@@ -10,6 +10,7 @@ import 'react-pdf/dist/Page/TextLayer.css'
 import { doc, getDoc, setDoc, increment } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { STORAGE_LIMIT } from '../utils/fileUtils'
+import { useTour } from '../hooks/useTour'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
@@ -107,6 +108,15 @@ function CourseFolder() {
   const [editError, setEditError] = useState('')
   const [storageUsed, setStorageUsed] = useState(0)
 
+  const { startTour } = useTour(
+  'coursefolder',
+  true,
+  () => {},
+  () => {},
+  () => {},
+  () => {},
+  user
+)
   const isOnline = useNetworkStatus()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -349,14 +359,18 @@ const handleFiles = async (incoming: FileList | null) => {
 
           {/* Header */}
           <div className='flex flex-col md:flex-row  md:justify-between md:items-center lg:justify-between lg:items-center w-full gap-3 mb-6'>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center  gap-4">
               <button
+              
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
                 className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
+                <div id='goBackBtn' className='flex flex-col justify-center items-center '>
                 <span className="text-5xl leading-none">←</span>
                 <span className="text-sm">Back</span>
+                </div>
+
               </button>
               <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 {folderName}
@@ -393,6 +407,7 @@ const handleFiles = async (incoming: FileList | null) => {
               />
 
               <button
+              id='uploadFilesBtn'
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading || isRestoredFolder || !isOnline}  // ← add !isOnline
                 className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md lg:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
@@ -410,8 +425,8 @@ const handleFiles = async (incoming: FileList | null) => {
           )}
 
           {/* Storage Bar */}
-          <div className='w-full mb-4 mt-3'>
-            <div className='flex justify-between text-xs text-gray-400 font-roboto mb-1'>
+          <div id='storageBar' className='w-full mb-4 mt-3'>
+            <div  className='flex justify-between text-xs text-gray-400 font-roboto mb-1'>
               <span>Storage used</span>
               <span className={storagePercent > 90 ? 'text-red-500 font-semibold' : ''}>
                 {(storageUsed / (1024 * 1024)).toFixed(1)} MB / 1 GB
@@ -494,14 +509,14 @@ const handleFiles = async (incoming: FileList | null) => {
               No files match the selected filter.
             </p>
           ) : (
-            <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-2 md:gap-x-2 md:gap-y-5 lg:gap-x-0'>
+            <div id='filesGrid' className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-2 md:gap-x-2 md:gap-y-5 lg:gap-x-0'>
               {filteredFiles.map((file) => (
                 <div
                   key={file.id}
                   className='flex flex-col items-center bg-white border-gray-200 rounded-xl p-4 hover:shadow-md transition relative w-36 md:w-44 lg:w-48'
                 >
                   <div className='relative w-full flex justify-center items-end'>
-                    <button onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
+                    <button  onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
                       <img
                         src={
                           ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
@@ -518,6 +533,7 @@ const handleFiles = async (incoming: FileList | null) => {
                     </button>
 
                     <button
+                    id='fileOptionsBtn'
                       onClick={(e) => { e.stopPropagation(); setActiveFileMenu(activeFileMenu === file.id ? null : file.id) }}
                       className='flex flex-col items-center justify-center gap-[3px] p-2 rounded-full hover:bg-gray-100 w-8 h-12'
                       title='Options'
@@ -714,6 +730,20 @@ const handleFiles = async (incoming: FileList | null) => {
           </div>
         </div>
       )}
+      <button
+        id='tour-btn'
+        onClick={() => startTour()}
+        className='fixed bottom-6 right-6 z-50
+          flex flex-col items-center gap-1
+          hover:opacity-80 active:scale-95 transition-all
+          lg:bottom-8 lg:right-8'
+        title='Take a Tour'
+      >
+        <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+          <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+        </div>
+        <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+      </button>
     </div>
   )
 }

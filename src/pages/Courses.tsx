@@ -3,14 +3,17 @@ import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useCourses } from '../hooks/useCourses'
-
+import { useTour } from '../hooks/useTour'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: { 
   itemName: string
   onConfirm: () => void
   onCancel: () => void
   isFolder?: boolean
-}) {
+}) 
+
+
+{
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
@@ -63,7 +66,15 @@ useEffect(() => {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const { user } = useAuth()
   const { courses, loading, addCourse, updateCourse, deleteCourse } = useCourses(user)
-
+const { startTour } = useTour(
+  'courses',
+  true,
+  () => {},
+  () => {},
+  () => {},
+  () => {},
+  user
+)
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [folderName, setFolderName] = useState('')
@@ -156,6 +167,7 @@ useEffect(() => {
             <hr className='lg:hidden md:hidden w-full border-t border-primary-600 ' />
 
             <button
+              id='addCourseBtn'
               onClick={() => setShowModal(true)}
               disabled={!isOnline}
               title={!isOnline ? 'You are offline' : undefined}
@@ -172,7 +184,8 @@ useEffect(() => {
               Loading courses...
             </div>
           ) : (
-            <div className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
+            <div id='coursesGrid'
+            className='grid grid-cols-2 lg:grid-cols-5 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-10'>
               {courses.length === 0 ? (
               <div className='col-span-2 md:col-span-3 lg:col-span-5 flex items-center justify-center py-20 w-full'>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
@@ -181,7 +194,7 @@ useEffect(() => {
               </div>
               ) : (
                 courses.map((course) => (
-                  <div key={course.id} className='max-w-36 md:max-w-52   lg:max-w-52'>
+                  <div id='courseFolder' key={course.id} className='max-w-36 md:max-w-52   lg:max-w-52'>
                     <div className="relative">
                       <button
                         title={`Open ${course.name} Folder`}
@@ -195,14 +208,15 @@ useEffect(() => {
                       </button>
 
                       <button
+                      id='courseOptionsBtn'
                         onClick={(e) => {
                           e.stopPropagation()
                           setActiveMenu(activeMenu === course.id ? null : course.id)
                         }}
-                        className="absolute bottom-2 right-2 w-8 h-6 flex items-center justify-center transition group"
+                        className="absolute bottom-2 right-2 w-16  h-6 flex items-center justify-center transition group"
                         title='More Options'
                       >
-                        <div className="flex flex-row items-center justify-center gap-[8px] pr-5">
+                        <div  className="flex flex-row items-center justify-center gap-[8px] pr-0 md:pr-5">
                           <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
                           <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
                           <span className="w-2 h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
@@ -315,7 +329,20 @@ useEffect(() => {
             </div>
           </div>
         )}
-
+<button
+  id='tour-btn'
+  onClick={() => startTour()}
+  className='fixed bottom-6 right-6 z-50
+    flex flex-col items-center gap-1
+    hover:opacity-80 active:scale-95 transition-all
+    lg:bottom-8 lg:right-8'
+  title='Take a Tour'
+>
+  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+  </div>
+  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+</button>
       </main>
         {pendingDelete && (
           <SoftDeleteModal

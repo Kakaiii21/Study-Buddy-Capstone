@@ -277,7 +277,845 @@ const dashboardMobile: DriveStep[] = [
     },
   },
 ]
+// ─── To-Do List Desktop (lg+, 1024px+) ──────────────────────────────────────
+const todolistDesktop: DriveStep[] = [
+  {
+    element: '#newTaskBtn',
+    popover: {
+      title: '➕ Create a Task',
+      description:
+        'Click here to add a new task. Give it a title and a deadline to get started.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#todoColumns',
+    popover: {
+      title: '🗂️ Task Board',
+      description:
+        'Your tasks are organized into three columns: To Do, In Progress, and Done.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#taskCard',
+    popover: {
+      title: '📌 Task Card',
+      description:
+        'Each card is a task. Drag and drop it between columns as you work to keep your progress up to date.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#taskOptionsBtn',
+    popover: {
+      title: '⚙️ Task Options',
+      description:
+        'Need to make changes? Click the three dots to edit or delete this task.',
+      side: 'left',
+    },
+  },
+]
 
+// ─── To-Do List Tablet (md, 768px–1023px) ───────────────────────────────────
+const todolistTablet: DriveStep[] = [
+  {
+    element: '#newTaskBtn',
+    popover: {
+      title: '➕ Create a Task',
+      description:
+        'Click here to add a new task. Give it a title and a deadline to get started.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#todoColumns',
+    popover: {
+      title: '🗂️ Task Board',
+      description:
+        'Your tasks are organized into three columns: To Do, In Progress, and Done.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#taskCard',
+    popover: {
+      title: '📌 Task Card',
+      description:
+        'Each card is a task. Drag and drop it between columns as you work to keep your progress up to date.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#taskOptionsBtn',
+    popover: {
+      title: '⚙️ Task Options',
+      description:
+        'Need to make changes? Click the three dots to edit or delete this task.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── To-Do List Mobile (below 768px) ────────────────────────────────────────
+const todolistMobile: DriveStep[] = [
+  {
+    element: '#newTaskBtn',
+    popover: {
+      title: '➕ Create a Task',
+      description:
+        'Click here to add a new task. Give it a title and a deadline to get started.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#todoColumns',
+    popover: {
+      title: '🗂️ Task Board',
+      description:
+        'Your tasks are organized into three columns: To Do, In Progress, and Done.',
+      side: 'over'
+    },
+  },
+  {
+    element: '#taskCard',
+    popover: {
+      title: '📌 Task Card',
+      description:
+        'Each card is a task. Drag and drop it between columns as you work to keep your progress up to date.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#taskOptionsBtn',
+    popover: {
+      title: '⚙️ Task Options',
+      description:
+        'Need to make changes? Click the three dots to edit or delete this task.',
+      side: 'left',
+    },
+  },
+]
+// ─── Notes Desktop (lg+, 1024px+) ───────────────────────────────────────────
+const notesDesktop: DriveStep[] = [
+  {
+    element: '#addSubjectBtn',
+    popover: {
+      title: '➕ Add a Subject',
+      description: 'Create a new subject to organize your notes by class or topic.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#subjectDropdown',
+    popover: {
+      title: '🗂️ Filter by Subject',
+      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#notesSearchBar',
+    popover: {
+      title: '🔍 Search Notes',
+      description: 'Quickly find a note by typing part of its title here.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#newNoteBtnDesktop',
+    popover: {
+      title: '📝 Create a Note',
+      description: 'Click here to write a new note.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#notesGrid',
+    popover: {
+      title: '📚 Your Notes',
+      description: 'Click any note card to view it in full.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#noteOptionsBtn',
+    popover: {
+      title: '⋮ Note Options',
+      description: 'Click the three dots on any note to edit, download as a .txt file, or delete it.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Notes Tablet (md, 768px–1023px) ────────────────────────────────────────
+const notesTablet: DriveStep[] = [
+
+  {
+    element: '#addSubjectBtn',
+    popover: {
+      title: '➕ Add a Subject',
+      description: 'Create a new subject to organize your notes by class or topic.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#subjectDropdown',
+    popover: {
+      title: '🗂️ Filter by Subject',
+      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#notesSearchBar',
+    popover: {
+      title: '🔍 Search Notes',
+      description: 'Quickly find a note by typing part of its title here.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#newNoteBtnDesktop',
+    popover: {
+      title: '📝 Create a Note',
+      description: 'Tap here to write a new note.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#notesGrid',
+    popover: {
+      title: '📚 Your Notes',
+      description: 'Tap any note card to view it in full.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#noteOptionsBtn',
+    popover: {
+      title: '⋮ Note Options',
+      description: 'Tap the three dots on any note to edit, download as a .txt file, or delete it.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Notes Mobile (below 768px) ─────────────────────────────────────────────
+const notesMobile: DriveStep[] = [
+
+  {
+    element: '#addSubjectBtn',
+    popover: {
+      title: '➕ Add a Subject',
+      description: 'Create a new subject to organize your notes by class or topic.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#subjectDropdown',
+    popover: {
+      title: '🗂️ Filter by Subject',
+      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#notesSearchBar',
+    popover: {
+      title: '🔍 Search Notes',
+      description: 'Quickly find a note by typing part of its title here.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#newNoteBtnMobile',
+    popover: {
+      title: '📝 Create a Note',
+      description: 'Tap here to write a new note.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#notesGrid',
+    popover: {
+      title: '📚 Your Notes',
+      description: 'Tap any note card to view it in full.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#noteOptionsBtn',
+    popover: {
+      title: '⋮ Note Options',
+      description: 'Tap the three dots on any note to edit, download as a .txt file, or delete it.',
+      side: 'bottom',
+    },
+  },
+]
+// ─── Class Schedule Desktop (lg+, 1024px+) ──────────────────────────────────
+const classscheduleDesktop: DriveStep[] = [
+  {
+    element: '#addScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Click here to add a new class with its day, time, room, and instructor.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#clearScheduleBtn',
+    popover: {
+      title: '🗑️ Clear All Schedules',
+      description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#scheduleGrid',
+    popover: {
+      title: '📅 Your Weekly Schedule',
+      description: 'See all your classes organized by day, Monday through Sunday.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#scheduleOptionsBtn',
+    popover: {
+      title: '⋮ Class Options',
+      description: 'Click this icon on any class to edit its details or delete it.',
+      side: 'right',
+    },
+  },
+]
+
+// ─── Class Schedule Tablet (md, 768px–1023px) ───────────────────────────────
+const classscheduleTablet: DriveStep[] = [
+  {
+    element: '#addScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Tap here to add a new class with its day, time, room, and instructor.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#clearScheduleBtn',
+    popover: {
+      title: '🗑️ Clear All Schedules',
+      description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#scheduleGrid',
+    popover: {
+      title: '📅 Your Weekly Schedule',
+      description: 'See all your classes organized by day, Monday through Sunday.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#scheduleOptionsBtn',
+    popover: {
+      title: '⋮ Class Options',
+      description: 'Tap this icon on any class to edit its details or delete it.',
+      side: 'right',
+    },
+  },
+]
+
+// ─── Class Schedule Mobile (below 768px) ────────────────────────────────────
+const classscheduleMobile: DriveStep[] = [
+  {
+    element: '#addScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Tap here to add a new class with its day, time, room, and instructor.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#clearScheduleBtn',
+    popover: {
+      title: '🗑️ Clear All Schedules',
+      description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#scheduleGrid',
+    popover: {
+      title: '📅 Your Weekly Schedule',
+      description: 'See all your classes organized by day, Monday through Sunday.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#scheduleOptionsBtn',
+    popover: {
+      title: '⋮ Class Options',
+      description: 'Tap this icon on any class to edit its details or delete it.',
+      side: 'top',
+    },
+  },
+]
+
+// ─── Courses Desktop (lg+, 1024px+) ─────────────────────────────────────────
+const coursesDesktop: DriveStep[] = [
+  {
+    element: '#addCourseBtn',
+    popover: {
+      title: '➕ Add a Course Folder',
+      description: 'Click here to create a new folder for organizing files under a specific course.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#coursesGrid',
+    popover: {
+      title: '📁 Your Course Folders',
+      description: 'All your course folders live here. Click one to open it and see the files inside.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#courseFolder',
+    popover: {
+      title: '📁 Course Folder',
+      description:
+        'Open this folder to view, upload, and organize your academic files.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#courseOptionsBtn',
+    popover: {
+      title: '⋮ Folder Options',
+      description: 'Click this icon on any folder to rename it or move it to Recently Deleted.',
+      side: 'right',
+    },
+  },
+]
+
+// ─── Courses Tablet (md, 768px–1023px) ──────────────────────────────────────
+const coursesTablet: DriveStep[] = [
+  {
+    element: '#addCourseBtn',
+    popover: {
+      title: '➕ Add a Course Folder',
+      description: 'Tap here to create a new folder for organizing files under a specific course.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#coursesGrid',
+    popover: {
+      title: '📁 Your Course Folders',
+      description: 'All your course folders live here. Tap one to open it and see the files inside.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseFolder',
+    popover: {
+      title: '📁 Course Folder',
+      description:
+        'Open this folder to view, upload, and organize your academic files.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#courseOptionsBtn',
+    popover: {
+      title: '⋮ Folder Options',
+      description: 'Tap this icon on any folder to rename it or move it to Recently Deleted.',
+      side: 'right',
+    },
+  },
+]
+
+// ─── Courses Mobile (below 768px) ───────────────────────────────────────────
+const coursesMobile: DriveStep[] = [
+  {
+    element: '#addCourseBtn',
+    popover: {
+      title: '➕ Add a Course Folder',
+      description: 'Tap here to create a new folder for organizing files under a specific course.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#coursesGrid',
+    popover: {
+      title: '📁 Your Course Folders',
+      description: 'All your course folders live here. Tap one to open it and see the files inside.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseFolder',
+    popover: {
+      title: '📁 Course Folder',
+      description:
+        'Open this folder to view, upload, and organize your academic files.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseOptionsBtn',
+    popover: {
+      title: '⋮ Folder Options',
+      description: 'Tap this icon on any folder to rename it or move it to Recently Deleted.',
+      side: 'bottom',
+    },
+  },
+]
+// ─── Course Folder Desktop (lg+, 1024px+) ───────────────────────────────────
+const coursefolderDesktop: DriveStep[] = [
+  {
+    element: '#goBackBtn',
+    popover: {
+      title: '⬅️ Go Back',
+      description:
+        'Click here anytime to return to the Course Folder.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#file-filter',
+    popover: {
+      title: '🔍 Filter by File Type',
+      description: 'Narrow down what you see — PDFs, Word docs, PowerPoint, images, and more.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#uploadFilesBtn',
+    popover: {
+      title: '⬆️ Upload Files',
+      description: 'Click here to upload a new file to this course folder. Max 10 MB per file.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#storageBar',
+    popover: {
+      title: '💾 Storage Usage',
+      description: 'Track how much of your 1 GB storage you\'ve used across all your files.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#filesGrid',
+    popover: {
+      title: '📄 Your Files',
+      description: 'Click any file to preview it right in the browser.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#fileOptionsBtn',
+    popover: {
+      title: '⋮ File Options',
+      description: 'Click this icon on any file to rename, download, or delete it.',
+      side: 'right',
+    },
+  },
+]
+
+// ─── Course Folder Tablet (md, 768px–1023px) ────────────────────────────────
+const coursefolderTablet: DriveStep[] = [
+  {
+    element: '#goBackBtn',
+    popover: {
+      title: '⬅️ Go Back',
+      description:
+        'Click here anytime to return to the Course Folder.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#file-filter',
+    popover: {
+      title: '🔍 Filter by File Type',
+      description: 'Narrow down what you see — PDFs, Word docs, PowerPoint, images, and more.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#uploadFilesBtn',
+    popover: {
+      title: '⬆️ Upload Files',
+      description: 'Tap here to upload a new file to this course folder. Max 10 MB per file.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#storageBar',
+    popover: {
+      title: '💾 Storage Usage',
+      description: 'Track how much of your 1 GB storage you\'ve used across all your files.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#filesGrid',
+    popover: {
+      title: '📄 Your Files',
+      description: 'Tap any file to preview it right in the browser.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#fileOptionsBtn',
+    popover: {
+      title: '⋮ File Options',
+      description: 'Tap this icon on any file to rename, download, or delete it.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Course Folder Mobile (below 768px) ─────────────────────────────────────
+const coursefolderMobile: DriveStep[] = [
+  {
+    element: '#goBackBtn',
+    popover: {
+      title: '⬅️ Go Back',
+      description:
+        'Click here anytime to return to the Course Folder.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#file-filter',
+    popover: {
+      title: '🔍 Filter by File Type',
+      description: 'Narrow down what you see — PDFs, Word docs, PowerPoint, images, and more.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#uploadFilesBtn',
+    popover: {
+      title: '⬆️ Upload Files',
+      description: 'Tap here to upload a new file to this course folder. Max 10 MB per file.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#storageBar',
+    popover: {
+      title: '💾 Storage Usage',
+      description: 'Track how much of your 1 GB storage you\'ve used across all your files.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#filesGrid',
+    popover: {
+      title: '📄 Your Files',
+      description: 'Tap any file to preview it right in the browser.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#fileOptionsBtn',
+    popover: {
+      title: '⋮ File Options',
+      description: 'Tap this icon on any file to rename, download, or delete it.',
+      side: 'top',
+    },
+  },
+]
+// ─── Study Generator Desktop (lg+, 1024px+) ─────────────────────────────────
+const studygeneratorDesktop: DriveStep[] = [
+  {
+    element: '#localFilesBtn',
+    popover: {
+      title: '💻 Upload a Local File',
+      description: 'Click here to upload a file straight from your device.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseFilesBtn',
+    popover: {
+      title: '📁 Use a Course File',
+      description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#quizTabBtn',
+    popover: {
+      title: '📝 Quiz Mode',
+      description: 'Generate multiple-choice questions based on your uploaded file.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#flashcardTabBtn',
+    popover: {
+      title: '🃏 Flashcard Mode',
+      description: 'Generate flashcards instead, great for quick review and memorization.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#itemsSelect',
+    popover: {
+      title: '🔢 Number of Items',
+      description: 'Choose how many questions or flashcards you want generated.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#randomItemsBtn',
+    popover: {
+      title: '🎲 Feeling Random?',
+      description: 'Let Study Buddy pick a random number of items for you.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#generateNowBtn',
+    popover: {
+      title: '🚀 Generate',
+      description: 'Once you\'re ready, click here to generate your quiz or flashcards.',
+      side: 'top',
+    },
+  },
+]
+
+// ─── Study Generator Tablet (md, 768px–1023px) ──────────────────────────────
+const studygeneratorTablet: DriveStep[] = [
+  {
+    element: '#tour-btn',
+    popover: {
+      title: '❓ Need Help Anytime?',
+      description: 'Tap this button whenever you need a tour of the current page.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#localFilesBtn',
+    popover: {
+      title: '💻 Upload a Local File',
+      description: 'Tap here to upload a file straight from your device.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseFilesBtn',
+    popover: {
+      title: '📁 Use a Course File',
+      description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#quizTabBtn',
+    popover: {
+      title: '📝 Quiz Mode',
+      description: 'Generate multiple-choice questions based on your uploaded file.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#flashcardTabBtn',
+    popover: {
+      title: '🃏 Flashcard Mode',
+      description: 'Generate flashcards instead, great for quick review and memorization.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#itemsSelect',
+    popover: {
+      title: '🔢 Number of Items',
+      description: 'Choose how many questions or flashcards you want generated.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#randomItemsBtn',
+    popover: {
+      title: '🎲 Feeling Random?',
+      description: 'Let Study Buddy pick a random number of items for you.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#generateNowBtn',
+    popover: {
+      title: '🚀 Generate',
+      description: 'Once you\'re ready, tap here to generate your quiz or flashcards.',
+      side: 'top',
+    },
+  },
+]
+
+// ─── Study Generator Mobile (below 768px) ───────────────────────────────────
+const studygeneratorMobile: DriveStep[] = [
+  {
+    element: '#localFilesBtn',
+    popover: {
+      title: '💻 Upload a Local File',
+      description: 'Tap here to upload a file straight from your device.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#courseFilesBtn',
+    popover: {
+      title: '📁 Use a Course File',
+      description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#quizTabBtn',
+    popover: {
+      title: '📝 Quiz Mode',
+      description: 'Generate multiple-choice questions based on your uploaded file.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#flashcardTabBtn',
+    popover: {
+      title: '🃏 Flashcard Mode',
+      description: 'Generate flashcards instead, great for quick review and memorization.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#itemsSelect',
+    popover: {
+      title: '🔢 Number of Items',
+      description: 'Choose how many questions or flashcards you want generated.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#randomItemsBtn',
+    popover: {
+      title: '🎲 Feeling Random?',
+      description: 'Let Study Buddy pick a random number of items for you.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#generateNowBtn',
+    popover: {
+      title: '🚀 Generate',
+      description: 'Once you\'re ready, tap here to generate your quiz or flashcards.',
+      side: 'top',
+    },
+  },
+]
 // ─── Tour steps map ─────────────────────────────────────────────────────────
 export const tourSteps: Record<string, {
   desktop: DriveStep[]
@@ -289,6 +1127,37 @@ export const tourSteps: Record<string, {
     tablet:  dashboardTablet,
     mobile:  dashboardMobile,
   },
+  todolist: {                   
+    desktop: todolistDesktop,
+    tablet:  todolistTablet,
+    mobile:  todolistMobile,
+  },
+  notes: {                             
+    desktop: notesDesktop,
+    tablet:  notesTablet,
+    mobile:  notesMobile,
+  },
+  classschedule: { 
+    desktop: classscheduleDesktop, 
+    tablet: classscheduleTablet,
+    mobile: classscheduleMobile 
+  }, 
+  courses: { 
+    desktop: coursesDesktop,
+    tablet: coursesTablet,       
+    mobile: coursesMobile 
+  }, 
+  coursefolder: { 
+    desktop: coursefolderDesktop,  
+    tablet: coursefolderTablet,  
+    mobile: coursefolderMobile 
+  }, 
+  studygenerator: { 
+    desktop: studygeneratorDesktop, 
+    tablet: studygeneratorTablet, 
+    mobile: studygeneratorMobile 
+  }, 
+
 }
 
 // ─── startTour ──────────────────────────────────────────────────────────────
