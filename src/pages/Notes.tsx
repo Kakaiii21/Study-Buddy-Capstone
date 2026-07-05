@@ -390,7 +390,7 @@ function Notes() {
                 <div
                   key={note.id}
                   onClick={() => openViewModal(note)}
-                  className='relative bg-slate-50 border-2 border-primary-600 shadow-[0_1px_2px_rgba(0,0,0,1)] rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
+                  className='relative bg-slate-50 rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
                 >
                   <div className='flex justify-between items-center'>
                     <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>

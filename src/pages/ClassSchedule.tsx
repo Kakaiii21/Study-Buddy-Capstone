@@ -199,10 +199,8 @@ const handleSave = () => {
     return (
       <div className='flex flex-col mt-7 pb-2 bg-primary-600
       bg-gradient-to-br from-[#0f1f3a] to-[#0b1730]
-        shadow-[0_10px_30px_rgba(0,0,0,0.35)]
         rounded-2xl
-        backdrop-blur-xl
-      bg-white/5
+
       
       border border-white/10
         hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]

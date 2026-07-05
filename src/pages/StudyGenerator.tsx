@@ -34,6 +34,7 @@ const FUNCTION_URL = import.meta.env.VITE_STUDY_GENERATOR_URL as string
 const COOLDOWN_MS = 2 * 60 * 1000 // ── NEW: 2 minutes
 const COOLDOWN_KEY = 'studygen_cooldown_until' // ── NEW: localStorage key
 
+
 // Session storage keys
 export const SESSION_KEY_RESULT = 'studygen_result'
 
@@ -96,7 +97,7 @@ function CoursePicker({
   }
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+    <div className='fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50'>
       <div className='bg-white rounded-2xl shadow-2xl w-[95%] max-w-xl flex flex-col max-h-[80vh] overflow-hidden'>
         <div className='flex items-center justify-between px-6 py-4 bg-primary-600 rounded-t-2xl'>
           <p className='text-white font-roboto font-bold text-xl uppercase'>
@@ -207,6 +208,19 @@ function StudyGenerator() {
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null) // ── NEW
   const items = [10, 20, 30, 40, 50]
   const isOnline = useNetworkStatus()
+
+//scroll sa div ng options
+  const generateSectionRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (uploadedFile && generateSectionRef.current) {
+      const timeout = setTimeout(() => {
+        generateSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+      return () => clearTimeout(timeout)
+    }
+  }, [uploadedFile])
+
+
   // ── NEW: initialize cooldown from localStorage on mount ──────────────────
   useEffect(() => {
     const stored = localStorage.getItem(COOLDOWN_KEY)
@@ -397,20 +411,20 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
               </div>
             )}
             {/* ─────────────────────── */}
-
+          <hr className='w-52 md:w-[500px] lg:w-[600px] mt-5 md:mt-10 mx-auto border-t border-primary-600 mb-1 md:mb-3' />
             {/* File Source Panel */}
-            <div className='flex flex-col justify-center mt-10 gap-5 items-center w-full max-w-[800px] border-4 bg-slate-100 border-primary-600 shadow-[0_4px_8px_rgba(100,100,100,1)] rounded-3xl px-6 py-8'>
-              <p className='lg:text-xl md:text-xl text-primary-600 font-bold font-fustat'>
+            <div className='flex flex-col justify-center mt-0 md:mt-5 gap-5 items-center w-full max-w-[800px]  px-6 py-8'>
+              <p className='text-sm lg:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10'>
                 Choose where to access your files
               </p>
 
-              <div className='flex flex-row gap-5 md:gap-16 lg:gap-16'>
-                <div className='flex flex-col gap-3 justify-start items-center'>
-                  <img className='w-20 md:w-32 lg:w-32' src='Localbtn.png' alt='localbtnicon' />
+              <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-16'>                
+                <div className='flex flex-col gap-3 justify-start items-center border-2 md:border-4  border-primary-600 rounded-xl md:rounded-3xl px-7 py-4 md:px-12 md:py-8 '>
+                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-32' src='Localbtn.png' alt='localbtnicon' />
                   <button
                     onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
                     disabled={isGenerating || !isOnline}
-                    className='bg-primary-600 text-white rounded-md text-sm md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
+                    className='bg-primary-600 w-24  md:w-44 text-xs text-white rounded-md md:text-xl lg:text-sm font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                   >
                     Local Files
                   </button>
@@ -418,12 +432,12 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
 
                 <p className='text-center lg:mt-16 text-primary-600 lg:text-xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
 
-                <div className='flex flex-col gap-3 justify-start items-center'>
-                  <img className='w-20 md:w-32 lg:w-32' src='Coursesbtn.png' alt='coursesbtnicon' />
+                <div className='flex flex-col gap-3 justify-start items-center border-2 md:border-4  border-primary-600 rounded-xl md:rounded-3xl px-7 py-4 md:px-12 md:py-8 '>
+                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-32 ' src='Coursesbtn.png' alt='coursesbtnicon' />
                   <button
                     onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
                     disabled={coursesLoading || isGenerating || !isOnline}
-                    className='bg-primary-600 text-sm text-white rounded-md md:text-xl lg:text-xl font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
+                    className='bg-primary-600 w-24  md:w-44 text-xs text-white rounded-md md:text-xl lg:text-sm font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:px-8 lg:py-2 hover:bg-primary-500'
                   >
                     {coursesLoading ? 'Loading...' : 'Course Files'}
                   </button>
@@ -440,7 +454,7 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
               />
 
               {uploadedFile && (
-                <div className='w-full mt-2 flex items-center gap-4 bg-white bg-opacity-90 border-2 border-primary-600 rounded-xl px-4 py-3'>
+                <div ref={generateSectionRef} className='w-full mt-2 flex items-center gap-4 bg-white bg-opacity-90 border-2 border-primary-600 rounded-xl px-4 py-3'>
                   <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 object-contain flex-shrink-0' />
                   <div className='flex-1 min-w-0'>
                     <p className='font-roboto font-bold text-primary-600 text-sm truncate'>{uploadedFile.name}</p>
@@ -476,10 +490,12 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
               </button>
             )}
 
-            <p className='mt-6 text-center text-xs lg:text-sm md:text-sm text-primary-600'>
+            <p className='  mt-6 text-center text-xs lg:text-sm md:text-sm text-primary-600'>
               <i><strong>Reminder:</strong> All files generated by Study Buddy may not be 100% accurate.
-              Users are advised to review the generated files before proceeding. Thank you.</i>
+              </i>
             </p>
+            <p className='  mt-1 text-center text-xs lg:text-sm md:text-sm text-primary-600'>
+              <i>Users are advised to review the generated files before proceeding. Thank you.</i></p>
 
             {uploadedFile && (
               <div className='mt-8 flex flex-col justify-start items-center min-w-full'>
