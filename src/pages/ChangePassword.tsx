@@ -10,6 +10,12 @@ function ChangePassword() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+const maskEmail = (em: string) => {
+  if (!em) return ''
+  const [local, domain] = em.split('@')
+  if (!domain) return em
+  return `${local[0]}${'•'.repeat(local.length - 1)}@${domain}`
+}
   const handleSendLink = async () => {
     setError('')
     setSuccess('')
@@ -53,7 +59,7 @@ return (
       <input
         aria-label='email'
         type="email"
-        value={currentEmail}
+        value={maskEmail(currentEmail)}
         readOnly
         className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
       />

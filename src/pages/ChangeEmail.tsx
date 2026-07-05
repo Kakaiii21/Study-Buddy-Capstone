@@ -124,9 +124,10 @@ function ChangeEmail({ setActiveTab }: ChangeEmailProps) {
     }
   }
 
-  return (
-    <div className='min-h-screen flex flex-col'>
-
+return (
+  <div className='w-full flex justify-center items-center mt-6 px-4 md:px-8'>
+    <div className='w-full max-w-3xl px-4 md:px-10 py-5 rounded-xl '>
+      
       {toast && (
         <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl shadow-lg font-roboto text-sm transition-all text-white ${
           toast.type === 'error' ? 'bg-red-500' : 'bg-primary-600'
@@ -135,9 +136,9 @@ function ChangeEmail({ setActiveTab }: ChangeEmailProps) {
         </div>
       )}
 
-      <div className='flex flex-col md:flex-row lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
-        <p className='text-2xl md:ml-16 lg:ml-0 md:text-4xl lg:text-4xl font-semibold text-primary-600 uppercase font-roboto text-center lg:text-start'>
-          Change Email
+      <div className='flex flex-col md:flex-row  lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
+        <p className='text-2xl md:ml-16 text-center lg:ml-0 md:text-4xl lg:text-3xl font-semibold text-primary-600 uppercase font-inter lg:text-start'>
+          Change Email 
         </p>
       </div>
       <hr className='w-full border-t border-primary-600 mb-1' />
@@ -156,44 +157,42 @@ function ChangeEmail({ setActiveTab }: ChangeEmailProps) {
         <div className='flex flex-col w-full justify-start items-center'>
           <div className='w-full my-8 mt-1'>
 
-            <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-              <p className='text-primary-600 font-semibold font-inter lg:text-xl text-md'>Current Password:</p>
+            <div className='flex flex-col gap-2 mt-6'>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Current Password</p>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Enter current password'
                 autoComplete="new-password"
-                className='border border-primary-600 rounded-md bg-white text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5 py-2'
+                className='border font-inter font-light border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
               />
             </div>
-            <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
 
-            <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-              <p className='text-primary-600 font-semibold font-inter lg:text-xl text-md'>New Email:</p>
+            <div className='flex flex-col gap-2 mt-6'>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>New Email</p>
               <input
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder='Enter new email'
-                className='border border-primary-600 rounded-md bg-white text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5 py-2'
+                className='border border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
               />
             </div>
-            <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
 
-            <div className='flex lg:flex-row md:flex-row flex-col gap-3 lg:gap-10 mt-6 lg:justify-start lg:items-center'>
-              <p className='text-primary-600 font-semibold font-inter lg:text-xl text-md'>Confirm Email:</p>
+            <div className='flex flex-col gap-2 mt-6'>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Confirm New Email</p>
               <input
                 type="email"
                 value={confirmEmail}
                 onChange={(e) => setConfirmEmail(e.target.value)}
                 placeholder='Confirm new email'
-                className='border border-primary-600 rounded-md bg-white text-primary-600 w-[300px] lg:w-[500px] md:w-[500px] px-5 py-2'
+                className='border border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
               />
             </div>
             <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
 
-            <div className='flex flex-row gap-4 mt-4'>
+            <div className='flex flex-row justify-center md:justify-end gap-4 mt-4'>
               <button
                 onClick={handleCancel}
                 className='border border-primary-600 text-primary-600 p-2 px-4 text-sm rounded-md font-inter uppercase'
@@ -213,7 +212,8 @@ function ChangeEmail({ setActiveTab }: ChangeEmailProps) {
         </div>
       )}
     </div>
-  )
+  </div>
+)
 }
 
 export default ChangeEmail

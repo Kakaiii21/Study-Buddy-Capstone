@@ -7,6 +7,8 @@ function isFirebaseError(err: unknown): err is { code: string } {
   return typeof err === 'object' && err !== null && 'code' in err
 }
 
+
+
 function PasswordChangeWatcher() {
   const prevUserRef = useRef<User | null>(null)
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)

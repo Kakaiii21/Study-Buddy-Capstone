@@ -11,6 +11,7 @@ function App() {
 
   const signupRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
+  const contactRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const [showPoliciesMenu, setShowPoliciesMenu] = useState(false)
   const policiesRef = useRef<HTMLDivElement>(null)
@@ -388,7 +389,7 @@ useEffect(() => {
 <section ref={aboutRef} className="py-10 w-full flex flex-col justify-center">
     <div className='flex flex-col mt-10 gap-2 justify-center items-center md:items-start'>
     <h1 className='text-primary-600 px- 4 text-center md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[350px] w-full font-inter font-extrabold'>Developers</h1>
-    <p className='text-primary-600 px-4   font-inter  text-center md:ml-0 md:text-left md:px-[50px] lg:px-0 xl:px-[30px] 2xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
+    <p className='text-primary-600 px-4   font-inter  text-center md:ml-0 md:text-left md:px-[50px] lg:px-[150px] xl:px-[30px] 2xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
 
     {/*Proponents*/}
 <div className='flex flex-col md:flex-row justify-between items-start w-full max-w-6xl mx-auto gap-12 md:gap-8 px-4 md:px-[60px] lg:px-[100px] xl:px-[120px] 2xl:px-[80px]'>
@@ -491,7 +492,7 @@ useEffect(() => {
   </div>
 </section>
   {/*Contact Us Section*/}
-<section className='py-2 md:py-10 lg:py-10 xl:py-10 2xl:py-10 w-full overflow-hidden'>
+<section ref={contactRef} className='py-2 md:py-10 lg:py-10 xl:py-10 2xl:py-10 w-full overflow-hidden'>
   <div className='flex flex-col items-center md:items-start mt-0 md:mt-10 lg:mt-10 xl:mt-10 2xl:mt-10 gap-2 justify-start'>
 
     <h1 className='text-primary-600 text-center md:text-start lg:text-start xl:text-start 2xl:text-start px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] w-full font-inter font-extrabold'>Contact Us!</h1>
@@ -578,7 +579,7 @@ useEffect(() => {
         <p className='text-xs md:text-xs lg:text-sm uppercase text-white font-fustat font-normal'>About us</p>
         <button onClick={() => aboutRef.current?.scrollIntoView({behavior: 'smooth'})}
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Developers</button>
-        <button onClick={() => aboutRef.current?.scrollIntoView({behavior: 'smooth'})}
+        <button onClick={() => contactRef.current?.scrollIntoView({behavior: 'smooth'})}
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Contact Us</button>
          <a href="https://lordicon.com/" className="text-xs text-gray-400 hover:underline">
           Icons by Lordicon.com

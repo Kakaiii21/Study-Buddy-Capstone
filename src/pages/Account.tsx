@@ -1,6 +1,6 @@
 import Sidebar from '../components/Sidebar'
-import BasicInfo from '../components/BasicInfo'
 import { useState ,useEffect , useRef} from 'react'
+import BasicInfo from '../components/BasicInfo'
 import Terms from '../terms'
 import Privacy from '../privacy'
 import ChangeEmail from './ChangeEmail' 
@@ -84,29 +84,29 @@ function Account() {
       <div className="absolute right-0 top-1/2 h-2 w-10 -translate-y-1/2 bg-gray-400 blur-md opacity-50"></div>
     </div>
 
-<button
-  onClick={() => setActiveTab('terms')}
-  className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'terms' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
-  <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
-    <img src='/tos.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
-    <span className='font-inter text-base xl:text-lg 2xl:text-xl font-medium text-primary-600'>Terms of Service</span>
-  </div>
-  <img src="./arrowA.png" alt="nextArrow" className='w-2 xl:w-2.5 2xl:w-3' />
-</button>
-<hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
+    <button
+      onClick={() => setActiveTab('terms')}
+      className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'terms' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+      <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
+        <img src='/tos.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
+        <span className='font-inter text-base xl:text-lg 2xl:text-xl font-medium text-primary-600'>Terms of Service</span>
+      </div>
+      <img src="./arrowA.png" alt="nextArrow" className='w-2 xl:w-2.5 2xl:w-3' />
+    </button>
+    <hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
 
-<button
-  onClick={() => setActiveTab('privacy')}
-  className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'privacy' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
-  <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
-    <img src='/pp.png' alt='Privacyicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
-    <span className='font-inter text-base xl:text-lg 2xl:text-xl font-medium text-primary-600'>Privacy Policy</span>
-  </div>
-  <img src="./arrowA.png" alt="nextArrow" className='w-2 xl:w-2.5 2xl:w-3' />
-</button>
-<hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
-  </nav>
-</div>
+    <button
+      onClick={() => setActiveTab('privacy')}
+      className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'privacy' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
+      <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
+        <img src='/pp.png' alt='Privacyicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
+        <span className='font-inter text-base xl:text-lg 2xl:text-xl font-medium text-primary-600'>Privacy Policy</span>
+      </div>
+      <img src="./arrowA.png" alt="nextArrow" className='w-2 xl:w-2.5 2xl:w-3' />
+    </button>
+    <hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
+      </nav>
+    </div>
           {/* Right Panel */}
           <div className='flex-1 lg:flex-[3] overflow-auto mt-16 lg:mt-0 xl:mt-0 2xl:mt-0 p-4 lg:p-8 pt-0 pb-20 lg:pb-0'>
             {activeTab === 'basicinfo' && <BasicInfo setActiveTab={setActiveTab} />}

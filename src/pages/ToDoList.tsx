@@ -482,7 +482,7 @@ function Column({
       `}
     >
       <div className="bg-primary-600 
-      shadow-[0_0px_5px_rgba(0,0,0,.75)]
+      shadow-[0_0px_5px_rgba(0,0,0,.3)]
       max-w-full w-full p-3 flex items-center justify-between">
         <p className="text-white pl-5 lg:pl-0 text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
@@ -618,8 +618,8 @@ function ToDoList() {
         />
       )}
 
-      <main className="flex-1 overflow-auto p-8 pt-7">
-        <div className="min-h-screen flex flex-col">
+      <main className="flex-1 w-full overflow-auto p-8  pt-7">
+        <div className="min-h-screen w-full flex flex-col">
 
           <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
             <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex   text-primary-600 font-roboto">TO DO LIST</p>
@@ -629,7 +629,6 @@ function ToDoList() {
               className="bg-green-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-white font-roboto font-bold mx-10
                text-md py-3 px-9 rounded-md
                hover:opacity-90
-               shadow-[0_4px_8px_rgba(0,0,0,0.35)]
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
                transition-all duration-300'"
@@ -637,6 +636,8 @@ function ToDoList() {
               + New Task
             </button>
           </div>
+          <hr className='hidden md:flex mt-3 w-full border-t border-primary-600' />
+
 
           {isAddModalOpen && (
             <TaskModal
@@ -672,7 +673,7 @@ function ToDoList() {
               onDragEnd={handleDragEnd}
               autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
-              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-10 border-primary-600 shadow-[0_0px_5px_rgba(0,0,0,0.50)] border-2 rounded-3xl">
+              <div className="w-full flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-2  rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}
