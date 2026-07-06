@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useFlashcardHistory } from '../hooks/useFlashcardHistory'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
-
+import { useTour } from '../hooks/useTour'
 function formatDate(date: Date): string {
   return date.toLocaleString('en-US', {
     month: '2-digit',
@@ -85,7 +85,7 @@ function GeneratedHistory() {
 
   const genOption = ['Quiz', 'Flashcard']
   const loading = selectedGen === 'Quiz' ? quizLoading : flashLoading
-
+  const { startTour } = useTour('generatedhistory', false, () => {}, () => {}, () => {}, () => {}, user)
   const filteredQuiz = quizHistory.filter((item) =>
     item.fileName.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -167,6 +167,7 @@ function GeneratedHistory() {
           {/* Filters */}
           <div className='flex flex-row lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
             <select
+            id='genTypeSelect'
               value={selectedGen}
               aria-label='Generation Type'
               onChange={(e) => { setSelectedGen(e.target.value); setSearchQuery('') }}
@@ -178,6 +179,7 @@ function GeneratedHistory() {
             </select>
 
             <input
+            id='genSearchBar'
               type='text'
               placeholder='Search...'
               value={searchQuery}
@@ -204,12 +206,12 @@ function GeneratedHistory() {
           )}
 
           {!loading && (
-            <div className='w-full'>
+            <div  id='genTable'  className='w-full'>
 
               {/* ── Quiz Table ── */}
               {selectedGen === 'Quiz' && (
                 <>
-                  <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                  <div  className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
                     <p>Name</p>
                     <p className='text-center'>Score</p>
                     <p className='text-center'>Items</p>
@@ -232,8 +234,9 @@ function GeneratedHistory() {
                           </div>
                           <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.score}</p>
                           <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
-                          <div className='flex justify-center'>
+                          <div  className='flex justify-center'>
                             <img
+                            id='viewBtn'
                               src='/View.png'
                               alt='View'
                               className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
@@ -242,6 +245,7 @@ function GeneratedHistory() {
                           </div>
                           <div className='flex justify-center'>
                             <img
+                            id='retakeBtn'
                               src='/Retake.png'
                               alt='Retake'
                               className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
@@ -250,6 +254,7 @@ function GeneratedHistory() {
                           </div>
                           <div className='flex justify-center'>
                           <img
+                          id='deleteBtn'
                             src='/delete.png'
                             alt='Delete'
                             className={`lg:w-7 lg:h-7 w-5 h-5 transition
@@ -270,7 +275,7 @@ function GeneratedHistory() {
               {/* ── Flashcard Table ── */}
               {selectedGen === 'Flashcard' && (
                 <>
-                  <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                  <div  className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
                     <p>Name</p>
                     <p className='text-center'>Items</p>
                     <p className='text-center'>View</p>
@@ -329,6 +334,21 @@ function GeneratedHistory() {
     onCancel={() => setPendingDelete(null)}
   />
 )}
+
+<button
+  id='tour-btn'
+  onClick={() => startTour()}
+  className='fixed bottom-6 right-6 z-50
+    flex flex-col items-center gap-1
+    hover:opacity-80 active:scale-95 transition-all
+    lg:bottom-8 lg:right-8'
+  title='Take a Tour'
+>
+  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+  </div>
+  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+</button>
       </main>
 
 

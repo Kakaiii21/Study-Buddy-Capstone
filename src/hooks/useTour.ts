@@ -11,20 +11,23 @@ export function useTour(
   onCloseTimer?: () => void,
   onOpenSidebar?: () => void,
   onCloseSidebar?: () => void,
-  user?: User | null   // ← add this
+  user?: User | null,
+  onTourEnd?: () => void   // ← NEW, added at the end so existing call sites don't break
 ) {
   useEffect(() => {
     if (!auto) return
-    const key = `${TOUR_KEY}_${page}_${user?.uid ?? 'guest'}`  // ← scoped key
+    const key = `${TOUR_KEY}_${page}_${user?.uid ?? 'guest'}`
     const seen = localStorage.getItem(key)
     if (!seen) {
       const timeout = setTimeout(() => {
-        startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar)
+        startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar, onTourEnd)
         localStorage.setItem(key, 'true')
       }, 600)
       return () => clearTimeout(timeout)
     }
-  }, [page, auto, user?.uid])  // ← add user?.uid to deps
+  }, [page, auto, user?.uid])
 
-  return { startTour: () => startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar) }
+  return {
+    startTour: () => startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar, onTourEnd)
+  }
 }

@@ -548,7 +548,7 @@ function ToDoList() {
 
   const { startTour } = useTour(
     'todolist',
-    true,
+    false,
     () => {},   // no-op
     () => {},   // no-op
     () => {},   // no-op — don't need to open the sidebar

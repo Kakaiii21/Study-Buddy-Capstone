@@ -110,7 +110,7 @@ function CourseFolder() {
 
   const { startTour } = useTour(
   'coursefolder',
-  true,
+  false,
   () => {},
   () => {},
   () => {},

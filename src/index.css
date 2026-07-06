@@ -113,6 +113,19 @@ code {
   font-family: inherit;
   animation: fadeSlideIn 0.25s ease;
 }
+/* Anchor the mobile bottom-nav tour steps closer to the nav bar */
+.tour-bottom-anchor .driver-popover {
+  position: fixed !important;
+  top: auto !important;
+  bottom: calc(78px + env(safe-area-inset-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  max-width: 300px;
+}
+
+.tour-bottom-anchor .driver-popover-arrow {
+  display: none !important;
+}
 
 @keyframes fadeSlideIn {
   from {

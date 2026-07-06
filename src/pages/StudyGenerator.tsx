@@ -205,6 +205,7 @@ function StudyGenerator() {
   const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
   const [cooldownSeconds, setCooldownSeconds] = useState(0) // ── NEW
 
+  const [tourPreview, setTourPreview] = useState(false) // ── NEW
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null) // ── NEW
   const items = [10, 20, 30, 40, 50]
@@ -376,12 +377,13 @@ const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCooli
     : ''
 const { startTour } = useTour(
   'studygenerator',
-  true,
+  false,
   () => {},
   () => {},
   () => {},
   () => {},
-  user
+  user,
+  () => setTourPreview(false)   
 )
   return (
     <div className='flex h-screen'>
@@ -508,7 +510,7 @@ const { startTour } = useTour(
             <p className='  mt-1 text-center text-xs lg:text-sm md:text-sm text-primary-600'>
               <i>Users are advised to review the generated files before proceeding. Thank you.</i></p>
 
-            {uploadedFile && (
+            {(uploadedFile || tourPreview) && (
               <div className='mt-8 flex flex-col justify-start items-center min-w-full'>
                 <div className='flex flex-row gap-2 lg:gap-8 md:gap-14'>
                   <button
@@ -589,9 +591,9 @@ const { startTour } = useTour(
             )}
           </div>
         </div>
-        <button
+<button
   id='tour-btn'
-  onClick={() => startTour()}
+  onClick={() => { setTourPreview(true); startTour() }}
   className='fixed bottom-6 right-6 z-50
     flex flex-col items-center gap-1
     hover:opacity-80 active:scale-95 transition-all

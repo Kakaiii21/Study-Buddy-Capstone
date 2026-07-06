@@ -107,7 +107,7 @@ function ClassSchedule() {
   const typeRoom = ['Lecture', 'Laboratory']
   const { startTour } = useTour(
     'classschedule',
-    true,
+    false,
     () => {},
     () => {},
     () => {},

@@ -64,7 +64,7 @@ function Notes() {
 
     const { startTour } = useTour(
     'notes',
-    true,
+    false,
     () => {},
     () => {},
     () => {},

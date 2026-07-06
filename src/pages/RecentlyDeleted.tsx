@@ -3,6 +3,8 @@ import Sidebar from '../components/Sidebar'
 import { useRecentlyDeleted } from '../hooks/useRecentlyDeleted'
 import { daysRemaining } from '../services/recentlyDeletedService'
 import type { DeletedItemType , DeletedItem} from '../services/recentlyDeletedService'
+import { useAuth } from '../hooks/useAuth'
+import { useTour } from '../hooks/useTour'
 const PAGE_TYPES: DeletedItemType[] = [
   'To Do',
   'Notes',
@@ -51,7 +53,7 @@ function DaysBadge({ days }: { days: number }) {
     }
 
     return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div   className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
         <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
           <h2 className='text-lg font-bold text-gray-800 mb-2'>Permanently Delete?</h2>
           <p className='text-sm text-gray-500 mb-6'>
@@ -80,11 +82,17 @@ function DaysBadge({ days }: { days: number }) {
   }
 
 function RecentlyDeleted() {
+  const { user } = useAuth()   // ← NEW
   const [selectedType, setSelectedType] = useState<DeletedItemType>('To Do')
   const [searchQuery, setSearchQuery] = useState('')
   const [confirmItem, setConfirmItem] = useState<{ id: string; name: string } | null>(null)
   const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null) // ← add this
-
+  const { startTour } = useTour(   // ← NEW
+    'recentlydeleted',
+    false,
+    () => {}, () => {}, () => {}, () => {},
+    user
+  )
   const {
     items,
     loading,
@@ -170,6 +178,7 @@ const filtered = useMemo(() => {
             <div className='flex items-center gap-2'>
               <span className='text-sm font-semibold text-primary-600 whitespace-nowrap'>Filter by:</span>
               <select
+              id='filterTypeSelect'
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
                 className='border-2 border-primary-600 rounded-lg px-4 py-2 text-primary-600 font-semibold bg-white focus:outline-none text-sm'
@@ -181,6 +190,7 @@ const filtered = useMemo(() => {
               </select>
             </div>
             <input
+            id='deletedSearchBar'
               type='text'
               placeholder='Search...'
               value={searchQuery}
@@ -190,7 +200,8 @@ const filtered = useMemo(() => {
           </div>
 
           {/* Table header */}
-          <div className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
+ <div  id='deletedTable'>
+           <div id='deletedTable' className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
             <p>Name</p>
             <p className='text-center'>Expires</p>
             <p className='text-center'>Restore</p>
@@ -198,8 +209,8 @@ const filtered = useMemo(() => {
           </div>
 
           {/* Rows */}
-          {!loading && !error && (
-            <ul className='divide-y divide-gray-100'>
+          {!loading  && !error && (
+            <ul  className='divide-y divide-gray-100'>
               {filtered.map((item) => {
                 const days = daysRemaining(item.deletedAt)
                 const isActing = actionLoading === item.id
@@ -210,7 +221,7 @@ const filtered = useMemo(() => {
                       isActing ? 'opacity-50 pointer-events-none' : ''
                     }`}
                   >
-          <p className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
+          <p  className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
             {item.name}
             {item.type === 'Course' && (
               <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
@@ -227,6 +238,7 @@ const filtered = useMemo(() => {
           </div>
               <div className='flex justify-center'>
                 <button
+                id='restoreBtn'
                   aria-label={`Restore ${item.name}`}
                   onClick={() => {
                     if (orphanedFileIds.has(item.id)) {
@@ -248,6 +260,7 @@ const filtered = useMemo(() => {
 
           <div className='flex justify-center'>
             <button
+            id='permaDeleteBtn'
               aria-label={`Delete ${item.name}`}
               onClick={() => handleDeleteClick(item.id, item.name)}
               disabled={isActing}
@@ -261,6 +274,7 @@ const filtered = useMemo(() => {
     })}
   </ul>
 )}
+ </div>
 
           {/* States */}
           {loading && (
@@ -285,6 +299,20 @@ const filtered = useMemo(() => {
 
 
         </div>
+          <button
+            id='tour-btn'
+            onClick={() => startTour()}
+            className='fixed bottom-6 right-6 z-50
+              flex flex-col items-center gap-1
+              hover:opacity-80 active:scale-95 transition-all
+              lg:bottom-8 lg:right-8'
+            title='Take a Tour'
+          >
+            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+            </div>
+            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+          </button>
       </main>
     </div>
   )

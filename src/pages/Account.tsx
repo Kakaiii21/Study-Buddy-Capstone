@@ -8,8 +8,20 @@ import ChangePassword from './ChangePassword'
 import { Player, } from '@lordicon/react'
 
 
+import { useAuth } from '../hooks/useAuth'
+import { useTour } from '../hooks/useTour'
 
 function Account() {
+  const { user } = useAuth()
+  const [tourActive, setTourActive] = useState(false)
+
+const { startTour } = useTour(
+  'account',
+  false,
+  () => {}, () => {}, () => {}, () => {},
+  user,
+  () => setTourActive(false)
+)
   const [activeTab, setActiveTab] = useState('basicinfo')
   const playerRef = useRef<Player>(null);
   const [iconData, setIconData] = useState<object | null>(null);
@@ -41,6 +53,7 @@ function Account() {
 
   <nav className='flex flex-col'>
     <button
+    id='navBasicInfo'
       onMouseEnter={() => {
       playerRef.current?.playFromBeginning();
       }}
@@ -72,6 +85,7 @@ function Account() {
     <hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
 
     <button
+    id='navPassword'
       onClick={() => setActiveTab('password')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'password' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
@@ -85,6 +99,7 @@ function Account() {
     </div>
 
     <button
+    id='navTerms'
       onClick={() => setActiveTab('terms')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'terms' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
@@ -96,6 +111,7 @@ function Account() {
     <hr className='border-t border-gray-400 ml-9 xl:ml-10 2xl:ml-11' />
 
     <button
+    id='navPrivacy'
       onClick={() => setActiveTab('privacy')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 xl:py-3 2xl:py-4 text-left font-medium transition ${activeTab === 'privacy' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 xl:pl-10 2xl:pl-11'>
@@ -108,7 +124,7 @@ function Account() {
       </nav>
     </div>
           {/* Right Panel */}
-          <div className='flex-1 lg:flex-[3] overflow-auto mt-16 lg:mt-0 xl:mt-0 2xl:mt-0 p-4 lg:p-8 pt-0 pb-20 lg:pb-0'>
+          <div  className='flex-1 lg:flex-[3] overflow-auto mt-16 lg:mt-0 xl:mt-0 2xl:mt-0 p-4 lg:p-8 pt-0 pb-20 lg:pb-0'>
             {activeTab === 'basicinfo' && <BasicInfo setActiveTab={setActiveTab} />}
             {activeTab === 'changeEmail' && <ChangeEmail setActiveTab={setActiveTab} />}
             {activeTab === 'password' && <ChangePassword />}
@@ -124,6 +140,7 @@ function Account() {
     <div className='flex items-stretch justify-around px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]'>
 
     <button
+    id='mobileNavBasicInfo'
       onClick={() => setActiveTab('basicinfo')}
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
@@ -136,6 +153,7 @@ function Account() {
     </button>
 
     <button
+    id='mobileNavPassword'
       onClick={() => setActiveTab('password')}
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
@@ -148,6 +166,7 @@ function Account() {
     </button>
 
     <button
+    id='mobileNavTerms'
       onClick={() => setActiveTab('terms')}
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
@@ -160,11 +179,12 @@ function Account() {
     </button>
 
     <button
+   id='mobileNavPrivacy'
       onClick={() => setActiveTab('privacy')}
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
       <div className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 ${activeTab === 'privacy' ? 'bg-primary-0' : ''}`}>
-        <img src='/pp.png' alt='Privacy' className={`w-7 h-7 object-contain transition-opacity duration-200 ${activeTab === 'privacy' ? 'opacity-100' : 'opacity-40'}`} />
+        <img   src='/pp.png' alt='Privacy' className={`w-7 h-7 object-contain transition-opacity duration-200 ${activeTab === 'privacy' ? 'opacity-100' : 'opacity-40'}`} />
       </div>
       <span className={`text-[10px] font-inter leading-none transition-colors duration-200 ${activeTab === 'privacy' ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
         Privacy
@@ -173,6 +193,17 @@ function Account() {
 
   </div>
 </div>
+<button
+  id='tour-btn'
+  onClick={() => { setTourActive(true); startTour() }}
+  className={`fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-6 z-50 flex flex-col items-center gap-1 hover:opacity-80 active:scale-95 transition-all lg:bottom-8 lg:right-8 ${tourActive ? 'hidden' : ''}`}
+  title='Take a Tour'
+>
+  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+  </div>
+  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+</button>
     </div>
   )
 }

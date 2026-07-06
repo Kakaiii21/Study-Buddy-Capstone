@@ -1116,6 +1116,406 @@ const studygeneratorMobile: DriveStep[] = [
     },
   },
 ]
+// ─── Generated History Desktop (lg+, 1024px+) ───────────────────────────────
+const generatedhistoryDesktop: DriveStep[] = [
+  {
+    element: '#genTypeSelect',
+    popover: {
+      title: '🔀 Switch View',
+      description: 'Toggle between your Quiz history and Flashcard history here.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#genSearchBar',
+    popover: {
+      title: '🔍 Search History',
+      description: 'Quickly find a past quiz or flashcard set by file name.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#genTable',
+    popover: {
+      title: '📋 Your Generated Materials',
+      description: 'View, retake, or delete any previously generated quiz or flashcard set from here.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#viewBtn',
+    popover: {
+      title: '👁️ View',
+      description: 'Click here to review this quiz or flashcard set in detail.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#retakeBtn',
+    popover: {
+      title: '🔄 Retake',
+      description: 'Click here to retake this quiz with a fresh attempt.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deleteBtn',
+    popover: {
+      title: '🗑️ Delete',
+      description: 'Click here to move this item to Recently Deleted.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Generated History Tablet (md, 768px–1023px) ────────────────────────────
+const generatedhistoryTablet: DriveStep[] = [
+  {
+    element: '#genTypeSelect',
+    popover: {
+      title: '🔀 Switch View',
+      description: 'Tap to toggle between your Quiz history and Flashcard history.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#genSearchBar',
+    popover: {
+      title: '🔍 Search History',
+      description: 'Quickly find a past quiz or flashcard set by file name.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#genTable',
+    popover: {
+      title: '📋 Your Generated Materials',
+      description: 'View, retake, or delete any previously generated quiz or flashcard set from here.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#viewBtn',
+    popover: {
+      title: '👁️ View',
+      description: 'Tap here to review this quiz or flashcard set in detail.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#retakeBtn',
+    popover: {
+      title: '🔄 Retake',
+      description: 'Tap here to retake this quiz with a fresh attempt.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deleteBtn',
+    popover: {
+      title: '🗑️ Delete',
+      description: 'Tap here to move this item to Recently Deleted.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Generated History Mobile (below 768px) ─────────────────────────────────
+const generatedhistoryMobile: DriveStep[] = [
+  {
+    element: '#genTypeSelect',
+    popover: {
+      title: '🔀 Switch View',
+      description: 'Tap to toggle between your Quiz history and Flashcard history.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#genSearchBar',
+    popover: {
+      title: '🔍 Search History',
+      description: 'Quickly find a past quiz or flashcard set by file name.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#genTable',
+    popover: {
+      title: '📋 Your Generated Materials',
+      description: 'View, retake, or delete any previously generated quiz or flashcard set from here.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#viewBtn',
+    popover: {
+      title: '👁️ View',
+      description: 'Tap here to review this quiz or flashcard set in detail.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#retakeBtn',
+    popover: {
+      title: '🔄 Retake',
+      description: 'Tap here to retake this quiz with a fresh attempt.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#deleteBtn',
+    popover: {
+      title: '🗑️ Delete',
+      description: 'Tap here to move this item to Recently Deleted.',
+      side: 'bottom',
+    },
+  },
+]
+// ─── Recently Deleted Desktop (lg+, 1024px+) ────────────────────────────────
+const recentlydeletedDesktop: DriveStep[] = [
+  {
+    element: '#filterTypeSelect',
+    popover: {
+      title: '🔀 Filter by Type',
+      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deletedSearchBar',
+    popover: {
+      title: '🔍 Search',
+      description: 'Quickly find a deleted item by name.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deletedTable',
+    popover: {
+      title: '🗑️ Deleted Items',
+      description: 'Items stay here for 30 days before being permanently removed.',
+      side: 'over',
+    },
+  },
+  {
+    element: '#restoreBtn',
+    popover: {
+      title: '♻️ Restore',
+      description: 'Click here to bring this item back to where it came from.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#permaDeleteBtn',
+    popover: {
+      title: '❌ Delete Forever',
+      description: 'Click here to permanently delete this item. This cannot be undone.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Recently Deleted Tablet (md, 768px–1023px) ─────────────────────────────
+const recentlydeletedTablet: DriveStep[] = [
+  {
+    element: '#filterTypeSelect',
+    popover: {
+      title: '🔀 Filter by Type',
+      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deletedSearchBar',
+    popover: {
+      title: '🔍 Search',
+      description: 'Quickly find a deleted item by name.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#deletedTable',
+    popover: {
+      title: '🗑️ Deleted Items',
+      description: 'Items stay here for 30 days before being permanently removed.',
+      side: 'over',
+    },
+  },
+  {
+    element: '#restoreBtn',
+    popover: {
+      title: '♻️ Restore',
+      description: 'Tap here to bring this item back to where it came from.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#permaDeleteBtn',
+    popover: {
+      title: '❌ Delete Forever',
+      description: 'Tap here to permanently delete this item. This cannot be undone.',
+      side: 'left',
+    },
+  },
+]
+
+// ─── Recently Deleted Mobile (below 768px) ──────────────────────────────────
+const recentlydeletedMobile: DriveStep[] = [
+  {
+    element: '#filterTypeSelect',
+    popover: {
+      title: '🔀 Filter by Type',
+      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#deletedSearchBar',
+    popover: {
+      title: '🔍 Search',
+      description: 'Quickly find a deleted item by name.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#deletedTable',
+    popover: {
+      title: '🗑️ Deleted Items',
+      description: 'Items stay here for 30 days before being permanently removed.',
+      side: 'over',
+    },
+  },
+  {
+    element: '#restoreBtn',
+    popover: {
+      title: '♻️ Restore',
+      description: 'Tap here to bring this item back to where it came from.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#permaDeleteBtn',
+    popover: {
+      title: '❌ Delete Forever',
+      description: 'Tap here to permanently delete this item. This cannot be undone.',
+      side: 'bottom',
+    },
+  },
+]
+// ─── Account Desktop (lg+, 1024px+) ─────────────────────────────────────────
+const accountDesktop: DriveStep[] = [
+  {
+    element: '#navBasicInfo',
+    popover: {
+      title: '👤 Basic Info',
+      description: 'Update your name, profile photo, and other basic account details here.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#navPassword',
+    popover: {
+      title: '🔒 Password',
+      description: 'Change your account password here.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#navTerms',
+    popover: {
+      title: '📄 Terms of Service',
+      description: 'Review the Terms of Service for Study Buddy.',
+      side: 'right',
+    },
+  },
+  {
+    element: '#navPrivacy',
+    popover: {
+      title: '🛡️ Privacy Policy',
+      description: 'Review how your data is handled in our Privacy Policy.',
+      side: 'right',
+    },
+  },
+
+]
+
+// ─── Account Tablet (md, 768px–1023px) ──────────────────────────────────────
+const accountTablet: DriveStep[] = [
+  {
+    element: '#mobileNavBasicInfo',
+    popover: {
+      title: '👤 Basic Info',
+      description: 'Tap here to update your name, profile photo, and other basic account details.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#mobileNavPassword',
+    popover: {
+      title: '🔒 Password',
+      description: 'Tap here to change your account password.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#mobileNavTerms',
+    popover: {
+      title: '📄 Terms of Service',
+      description: 'Tap here to review the Terms of Service.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#mobileNavPrivacy',
+    popover: {
+      title: '🛡️ Privacy Policy',
+      description: 'Tap here to review the Privacy Policy.',
+      side: 'top',
+    },
+  },
+  
+]
+
+// ─── Account Mobile (below 768px) ───────────────────────────────────────────
+const accountMobile: DriveStep[] = [
+  {
+    element: '#mobileNavBasicInfo',
+    popover: {
+      title: '👤 Basic Info',
+      description: 'Tap here to update your name, profile photo, and other basic account details.',
+      side: 'top',
+      popoverClass: 'study-buddy-tour tour-bottom-anchor', // 👈 added
+    },
+  },
+  {
+    element: '#mobileNavPassword',
+    popover: {
+      title: '🔒 Password',
+      description: 'Tap here to change your account password.',
+      side: 'top',
+      popoverClass: 'study-buddy-tour tour-bottom-anchor', // 👈 added
+    },
+  },
+  {
+    element: '#mobileNavTerms',
+    popover: {
+      title: '📄 Terms of Service',
+      description: 'Tap here to review the Terms of Service.',
+      side: 'top',
+      popoverClass: 'study-buddy-tour tour-bottom-anchor', // 👈 added
+    },
+  },
+  {
+    element: '#mobileNavPrivacy',
+    popover: {
+      title: '🛡️ Privacy Policy',
+      description: 'Tap here to review the Privacy Policy.',
+      side: 'top',
+      popoverClass: 'study-buddy-tour tour-bottom-anchor', // 👈 added
+    },
+  },
+  
+]
 // ─── Tour steps map ─────────────────────────────────────────────────────────
 export const tourSteps: Record<string, {
   desktop: DriveStep[]
@@ -1157,7 +1557,21 @@ export const tourSteps: Record<string, {
     tablet: studygeneratorTablet, 
     mobile: studygeneratorMobile 
   }, 
-
+  generatedhistory: {                             
+    desktop: generatedhistoryDesktop,
+    tablet:  generatedhistoryTablet,
+    mobile:  generatedhistoryMobile,
+  },
+   recentlydeleted: {                      
+    desktop: recentlydeletedDesktop,
+    tablet:  recentlydeletedTablet,
+    mobile:  recentlydeletedMobile,
+  },
+  account: {
+    desktop: accountDesktop,
+    tablet:  accountTablet,
+    mobile:  accountMobile,
+  },
 }
 
 // ─── startTour ──────────────────────────────────────────────────────────────
@@ -1166,7 +1580,8 @@ export function startTour(
   onOpenTimer?: () => void,
   onCloseTimer?: () => void,
   onOpenSidebar?: () => void,
-  onCloseSidebar?: () => void
+  onCloseSidebar?: () => void,
+  onTourEnd?: () => void   // ← NEW: 6th param
 ) {
   const w = window.innerWidth
 
@@ -1177,29 +1592,29 @@ export function startTour(
 
   if (!steps?.length) return
 
-const driverObj = driver({
-  showProgress: true,
-  animate: true,
-  smoothScroll: true,
-  overlayOpacity: 0.4,
-  popoverClass: 'study-buddy-tour',
-  nextBtnText: 'Next →',
-  prevBtnText: '← Back',
-  doneBtnText: 'Done',
-  allowClose: false,
-  stagePadding: 9,
-  stageRadius: 12,
-  onPopoverRender: (popover) => {
-    const closeBtn = document.createElement('button')
-    closeBtn.innerText = '✕'
-    closeBtn.style.cssText = `
-      position: absolute; top: 10px; right: 10px;
-      background: none; border: none; font-size: 16px;
-      cursor: pointer; color: #666; line-height: 1;
-    `
-    closeBtn.onclick = () => driverObj.destroy()
-    popover.wrapper.appendChild(closeBtn)
-  },
+  const driverObj = driver({
+    showProgress: true,
+    animate: true,
+    smoothScroll: true,
+    overlayOpacity: 0.4,
+    popoverClass: 'study-buddy-tour',
+    nextBtnText: 'Next →',
+    prevBtnText: '← Back',
+    doneBtnText: 'Done',
+    allowClose: false,
+    stagePadding: 9,
+    stageRadius: 12,
+    onPopoverRender: (popover) => {
+      const closeBtn = document.createElement('button')
+      closeBtn.innerText = '✕'
+      closeBtn.style.cssText = `
+        position: absolute; top: 10px; right: 10px;
+        background: none; border: none; font-size: 16px;
+        cursor: pointer; color: #666; line-height: 1;
+      `
+      closeBtn.onclick = () => driverObj.destroy()
+      popover.wrapper.appendChild(closeBtn)
+    },
     onNextClick: (_element, step) => {
       if (step.element === '#sidebar-btn' && onOpenSidebar) {
         onOpenSidebar()
@@ -1222,6 +1637,9 @@ const driverObj = driver({
         return
       }
       driverObj.moveNext()
+    },
+    onDestroyed: () => {          // ← NEW: fires on Done, ✕, Escape, overlay click
+      onTourEnd?.()
     },
     steps,
   })

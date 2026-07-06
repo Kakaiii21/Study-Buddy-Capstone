@@ -68,7 +68,7 @@ useEffect(() => {
   const { courses, loading, addCourse, updateCourse, deleteCourse } = useCourses(user)
 const { startTour } = useTour(
   'courses',
-  true,
+  false,
   () => {},
   () => {},
   () => {},
