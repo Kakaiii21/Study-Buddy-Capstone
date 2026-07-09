@@ -35,29 +35,29 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
   const handleNavigate = (path: string) => {
     if (isBlocked) return
     navigate(path)
-    close()   // ← was setIsOpen(false)
+    close() 
   }
 
   const navSections = [
     {
       heading: 'Home',
-      items: [{ label: 'Dashboard', path: '/dashboard' }]
+      items: [{ label: 'Dashboard', path: '/dashboard', icon: '/sideIcons/dashboard.png' }]
     },
     {
       heading: 'Activities',
       items: [
-        { label: 'To Do List', path: '/todolist' },
-        { label: 'Notes', path: '/notes' },
-        { label: 'Class Schedule', path: '/schedule' },
-        { label: 'Course', path: '/courses' },
-        { label: 'Study Generator', path: '/studyGenerator' },
-        { label: 'Generated History', path: '/history' },
-        { label: 'Recently Deleted', path: '/delete' },
+        { label: 'To Do List', path: '/todolist' , icon: '/sideIcons/todo.png' },
+        { label: 'Notes', path: '/notes' , icon: '/sideIcons/notes.png' },
+        { label: 'Class Schedule', path: '/schedule' , icon: '/sideIcons/classSched.png' },
+        { label: 'Course', path: '/courses' , icon: '/sideIcons/courses.png' },
+        { label: 'Study Generator', path: '/studyGenerator' , icon: '/sideIcons/studyGen.png' },
+        { label: 'Generated History', path: '/history' , icon: '/sideIcons/genHis.png' },
+        { label: 'Recently Deleted', path: '/delete' , icon: '/sideIcons/RecentD.png' },
       ]
     },
     {
       heading: 'More',
-      items: [{ label: 'Account', path: '/account' }]
+      items: [{ label: 'Account', path: '/account', icon: '/sideIcons/account.png' }]
     },
   ]
 
@@ -90,8 +90,9 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       {/* SIDEBAR */}
       <aside
         className={`
-          fixed top-0 left-0 h-full w-60 lg:w-56 xl:w-56 2xl:w-80 bg-primary-50 z-40
-          flex flex-col shadow-lg
+          rounded-2xl
+          fixed top-0 left-0 h-full  w-60 lg:w-56 xl:w-56 2xl:w-64 bg-primary-800 z-40
+          flex flex-col shadow-lg 
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:flex
@@ -99,51 +100,65 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         `}
       >
         {/* LOGO */}
-        <div className="p-6 flex justify-center items-center">
-          <img src="/logo.png" alt="Study Buddy" className="w-40 lg:w-40 xl:w-48 2xl:w-56" />
+        <div className="p-6 ml-2 flex gap-2 justify-start items-center">
+          <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-14 xl:w-14 2xl:w-20" />
+            <p className='font-roboto lg:text-[12px] xl:text-xs 2xl:text-[16px] text-white uppercase'>Study <br></br> Buddy</p>
         </div>
 
         {/* NAV SECTIONS */}
         <nav id='sidebar' className="flex-1 overflow-y-auto pb-4 ">
           {navSections.map((section) => (
             <div  key={section.heading} className="mb-4 ">
-              <div className="flex items-center gap-2 px-6 lg:px-6 xl:px-8 2xl:px-14 mb-2">
-                <span className="text-primary-600 font-roboto font-bold text-lg uppercase tracking-wide">
+              <div className=" mx-5 h-px bg-primary-100" />
+              <div className="flex pl-5 flex-row items-start mb-2">
+                <span className="text-[#8C8C8C] font-roboto font-normal text-sm pt-3  tracking-wide">
                   {section.heading}
                 </span>
-                <div className="flex-1 h-px bg-primary-100" />
               </div>
+            <div className='px-5 lg:px-2 xl:px-3'>
 
               {section.items.map((item) => (
-                <button
+              <button
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
                   className={`
-                    w-full text-left py-2 px-4 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 mb-1
-                    font-medium text-lg lg:text-md xl:text-md 2xl:text-xl
-                    transition-colors duration-200
+                    w-full text-left py-2 pl-3  mb-1
+                    font-medium text-lg lg:text-[15px] xl:text-[16px] 2xl:text-[18px]
+                    transition-colors duration-200  rounded-lg
+                    flex items-center gap-2 justs
                     ${location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/') ||
                       (item.path === '/history' && ['/quizView', '/flashcardView'].includes(location.pathname)) ||
                       (item.path === '/account' && location.pathname === '/changeEmail')
-                      ? 'bg-primary-100 text-primary-600 font-semibold'
-                      : 'text-primary-600 hover:bg-primary-100'
+                      ? 'bg-[#4A4A49] text-white font-medium'
+                      : 'text-white hover:bg-[#4A4A49]'
                     }
                   `}
                 >
+                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 shrink-0" />
                   {item.label}
                 </button>
               ))}
             </div>
+            </div>
           ))}
 
           {/* LOGOUT */}
-          <button
-            onClick={() => !isBlocked && setShowLogoutModal(true)}
-            className="w-full text-left py-2 pl-14 lg:pl-14 xl:pl-14 2xl:pl-24 px-4 text-lg lg:text-md xl:text-md 2xl:text-xl mb-1 font-medium font-roboto text-primary-600 hover:bg-primary-100 transition-colors duration-200"
-          >
-            Logout
-          </button>
+              <div className='px-5 lg:px-2 xl:px-3'>
+                <button
+                  onClick={() => !isBlocked && setShowLogoutModal(true)}
+                  className="
+                    w-full text-left py-2 pl-3 mb-1
+                    font-medium text-lg lg:text-[15px] xl:text-[16px] 2xl:text-[18px]
+                    transition-colors duration-200 rounded-lg
+                    flex items-center gap-2 
+                    text-white hover:bg-[#4A4A49]
+                  "
+                >
+                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 shrink-0" />
+                  Logout
+                </button>
+              </div>
         </nav>
       </aside>
 

@@ -36,7 +36,9 @@ const { startTour } = useTour(
 
   return (
     <div className='flex h-screen'>
-      <Sidebar />
+      <div className='p-3 '>
+      <Sidebar />        
+      </div>
 
       <div className='flex-1 flex flex-col overflow-hidden'>
 

@@ -387,7 +387,10 @@ const { startTour } = useTour(
 )
   return (
     <div className='flex h-screen'>
+      <div className='p-3 '>
       <Sidebar />
+        
+      </div>
       <main className='flex-1 overflow-auto p-8 mt-1'>
         <div className='min-h-screen flex flex-col'>
 

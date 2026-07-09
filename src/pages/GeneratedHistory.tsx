@@ -150,8 +150,10 @@ function GeneratedHistory() {
   return (
     <div className='flex h-screen'>
 
-      <Sidebar />
+      <div className='p-3 '>
+        <Sidebar />
 
+      </div>
       <main className='flex-1 overflow-auto p-4 md:p-8 mt-1 lg:mt-0'>
         <div className='min-h-screen flex flex-col'>
 

@@ -139,8 +139,11 @@ function FlashcardView() {
   return (
     <div className='flex h-screen'>
 
+      <div className='p-3 '>
       <Sidebar />
-      <main className='flex-1 overflow-auto p-4 md:p-8'>
+        
+      </div>
+        <main className='flex-1 overflow-auto p-4 md:p-8'>
 
         {/* Header */}
         <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6 mt-4'>

@@ -266,7 +266,10 @@ function Notes() {
 
   return (
     <div className='flex h-screen'>
-      <Sidebar />
+      <div className='p-3 '>
+        <Sidebar />        
+      </div>
+
       <main className='flex-1 overflow-auto p-8'>
         <div className='min-h-screen flex flex-col'>
 

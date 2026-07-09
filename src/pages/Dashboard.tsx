@@ -133,10 +133,12 @@ function Dashboard() {
       <div className='flex h-full'>
 
         {/* Sidebar */}
-        <Sidebar
-          isOpenExternal={showSidebar}
-          onExternalClose={() => setShowSidebar(false)}
-        />
+        <div className='p-3 '>
+          <Sidebar
+            isOpenExternal={showSidebar}
+            onExternalClose={() => setShowSidebar(false)}
+          />
+        </div>
 
         {/* Right of sidebar */}
         <div className='flex-1 flex flex-col overflow-hidden'>
@@ -168,6 +170,7 @@ function Dashboard() {
                     md:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
                     lg:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
                     xl:shadow-[0_2px_4px_rgba(0,0,0,0.8)]
+                    md:bg-pink-600 lg:bg-green-600 xl:bg-blue-600 2xl:bg-yellow-600
                     2xl:shadow-[0_4px_5px_rgba(0,0,0,.32)]'>
                 <div className='flex items-center justify-between'>
                   <div className='flex flex-col gap-0 text-left'>

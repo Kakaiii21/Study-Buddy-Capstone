@@ -155,7 +155,10 @@ const { startTour } = useTour(
 
   return (
     <div className='flex h-screen' onClick={() => setActiveMenu(null)}>
+      <div className='p-3 '>
       <Sidebar />
+        
+      </div>
       <main className="flex-1 overflow-y-auto p-8 mt-0">
         <div className='min-h-screen flex flex-col'>
 

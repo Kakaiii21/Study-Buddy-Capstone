@@ -549,10 +549,10 @@ function ToDoList() {
   const { startTour } = useTour(
     'todolist',
     false,
-    () => {},   // no-op
-    () => {},   // no-op
-    () => {},   // no-op — don't need to open the sidebar
-    () => {},   // no-op — don't need to close the sidebar
+    () => {},   
+    () => {},
+    () => {},   
+    () => {},   
     user
 )
 
@@ -625,7 +625,10 @@ function ToDoList() {
   return (
     <div className="flex h-screen">
 
-      <Sidebar />
+      <div className='p-3 '>
+        <Sidebar />
+      </div>
+      
 
       {pendingDelete && (
         <SoftDeleteModal

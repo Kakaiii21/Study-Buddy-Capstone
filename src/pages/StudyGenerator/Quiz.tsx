@@ -99,8 +99,9 @@ function Quiz() {
     if (!result?.items || result.items.length === 0) {
           return (
           <div className='flex h-screen'>
-
-            <Sidebar quizActive={!submitted} />
+           <div className='p-3 '>
+              <Sidebar quizActive={!submitted} />
+            </div>
             <main className='flex-1 overflow-auto p-8 flex flex-col items-center justify-center'>
               <p className='text-primary-600 font-roboto font-bold text-xl mb-4'>No quiz data found.</p>
               <button
@@ -266,9 +267,10 @@ function Quiz() {
 
   return (
     <div className='flex h-screen'>
-      <div className='flex bg-gray-600 h-screen w-16'></div>
+    <div className='p-3 '>
 
      <Sidebar quizActive={!submitted} />
+     </div>
       <main className='flex-1 overflow-auto p-8'>
 
         <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6'>
