@@ -22,6 +22,7 @@ export default {
         orbitron:['Orbitron', 'sans-serif'],
         fustat:['Fustat', 'sans-serif'],
         inter:['Inter', 'sans-serif'],
+        kapakana:['Kapakana', 'cursive'],
       }
     },
   },

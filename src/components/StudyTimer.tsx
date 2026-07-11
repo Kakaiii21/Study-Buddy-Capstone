@@ -1,8 +1,4 @@
-import { useState, useMemo } from 'react'
-import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { useTasks } from '../hooks/useTasks'
+import { useState } from 'react'
 import { useTimerContext } from '../context/TimerContext'
 
 const PRESETS = [
@@ -15,37 +11,17 @@ const PRESETS = [
 ]
 
 function StudyTimer() {
-  const navigate  = useNavigate()
-  const { user }  = useAuth()
-  const { tasks } = useTasks(user)
-
-const completedPercent = useMemo(() => {
-  const total = tasks.length
-
-  const done = tasks.filter(
-    (t: { status: string }) => t.status === 'done'
-  ).length
-
-  return total === 0 ? 0 : Math.round((done / total) * 100)
-}, [tasks])
-  // ↓ from context now — replaces useTimer + totalTimeInSeconds + showExpiredMsg
   const {
     seconds, minutes, hours,
-    isRunning, isActive,  
-    setTimer, pause, resume, stop,  
-    
+    isRunning, isActive,
+    setTimer, pause, resume, stop,
   } = useTimerContext()
 
-  // ↓ these stay local — only used inside the modal
-  const [showModal,    setShowModal]    = useState<boolean>(false)
   const [errorMsg,     setErrorMsg]     = useState<string>('')
   const [inputHours,   setInputHours]   = useState<string>('0')
   const [inputMinutes, setInputMinutes] = useState<string>('0')
   const [inputSeconds, setInputSeconds] = useState<string>('0')
 
-  // ↓ remove: useState for totalTimeInSeconds, getExpiryTimestamp, initialExpiry, useTimer
-
-  const closeModal = () => setShowModal(false)
   const formatTime = (t: number): string => t.toString().padStart(2, '0')
 
   const handleSetTime = (): void => {
@@ -57,182 +33,126 @@ const completedPercent = useMemo(() => {
     if (hrs > 23 || mins > 59 || secs > 59)    { setErrorMsg('Invalid time values');     return }
 
     setErrorMsg('')
-    setTimer(hrs, mins, secs)  // ← context handles it now
-    closeModal()
+    setTimer(hrs, mins, secs)
   }
 
-
   return (
-<div className='flex flex-col min-h-screen w-full bg-primary-600 p-4 lg:p-3 py-6 gap-14 md:gap-16 lg:gap-20 2xl:gap-24 items-center justify-center overflow-y-auto'>
+    <div className='flex flex-col h-full w-full bg-white
+      px-3 xs:px-4 sm:px-5 lg:px-4 xl:px-5 2xl:px-6
+      py-6 sm:py-7 lg:py-5 xl:py-6 2xl:py-6
+      gap-8 sm:gap-10 md:gap-12 lg:gap-4 xl:gap-5 2xl:gap-5
+      items-start justify-start overflow-y-auto overflow-x-hidden box-border'>
 
-    <p  className='font-roboto font-light text-center  text-white tracking-widest text-2xl lg:mt-10 xl:mt-10 2xl:mt-10 lg:text-2xl 2xl:text-4xl uppercase'>
-        Study Timer
-      </p>
+      <div className='w-full flex flex-col gap-4 lg:gap-3 xl:gap-4 2xl:gap-y-10 rounded-2xl justify-center items-center bg-primary-800'>
+        <p className='font-bold text-center font-inter text-white tracking-widest mt-6 sm:mt-8 lg:mt-10 xl:mt-10 2xl:mt-10 text-base sm:text-lg md:text-xl lg:text-lg xl:text-xl 2xl:text-2xl uppercase px-2'>
+          Study Timer
+        </p>
 
-
-
-      {/* TIMER DISPLAY — exact same as before */}
-      <div  id='timer' className='flex  items-end gap-2'>
-        {[
-          { val: formatTime(hours),   label: 'HOUR' },
-          { val: formatTime(minutes), label: 'MIN'  },
-          { val: formatTime(seconds), label: 'SEC'  },
-        ].map((item, i) => (
-          <div key={i} className='flex items-end gap-2'>
-            <div className='flex flex-col items-center'>
-              <span className='font-orbitron  text-white text-3xl md:text-3xl lg:text-4xl 2xl:text-[40px]'>{item.val}</span>
-              <span className='text-lg font-roboto font-medium text-white tracking-widest'>{item.label}</span>
+        {/* TIMER DISPLAY */}
+        <div id='timer' className='flex items-end gap-1 xs:gap-2 flex-wrap justify-center px-2'>
+          {[
+            { val: formatTime(hours),   label: 'HOUR' },
+            { val: formatTime(minutes), label: 'MIN'  },
+            { val: formatTime(seconds), label: 'SEC'  },
+          ].map((item, i) => (
+            <div key={i} className='flex items-end gap-1 xs:gap-2'>
+              <div className='flex flex-col items-center'>
+                <span className='font-orbitron leading-none text-white text-2xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[25px] xl:text-[35px] 2xl:text-[40px]'>{item.val}</span>
+                <span className='text-xs xs:text-sm sm:text-base md:text-lg font-roboto font-medium leading-none mt-1 sm:mt-2 lg:text-[14px] xl:text-[20px] 2xl:text-[20px] text-white tracking-widest'>{item.label}</span>
+              </div>
+              {i < 2 && (
+                <div className='flex flex-col items-center'>
+                  <span className='font-orbitron font-bold leading-none text-white text-2xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[30px] xl:text-[35px] 2xl:text-[40px]'>:</span>
+                  <span aria-hidden className='invisible text-xs xs:text-sm sm:text-base md:text-lg font-roboto font-medium leading-none mt-1 lg:text-[18px] xl:text-[20px] 2xl:text-[40px] tracking-widest'>0</span>
+                </div>
+              )}
             </div>
-            {i < 2 && (
-              <span className='font-orbitron font-bold text-white md:text-3xl text-3xl mb-4'>:</span>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-        {/* BUTTONS */}
-        <div className='flex gap-3'>
-          {!isActive ? (
-            <>
-              <button id='setTime' onClick={() => setShowModal(true)}
-                className='px-4 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-primary-300 uppercase text-primary-600 font-inter font-extrabold text-sm hover:bg-primary-100'>
-                Set Time
-              </button>
-              <button onClick={() => setShowModal(true)}
-                className='px-4 py-2 rounded-xl bg-white text-primary-600 uppercase font-extrabold font-inter text-sm hover:bg-primary-700'>
-                Start
-              </button>
-            </>
-          ) : (
+        {/* BUTTONS — Stop/Pause/Resume, shown only when a timer is active */}
+        <div className='flex flex-wrap justify-center gap-3 mb-8 sm:mb-10 px-2'>
+          {isActive && (
             <>
               <button onClick={() => stop()}
-                className='px-6 lg:px-3 xl:px-3 2xl:px-6 py-2 rounded-xl bg-white text-red-500 font-bold text-sm hover:bg-red-50'>
+                className='px-5 sm:px-6 lg:px-3 xl:px-3 2xl:px-10 py-2 lg:py-1 xl:py-2 2xl:py-2 rounded-md bg-[#4A4A49] text-white font-inter font-extrabold uppercase text-xs sm:text-sm lg:text-xs xl:text-sm 2xl:text-sm hover:bg-red-50'>
                 Stop
               </button>
               <button
                 onClick={() => { if (isRunning) { pause(); return } resume() }}
-                className='px-8 py-2 rounded-xl bg-white text-primary-600 font-bold text-sm hover:bg-primary-700'>
+                className='px-5 sm:px-6 lg:px-3 xl:px-3 2xl:px-10 py-2 lg:py-1 xl:py-2 2xl:py-2 rounded-md bg-white text-primary-800 font-inter font-extrabold uppercase text-xs sm:text-sm lg:text-xs xl:text-sm 2xl:text-sm hover:bg-primary-700'>
                 {isRunning ? 'Pause' : 'Resume'}
               </button>
             </>
           )}
         </div>
-
-    {/* CIRCULAR PROGRESS — exact same as before */}
-    <div id='progressC' className='flex flex-col items-center gap-3'>
-      <p className='text-xs lg:text-lg xl:text-xl 2xl:text-2xl font-light font-roboto  text-white tracking-widest uppercase text-center mb-3'>
-       Task Progress
-      </p>
-      <div className='relative flex items-center justify-center 
-      w-44 h-44
-      md:w-48 md:h-48
-      lg:w-52 lg:h-52
-      xl:w-52 xl:h-52
-      2xl:w-52 2xl:h-52
-      '>
-        
-        <svg className='w-full h-full -rotate-90' viewBox='0 0 36 36'>
-          <circle cx='18' cy='18' r='14' fill='none' stroke='#e2e8f0' strokeWidth='4'   />
-          <circle
-            cx='18' cy='18' r='14'
-            fill='none' stroke='currentColor' strokeWidth='4'   strokeLinecap='butt'
-            className='text-gray-500'
-            strokeDasharray='100'
-            strokeDashoffset={100 - completedPercent}
-          />
-        </svg>
-        <span className='absolute font-inter font-extrabold  text-white text-3xl'>
-          {completedPercent}%
-        </span>
       </div>
 
-    </div>
+      <div className='flex w-full'>
+        <p className='font-inter font-semibold uppercase text-left text-xs sm:text-sm md:text-md lg:text-sm xl:text-md 2xl:text-lg text-[#B3B3B3]'>set your study time</p>
+      </div>
 
-      {/* VIEW TASKS — exact same as before */}
-      <button id='viewBtn'
-        onClick={() => navigate('/todolist')}
-        className='px-8 py-2 rounded-xl bg-white font-inter font-extrabold uppercase text-primary-600 text-sm'
-      >
-        View
-      </button>
+      {/* SET-TIMER PANEL */}
+      <div className='w-full bg-white rounded-2xl p-4 sm:p-5 lg:p-4 xl:p-6 2xl:p-8 flex flex-col gap-0 border-2 border-primary-800'>
+        {errorMsg && (
+          <p className='text-red-500 text-xs text-center mb-4'>{errorMsg}</p>
+        )}
 
-      {/* MODAL — exact same as before, portal still works fine */}
-      {showModal && createPortal(
-        <div
-          className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/40'
-          onMouseDown={() => closeModal()}
-        >
-          <div
-            className='bg-white rounded-2xl p-6  w-[400px] lg:w-[400px] xl:w-[400px] 2xl:w-[500px] mx-5 h-auto  flex flex-col gap-0 shadow-xl'
-            onMouseDown={(e) => e.stopPropagation()}
-          >       
-          {/*  
-              <button className='text-xl  ml-auto font-bold font-roboto' onClick={() => closeModal()}>CLOSE</button>
-              <h3 className='font-bold  mb-7 text-center text-primary-600 text-2xl font-roboto uppercase'>Set Timer</h3>
- */}     
-             <div className='flex justify-between'>
-              <h3 className='font-bold font-roboto text-primary-600 text-xl uppercase'>Set Timer</h3>
-              <button className='font-bold mb-3 text-xl uppercase' onClick={() => setShowModal(false)}>Close</button>
-            </div>
-              <hr className='w-full border-t border-primary-600 mb-6' />
-
-
-            {errorMsg && (
-              <p className='text-red-500 text-xs text-center'>{errorMsg}</p>
-            )}
-
-            <div className='flex justify-center gap-10 text-primary-600 font-roboto'>
-              {[
-                { label: 'Hours',   val: inputHours,   set: setInputHours,   id: 'hours'   },
-                { label: 'Minutes', val: inputMinutes, set: setInputMinutes, id: 'minutes' },
-                { label: 'Seconds', val: inputSeconds, set: setInputSeconds, id: 'seconds' },
-              ].map((field) => (
-                <div key={field.id} className='flex flex-col items-center'>
-                  <label htmlFor={field.id} className='text-md text-primary-600 '>{field.label}</label>
-                  <input
-                    id={field.id}
-                    type='text'
-                    inputMode='numeric'
-                    pattern='[0-9]*'
-                    value={field.val}
-                    onChange={(e) => {
-                      const clean = e.target.value.replace(/[^0-9]/g, '')
-                      field.set(clean === '' ? '0' : clean)
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    className='w-16 text-center border rounded text-xl text-primary-600 mb-10'
-                  />
-                </div>
-              ))}
-            </div>
-            <p className='text-xl text-primary-600 mb-5 font-roboto text-center'>Quick Presets</p>
-
-            <div className='grid grid-cols-3 gap-2 justify-center mb-10'>
-              {PRESETS.map((p) => (
-                <button
-                  key={p.label}
-                  onClick={() => {
-                    setInputHours(String(p.h))
-                    setInputMinutes(String(p.m))
-                    setInputSeconds(String(p.s))
+        <div className='flex flex-wrap justify-center items-end text-xs gap-x-1 xs:gap-x-0 sm:gap-x-2 lg:gap-1 xl:gap-5 2xl:gap-6 text-primary-600 mt-4 sm:mt-5 lg:mt-3 xl:mt-5 2xl:mt-6 uppercase font-roboto'>
+          {[
+            { label: 'Hours',   val: inputHours,   set: setInputHours,   id: 'hours'   },
+            { label: 'Minutes', val: inputMinutes, set: setInputMinutes, id: 'minutes' },
+            { label: 'Seconds', val: inputSeconds, set: setInputSeconds, id: 'seconds' },
+          ].map((field, i) => (
+            <div key={field.id} className='flex items-end'>
+              <div className='flex flex-col items-center'>
+                <label htmlFor={field.id} className='text-sm sm:text-md lg:text-xs xl:text-[15px] 2xl:text-lg text-primary-600 mb-2 sm:mb-3 lg:mb-2 xl:mb-3 2xl:mb-4'>{field.label}</label>
+                <input
+                  id={field.id}
+                  type='text'
+                  inputMode='numeric'
+                  pattern='[0-9]*'
+                  value={field.val}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/[^0-9]/g, '')
+                    field.set(clean === '' ? '0' : clean)
                   }}
-                  className='px-3 py-1 text-md border bg-primary-600 text-white  font-roboto rounded'
-                >
-                  {p.label}
-                </button>
-              ))}
+                  onFocus={(e) => e.target.select()}
+                  className='w-12 xs:w-14 sm:w-16 lg:w-14 xl:w-16 2xl:w-20 text-center border-2 border-primary-800 rounded text-lg xs:text-xl lg:text-sm xl:text-lg 2xl:text-2xl text-primary-600 mb-8 sm:mb-10 lg:mb-6 xl:mb-8 2xl:mb-10'
+                />
+              </div>
+              {i < 2 && (
+                <span className='text-sm lg:text-xs xl:text-sm 2xl:text-base font-bold text-primary-600 mb-8 sm:mb-10 lg:mb-6 xl:mb-8 2xl:mb-10 mx-0.5 leading-none'>:</span>
+              )}
             </div>
+          ))}
+        </div>
 
+        <button
+          onClick={handleSetTime}
+          className='w-full py-2 lg:py-1 xl:py-2 2xl:py-3 bg-primary-800 font-inter text-xs sm:text-sm lg:text-sm xl:text-[16px] 2xl:text-lg font-extrabold uppercase text-white rounded-md mb-2'
+        >
+          Set Timer
+        </button>
+
+        <p className='text-primary-800 mb-3 lg:mb-2 xl:mb-3 2xl:mb-4 font-inter font-normal text-xs sm:text-sm lg:text-sm xl:text-[15px] 2xl:text-lg uppercase text-center'>Quick Presets</p>
+
+        <div className='grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 gap-x-2 px-2 sm:px-5 lg:px-1 xl:gap-x-5 xl:px-4 2xl:gap-x-6 2xl:px-6 w-full uppercase justify-center mb-8'>
+          {PRESETS.map((p) => (
             <button
-              onClick={handleSetTime}
-              className='w-full py-2 bg-primary-600 text-white rounded-xl'
+              key={p.label}
+              onClick={() => {
+                setInputHours(String(p.h))
+                setInputMinutes(String(p.m))
+                setInputSeconds(String(p.s))
+              }}
+              className='px-1 w-full py-2 lg:py-1 xl:py-2 2xl:py-3 text-xs sm:text-sm lg:text-xs xl:text-[15px] 2xl:text-base uppercase bg-[#4A4A49] rounded-md text-white font-inter font-bold'
             >
-              Set Timer
+              {p.label}
             </button>
-          </div>
-        </div>,
-        document.body
-      )}
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

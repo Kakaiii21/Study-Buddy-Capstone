@@ -90,8 +90,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       {/* SIDEBAR */}
       <aside
         className={`
-          rounded-2xl
-          fixed top-0 left-0 h-full  w-60 lg:w-56 xl:w-56 2xl:w-64 bg-primary-800 z-40
+          md:rounded-2xl
+          fixed top-0 left-0 h-full  w-60 lg:w-[180px] xl:w-56 2xl:w-[300px] bg-primary-800 z-40
           flex flex-col shadow-lg 
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -100,7 +100,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         `}
       >
         {/* LOGO */}
-        <div className="p-6 ml-2 flex gap-2 justify-start items-center">
+        <div className="p-6  ml-2 lg:ml-0 flex gap-2 justify-start items-center">
           <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-14 xl:w-14 2xl:w-20" />
             <p className='font-roboto lg:text-[12px] xl:text-xs 2xl:text-[16px] text-white uppercase'>Study <br></br> Buddy</p>
         </div>
@@ -111,7 +111,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
             <div  key={section.heading} className="mb-4 ">
               <div className=" mx-5 h-px bg-primary-100" />
               <div className="flex pl-5 flex-row items-start mb-2">
-                <span className="text-[#8C8C8C] font-roboto font-normal text-sm pt-3  tracking-wide">
+                <span className="text-[#8C8C8C]  font-roboto font-normal text-xs lg:text-xs xl:text-lg  pt-3  tracking-wide">
                   {section.heading}
                 </span>
               </div>
@@ -123,8 +123,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                   onClick={() => handleNavigate(item.path)}
                   className={`
                     w-full text-left py-2 pl-3  mb-1
-                    font-medium text-lg lg:text-[15px] xl:text-[16px] 2xl:text-[18px]
-                    transition-colors duration-200  rounded-lg
+                    font-medium text-lg lg:text-[12px] xl:text-[16px] 2xl:text-[18px]
+                    transition-colors duration-200  rounded-md
                     flex items-center gap-2 justs
                     ${location.pathname === item.path ||
                       location.pathname.startsWith(item.path + '/') ||
@@ -149,7 +149,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                   onClick={() => !isBlocked && setShowLogoutModal(true)}
                   className="
                     w-full text-left py-2 pl-3 mb-1
-                    font-medium text-lg lg:text-[15px] xl:text-[16px] 2xl:text-[18px]
+                    font-medium text-lg lg:text-[12px] xl:text-[16px] 2xl:text-[18px]
                     transition-colors duration-200 rounded-lg
                     flex items-center gap-2 
                     text-white hover:bg-[#4A4A49]
