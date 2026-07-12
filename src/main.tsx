@@ -31,6 +31,7 @@ import { setInstallPrompt } from './utils/pwaPrompt'
 import PrivacyPolicy from './privacy'
 import TermsOfService from './terms'
 import AuthGate from './components/AuthGate'
+import StudyTimerPage from './pages/StudyTimerPage'
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
@@ -76,6 +77,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/timer',
+    element: (
+      <ProtectedRoute>
+        <StudyTimerPage />
       </ProtectedRoute>
     ),
   },
