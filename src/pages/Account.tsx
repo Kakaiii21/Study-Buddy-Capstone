@@ -18,7 +18,7 @@ function Account() {
 const { startTour } = useTour(
   'account',
   false,
-  () => {}, () => {}, () => {}, () => {},
+  () => {}, () => {},
   user,
   () => setTourActive(false)
 )

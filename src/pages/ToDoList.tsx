@@ -80,17 +80,17 @@ function buildStorageValue(dateDisplay: string, time: string): string {
 }
 
 function getCardStyle(task: Task, nowISO: string): string {
-  if (task.status === 'done') return 'bg-green-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
-  if (task.deadline && task.deadline < nowISO) return 'bg-red-600 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  if (task.status === 'done') return 'border border-2 border-black bg-[#C4EAAD]  lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  if (task.deadline && task.deadline < nowISO) return 'border border-2 border-black bg-[#FF8383] lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 
   if (task.deadline) {
     const msUntil = new Date(task.deadline).getTime() - Date.now()
     if (msUntil > 0 && msUntil <= 60 * 60 * 1000) {
-      return 'bg-amber-300 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+      return 'bg-amber-300  border border-2 border-black lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
     }
   }
 
-  return 'bg-primary-700 lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  return 'bg-white border border-2 border-black lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 }
 
 // ── Task Modal ────────────────────────────────
@@ -182,7 +182,7 @@ function TaskModal({
         className="bg-white rounded-2xl p-7 mx-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-center font-bold text-primary-600 text-3xl p-4 pt-1">{title}</p>
+        <p className="text-center font-bold text-primary-600 text-3xl pt-4 ">{title}</p>
 
         <label className="flex font-semibold text-primary-600 text-xl py-2">Task</label>
         <input
@@ -197,7 +197,7 @@ function TaskModal({
         />
 
         <div className="flex flex-col gap-1">
-          <label className="flex text-primary-600 font-semibold text-xl py-3">Suggested Tasks:</label>
+          <label className="flex text-primary-800 font-semibold text-xl py-3">Suggested Tasks:</label>
           <div className="flex flex-wrap gap-2">
             {['Prepare report', 'Review', 'Study', 'Plan', 'Research', 'Advance Study', 'Read'].map((s) => (
               <button
@@ -371,7 +371,7 @@ function TaskCard({
       style={style}
       {...attributes}
       className={`
-        rounded-xl p-4 mb-3
+        rounded-md p-2  2xl:px-3 2xl:py-2 pt-0  mb-3
         hover:shadow-md
       
         w-full select-none relative
@@ -381,25 +381,25 @@ function TaskCard({
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
-        <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
+        <div className='flex justify-end text-primary-600 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
           <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
             month: '2-digit', day: '2-digit', year: 'numeric',
           })}</p>
         </div>
         <div className="flex justify-between items-start">
-          <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+          <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-black' : 'text-primary-600'}`}>
             {task.name}
           </p>
         </div>
         {task.deadline && (
-          <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
+          <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-black font-semibold' : 'text-primary-600'}`}>
             {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
             {toDisplayFormat(task.deadline)}
           </p>
         )}
       </div>
 
-      <div className="absolute bottom-3 right-3">
+      <div className="absolute bottom-1 right-3">
         <button
         id='taskOptionsBtn'
           title='More Options'
@@ -438,19 +438,20 @@ function DragCard({ task }: { task: Task }) {
   const nowISO = getNowISO()
   const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
   const isDone = task.status === 'done'
-
   return (
-    <div className={`rounded-xl p-4 w-full select-none relative shadow-2xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
-      <div className='flex justify-end text-primary-600 font-normal font-roboto text-sm'>
+    <div className={`rounded-md p-2 2xl:px-3 2xl:py-2 pt-0 mb-3 w-full select-none relative shadow-2xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
+      <div className='flex justify-end text-primary-600 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
         <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
           month: '2-digit', day: '2-digit', year: 'numeric',
         })}</p>
       </div>
-      <p className={`font-semibold font-roboto overflow-hidden text-ellipsis ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
-        {task.name}
-      </p>
+      <div className="flex justify-between items-start">
+        <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+          {task.name}
+        </p>
+      </div>
       {task.deadline && (
-        <p className={`text-sm mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
+        <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
           {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
           {toDisplayFormat(task.deadline)}
         </p>
@@ -458,7 +459,6 @@ function DragCard({ task }: { task: Task }) {
     </div>
   )
 }
-
 // ── Column ────────────────────────────────────
 
 function Column({
@@ -479,17 +479,17 @@ function Column({
       ref={setNodeRef}
       className={`
         w-full lg:flex-1
-        md:px-20 
-        flex flex-col items-center p-4 sm:p-6 lg:p-10 rounded-3xl
+        md:px-32 
+        flex flex-col items-center p-4 py-0 pt-4 md:py-0 md:pt-3 sm:p-6 lg:px-10 2xl:px-16 lg:p-0 lg:pt-0 lg:pb-5 rounded-3xl
         transition-colors duration-200
         ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
         ${isOver ? 'bg-primary-50' : ''}
       `}
     >
-      <div className="bg-primary-600 
+      <div className="bg-primary-800 
       shadow-[0_0px_5px_rgba(0,0,0,.3)]
       max-w-full w-full p-3 flex items-center justify-between">
-        <p className="text-white pl-5 lg:pl-0 text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
+        <p className="text-white pl-5 lg:pl-0 text-xl lg:text-sm 2xl:text-lg lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
           onClick={onToggleCollapse}
           className="lg:hidden text-white ml-2 text-xl font-bold"
@@ -505,7 +505,7 @@ function Column({
       <div
 
         style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
-        className="grid transition-all lg:px-0 md:px-24 duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
+        className="grid  transition-all lg:px-0 md:min-px-15 duration-300 ease-in-out lg:!grid-rows-[1fr] w-full"
       >
         <div className={`min-h-0 flex flex-col items-center w-full mt-4 transition-opacity duration-300
           ${collapsed ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}
@@ -551,8 +551,6 @@ function ToDoList() {
     false,
     () => {},   
     () => {},
-    () => {},   
-    () => {},   
     user
 )
 
@@ -623,12 +621,34 @@ function ToDoList() {
   const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null
 
   return (
-    <div className="flex h-screen">
+    <div className='h-screen w-full  overflow-hidden bg-white'>
+      <div className='flex h-full'>
+        {/* Sidebar */}
+        <div className='md:p-3 '>
+          <Sidebar
+          />
+        </div>
+        
 
-      <div className='p-3 '>
-        <Sidebar />
-      </div>
-      
+        {/* Right of sidebar */}
+        <div className='flex-1  flex flex-col overflow-hidden'>
+
+        {/* Top Bar — mobile only */}
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>To do list</p>
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='flex flex-col items-center gap-1 ml-auto
+                hover:opacity-80 active:scale-95 transition-all'
+              title='Take a Tour'
+            >
+              <div className='bg-white  w-14 h-14 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              </div>
+              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
+        </div>
 
       {pendingDelete && (
         <SoftDeleteModal
@@ -638,28 +658,52 @@ function ToDoList() {
         />
       )}
 
-      <main className="flex-1 w-full overflow-auto p-8  pt-7">
-        <div className="min-h-screen w-full flex flex-col">
+      <main className="flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-2  pt-1">
+        <div className="min-h-screen  w-full flex flex-col">
+<p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-10 
+  font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+  mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>To do list</p>
 
-          <div className="w-full flex flex-col lg:flex-row md:flex-row justify-center lg:justify-between lg:items-start md:justify-between md:items-start sm:items-center gap-4 p-2">
-            <p className="text-3xl lg:text-4xl lg:pt-2 lg:ml-0 md:ml-10 text-center font-bold sm:flex   text-primary-600 font-roboto">TO DO LIST</p>
-            <hr className='lg:hidden md:hidden w-full border-t border-primary-600' />
+          <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
+          pl-1   
+          lg:justify-end  lg:items-start lg:pr-10 lg:px-2 lg:gap-3
+           md:justify-between md:items-start sm:items-center gap-1 p-2">
+            <hr className='lg:hidden md:hidden w-full border-t border-[#E9E9E9]' />
             <button
             id='newTaskBtn'
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-500 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-white font-roboto font-bold mx-10
-               text-md py-3 px-9 rounded-md
-               hover:opacity-90
+              className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+              py-1 px-4 rounded-sm 
+              font-inter font-black
+               text-[10px] lg:text-[8px]
+               xl:text-[10px] 2xl:text-[12px]
+
+               hover:opacity-90 w-auto
                backdrop-blur-xs
-               hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
-               transition-all duration-300'"
+               hover:-translate-y-1 
+               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+               transition-all duration-300"
+            >
+              X  CLEAR ALL TASKS
+            </button>
+            <button
+            id='newTaskBtn'
+              onClick={() => setIsAddModalOpen(true)}
+              className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+              py-1 px-4 rounded-sm 
+              font-inter font-black
+               text-[10px] lg:text-[8px]
+               xl:text-[10px] 2xl:text-[12px]
+               hover:opacity-90 w-auto
+               backdrop-blur-xs
+               hover:-translate-y-1 
+               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+               transition-all duration-300"
             >
               + New Task
             </button>
           </div>
-          <hr className='hidden md:flex mt-3 w-full border-t border-primary-600' />
-
-
+<hr className="hidden lg:block mt-3 w-[75vw] mx-auto border-t border-[#E9E9E9]" />
           {isAddModalOpen && (
             <TaskModal
               title="ADD A TASK"
@@ -696,7 +740,7 @@ function ToDoList() {
             >
               <div 
               id='todoColumns'
-              className="w-full  flex flex-col lg:flex-row h-auto lg:min-h-screen mt-6 lg:mt-2  rounded-3xl">
+              className="w-full  flex flex-col lg:flex-row h-auto lg:min-h-screen mt-0 md:mt-0 lg:mt-2  rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
                     key={col.id}
@@ -719,23 +763,12 @@ function ToDoList() {
               </DragOverlay>
             </DndContext>
           )}
-            <button
-            id='tour-btn'
-              onClick={() => startTour()}
-              className='fixed bottom-6 right-6 z-50
-                flex flex-col items-center gap-1
-                hover:opacity-80 active:scale-95 transition-all
-                lg:bottom-8 lg:right-8'
-              title='Take a Tour'
-            >
-              <div className='bg-white  w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-              </div>
-              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-            </button>
+
         </div>
 
       </main>
+    </div>
+    </div>
     </div>
   )
 }

@@ -90,7 +90,7 @@ function RecentlyDeleted() {
   const { startTour } = useTour(   // ← NEW
     'recentlydeleted',
     false,
-    () => {}, () => {}, () => {}, () => {},
+    () => {}, () => {},
     user
   )
   const {

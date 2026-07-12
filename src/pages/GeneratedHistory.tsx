@@ -85,7 +85,7 @@ function GeneratedHistory() {
 
   const genOption = ['Quiz', 'Flashcard']
   const loading = selectedGen === 'Quiz' ? quizLoading : flashLoading
-  const { startTour } = useTour('generatedhistory', false, () => {}, () => {}, () => {}, () => {}, user)
+  const { startTour } = useTour('generatedhistory', false, () => {}, () => {},user)
   const filteredQuiz = quizHistory.filter((item) =>
     item.fileName.toLowerCase().includes(searchQuery.toLowerCase())
   )

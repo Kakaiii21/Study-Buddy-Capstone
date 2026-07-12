@@ -113,8 +113,6 @@ function CourseFolder() {
   false,
   () => {},
   () => {},
-  () => {},
-  () => {},
   user
 )
   const isOnline = useNetworkStatus()

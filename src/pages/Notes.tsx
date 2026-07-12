@@ -67,8 +67,6 @@ function Notes() {
     false,
     () => {},
     () => {},
-    () => {},
-    () => {},
     user
   )
   function handleSubjectDelete(subject: string) {

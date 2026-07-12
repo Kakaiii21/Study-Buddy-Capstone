@@ -71,8 +71,6 @@ const { startTour } = useTour(
   false,
   () => {},
   () => {},
-  () => {},
-  () => {},
   user
 )
   const [showModal, setShowModal] = useState(false)

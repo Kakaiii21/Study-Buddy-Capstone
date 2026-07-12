@@ -110,8 +110,6 @@ function ClassSchedule() {
     false,
     () => {},
     () => {},
-    () => {},
-    () => {},
     user
   )
   const formatTime = (time: string) => {

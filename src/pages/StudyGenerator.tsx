@@ -380,8 +380,6 @@ const { startTour } = useTour(
   false,
   () => {},
   () => {},
-  () => {},
-  () => {},
   user,
   () => setTourPreview(false)   
 )

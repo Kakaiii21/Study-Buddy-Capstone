@@ -1497,8 +1497,7 @@ export const tourSteps: Record<string, {
 // ─── startTour ──────────────────────────────────────────────────────────────
 export function startTour(
   page: keyof typeof tourSteps,
-  onOpenTimer?: () => void,
-  onCloseTimer?: () => void,
+
   onOpenSidebar?: () => void,
   onCloseSidebar?: () => void,
   onTourEnd?: () => void   // ← NEW: 6th param

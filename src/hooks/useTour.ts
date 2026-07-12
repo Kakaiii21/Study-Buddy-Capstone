@@ -7,8 +7,6 @@ const TOUR_KEY = 'study_buddy_tour_seen'
 export function useTour(
   page: keyof typeof tourSteps,
   auto = false,
-  onOpenTimer?: () => void,
-  onCloseTimer?: () => void,
   onOpenSidebar?: () => void,
   onCloseSidebar?: () => void,
   user?: User | null,
@@ -20,7 +18,7 @@ export function useTour(
     const seen = localStorage.getItem(key)
     if (!seen) {
       const timeout = setTimeout(() => {
-        startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar, onTourEnd)
+        startTour(page, onOpenSidebar, onCloseSidebar, onTourEnd)
         localStorage.setItem(key, 'true')
       }, 600)
       return () => clearTimeout(timeout)
@@ -28,6 +26,6 @@ export function useTour(
   }, [page, auto, user?.uid])
 
   return {
-    startTour: () => startTour(page, onOpenTimer, onCloseTimer, onOpenSidebar, onCloseSidebar, onTourEnd)
+    startTour: () => startTour(page, onOpenSidebar, onCloseSidebar, onTourEnd)
   }
 }

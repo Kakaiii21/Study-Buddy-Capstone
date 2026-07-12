@@ -43,8 +43,6 @@ function Dashboard() {
   const { startTour } = useTour(
     'dashboard',
     true,
-    undefined,                
-    undefined,     
     () => setShowSidebar(true), // onOpenSidebar
     () => setShowSidebar(false), // onCloseSidebar
     user
