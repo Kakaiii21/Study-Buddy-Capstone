@@ -164,34 +164,36 @@ function Dashboard() {
 <div className='flex w-full flex-1 overflow-hidden mt-0 lg:mt-0'>
 
      {/* Scrollable Main Content */}
-<main ref={mainRef} className='flex-1 min-w-0 w-full overflow-hidden bg-white px-8 lg:px-0 xl:px-1 2xl:px-8'>
-<p className='hidden md:flex w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto font-inter mt-6 xl:mt-10 2xl:mt-6 font-semibold text-sm md:text-md lg:text-md text-[#B3B3B3] uppercase'>Dashboard</p>
+<main ref={mainRef} className='flex-1 min-w-0 w-full overflow-hidden bg-white px-8 lg:px-5 xl:px-1 2xl:px-8'>
+<p className='hidden md:flex w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto 
+font-inter mt-6 lg:mt-3 xl:mt-10 2xl:mt-6 font-semibold text-sm md:text-md lg:text-[10px] text-[#B3B3B3] uppercase'>Dashboard</p>
 
 {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
-<div className='w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto mt-4'>
+<div className='w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto mt-2'>
 <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 md:gap-6 lg:gap-6 xl:gap-8 2xl:gap-[clamp(1rem,2vw,4rem)] mt-0 justify-center items-center'>
     
     {/* ID Card */}
-<div className='w-full flex-1 min-w-0 xl:mt-0 2xl:mt-4 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[340px] xl:max-w-[420px] 2xl:min-w-[400px] 2xl:max-w-[530px] h-auto pb-5 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden relative'>
+<div className='w-full flex-1 min-w-0 xl:mt-0 2xl:mt-4 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[340px] xl:max-w-[420px] 2xl:min-w-[400px] 2xl:max-w-[530px] 
+h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-12 2xl:h-12  bg-[#FFF1AB] rounded-t-2xl border-b-2 border-primary-800 relative'>
+      <div className='w-full h-8 md:h-9 lg:h-7 xl:h-12 2xl:h-12  bg-[#FFF1AB] rounded-t-2xl border-b-2 border-primary-800 relative'>
         {/* White pill notch */}
-        <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 h-3 md:h-3 lg:h-4 2xl:h-6 border-2 border-primary-800 rounded-full'></div>
+        <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 h-3 md:h-3 lg:h-3 2xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
       {/* Main content: photo + text + logo */}
       <div className='flex  flex-row items-start gap-3 px-4 md:px-4 lg:px-2 xl:px-3 2xl:px-4 lg:mt-2 xl:mt-6'>
         <img 
           src={profilePic} 
           alt="Profile" 
-          className='w-[70px] h-[95px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[110px] xl:w-[110px] xl:h-[145px] 2xl:w-[130px] 2xl:h-[170px] object-cover border-2 border-primary-800'
+          className='w-[70px] h-[95px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[100px] xl:w-[110px] xl:h-[145px] 2xl:w-[130px] 2xl:h-[170px] object-cover border-2 border-primary-800'
         />
         <div className='flex flex-col flex-1 pl-1'>
           <div className='flex flex-row items-start justify-between'>
-            <span className='font-kapakana italic text-[28px] md:text-[30px] lg:text-[34px] xl:text-[44px] 2xl:text-[50px] font-extrabold text-primary-800 leading-tight'>Welcome,</span>
+            <span className='font-kapakana italic text-[28px] md:text-[30px] lg:text-[28px] xl:text-[44px] 2xl:text-[50px] font-extrabold text-primary-800 leading-tight'>Welcome,</span>
             <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-11 xl:h-9 2xl:w-12 2xl:h-10' />
           </div>
-          <span className='font-bold font-inter text-primary-800 text-xl md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl leading-tight -mt-3 md:-mt-3 lg:-mt-4 xl:-mt-5 2xl:-mt-6'> {firstName ?? ''}</span>
+          <span className='font-bold font-inter text-primary-800 text-xl md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl leading-tight -mt-3 md:-mt-3 lg:-mt-2 xl:-mt-5 2xl:-mt-6'> {firstName ?? ''}</span>
           <span className='text-[8px] md:text-[9px] lg:text-[8px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800 tracking-wide mt-2'>
             START YOUR DAY BY BEING PRODUCTIVE.
           </span>
@@ -209,7 +211,7 @@ function Dashboard() {
     {/* Stats column */}
 <div className='flex w-full flex-1 min-w-0 flex-row gap-x-2 md:flex-col md:flex-1 lg:flex-1
   lg:min-w-[200px] lg:max-w-[clamp(260px,28vw,320px)] xl:min-w-[260px] xl:max-w-[320px] 2xl:max-w-[360px]
-  gap-y-3 md:gap-y-3 lg:gap-y-5 xl:gap-y-7 justify-between md:justify-center items-center pr-3'>
+  gap-y-3 md:gap-y-3 lg:gap-y-2 xl:gap-y-7 justify-between md:justify-center items-center pr-3'>
       {/* Current Time Spent */}
       <div id='currentTime'           
         className='w-full h-auto px-3 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 py-3
@@ -217,7 +219,7 @@ function Dashboard() {
           md:min-h-[70px]
         '>
         <img src="/currentTime.png" alt="Timer"
-          className='h-9 w-9 md:h-10 md:w-10 lg:h-[50px]  lg:w-[50px] xl:h-[60px] xl:w-[60px] 2xl:h-16 2xl:w-16 flex-shrink-0' />
+          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px]  lg:w-[40px] xl:h-[60px] xl:w-[60px] 2xl:h-16 2xl:w-16 flex-shrink-0' />
         <div className='flex flex-col flex-1 items-center'>
           <p className='text-[10px] md:text-[10px] lg:text-[12px] xl:text-[16px] 2xl:min-text-lg font-extrabold font-inter text-center text-primary-600'>Current Time Spent</p>
           <p className='text-xs md:text-sm lg:text-[18px] xl:text-[25px] 2xl:min-text-[35px] font-orbitron font-normal text-center text-primary-600'>
@@ -232,7 +234,7 @@ function Dashboard() {
           md:min-h-[70px]
         '>
         <img src="/currentScore.png" alt="Score"
-          className='h-9 w-9 md:h-10 md:w-10 lg:h-[50px] lg:w-[50px] xl:h-[60px] xl:w-[60px] 2xl:h-16 2xl:w-16 flex-shrink-0' />
+          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px] lg:w-[40px] xl:h-[60px] xl:w-[60px] 2xl:h-16 2xl:w-16 flex-shrink-0' />
         <div className='flex flex-col flex-1 items-center'>
           <p className='text-[10px] md:text-[10px] lg:text-[13px] xl:text-[16px] 2xl:min-text-lg font-extrabold font-inter text-center text-primary-600'>Current Score</p>
           <p className='text-sm md:text-base lg:text-[20px] xl:text-[25px] 2xl:min-text-[35px] font-roboto font-bold text-center text-primary-600'>
@@ -245,14 +247,14 @@ function Dashboard() {
 </div>
 
 {/* TASK PROGRESS heading with percent aligned right */}
-<div className='flex items-center justify-between w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] lg:pr-3 mx-auto 2xl:mt-10 mt-6'>
-  <p className='font-inter font-semibold text-sm md:text-md lg:text-md text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
-  <span className='font-inter font-semibold text-sm md:text-md lg:text-md text-primary-600'>{completedPercent}%</span>
+<div className='flex items-center justify-between w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] lg:pr-3 mx-auto lg:mt-4 2xl:mt-10 mt-6'>
+  <p className='font-inter font-semibold text-sm md:text-md lg:text-[10px] text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
+  <span className='font-inter font-semibold text-sm md:text-md lg:text-[10px] text-primary-600'>{completedPercent}%</span>
 </div>
 
 {/* HORIZONTAL PROGRESS BAR */}
 <div id='progressC' className='w-full max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto px-2 mt-3 xl:mt-5 2xl:mt-6 mb-2'>
-  <div className='w-full h-3 lg:h-4 xl:h-5 bg-gray-200 rounded-full overflow-hidden'>
+  <div className='w-full h-3 lg:h-3 xl:h-5 bg-gray-200 rounded-full overflow-hidden'>
     <div
       className='h-full bg-[#9CCF7E] rounded-full  transition-all  duration-500 ease-out'
       style={{ width: `${completedPercent}%` }}
@@ -260,8 +262,8 @@ function Dashboard() {
   </div>
 </div>
 
-<div className='flex flex-row w-full mt-5 lg:pr-3  2xl:mt-6 max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto justify-between'>
-  <p className='font-inter xl:text-[16px] mt-5 2xl:mt-8 font-semibold text-sm md:text-md lg:text-md text-[#B3B3B3] uppercase'>Activities</p>
+<div className='flex border flex-row w-full mt-5 lg:mt-1 lg:pr-3  2xl:mt-6 max-w-[520px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[900px] mx-auto justify-between'>
+  <p className='font-inter xl:text-[16px] mt-5 2xl:mt-8 font-semibold text-sm md:text-md lg:text-[10px] text-[#B3B3B3] uppercase'>Activities</p>
 
   <button
     id='tour-btn'
@@ -269,29 +271,29 @@ function Dashboard() {
     title='Take a Tour'
     className='flex flex-col items-center justify-center'
   >
-    <div className='w-14 h-14 lg:w-10 lg:h-10 flex items-center justify-center text-2xl font-bold'>
+    <div className='w-14 h-14 lg:w-7 lg:h-7 flex items-center justify-center text-2xl font-bold'>
       <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
     </div>
-    <p className='text-xs text-primary-600 lg:text-primary-800 text-center md:text-primary-600 xl:text-primary-800 2xl:text-primary-800 font-inter font-medium'>Need Help?</p>
+    <p className='text-xs text-primary-800  uppercase text-center lg:text-[8px]
+    font-inter font-semibold'>Need Help?</p>
   </button>
   </div>
 
 
-  {/* Activities Grid */}
 {/* Activities Grid */}
 <div className='flex justify-center pb-8 mt-3 lg:mt-3 lg:pr-3 2xl:mt-7 pr-1'>
-  <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3  2xl:px-1 2xl:grid-cols-3 gap-4 md:gap-6  lg:gap-x-3  lg:gap-y-4 xl:gap-x-10 xl:gap-y-5 2xl:gap-x-12 2xl:gap-y-5'>
+  <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3  2xl:px-1 2xl:grid-cols-3 gap-4 md:gap-6  lg:gap-x-10  lg:gap-y-4 xl:gap-x-10 xl:gap-y-5 2xl:gap-x-12 2xl:gap-y-5'>
     {activities.map((activity) => (
       <button
         key={activity.label}
         onClick={() => navigate(activity.path)}
         style={{ backgroundColor: activity.color }}
-className='relative flex flex-col justify-between text-left p-4
-  w-[100px] h-[100px] md:w-[190px] md:h-[120px]  lg:w-full lg:max-w-[190px] lg:h-[140px] xl:w-[180px] xl:h-[140px] 2xl:w-[220px] 2xl:h-[150px]
-  border-2 border-black rounded-2xl
-  hover:scale-[1.02] active:scale-[0.98] transition-transform'
+      className='relative flex flex-col justify-between text-left p-2
+        w-[100px] h-[100px] md:w-[190px] md:h-[120px]  lg:w-full lg:max-w-[170px] lg:h-[100px] xl:w-[180px] xl:h-[140px] 2xl:w-[220px] 2xl:h-[150px]
+        border-2 border-black rounded-2xl lg:rounded-lg
+        hover:scale-[1.02] active:scale-[0.98] transition-transform'
       >
-        <span className='font-inter font-black text-base md:text-lg lg:text-lg  2xl:text-2xl text-black uppercase leading-tight pr-8'>
+        <span className='font-inter font-black text-base md:text-lg lg:text-[16px]  2xl:text-2xl text-black uppercase leading-tight  pr-8'>
           {activity.label}
         </span>
         <div className='absolute bottom-3 
