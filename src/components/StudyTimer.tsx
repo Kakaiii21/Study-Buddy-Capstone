@@ -58,7 +58,7 @@ function StudyTimer() {
       gap-4  md:gap-5 lg:gap-2 xl:gap-3 2xl:gap-5
       items-start justify-start overflow-y-auto overflow-x-hidden box-border'>
 
-      <div className='w-full flex flex-col gap-4 md:gap-5 lg:gap-3 xl:gap-4 2xl:gap-y-10 
+      <div id='timer' className='w-full flex flex-col gap-4 md:gap-5 lg:gap-3 xl:gap-4 2xl:gap-y-10 
       rounded-2xl lg:rounded-xl pb-10 lg:pb-0
        justify-center items-center  bg-primary-800'>
         <p className='font-bold text-center font-inter text-white tracking-widest 
@@ -67,7 +67,7 @@ function StudyTimer() {
         </p>
 
         {/* TIMER DISPLAY */}
-        <div id='timer' className='flex items-end gap-2 mt-3 md:mt-3 md:gap-2 lg:mt-0 xs:gap-2 flex-wrap justify-center px-2'>
+        <div  className='flex items-end gap-2 mt-3 md:mt-3 md:gap-2 lg:mt-0 xs:gap-2 flex-wrap justify-center px-2'>
           {[
             { val: formatTime(hours),   label: 'HOUR' },
             { val: formatTime(minutes), label: 'MIN'  },
@@ -118,7 +118,7 @@ function StudyTimer() {
       </div>
 
       {/* SET-TIMER PANEL */}
-      <div className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800'>
+      <div id='setTime' className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800'>
 <p className={`text-red-500  text-xs  sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-4 transition-opacity ${
   errorMsg ? 'opacity-100' : 'opacity-0'
 }`}>

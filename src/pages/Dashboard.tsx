@@ -263,7 +263,8 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden rel
 </div>
 
 {/* TASK PROGRESS heading with percent aligned right */}
-<div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] lg:pr-3 mx-auto lg:mt-4 2xl:mt-5 mt-6 sm:mt-5 md:mt-5'>
+<div id='progressC' >
+  <div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] lg:pr-3 mx-auto lg:mt-4 2xl:mt-5 mt-6 sm:mt-5 md:mt-5'>
   <p className='font-inter font-semibold text-sm md:text-md 
   lg:text-[10px] xl:text-[11px] 2xl:text-[13px] text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
   <span className='font-inter font-semibold text-sm md:text-md 
@@ -271,13 +272,14 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden rel
 </div>
 
 {/* HORIZONTAL PROGRESS BAR */}
-<div id='progressC' className='w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] mx-auto px-2 mt-3 xl:mt-3 2xl:mt-3 mb-2'>
+<div  className='w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] mx-auto px-2 mt-3 xl:mt-3 2xl:mt-3 mb-2'>
   <div className='w-full h-3 lg:h-3 xl:h-3 bg-gray-200 rounded-full overflow-hidden'>
     <div
       className='h-full bg-[#9CCF7E] rounded-full  transition-all  duration-500 ease-out'
       style={{ width: `${completedPercent}%` }}
     />
   </div>
+</div>
 </div>
 
 <div className='flex  flex-row w-full mt-5 sm:mt-4 md:mt-4 lg:mt-1 lg:pr-3  2xl:mt-3 max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] mx-auto justify-between'>
@@ -300,7 +302,7 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden rel
 
 
 {/* Activities Grid */}
-<div className='flex  justify-center pb-8 mt-3 sm:mt-3 md:mt-3 lg:mt-3 lg:pr-3 2xl:mt-2 pr-1'>
+<div id='activitiesGrid' className='flex  justify-center pb-8 mt-3 sm:mt-3 md:mt-3 lg:mt-3 lg:pr-3 2xl:mt-2 pr-1'>
   <div className='grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:px-2 2xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-x-10 lg:gap-y-4 xl:gap-x-11 xl:gap-y-5 2xl:gap-x-10 2xl:gap-y-8'>
     {activities.map((activity) => (
       <button

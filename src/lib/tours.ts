@@ -9,16 +9,8 @@ const dashboardDesktop: DriveStep[] = [
   popover: {
     title: '❓ Need Help Anytime?',
     description: 'Click this button whenever you need a tour of the current page.',
-    side: 'top',
+    side: 'left',
   },
-  },
-  {
-    element: '#dash_stats',
-    popover: {
-      title: '📊 Your Stats at a Glance',
-      description: 'See how much time you\'ve studied, how many notes you\'ve made, and your file usage — all in one place.',
-      side: 'bottom',
-    },
   },
   {
     element: '#currentTime',
@@ -33,14 +25,6 @@ const dashboardDesktop: DriveStep[] = [
     popover: {
       title: '🏆 Latest Quiz Score',
       description: 'Your most recent quiz result appears here. Take more quizzes to keep improving!',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#genHistory',
-    popover: {
-      title: '📁 Generation History',
-      description: 'Click here to browse all the study materials you\'ve previously generated.',
       side: 'bottom',
     },
   },
@@ -65,15 +49,15 @@ const dashboardDesktop: DriveStep[] = [
     popover: {
       title: '✅ Task Progress',
       description: 'This ring shows how much of your to-do list you\'ve completed. Keep checking things off!',
-      side: 'left',
+      side: 'top',
     },
   },
   {
-    element: '#viewBtn',
+    element: '#activitiesGrid',
     popover: {
-      title: '📝 Go to To-Do List',
-      description: 'Click here to open your To-Do List and manage your study tasks.',
-      side: 'left',
+      title: '🚀 Quick Access',
+      description: 'Click any of these to go to different pages, like Notes, To-Do List, or your Class Schedule.',
+      side: 'top',
     },
   },
 ]
@@ -108,47 +92,7 @@ const dashboardTablet: DriveStep[] = [
     element: '#timer-btn',
     popover: {
       title: '⏳ Open Study Timer',
-      description: 'Tap this to slide open the study timer panel.',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#timer',
-    popover: {
-      title: '⏳ Study Timer',
-      description: 'Use this timer to track your focus sessions. It automatically logs your study time to your stats.',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#setTime',
-    popover: {
-      title: '🕐 Set Your Session Length',
-      description: 'Tap here to choose how long you want to study before the timer starts counting down.',
-      side: 'left',
-    },
-  },
-  {
-    element: '#progressC',
-    popover: {
-      title: '✅ Task Progress',
-      description: 'This ring shows how much of your to-do list you\'ve completed. Keep checking things off!',
-      side: 'top',
-    },
-  },
-  {
-    element: '#viewBtn',
-    popover: {
-      title: '📝 Go to To-Do List',
-      description: 'Tap here to open your To-Do List and manage your study tasks.',
-      side: 'top',
-    },
-  },
-  {
-    element: '#dash_stats',
-    popover: {
-      title: '📊 Your Stats at a Glance',
-      description: 'See how much time you\'ve studied, how many notes you\'ve made, and your file usage — all in one place.',
+      description: 'Click to open the study timer.',
       side: 'bottom',
     },
   },
@@ -169,11 +113,19 @@ const dashboardTablet: DriveStep[] = [
     },
   },
   {
-    element: '#genHistory',
+    element: '#progressC',
     popover: {
-      title: '📁 Generation History',
-      description: 'Tap here to browse all the study materials you\'ve previously generated.',
-      side: 'bottom',
+      title: '✅ Task Progress',
+      description: 'This ring shows how much of your to-do list you\'ve completed. Keep checking things off!',
+      side: 'top',
+    },
+  },
+  {
+    element: '#activitiesGrid',
+    popover: {
+      title: '🚀 Quick Access',
+      description: 'Click any of these to go to different pages, like Notes, To-Do List, or your Class Schedule.',
+      side: 'top',
     },
   },
 ]
@@ -208,48 +160,8 @@ const dashboardMobile: DriveStep[] = [
     element: '#timer-btn',
     popover: {
       title: '⏳ Open Study Timer',
-      description: 'Tap this to slide open the study timer panel.',
+      description: 'Click to open the study timer.',
       side: 'left',
-    },
-  },
-  {
-    element: '#timer',
-    popover: {
-      title: '⏳ Study Timer',
-      description: 'Use this timer to track your focus sessions. It automatically logs your study time to your stats.',
-      side: 'over',
-    },
-  },
-  {
-    element: '#setTime',
-    popover: {
-      title: '🕐 Set Your Session Length',
-      description: 'Tap here to choose how long you want to study before the timer starts counting down.',
-      side: 'left',
-    },
-  },
-  {
-    element: '#progressC',
-    popover: {
-      title: '✅ Task Progress',
-      description: 'This ring shows how much of your to-do list you\'ve completed. Keep checking things off!',
-      side: 'top',
-    },
-  },
-  {
-    element: '#viewBtn',
-    popover: {
-      title: '📝 Go to To-Do List',
-      description: 'Tap here to open your To-Do List and manage your study tasks.',
-      side: 'top',
-    },
-  },
-  {
-    element: '#dash_stats',
-    popover: {
-      title: '📊 Your Stats at a Glance',
-      description: 'See how much time you\'ve studied, how many notes you\'ve made, and your file usage — all in one place.',
-      side: 'bottom',
     },
   },
   {
@@ -269,10 +181,18 @@ const dashboardMobile: DriveStep[] = [
     },
   },
   {
-    element: '#genHistory',
+    element: '#progressC',
     popover: {
-      title: '📁 Generation History',
-      description: 'Tap here to browse all the study materials you\'ve previously generated.',
+      title: '✅ Task Progress',
+      description: 'This ring shows how much of your to-do list you\'ve completed. Keep checking things off!',
+      side: 'top',
+    },
+  },
+  {
+    element: '#activitiesGrid',
+    popover: {
+      title: '🚀 Quick Access',
+      description: 'Click any of these to go to different pages, like Notes, To-Do List, or your Class Schedule.',
       side: 'top',
     },
   },
@@ -1623,16 +1543,6 @@ export function startTour(
       }
       if (step.element === '#sidebar' && onCloseSidebar) {
         onCloseSidebar()
-        setTimeout(() => driverObj.moveNext(), 300)
-        return
-      }
-      if (step.element === '#timer-btn' && onOpenTimer) {
-        onOpenTimer()
-        setTimeout(() => driverObj.moveNext(), 400)
-        return
-      }
-      if (step.element === '#viewBtn' && onCloseTimer) {
-        onCloseTimer()
         setTimeout(() => driverObj.moveNext(), 300)
         return
       }
