@@ -113,18 +113,19 @@ function StudyTimer() {
       </div>
 
       <div className='flex w-full '>
-        <p className='font-inter font-semibold uppercase text-left text-sm  md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3]'>set your study time</p>
+        <p className='font-inter font-semibold uppercase text-left 
+        text-sm  md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3]'>set your study time</p>
       </div>
 
       {/* SET-TIMER PANEL */}
-      <div className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-4 xl:p-6 2xl:p-8 flex flex-col gap-0 border-2 border-primary-800'>
-<p className={`text-red-500 text-xs sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-3 transition-opacity ${
+      <div className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800'>
+<p className={`text-red-500  text-xs  sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-4 transition-opacity ${
   errorMsg ? 'opacity-100' : 'opacity-0'
 }`}>
   {errorMsg || '\u00A0'}
 </p>
 
-        <div className='flex flex-wrap justify-center items-end text-xs gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-1 xl:gap-2 2xl:gap-3 text-primary-600 mt-4 sm:mt-5 md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 uppercase font-roboto'>
+        <div className='flex flex-wrap justify-center items-end text-xs gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-2 xl:gap-2 2xl:gap-3 text-primary-600 mt-4  md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 uppercase font-roboto'>
           {[
             { label: 'Hours',   val: inputHours,   set: setInputHours,   id: 'hours'   },
             { label: 'Minutes', val: inputMinutes, set: setInputMinutes, id: 'minutes' },
@@ -133,7 +134,7 @@ function StudyTimer() {
             <div key={field.id} className='flex items-end'>
               <div className='flex flex-col items-center'>
                 <label htmlFor={field.id} className='text-sm md:text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-primary-600 
-                mb-3  md:mb-4 lg:mb-2 xl:mb-3 2xl:mb-4'>{field.label}</label>
+                mb-3  md:mb-4 lg:mb-1 xl:mb-3 2xl:mb-4'>{field.label}</label>
                 <input
                   id={field.id}
                   type='text'
@@ -158,14 +159,21 @@ function StudyTimer() {
         <button
           onClick={handleSetTime}
           className='w-full py-2 md:py-2 lg:py-[1px] xl:py-[2px] 2xl:py-[3px] bg-primary-800 font-inter 
-          text-xs sm:text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] font-extrabold uppercase text-white rounded-md mb-2'
+          text-xs sm:text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] font-extrabold uppercase text-white
+          rounded-md mb-2
+          shadow-[0_2px_3px_rgba(107,114,128,0.8)]
+          hover:opacity-80
+          transition-shadow
+          hover:shadow-[0_2px_4px_rgba(107,114,128,1)]  '
         >
           Set Timer
         </button>
 
         <p className='text-primary-800 mb-3 sm:mb-4 md:mb-4 lg:mb-2 xl:mb-3 2xl:mb-4 font-inter font-normal text-xs sm:text-sm md:text-base lg:text-[10px] xl:text-[12px] 2xl:text-[14px] uppercase text-center'>Quick Presets</p>
 
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 md:gap-y-4 md:gap-x-8 gap-y-3 gap-x-8 px-2 sm:px-5 md:px-6 lg:px-1 xl:gap-x-5 xl:px-2 2xl:gap-x-2 2xl:px-1 w-full uppercase justify-center mb-2'>
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 md:gap-y-4 md:gap-x-8 gap-y-3 gap-x-8 px-2 sm:px-5 md:px-6 
+        lg:gap-x-5   lg:gap-y-2 lg:px-3 
+        xl:gap-x-5 xl:px-2 2xl:gap-x-2 2xl:px-1 w-full uppercase justify-center mb-2'>
           {PRESETS.map((p) => (
             <button
               key={p.label} 
@@ -175,7 +183,12 @@ function StudyTimer() {
                 setInputSeconds(String(p.s))
               }}
               className='px-1 w-full py-2 md:py-3 lg:py-[1px] xl:py-[2px] 2xl:py-[3px] 
-              text-xs sm:text-sm md:text-base lg:text-[9px] xl:text-[11px] 2xl:text-[13px] uppercase bg-[#4A4A49] rounded-md text-white font-inter font-bold'
+              text-xs sm:text-sm md:text-base lg:text-[9px] xl:text-[11px] 2xl:text-[13px]
+              uppercase bg-[#4A4A49] rounded-md text-white font-inter font-bold
+              shadow-[0_2px_3px_rgba(107,114,128,0.8)]
+              hover:opacity-80
+              transition-shadow
+              hover:shadow-[0_2px_4px_rgba(107,114,128,1)]'
             >
               {p.label}
             </button>

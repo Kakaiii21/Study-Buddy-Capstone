@@ -90,7 +90,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       {/* SIDEBAR */}
       <aside
         className={`
-          md:rounded-2xl lg:rounded-lg
+          md:rounded-none lg:rounded-lg
           fixed top-0 left-0 h-full  w-60 lg:w-[165px] xl:w-[200px] 2xl:w-[235px] bg-primary-800 z-40
           flex flex-col shadow-lg 
           transition-transform duration-300 ease-in-out
