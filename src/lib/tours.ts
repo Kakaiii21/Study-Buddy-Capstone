@@ -200,6 +200,15 @@ const dashboardMobile: DriveStep[] = [
 // ─── To-Do List Desktop (lg+, 1024px+) ──────────────────────────────────────
 const todolistDesktop: DriveStep[] = [
   {
+    element: '#clearAllBtn',
+    popover: {
+      title: '🗑️ Clear All Tasks',
+      description:
+        'Click here to move every task to Recently Deleted at once. You can restore them within 30 days.',
+      side: 'left',
+    },
+  },
+  {
     element: '#newTaskBtn',
     popover: {
       title: '➕ Create a Task',
@@ -214,7 +223,7 @@ const todolistDesktop: DriveStep[] = [
       title: '🗂️ Task Board',
       description:
         'Your tasks are organized into three columns: To Do, In Progress, and Done.',
-      side: 'top',
+      side: 'over',
     },
   },
   {
@@ -223,7 +232,7 @@ const todolistDesktop: DriveStep[] = [
       title: '📌 Task Card',
       description:
         'Each card is a task. Drag and drop it between columns as you work to keep your progress up to date.',
-      side: 'top',
+      side: 'right',
     },
   },
   {
@@ -232,7 +241,7 @@ const todolistDesktop: DriveStep[] = [
       title: '⚙️ Task Options',
       description:
         'Need to make changes? Click the three dots to edit or delete this task.',
-      side: 'left',
+      side: 'right',
     },
   },
 ]
@@ -240,11 +249,29 @@ const todolistDesktop: DriveStep[] = [
 // ─── To-Do List Tablet (md, 768px–1023px) ───────────────────────────────────
 const todolistTablet: DriveStep[] = [
   {
-    element: '#newTaskBtn',
+    element: '#taskFabBtn',
+    popover: {
+      title: '➕ Quick Actions',
+      description:
+        'Tap this floating button to add a new task or clear all tasks at once.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabClearAllBtn',
+    popover: {
+      title: '🗑️ Clear All Tasks',
+      description:
+        'Tap here to move every task to Recently Deleted at once. You can restore them within 30 days.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabAddTaskBtn',
     popover: {
       title: '➕ Create a Task',
       description:
-        'Click here to add a new task. Give it a title and a deadline to get started.',
+        'Tap here to add a new task. Give it a title and a deadline to get started.',
       side: 'left',
     },
   },
@@ -254,6 +281,15 @@ const todolistTablet: DriveStep[] = [
       title: '🗂️ Task Board',
       description:
         'Your tasks are organized into three columns: To Do, In Progress, and Done.',
+      side: 'top',
+    },
+  },
+  {
+    element: '#colCollapseBtn',
+    popover: {
+      title: '🔼 Expand or Collapse',
+      description:
+        'Tap the arrow to collapse a column and hide its tasks, or expand it again to see them.',
       side: 'top',
     },
   },
@@ -271,7 +307,7 @@ const todolistTablet: DriveStep[] = [
     popover: {
       title: '⚙️ Task Options',
       description:
-        'Need to make changes? Click the three dots to edit or delete this task.',
+        'Need to make changes? Tap the three dots to edit or delete this task.',
       side: 'left',
     },
   },
@@ -280,11 +316,29 @@ const todolistTablet: DriveStep[] = [
 // ─── To-Do List Mobile (below 768px) ────────────────────────────────────────
 const todolistMobile: DriveStep[] = [
   {
-    element: '#newTaskBtn',
+    element: '#taskFabBtn',
+    popover: {
+      title: '➕ Quick Actions',
+      description:
+        'Tap this floating button to add a new task or clear all tasks at once.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabClearAllBtn',
+    popover: {
+      title: '🗑️ Clear All Tasks',
+      description:
+        'Tap here to move every task to Recently Deleted at once. You can restore them within 30 days.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabAddTaskBtn',
     popover: {
       title: '➕ Create a Task',
       description:
-        'Click here to add a new task. Give it a title and a deadline to get started.',
+        'Tap here to add a new task. Give it a title and a deadline to get started.',
       side: 'left',
     },
   },
@@ -298,6 +352,15 @@ const todolistMobile: DriveStep[] = [
     },
   },
   {
+    element: '#colCollapseBtn',
+    popover: {
+      title: '🔼 Expand or Collapse',
+      description:
+        'Tap the arrow to collapse a column and hide its tasks, or expand it again to see them.',
+      side: 'top',
+    },
+  },
+  {
     element: '#taskCard',
     popover: {
       title: '📌 Task Card',
@@ -311,7 +374,7 @@ const todolistMobile: DriveStep[] = [
     popover: {
       title: '⚙️ Task Options',
       description:
-        'Need to make changes? Click the three dots to edit or delete this task.',
+        'Need to make changes? Tap the three dots to edit or delete this task.',
       side: 'left',
     },
   },
@@ -1504,12 +1567,27 @@ export function startTour(
 ) {
   const w = window.innerWidth
 
-  const steps =
+  const rawSteps =
     w >= 1024 ? tourSteps[page].desktop :
     w >= 768  ? tourSteps[page].tablet  :
                 tourSteps[page].mobile
 
-  if (!steps?.length) return
+  if (!rawSteps?.length) return
+
+  // Some elements only appear once the user opens something mid-tour
+  // (sidebar, FAB quick actions) — never filter those out even though
+  // they're not in the DOM yet when the tour starts.
+  const dynamicIds = ['#sidebar', '#fabClearAllBtn', '#fabAddTaskBtn']
+
+  // Skip any step whose target simply doesn't exist right now — e.g. a
+  // new user with no tasks yet has no #taskCard / #taskOptionsBtn to show.
+  const steps = rawSteps.filter((step) => {
+    if (!step.element || typeof step.element !== 'string') return true
+    if (dynamicIds.includes(step.element)) return true
+    return !!document.querySelector(step.element)
+  })
+
+  if (!steps.length) return
 
   const driverObj = driver({
     showProgress: true,
@@ -1542,6 +1620,18 @@ export function startTour(
       }
       if (step.element === '#sidebar' && onCloseSidebar) {
         onCloseSidebar()
+        setTimeout(() => driverObj.moveNext(), 300)
+        return
+      }
+      // ── To-Do List FAB: open it when leaving the FAB trigger step ──
+      if (step.element === '#taskFabBtn') {
+        document.querySelector<HTMLButtonElement>('#taskFabBtn')?.click()
+        setTimeout(() => driverObj.moveNext(), 300)
+        return
+      }
+      // ── To-Do List FAB: close it after showing the last FAB action ──
+      if (step.element === '#fabAddTaskBtn') {
+        document.querySelector<HTMLButtonElement>('#taskFabBtn')?.click()
         setTimeout(() => driverObj.moveNext(), 300)
         return
       }

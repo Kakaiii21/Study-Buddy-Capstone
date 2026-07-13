@@ -176,7 +176,7 @@ function TaskModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed inset-0  bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
         className="bg-white rounded-2xl p-7 mx-6 w-full max-w-md"
@@ -275,7 +275,8 @@ function TaskModal({
           <button
             onClick={handleSave}
             disabled={!canSave }
-            className="flex-1 bg-primary-600 border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-white font-roboto hover:bg-primary-50 hover:text-primary-600 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 bg-[#FEE248] border-2 rounded-md text-primary-800 font-bold border-primary-800 items-center mt-5  font-roboto
+             hover:bg-primary-50 hover:text-primary-800 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             SAVE
           </button>
@@ -290,8 +291,7 @@ function SoftDeleteModal({ taskName, onConfirm, onCancel }: {
   taskName: string
   onConfirm: () => void
   onCancel: () => void 
-})
- {
+}) {
   const [confirming, setConfirming] = useState(false)
 
   const handleConfirm = () => {
@@ -309,7 +309,7 @@ function SoftDeleteModal({ taskName, onConfirm, onCancel }: {
         </div>
         <p className='text-sm text-gray-500 mb-1'>
           <span className='font-semibold text-gray-700'>"{taskName}"</span> will be moved to{' '}
-          <span className='font-semibold text-primary-600'>Recently Deleted</span>.
+          <span className='font-semibold text-primary-800'>Recently Deleted</span>.
         </p>
         <p className='text-xs text-gray-400 mb-6'>
           You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
@@ -325,6 +325,109 @@ function SoftDeleteModal({ taskName, onConfirm, onCancel }: {
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── Clear All Modal ───────────────────────────
+function ClearAllModal({ count, onConfirm, onCancel }: {
+  count: number
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const [confirming, setConfirming] = useState(false)
+
+  const handleConfirm = () => {
+    if (confirming) return
+    setConfirming(true)
+    onConfirm()
+  }
+
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
+          <h2 className='text-lg font-bold text-gray-800'>Move all tasks to Recently Deleted?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-1'>
+          <span className='font-semibold text-gray-700'>{count} task{count !== 1 ? 's' : ''}</span> will be moved to{' '}
+          <span className='font-semibold text-primary-800'>Recently Deleted</span>.
+        </p>
+        <p className='text-xs text-gray-400 mb-6'>
+          You can restore any of them within <span className='font-semibold text-red-400'>30 days</span>, after which they'll be permanently deleted.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button onClick={onCancel} disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'>
+            Cancel
+          </button>
+          <button onClick={handleConfirm} disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'>
+            {confirming ? 'Clearing...' : 'Clear All'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Speed Dial FAB (mobile/md only) ───────────
+function TaskFab({ onClearAll, onAddTask, disabled }: {
+  onClearAll: () => void
+  onAddTask: () => void
+  disabled: boolean
+}) {
+  const [open, setOpen] = useState(false)
+
+  const actions = [
+    {
+      id: 'fabAddTaskBtn',
+      label: 'Add Task',
+      icon: '/Add.png',
+      onClick: () => { onAddTask(); setOpen(false) },
+      className: 'bg-[#FEE248]',
+    },
+    {
+      id: 'fabClearAllBtn',
+      label: 'Clear All Tasks',
+      icon: '/delete.png',
+      onClick: () => { onClearAll(); setOpen(false) },
+      className: 'bg-[#E2E2E2]',
+      disabled,
+    },
+  ]
+
+  return (
+    <div className="lg:hidden fixed bottom-16 right-6 flex flex-col items-end gap-3 z-50">
+      {open && actions.slice().reverse().map((action) => (
+        <div key={action.label} className="flex items-center gap-3 animate-fade-in">
+          <span className="bg-white text-primary-800 text-xs font-inter font-semibold px-3 py-1 rounded-md whitespace-nowrap uppercase">
+            {action.label}
+          </span>
+          <button
+            id={action.id}
+            onClick={action.onClick}
+            disabled={action.disabled}
+            className={`w-12 h-12 rounded-full shadow-md flex items-center justify-center
+              hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.className}`}
+          >
+            <img src={action.icon} alt={action.label} className="w-5 h-5" />
+          </button>
+        </div>
+      ))}
+
+      <button
+        id="taskFabBtn"
+        onClick={() => setOpen((prev) => !prev)}
+        className="w-14 h-14 rounded-full bg-primary-600 active:bg-primary-600 focus:bg-primary-600 shadow-lg flex items-center justify-center transition-transform outline-none"
+        style={{
+          transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert" />
+      </button>
     </div>
   )
 }
@@ -381,18 +484,18 @@ function TaskCard({
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
-        <div className='flex justify-end text-primary-600 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
+        <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
           <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
             month: '2-digit', day: '2-digit', year: 'numeric',
           })}</p>
         </div>
         <div className="flex justify-between items-start">
-          <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-black' : 'text-primary-600'}`}>
+          <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-black' : 'text-primary-800'}`}>
             {task.name}
           </p>
         </div>
         {task.deadline && (
-          <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-black font-semibold' : 'text-primary-600'}`}>
+          <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-black font-semibold' : 'text-primary-800'}`}>
             {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
             {toDisplayFormat(task.deadline)}
           </p>
@@ -404,7 +507,7 @@ function TaskCard({
         id='taskOptionsBtn'
           title='More Options'
           onClick={() => setShowMenu((prev) => !prev)}
-          className="text-primary-600 hover:text-primary-800 text-lg"
+          className="text-primary-800 hover:text-primary-800 text-lg"
         >
           ⋮
         </button>
@@ -413,7 +516,7 @@ function TaskCard({
             <button
               onPointerDown={(e) => e.stopPropagation()}
               onClick={() => { onEdit(task); setShowMenu(false) }}
-              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-800 hover:bg-primary-50 font-semibold'
             >
               <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
             </button>
@@ -421,7 +524,7 @@ function TaskCard({
             <button
               onPointerDown={(e) => e.stopPropagation()}
               onClick={() => { onDelete(task.id, task.name); setShowMenu(false) }}
-              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+              className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-800 hover:bg-red-50 font-semibold'
             >
               <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
             </button>
@@ -439,19 +542,19 @@ function DragCard({ task }: { task: Task }) {
   const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
   const isDone = task.status === 'done'
   return (
-    <div className={`rounded-md p-2 2xl:px-3 2xl:py-2 pt-0 mb-3 w-full select-none relative shadow-2xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
-      <div className='flex justify-end text-primary-600 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
+    <div className={`rounded-md p-2 2xl:px-3 2xl:py-2 pt-0 mb-3 w-full select-none relative shadow-xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
+      <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
         <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
           month: '2-digit', day: '2-digit', year: 'numeric',
         })}</p>
       </div>
       <div className="flex justify-between items-start">
-        <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-600'}`}>
+        <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-800'}`}>
           {task.name}
         </p>
       </div>
       {task.deadline && (
-        <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-600' : isOverdue ? 'text-primary-50 font-semibold' : 'text-primary-600'}`}>
+        <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-primary-800 font-semibold' : 'text-primary-800'}`}>
           {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
           {toDisplayFormat(task.deadline)}
         </p>
@@ -476,6 +579,7 @@ function Column({
 
   return (
     <div
+    id='todoColumns'
       ref={setNodeRef}
       className={`
         w-full lg:flex-1
@@ -491,6 +595,7 @@ function Column({
       max-w-full w-full p-3 flex items-center justify-between">
         <p className="text-white pl-5 lg:pl-0 text-xl lg:text-sm 2xl:text-lg lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
+        id='colCollapseBtn'
           onClick={onToggleCollapse}
           className="lg:hidden text-white ml-2 text-xl font-bold"
           aria-label={collapsed ? 'Expand column' : 'Collapse column'}
@@ -537,6 +642,8 @@ function ToDoList() {
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null)
+  const [confirmingClearAll, setConfirmingClearAll] = useState(false)
+  const [clearingAll, setClearingAll] = useState(false)
 
   useTaskNotifications(tasks)
 
@@ -618,6 +725,14 @@ function ToDoList() {
     setPendingDelete(null)
   }
 
+  async function handleClearAllConfirm() {
+    if (clearingAll) return
+    setClearingAll(true)
+    await Promise.all(tasks.map((t) => deleteTask(t.id)))
+    setClearingAll(false)
+    setConfirmingClearAll(false)
+  }
+
   const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null
 
   return (
@@ -650,15 +765,29 @@ function ToDoList() {
             </button>
         </div>
 
-      {pendingDelete && (
-        <SoftDeleteModal
-          taskName={pendingDelete.name}
-          onConfirm={handleConfirmDelete}
-          onCancel={() => setPendingDelete(null)}
-        />
-      )}
+    <TaskFab
+      onClearAll={() => setConfirmingClearAll(true)}
+      onAddTask={() => setIsAddModalOpen(true)}
+      disabled={tasks.length === 0}
+    />
 
-      <main className="flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-2  pt-1">
+    {pendingDelete && (
+      <SoftDeleteModal
+        taskName={pendingDelete.name}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+    )}
+
+    {confirmingClearAll && (
+      <ClearAllModal
+        count={tasks.length}
+        onConfirm={handleClearAllConfirm}
+        onCancel={() => setConfirmingClearAll(false)}
+      />
+    )}
+
+      <main  className="flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-2  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
 <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-10 
   font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
@@ -666,26 +795,28 @@ function ToDoList() {
 
           <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
           pl-1   
-          lg:justify-end  lg:items-start lg:pr-10 lg:px-2 lg:gap-3
+          lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
            md:justify-between md:items-start sm:items-center gap-1 p-2">
             <hr className='lg:hidden md:hidden w-full border-t border-[#E9E9E9]' />
-            <button
-            id='newTaskBtn'
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-              py-1 px-4 rounded-sm 
-              font-inter font-black
-               text-[10px] lg:text-[8px]
-               xl:text-[10px] 2xl:text-[12px]
+<button
+id='clearAllBtn'
+  onClick={() => setConfirmingClearAll(true)}
+  disabled={tasks.length === 0}
+  className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+  py-1 px-4 rounded-sm 
+  font-inter font-black
+   text-[10px] lg:text-[8px]
+   xl:text-[10px] 2xl:text-[12px]
 
-               hover:opacity-90 w-auto
-               backdrop-blur-xs
-               hover:-translate-y-1 
-               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-               transition-all duration-300"
-            >
-              X  CLEAR ALL TASKS
-            </button>
+   hover:opacity-90 w-auto
+   backdrop-blur-xs
+   hover:-translate-y-1 
+   hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+   transition-all duration-300
+   disabled:opacity-40 disabled:cursor-not-allowed"
+>
+  X  CLEAR ALL TASKS
+</button>
             <button
             id='newTaskBtn'
               onClick={() => setIsAddModalOpen(true)}
@@ -738,8 +869,7 @@ function ToDoList() {
               onDragEnd={handleDragEnd}
               autoScroll={{ enabled: true, threshold: { x: 0, y: 0.2 } }}
             >
-              <div 
-              id='todoColumns'
+              <div id='todoColumns'
               className="w-full  flex flex-col lg:flex-row h-auto lg:min-h-screen mt-0 md:mt-0 lg:mt-2  rounded-3xl">
                 {COLUMNS.map((col) => (
                   <Column
@@ -765,7 +895,20 @@ function ToDoList() {
           )}
 
         </div>
-
+<button
+  id='tour-btn'
+  onClick={() => startTour()}
+  className='hidden lg:flex fixed bottom-6 right-6 z-50
+    flex flex-col items-center gap-1
+    hover:opacity-80 active:scale-95 transition-all
+    lg:bottom-8 lg:right-8'
+  title='Take a Tour'
+>
+  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+  </div>
+  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+</button>
       </main>
     </div>
     </div>
