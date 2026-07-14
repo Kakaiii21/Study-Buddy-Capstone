@@ -84,7 +84,65 @@ function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; on
     </div>
   )
 }
+// ── Speed Dial FAB (mobile/md only) ───────────
+function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
+  onClearAll: () => void
+  onAddSchedule: () => void
+  disabled: boolean
+}) {
+  const [open, setOpen] = useState(false)
 
+  const actions = [
+    {
+      id: 'fabAddScheduleBtn',
+      label: 'Add Schedule',
+      icon: '/Add.png',
+      onClick: () => { onAddSchedule(); setOpen(false) },
+      className: 'bg-[#FEE248]',
+    },
+    {
+      id: 'fabClearScheduleBtn',
+      label: 'Clear All Schedule',
+      icon: '/delete.png',
+      onClick: () => { onClearAll(); setOpen(false) },
+      className: 'bg-[#E2E2E2]',
+      disabled,
+    },
+  ]
+
+  return (
+    <div className="lg:hidden fixed bottom-16 right-6 flex flex-col items-end gap-3 z-50">
+      {open && actions.slice().reverse().map((action) => (
+        <div key={action.label} className="flex items-center gap-3 animate-fade-in">
+          <span className="bg-white text-primary-800 text-xs font-inter font-semibold px-3 py-1 rounded-md whitespace-nowrap uppercase">
+            {action.label}
+          </span>
+          <button
+            id={action.id}
+            onClick={action.onClick}
+            disabled={action.disabled}
+            className={`w-12 h-12 rounded-full shadow-md flex items-center justify-center
+              hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.className}`}
+          >
+            <img src={action.icon} alt={action.label} className="w-5 h-5" />
+          </button>
+        </div>
+      ))}
+
+      <button
+        id="scheduleFabBtn"
+        onClick={() => setOpen((prev) => !prev)}
+        className="w-14 h-14 rounded-full bg-primary-600 active:bg-primary-600 focus:bg-primary-600 shadow-lg flex items-center justify-center transition-transform outline-none"
+        style={{
+          transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert" />
+      </button>
+    </div>
+  )
+}
 function ClassSchedule() {
   const { user } = useAuth()
   const { schedules, loading, addSchedule, updateSchedule, deleteSchedule } = useClassSched(user)
@@ -204,22 +262,21 @@ const handleSave = () => {
     const daySchedules = byDay(day)
     return (
       <div id='scheduleGrid'
-      className='flex flex-col mt-7 pb-2 bg-primary-600 
-      bg-gradient-to-br from-[#0f1f3a] to-[#0b1730]
-        rounded-2xl
-
-      
+      className='flex flex-col   mt-2 pb-2 bg-primary-800
+        rounded-lg 
       border border-white/10
         hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
         transition-all duration-300
         self-start w-full'>
-        <p className='text-white text-center text-[25px] md:text-3xl lg:text-[29px] xl:text-[30px] 2xl:text-3xl uppercase mt-4 font-fustat'>{day}</p>
-        <div className='space-y-2 pb-5'>
+        <p className='text-white text-center text-[23px] md:text-3xl lg:text-[23px] xl:text-[24px] 2xl:text-[25px] uppercase mt-2 font-fustat'>{day}</p>
+        <div className='space-y-1  pb-2'>
           {daySchedules.length > 0 ? (
             daySchedules.map((s) => (
-              <div key={s.id} className='bg-white  mt-2 p-4 mx-4 mb-1 rounded-md relative'>
-                <div className='flex flex-row'>
-                  <p className=' text-[18px] md:text-[20px] lg:text-[21px] xl:text-[22px] 2xl:text-[23px] font-roboto font-bold text-primary-600'>{s.subject}</p>
+              <div key={s.id} className='bg-white px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
+                <div className='flex flex-row  items-center pt-1'>
+                  <p className='text-[10px] leading-tight md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] font-roboto font-bold text-primary-600'>
+                    {s.subject}
+                  </p>
 
                   <div data-note-menu className='relative ml-auto '>
                     <button
@@ -228,28 +285,28 @@ const handleSave = () => {
                       title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
-                      <img src="subM.png" alt="menu" className='h-[5px] w-[28px]' />
+                      <img src="subM.png" alt="menu" className='h-[15px] w-[3px] lg:h-[15px] lg:w-[3px] xl:h-[16px] xl:w-[4px] 2xl:h-[17px] 2xl:w-[5px]' />
                     </button>
 
                     {menuOpenIndex === s.id && (
                       <>
                         <div className='fixed inset-0 z-0' onClick={() => setMenuOpenIndex(null)} />
-                        <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
+                        <div className='absolute right-2 top-0 mt-1 bg-white border border-primary-800 rounded-sm shadow-lg z-10 w-24 py-0'>
                           <button
                             onClick={() => handleEditOpen(s)}
-                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                            className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] xl:text-[13px] 2xl:text-[14px] text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+                            <img className='w-5 h-5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' src="edit.png" alt="edit icon" />Edit
                           </button>
-                          <hr className='my-1 border-gray-100' />
+                          <hr className='my-1 mx-1 border-primary-800 ' />
                           <button
                             onClick={() => {
                               setMenuOpenIndex(null)
                               setPendingDelete({ id: s.id, name: s.subject })
                             }}
-                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                            className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] text-primary-600 hover:bg-red-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
+                            <img src="delete.png" alt="delete icon" className='w-5 lg:w-3 h-5 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' />Delete
                           </button>
                         </div>
                       </>
@@ -257,14 +314,16 @@ const handleSave = () => {
                   </div>
                 </div>
 
-                <p className='text-[16px] md:text-[16px] lg:text-[16px] xl:text-[18px] 2xl:text-[20px] font-roboto text-primary-600'>
+                <p className='text-[9px] leading-tight md:text-[9px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px] font-roboto text-primary-600 '>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
-                <p className='text-sm   text-gray-600'>{s.instructor}</p>
+                <p className='text-[9px] leading-tight lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-gray-600 pb-2'>
+                  {s.instructor}
+                </p>
               </div>
             ))
           ) : (
-            <p className='text-white  text-center mt-4 lg:mt-10 mb-5 lg:mb-0 font-fustat'>No scheduled class here.</p>
+            <p className='text-white  text-center lg:text-xs mt-4 lg:mt-3 mb-5 lg:mb-2 font-fustat'>No scheduled class here.</p>
           )}
         </div>
       </div>
@@ -277,55 +336,81 @@ const handleSave = () => {
       <div className='p-3 '>
        <Sidebar /> 
       </div>
-      <main className='flex-1 overflow-auto p-8'>
-        <div className='min-h-screen flex flex-col items-center justify-start'>
+        <div className='flex-1  flex flex-col overflow-hidden'>
 
+             {/* Top Bar — mobile only */}
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Class Schedule</p>
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='flex flex-col items-center gap-1 ml-auto
+                hover:opacity-80 active:scale-95 transition-all'
+              title='Take a Tour'
+            >
+              <div className='bg-white  w-14 h-14 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              </div>
+              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
+        </div>
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-0  pt-1">
+        <div className="min-h-screen  w-full flex flex-col">
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
+  font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+  mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Class Schedule</p>
           {/* Header */}
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
-            <p className='text-2xl lg:text-4xl lg:ml-0 md:ml-12 md:text-4xl text-primary-600 font-roboto uppercase font-bold'>Class Schedule</p>
-            <hr className='lg:hidden md:hidden w-full border-t mt-3 border-primary-600' />
-              <div className='flex flex-row gap-3 lg:gap-10'>
+
+              <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
+          pl-1 
+          lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
+           md:justify-between md:items-start sm:items-center gap-1 p-2">
+                <button
+                  id='clearScheduleBtn'
+                  onClick={() => setShowClearModal(true)}
+                  className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+                  py-1 px-4 rounded-sm 
+                  font-inter font-black
+                  text-[10px] lg:text-[8px]
+                  xl:text-[10px] 2xl:text-[12px]
+
+                  hover:opacity-90 w-auto
+                  backdrop-blur-xs
+                  hover:-translate-y-1 
+                  hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+                  transition-all duration-300 uppercase
+                  disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                    X  CLEAR ALL schedules
+                </button>
 
                 <button
                   id='addScheduleBtn'
                   onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-                  className='bg-primary-600 hover:bg-white font-bold hover:text-primary-600 
-                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
-                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
-                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
-                  text-white uppercase font-roboto text-xs
-                  shadow-[0_4px_8px_rgba(0,0,0,0.35)]
-                  rounded-md backdrop-blur-xs
-                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)]
-                  transition-all duration-300'
+                  className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+                  py-1 px-4 rounded-sm 
+                  font-inter font-black
+                  text-[10px] lg:text-[8px]
+                  xl:text-[10px] 2xl:text-[12px]
+                  hover:opacity-90 w-auto
+                  backdrop-blur-xs
+                  hover:-translate-y-1 
+                  hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+                  transition-all duration-300"
                 >
                   + Add Schedule
                 </button>
 
-                <button
-                  id='clearScheduleBtn'
-                  onClick={() => setShowClearModal(true)}
-                  className='bg-red-700 text-xs hover:bg-red-500 border border-red-400/30 font-bold hover:text-white 
-                  py-2 px-3 mt-2 md:mt-0 lg:mt-0 
-                  md:py-3 md:px-4 lg:px-4 xl:px-4 2xl:px-4 
-                  lg:text-[15px] xl:text-[15px] 2xl:text-[15px]
-                  text-white uppercase font-roboto 
-                  shadow-[0_4px_8px_rgba(220,38,38,0.35)]
-                  rounded-md backdrop-blur-xs
-                  hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(220,38,38,0.5)]
-                  transition-all duration-300'
-                >
-                  Clear Schedule
-                </button>
 
 
               </div>
           </div>
-          <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' />
+          {/* <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' /> */}
 
           {/* Add / Edit Modal */}
           {isAddSubOpen && (
-            <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
+            <div className='fixed inset-0   bg-black/50 flex items-center justify-center z-50'>
               <div className='bg-primary-600 rounded-lg p-6 w-full max-w-md mx-5 shadow-lg'>
                 <h2 className='text-2xl text-white uppercase text-center font-bold font-roboto mb-4'>
                   {editTargetId ? 'Edit Schedule' : 'Add Schedule'}
@@ -406,11 +491,16 @@ const handleSave = () => {
               Loading schedules...
             </div>
           ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6 w-full  items-start'>
+            <div className='grid px-6 mt-2 lg:mt-0 lg:gap-10 xl:gap-x-12 2xl:gap-x-20 2xl:px-20 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6 w-full items-start'>
               {days.map((day) => <DayCard key={day} day={day} />)}
             </div>
           )}
         </div>
+        <ScheduleFab
+          onClearAll={() => setShowClearModal(true)}
+          onAddSchedule={() => { resetForm(); setIsAddSubOpen(true) }}
+          disabled={schedules.length === 0}
+        />
 
         {/* Soft Delete Modal — rendered at root level, outside DayCard */}
         {pendingDelete && (
@@ -430,18 +520,19 @@ const handleSave = () => {
           <button
             id='tour-btn'
             onClick={() => startTour()}
-            className='fixed bottom-6 right-6 z-50
-              flex flex-col items-center gap-1
-              hover:opacity-80 active:scale-95 transition-all
-              lg:bottom-8 lg:right-8'
+            className='hidden lg:flex fixed bottom-6 right-6 z-50
+            flex-col items-center gap-1
+            hover:opacity-80 active:scale-95 transition-all
+            lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-            </div>
-            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
+            <div className='bg-white w-14 h-14 lg:w-10 lg:h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12    rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12  lg:w-10 xl:w-11 2xl:w-12 block mx-auto mt-1' />
+            </div>  
+            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-primary-600 font-inter font-medium'>Need Help?</p>
           </button>
       </main>
+      </div>
     </div>
   )
 }
