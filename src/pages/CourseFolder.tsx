@@ -348,24 +348,22 @@ const handleFiles = async (incoming: FileList | null) => {
   return (
     <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
 
-      <div className='hidden lg:block md:block'>
+      <div className='hidden lg:block '>
       <div className='p-3 h-screen'>
         <Sidebar uploading={uploading} />
         
       </div>
+
       </div>
+      <div className='flex-1  flex flex-col overflow-hidden'>
 
-      <main className='flex-1 overflow-y-auto p-8 overflow-hidden'>
-        <div className='min-h-screen flex flex-col'>
-
-          {/* Header */}
-          <div className='flex flex-col md:flex-row  md:justify-between md:items-center lg:justify-between lg:items-center w-full gap-3 mb-6'>
-            <div className="flex items-center  gap-4">
-              <button
+              {/* Top Bar — mobile only */}
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <button
               
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
-                className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
+                className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
                 <div id='goBackBtn' className='flex flex-col justify-center items-center '>
                 <span className="text-5xl leading-none">←</span>
@@ -373,19 +371,64 @@ const handleFiles = async (incoming: FileList | null) => {
                 </div>
 
               </button>
-              <p className="text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
+              <p className="hidden text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 {folderName}
               </p>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Courses</p>
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='flex flex-col items-center gap-1 ml-auto
+                hover:opacity-80 active:scale-95 transition-all'
+              title='Take a Tour'
+            >
+              <div className='bg-white  w-14 h-14 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              </div>
+              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
+        </div>
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
+        <div className="min-h-screen  w-full flex flex-col">
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Courses</p>
+          {/* Header */}
+          <div className='flex mt-1   lg:mt-0 flex-col md:flex-row  md:justify-between md:items-center  lg:justify-between lg:items-center w-full gap-3 mb-6 lg:mb-0'>
+            <div className="hidden   lg:flex items-center   gap-4">
+              <button
+                id='goBackBtn'
+                title="Go Back to Courses"
+                onClick={() => navigate('/courses')}
+                className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded hover:bg-gray-100 transition"
+              >
+                <div className='flex flex-col justify-center  items-center '>
+                <span className="text-5xl lg:text-2xl leading-none">←</span>
+                <span className="text-sm lg:text-[10px]">Back</span>
+                </div>
+
+              </button>
+<p className="text-3xl w-auto pr-10 whitespace-nowrap 
+lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
+  {folderName}
+</p>
             </div>
-            <div className='flex flex-row lg:ml-auto'>
-              <div className='flex items-center gap-2 mx-2 lg:mx-2 md:mx-2'>
-                <select
-                  id='file-filter'
-                  aria-label='Filter files by type'
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className='border border-primary-600 pl-4 rounded-md px-0 py-2 text-sm font-roboto text-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
-                >
+            <div className="flex flex-row w-full 
+              px-4 sm:px-6 justify-center items-center py-1 md:justify-end md:items-center 
+              lg:justify-end lg:items-center lg:pr-10 2xl:pr-16 lg:px-0 lg:gap-3
+              gap-2 p-0">
+            <div className='flex items-center gap-2 w-40 mx-2'>
+              <select
+                id='file-filter'
+                aria-label='Filter files by type'
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className='w-40 border border-primary-800 rounded-md
+                px-3 py-2 lg:py-1 lg:rounded-sm
+                text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
+                font-roboto text-primary-600
+                focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+              >
                   <option value='all'>All Files</option>
                   <option value='pdf'>PDF</option>
                   <option value='word'>Word Documents</option>
@@ -410,15 +453,24 @@ const handleFiles = async (incoming: FileList | null) => {
               <button
               id='uploadFilesBtn'
                 onClick={() => fileInputRef.current?.click()}
-                disabled={uploading || isRestoredFolder || !isOnline}  // ← add !isOnline
-                className='bg-primary-600 w-52 lg:px-10 py-2 rounded-md lg:mx-0 hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 text-white font-bold font-roboto text-md disabled:opacity-50 disabled:cursor-not-allowed'
-              >
+                disabled={uploading || isRestoredFolder || !isOnline}
+                className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+                py-2 lg:py-1 px-4 rounded-sm
+                font-inter font-black
+                text-[10px] lg:text-[8px]
+                xl:text-[10px] 2xl:text-[12px]
+                hover:opacity-90
+                backdrop-blur-xs
+                hover:-translate-y-1 
+                hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+                transition-all duration-300"            
+                >
                 {!isOnline ? '📶 Offline' : '+ Upload Files'}
               </button>
             </div>
           </div>
 
-          <hr className='w-full border-t border-primary-600 lg:mb-4' />
+          <hr className='w-full border-t border-primary-600 lg:mb-0' />
           {uploading && (
             <div className='w-full bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm font-roboto px-4 py-2 rounded-md mb-3 flex items-center gap-2'>
               ⚠ Please wait — navigating away will cancel the upload.
@@ -426,25 +478,25 @@ const handleFiles = async (incoming: FileList | null) => {
           )}
 
           {/* Storage Bar */}
-          <div id='storageBar' className='w-full mb-4 mt-3'>
-            <div  className='flex justify-between text-xs text-gray-400 font-roboto mb-1'>
+          <div id='storageBar' className='w-full mb-4 mt-3 '>
+            <div  className='flex justify-between text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-gray-400 font-roboto mb-1'>
               <span>Storage used</span>
               <span className={storagePercent > 90 ? 'text-red-500 font-semibold' : ''}>
                 {(storageUsed / (1024 * 1024)).toFixed(1)} MB / 1 GB
               </span>
             </div>
-            <div className='w-full bg-gray-200 rounded-full h-2'>
+            <div className='w-full bg-gray-200 rounded-full  h-2 lg:h-1 2xl:h-2'>
               <div
-                className={`h-2 rounded-full transition-all duration-300 ${storageColor}`}
+                className={`h-2 lg:h-1 2xl:h-2 rounded-full transition-all duration-300 ${storageColor}`}
                 style={{ width: `${storagePercent}%` }}
               />
             </div>
             {storagePercent > 90 && (
-              <p className='text-red-400 text-xs font-roboto mt-1'>
+              <p className='text-red-400 text-xs font-roboto lg:text-[8px] xl:text-[9px] 2xl:text-[11px] mt-1'>
                 ⚠ You're almost out of storage. Delete some files to free up space.
               </p>
             )}
-            <p className='text-xs text-gray-400 font-roboto mt-1'>
+            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[11px] text-gray-400 font-roboto mt-1'>
               💡 Deleted files go to{' '}
               <span className='font-semibold text-primary-600'>Recently Deleted</span>
               {' '}and still count toward your storage. Permanently delete them there to free up space.
@@ -468,17 +520,17 @@ const handleFiles = async (incoming: FileList | null) => {
           )}
 
           {error && (
-            <p className='text-red-500 text-sm font-roboto mb-4 text-center'>{error}</p>
+            <p className='text-red-500 text-sm font-roboto mb-4 lg:text-[9px] border  text-center'>{error}</p>
           )}
 
           {/* Files Area */}
           {loading ? (
-            <div className='flex-1 flex items-center justify-center text-primary-400 text-xl'>
+            <div className='flex-1  flex items-center justify-center text-primary-400 text-xl'>
               Loading files...
             </div>
           ) : files.length === 0 ? (
             isRestoredFolder ? (
-              <div className='flex flex-col items-center mt-3 justify-center border-2 border-dashed border-gray-200 rounded-xl py-24'>
+              <div className='flex flex-col items-center  mt-3 justify-center border-2 border-dashed border-gray-200 rounded-xl py-24'>
                 <p className='text-5xl mb-4'>📂</p>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
                   No restored files yet.
@@ -510,11 +562,11 @@ const handleFiles = async (incoming: FileList | null) => {
               No files match the selected filter.
             </p>
           ) : (
-            <div id='filesGrid' className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 md:gap-2 md:gap-x-2 md:gap-y-5 lg:gap-x-0'>
+            <div id='filesGrid' className='grid  pl-5 md:pl-0 lg:pl-0 grid-cols-2 md:grid-cols-3 lg:grid-cols-7  gap-x-2 gap-y-1 md:gap-2 md:gap-x-2 md:gap-y-5 lg:gap-x-0'>
               {filteredFiles.map((file) => (
                 <div
                   key={file.id}
-                  className='flex flex-col items-center bg-white border-gray-200 rounded-xl p-4 hover:shadow-md transition relative w-36 md:w-44 lg:w-48'
+                  className='flex  flex-col items-center bg-white border-gray-200 rounded-xl p-0 hover:shadow-md transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
                 >
                   <div className='relative w-full flex justify-center items-end'>
                     <button  onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
@@ -529,14 +581,14 @@ const handleFiles = async (incoming: FileList | null) => {
                           '/fileIcon.png'
                         }
                         alt={file.fileType}
-                        className='w-32 h-32 md:w-40 md:h-40 object-contain mt-4 hover:opacity-80 hover:cursor-pointer'
+                        className='w-32 font-inter font-normal  h-32 md:w-40 md:h-40 lg:h-[90px] xl:h-[120px] 2xl:h-[150px] object-contain mt-4 hover:opacity-80 hover:cursor-pointer'
                       />
                     </button>
 
                     <button
                     id='fileOptionsBtn'
                       onClick={(e) => { e.stopPropagation(); setActiveFileMenu(activeFileMenu === file.id ? null : file.id) }}
-                      className='flex flex-col items-center justify-center gap-[3px] p-2 rounded-full hover:bg-gray-100 w-8 h-12'
+                      className='flex flex-col items-center justify-center gap-[3px]  p-2 rounded-full hover:bg-gray-100 w-8 h-12'
                       title='Options'
                     >
                       <span className='w-1 h-1 bg-gray-500 rounded-full'></span>
@@ -547,36 +599,36 @@ const handleFiles = async (incoming: FileList | null) => {
                     {activeFileMenu === file.id && (
                       <div
                         onClick={(e) => e.stopPropagation()}
-                        className='absolute top-7 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 w-32 overflow-hidden'
+                        className='absolute top-7 left-10 bg-white border border-primary-800 rounded-sm shadow-lg z-20 w-32 lg:w-[100px] overflow-hidden'
                       >
                         <button
                           onClick={() => handleEdit(file.id)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                         >
-                          <img src='/edit.png' alt='edit icon' className='w-5 h-5' /> Rename
+                          <img src='/edit.png' alt='edit icon' className='w-5 h-5 lg:w-4 lg:h-4' /> Rename
                         </button>
-                        <hr className='my-1 border-gray-100' />
+                        <hr className='my-1 border-primary-800' />
                         <button
                           onClick={() => handleDownload(file)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                         >
-                          <img src='/download.png' alt='download icon' className='w-5 h-5' /> Download
+                          <img src='/download.png' alt='download icon' className='w-5 h-5  lg:w-4 lg:h-4' /> Download
                         </button>
-                        <hr className='my-1 border-gray-100' />
+                        <hr className='my-1 border-primary-800' />
                         <button
                           onClick={() => { setPendingDelete({ id: file.id, name: file.fileName }); setActiveFileMenu(null) }}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                         >
-                          <img src='/delete.png' alt='delete icon' className='w-5 h-5' /> Delete
+                          <img src='/delete.png' alt='delete icon' className='w-5 h-5  lg:w-4 lg:h-4' /> Delete
                         </button>
                       </div>
                     )}
                   </div>
 
-                  <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm 2xl:text-md mt-1 w-full truncate px-1'>
+                  <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm lg:text-[10px] xl:text-[11px]  2xl:text-md mt-1 lg:mt-0 w-full truncate px-1'>
                     {file.fileName}
                   </p>
-                  <p className='text-center font-roboto text-gray-400 text-xs'>{file.fileSize}</p>
+                  <p className='text-center lg:text-[9px] xl:text-[10px] 2xl:text-[11px] font-roboto text-gray-400 text-xs'>{file.fileSize}</p>
                 </div>
               ))}
 
@@ -590,10 +642,10 @@ const handleFiles = async (incoming: FileList | null) => {
                   className={`flex items-center justify-center border-2 border-dashed rounded-xl py-6 cursor-pointer transition-colors
                     ${dragOver ? 'border-primary-600 bg-primary-50' : 'border-gray-200 hover:border-primary-600'}`}
                 >
-                  <p className='text-gray-400 font-roboto text-sm text-center'>
+                  <p className='text-gray-400 font-roboto text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[12px] text-center'>
                     + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
                     <br />
-                    <span className='text-xs text-gray-500'>Max 10 MB per file</span>
+                    <span className='text-xs text-gray-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px]'>Max 10 MB per file</span>
                   </p>
                 </div>
               )}
@@ -601,6 +653,7 @@ const handleFiles = async (incoming: FileList | null) => {
           )}
         </div>
       </main>
+      </div>
 
       {/* File Preview Modal */}
       {previewFile && (
@@ -731,20 +784,20 @@ const handleFiles = async (incoming: FileList | null) => {
           </div>
         </div>
       )}
-      <button
-        id='tour-btn'
-        onClick={() => startTour()}
-        className='fixed bottom-6 right-6 z-50
-          flex flex-col items-center gap-1
-          hover:opacity-80 active:scale-95 transition-all
-          lg:bottom-8 lg:right-8'
-        title='Take a Tour'
-      >
-        <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
-          <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-        </div>
-        <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
-      </button>
+          <button
+            id='tour-btn'
+            onClick={() => startTour()}
+            className='hidden lg:flex fixed bottom-6 right-6 z-50
+            flex-col items-center gap-1
+            hover:opacity-80 active:scale-95 transition-all
+            lg:bottom-8 lg:right-8'
+            title='Take a Tour'
+          >
+            <div className='bg-white w-14 h-14 lg:w-10 lg:h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12    rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12  lg:w-10 xl:w-11 2xl:w-12 block mx-auto mt-1' />
+            </div>  
+            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-primary-600 font-inter font-medium'>Need Help?</p>
+          </button>
     </div>
   )
 }

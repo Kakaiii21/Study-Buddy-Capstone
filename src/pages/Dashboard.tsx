@@ -52,7 +52,7 @@ function Dashboard() {
   const { quizHistory } = useQuizHistory(user)
   const latestQuiz = quizHistory[0] ?? null
 
-  const { tasks } = useTasks(user)
+const { tasks, loading: tasksLoading } = useTasks(user)
   const computedPercent = useMemo(() => {
     const total = tasks.length
     const done = tasks.filter(
@@ -63,23 +63,21 @@ function Dashboard() {
 
   // Cached task progress — mirrors firstName/profilePic below, so the bar
   // shows the last known % instantly instead of flashing to 0 on navigation.
-  const cachedPercent = useMemo(() => {
-    if (!user) return 0
-    const cacheKey = `taskProgress_${user.uid}`
-    const cached = sessionStorage.getItem(cacheKey)
-    return cached ? Number(cached) : 0
-  }, [user])
+const cachedPercent = useMemo(() => {
+  if (!user) return 0
+  const cacheKey = `taskProgress_${user.uid}`
+  const cached = sessionStorage.getItem(cacheKey)
+  return cached ? Number(cached) : 0
+}, [user])
 
-  const completedPercent = tasks.length > 0 ? computedPercent : cachedPercent
+const completedPercent = tasksLoading ? cachedPercent : computedPercent
 
-  useEffect(() => {
-    if (!user) return
-    if (tasks.length === 0) return
-    const cacheKey = `taskProgress_${user.uid}`
-    sessionStorage.setItem(cacheKey, String(computedPercent))
-  }, [computedPercent, tasks.length, user])
-
-
+useEffect(() => {
+  if (!user) return
+  if (tasksLoading) return
+  const cacheKey = `taskProgress_${user.uid}`
+  sessionStorage.setItem(cacheKey, String(computedPercent))
+}, [computedPercent, tasksLoading, user])
   const [firstName, setFirstName] = useState<string | null>(null)
   const [profilePic, setProfilePic] = useState('/profile.png')
 

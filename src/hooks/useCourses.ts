@@ -13,12 +13,15 @@ import {
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
 
+export type CourseColor = 'yellow' | 'blue' | 'grey'
+
 export interface Course {
   id: string
   name: string
   uid: string
   createdAt: number
   fileCount?: number
+  color?: CourseColor
 }
 
 export function useCourses(user: User | null) {
@@ -49,13 +52,14 @@ export function useCourses(user: User | null) {
     return () => unsubscribe()
   }, [user])
 
-  async function addCourse(name: string) {
+  async function addCourse(name: string, color: CourseColor = 'blue') {
     if (!user || !name.trim()) return
     await addDoc(collection(db, 'users', user.uid, 'courses'), {
       name: name.trim(),
       uid: user.uid,
       createdAt: Date.now(),
-      fileCount : 0,
+      fileCount: 0,
+      color,
     })
   }
 
@@ -81,7 +85,7 @@ export function useCourses(user: User | null) {
           type: 'Course',
           originalCollection: `users/${user.uid}/courses/${courseId}/files`,
           originalDocId: fileDoc.id,
-          cloudinaryPublicId: fileData.publicId,  // ← this was missing
+          cloudinaryPublicId: fileData.publicId,
           data: { ...fileData, id: fileDoc.id },
         })
       })

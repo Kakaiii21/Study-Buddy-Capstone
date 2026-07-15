@@ -331,14 +331,14 @@ const handleSave = () => {
   }
 
   return (
-    <div className='flex h-screen'>
-      
-      <div className='p-3 '>
+      <div className='flex h-full'>
+        {/* Sidebar */}
+        <div className='lg:p-3 '>
        <Sidebar /> 
       </div>
         <div className='flex-1  flex flex-col overflow-hidden'>
 
-             {/* Top Bar — mobile only */}
+        {/* Top Bar — mobile only */}
         <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
           <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Class Schedule</p>
             <button
@@ -354,18 +354,19 @@ const handleSave = () => {
               <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
         </div>
-      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-0  pt-1">
+        
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
             <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
-  font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
-  mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Class Schedule</p>
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Class Schedule</p>
           {/* Header */}
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
 
               <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
-          pl-1 
-          lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
-           md:justify-between md:items-start sm:items-center gap-1 p-2">
+                pl-1 
+                lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
+                md:justify-between md:items-start sm:items-center gap-1 p-2">
                 <button
                   id='clearScheduleBtn'
                   onClick={() => setShowClearModal(true)}
@@ -411,48 +412,48 @@ const handleSave = () => {
           {/* Add / Edit Modal */}
           {isAddSubOpen && (
             <div className='fixed inset-0   bg-black/50 flex items-center justify-center z-50'>
-              <div className='bg-primary-600 rounded-lg p-6 w-full max-w-md mx-5 shadow-lg'>
-                <h2 className='text-2xl text-white uppercase text-center font-bold font-roboto mb-4'>
+              <div className='bg-white rounded-lg p-6 w-full max-w-md mx-5 shadow-lg'>
+                <h2 className='text-2xl text-primary-800 uppercase text-center font-bold font-roboto mb-4'>
                   {editTargetId ? 'Edit Schedule' : 'Add Schedule'}
                 </h2>
 
                 <div className='flex flex-row gap-2 w-full'>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white text-md font-roboto font-medium mb-1'>DAY</label>
-                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={`border rounded-md px-3 py-2 w-full ${errClass('selectedDay')}`}>
+                    <label className='text-primary-800 text-md font-roboto font-medium mb-1'>DAY</label>
+                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={`border rounded-sm  border-primary-800 px-3 py-2 w-full ${errClass('selectedDay')}`}>
                       <option value='' disabled>Select a day</option>
                       {days.map((day) => <option key={day} value={day}>{day}</option>)}
                     </select>
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white text-md font-roboto mb-1'>SUBJECT NAME</label>
-                    <input type='text' placeholder='Enter Subject' className={`py-2 rounded-md pl-4 text-md w-full ${errClass('subjectName')}`} 
+                    <label className='text-primary-800 text-md font-roboto mb-1'>SUBJECT NAME</label>
+                    <input type='text' placeholder='Enter Subject' className={`py-2 rounded-sm border border-primary-800 pl-4 text-md w-full ${errClass('subjectName')}`} 
                       value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
                   </div>
                 </div>
 
                 <div className='flex flex-row gap-2 w-full mt-4'>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white text-md font-roboto mb-1'>TIME START</label>
-                    <input aria-label='Time Start' type='time' className={`py-2 pl-4 text-md rounded-md w-full ${errClass('timeStart')}`}
+                    <label className='text-primary-800 text-md font-roboto mb-1'>TIME START</label>
+                    <input aria-label='Time Start' type='time' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('timeStart')}`}
                       value={timeStart} onChange={(e) => setTimeStart(e.target.value)} />
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white text-md font-roboto mb-1'>TIME END</label>
-                    <input aria-label='Time End' type='time' className={`py-2 pl-4 text-md rounded-md w-full ${errClass('timeEnd')}`}
+                    <label className='text-primary-800 text-md font-roboto mb-1'>TIME END</label>
+                    <input aria-label='Time End' type='time' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('timeEnd')}`}
                       value={timeEnd} onChange={(e) => setTimeEnd(e.target.value)} />
                   </div>
                 </div>
 
                 <div className='flex flex-row gap-2 w-full mt-4'>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white uppercase text-md font-roboto mb-1'>Room Assigned</label>
-                    <input type='text' placeholder='Enter Room' className={`py-2 pl-4 text-md rounded-md w-full ${errClass('roomAssigned')}`}
+                    <label className='text-primary-800 uppercase text-md font-roboto mb-1'>Room Assigned</label>
+                    <input type='text' placeholder='Enter Room' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('roomAssigned')}`}
                       value={roomAssigned} onChange={(e) => setRoomAssigned(e.target.value)} />
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-white text-md uppercase font-roboto mb-1'>Room Type</label>
-                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className={`border rounded-md py-2 px-3 w-full ${errClass('selectedRoomType')}`}>
+                    <label className='text-primary-800 text-md uppercase font-roboto mb-1'>Room Type</label>
+                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className={`border rounded-sm  border-primary-800 py-2 px-3 w-full ${errClass('selectedRoomType')}`}>
                       <option value='' disabled>Select type</option>
                       {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
                     </select>
@@ -460,8 +461,8 @@ const handleSave = () => {
                 </div>
 
                 <div className='flex flex-col mt-4'>
-                  <label className='uppercase text-white font-roboto mb-1'>Teacher / Instructor</label>
-                  <input type='text' placeholder='Enter Teacher/Instructor Name' className={`rounded-md py-2 pl-4 w-full ${errClass('instructor')}`}
+                  <label className='uppercase text-primary-800 font-roboto mb-1'>Teacher / Instructor</label>
+                  <input type='text' placeholder='Enter Teacher/Instructor Name' className={`rounded-sm border border-primary-800 py-2 pl-4 w-full ${errClass('instructor')}`}
                     value={instructor} onChange={(e) => setInstructor(e.target.value)} />
                 </div>
 
@@ -473,7 +474,7 @@ const handleSave = () => {
                   )}
                 <div className='flex flex-row justify-center items-center gap-6 mt-6'>
                   <button onClick={() => { setIsAddSubOpen(false); resetForm() }}
-                    className='bg-white text-primary-600 uppercase font-bold font-roboto px-8 rounded-full py-1'>
+                    className='bg-white text-primary-600 uppercase border border-primary-800 font-bold font-roboto px-8 rounded-full py-1'>
                     Cancel
                   </button>
                   <button onClick={handleSave}

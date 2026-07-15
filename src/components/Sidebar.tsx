@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { logout } from '../services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -37,6 +37,21 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
     navigate(path)
     close() 
   }
+
+  const [isScrolling, setIsScrolling] = useState(false)
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleScroll = () => {
+    setIsScrolling(true)
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+    scrollTimeout.current = setTimeout(() => setIsScrolling(false), 800)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+    }
+  }, [])
 
   const navSections = [
     {
@@ -106,7 +121,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         </div>
 
         {/* NAV SECTIONS */}
-        <nav id='sidebar' className="flex-1 overflow-y-auto pb-4 ">
+        <nav id='sidebar' onScroll={handleScroll}   className={`flex-1 overflow-y-auto pb-4 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
           {navSections.map((section) => (
             <div  key={section.heading} className="mb-4 lg:mb-0 ">
               <div className=" mx-5 h-px  bg-primary-100" />
