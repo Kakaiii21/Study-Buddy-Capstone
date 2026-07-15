@@ -757,7 +757,7 @@ const coursesMobile: DriveStep[] = [
 // ─── Course Folder Desktop (lg+, 1024px+) ───────────────────────────────────
 const coursefolderDesktop: DriveStep[] = [
   {
-    element: '#goBackBtn',
+    element: '#goBackBtn-desktop',
     popover: {
       title: '⬅️ Go Back',
       description:
@@ -863,7 +863,7 @@ const coursefolderTablet: DriveStep[] = [
 // ─── Course Folder Mobile (below 768px) ─────────────────────────────────────
 const coursefolderMobile: DriveStep[] = [
   {
-    element: '#goBackBtn',
+    element: '#goBackBtn-mobile',
     popover: {
       title: '⬅️ Go Back',
       description:

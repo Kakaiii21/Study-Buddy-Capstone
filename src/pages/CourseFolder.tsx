@@ -358,14 +358,14 @@ const handleFiles = async (incoming: FileList | null) => {
       <div className='flex-1  flex flex-col overflow-hidden'>
 
               {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+        <div  className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
           <button
-              
+id='goBackBtn-mobile'
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
                 className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
-                <div id='goBackBtn' className='flex flex-col justify-center items-center '>
+                <div id='goBackBtn' className='lg:hidden flex flex-col justify-center items-center '>
                 <span className="text-5xl leading-none">←</span>
                 <span className="text-sm">Back</span>
                 </div>
@@ -397,7 +397,7 @@ const handleFiles = async (incoming: FileList | null) => {
           <div className='flex mt-1   lg:mt-0 flex-col md:flex-row  md:justify-between md:items-center  lg:justify-between lg:items-center w-full gap-3 mb-6 lg:mb-0'>
             <div className="hidden   lg:flex items-center   gap-4">
               <button
-                id='goBackBtn'
+                id='goBackBtn-desktop'
                 title="Go Back to Courses"
                 onClick={() => navigate('/courses')}
                 className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded hover:bg-gray-100 transition"
