@@ -378,14 +378,14 @@ id='goBackBtn-mobile'
             <button
             id='tour-btn'
               onClick={() => startTour()}
-              className='flex flex-col items-center gap-1 ml-auto
-                hover:opacity-80 active:scale-95 transition-all'
+              className='flex flex-col items-center gap-1 ml-auto pt-3
+              hover:opacity-80 active:scale-95 transition-all'
               title='Take a Tour'
             >
-              <div className='bg-white  w-14 h-14 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
               </div>
-              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
         </div>
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">

@@ -755,14 +755,14 @@ function ToDoList() {
             <button
             id='tour-btn'
               onClick={() => startTour()}
-              className='flex flex-col items-center gap-1 ml-auto
-                hover:opacity-80 active:scale-95 transition-all'
+              className='flex flex-col items-center gap-1 ml-auto pt-3
+              hover:opacity-80 active:scale-95 transition-all'
               title='Take a Tour'
             >
-              <div className='bg-white  w-14 h-14 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
               </div>
-              <p className='text-xs text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
         </div>
 
@@ -906,11 +906,11 @@ id='clearAllBtn'
             lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-            <div className='bg-white w-14 h-14 lg:w-10 lg:h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12    rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12  lg:w-10 xl:w-11 2xl:w-12 block mx-auto mt-1' />
+              <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
             </div>  
-            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-primary-600 font-inter font-medium'>Need Help?</p>
-          </button>
+    <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px]
+    font-inter font-semibold'>Need Help?</p>          </button>
       </main>
     </div>
     </div>
