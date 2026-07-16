@@ -106,7 +106,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       <aside
         className={`
           md:rounded-none lg:rounded-lg
-          fixed top-0 left-0 h-full  w-60 lg:w-[165px] xl:w-[200px] 2xl:w-[235px] bg-primary-800 z-40
+          fixed top-0 left-0 h-full  w-60 lg:w-[165px] xl:w-[200px] 2xl:w-[235px] 3xl:w-[280px] bg-primary-800 z-40
           flex flex-col shadow-lg 
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -116,8 +116,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       >
         {/* LOGO */}
         <div className="p-6  ml-2 lg:ml-0 flex gap-2 justify-start items-center">
-          <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-9 xl:w-14 2xl:w-16" />
-            <p className='font-roboto lg:text-[9px] xl:text-xs 2xl:text-[16px] text-white uppercase'>Study <br></br> Buddy</p>
+          <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-9 xl:w-14 2xl:w-16 3xl:w-20" />
+            <p className='font-roboto lg:text-[9px] xl:text-xs 2xl:text-[16px] 3xl:text-[20px] text-white uppercase'>Study <br></br> Buddy</p>
         </div>
 
         {/* NAV SECTIONS */}
@@ -125,8 +125,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
           {navSections.map((section) => (
             <div  key={section.heading} className="mb-4 lg:mb-0 ">
               <div className=" mx-5 h-px  bg-primary-100" />
-              <div className="flex pl-5 flex-row items-start mb-2 lg:mb-1 2xl:mb-2">
-                <span className="text-[#8C8C8C]  font-roboto font-normal text-xs lg:text-[9px] xl:text-[12px]  pt-3 lg:pt-1 xl:pt-2 2xl:pt-3   tracking-wide">
+              <div className="flex pl-5 flex-row items-start mb-2 lg:mb-1 2xl:mb-2 3xl:mb-3">
+                <span className="text-[#8C8C8C]  font-roboto font-normal text-xs lg:text-[9px] xl:text-[12px] 3xl:text-[14px]  pt-3 lg:pt-1 xl:pt-2 2xl:pt-3 3xl:pt-4   tracking-wide">
                   {section.heading}
                 </span>
               </div>
@@ -137,8 +137,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                   key={item.path}
                   onClick={() => handleNavigate(item.path)}
                   className={`
-                    w-full text-left py-2 lg:py-0 pl-1 2xl:py-1  mb-1
-                    font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px]
+                    w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
+                    font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
                     transition-colors duration-200  rounded-md
                     flex items-center gap-2 justs 
                     ${location.pathname === item.path ||
@@ -150,7 +150,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                     }
                   `}
                 >
-                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 shrink-0" />
+                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0" />
                   {item.label}
                 </button>
               ))}
@@ -164,13 +164,13 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                   onClick={() => !isBlocked && setShowLogoutModal(true)}
                   className="
                      w-full text-left py-2 lg:py-0 pl-1   mb-1
-                    font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px]
+                    font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
                     transition-colors duration-200 rounded-lg
                     flex items-center gap-2 
                     text-white hover:bg-[#4A4A49]
                   "
                 >
-                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7  shrink-0" />
+                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9  shrink-0" />
                   Logout
                 </button>
               </div>

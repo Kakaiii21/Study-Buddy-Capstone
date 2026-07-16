@@ -139,7 +139,7 @@ function FlashcardView() {
   return (
     <div className='flex h-screen'>
 
-      <div className='p-3 '>
+      <div className='lg:p-3'>
       <Sidebar />
         
       </div>

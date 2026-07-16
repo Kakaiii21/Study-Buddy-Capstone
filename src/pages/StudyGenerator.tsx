@@ -396,7 +396,7 @@ const { startTour } = useTour(
 
               {/* Top Bar — mobile only */}
         <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Study Generator</p>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Study Generator</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -427,7 +427,7 @@ const { startTour } = useTour(
             <p className='mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
               Make your own Quiz/Flashcard Now!
             </p>
-            <p className='mt-0 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
+            <p className='mt-2 lg:mt-0 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
               Generate your own quiz or flashcards by uploading a file.
             </p>
 
@@ -445,14 +445,14 @@ const { startTour } = useTour(
               </div>
             )}
             {/* ─────────────────────── */}
-          <hr className='w-72 md:w-[500px] lg:w-[450px] 2xl:w-[650px] 3xl:w-[800px] mt-5 md:mt-10 lg:mt-2 mx-auto border-t border-primary-600 mb-1 md:mb-0' />
+          <hr className='w-72 mt-10 lg:mt-2 md:w-[500px] lg:w-[450px] 2xl:w-[650px] 3xl:w-[800px]  md:mt-10  mx-auto border-t border-primary-600 mb-1 md:mb-0' />
             {/* File Source Panel */}
-            <div className='flex flex-col justify-center mt-0 md:mt-5 lg:mt-0 gap-1 items-center w-full max-w-[800px] 3xl:max-w-[1000px]  px-6 py-1'>
+            <div className='flex flex-col justify-center mt-2 md:mt-5 lg:mt-0 gap-1 items-center w-full max-w-[800px] 3xl:max-w-[1000px]  px-6 py-1'>
               <p className='text-sm lg:text-[14px] 2xl:text-lg 3xl:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10 lg:mb-1 2xl:mt-3'>
                 Choose where to access your files
               </p>
 
-              <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 2xl:mt-3'>                
+              <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 mt-4 lg:mt-2 2xl:mt-3'>                
                 <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
                   <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36' src='Localbtn.png' alt='localbtnicon' />
                   <button

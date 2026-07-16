@@ -150,49 +150,81 @@ function GeneratedHistory() {
   return (
     <div className='flex h-screen'>
 
-      <div className='p-3 '>
+      <div className='lg:p-3 '>
         <Sidebar />
 
       </div>
-      <main className='flex-1 overflow-auto p-4 md:p-8 mt-1 lg:mt-0'>
-        <div className='min-h-screen flex flex-col'>
+      <div className='flex-1 flex flex-col overflow-hidden'>
 
-          {/* Header */}
-          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6 lg:mt-0 md:mt-0 mt-4'>
-            <p className='text-2xl lg:ml-0 md:ml-16 md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
-              Generated History
-            </p>
-          </div>
-
-          <hr className='w-full border-t border-primary-600 mb-6' />
-
+              {/* Top Bar — mobile only */}
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Generated History</p>
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='flex flex-col items-center gap-1 ml-auto pt-3
+              hover:opacity-80 active:scale-95 transition-all'
+              title='Take a Tour'
+            >
+              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              </div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
+        </div>
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
+        <div className="min-h-screen  w-full flex flex-col">
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Generated History</p>
           {/* Filters */}
-          <div className='flex flex-row lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
+          <div className='flex flex-row   lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
             <select
             id='genTypeSelect'
               value={selectedGen}
               aria-label='Generation Type'
               onChange={(e) => { setSelectedGen(e.target.value); setSearchQuery('') }}
-              className='border-2 border-primary-600 rounded-lg px-4 py-2 text-primary-600 font-semibold bg-white focus:outline-none'
-            >
+                className='w-40 border border-primary-800 rounded-md
+                px-3 py-1 lg:py-auto lg:rounded-sm
+                text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
+                font-roboto text-primary-600
+                focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+                >
               {genOption.map((option) => (
                 <option key={option} value={option}>{option}</option>
               ))}
             </select>
 
-            <input
-            id='genSearchBar'
-              type='text'
-              placeholder='Search...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full sm:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 bg-white focus:outline-none'
-            />
+           <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search"
+                className="w-full border border-primary-800 rounded-md
+                  py-2 pl-3 pr-8 
+                  text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[14px] 3xl:text-[17px]
+                  font-inter text-primary-800 placeholder:text-primary-800
+                  focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
+                  transition-all duration-200"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute right-2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
           </div>
 
           {/* Recent label */}
-          <div className='flex items-center gap-3 mb-4'>
-            <p className='whitespace-nowrap text-primary-600 font-semibold'>Recent</p>
+          <div className='flex items-center  gap-3 mb-4'>
+            <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
             <hr className='flex-1 border-t border-primary-100' />
           </div>
           {!isOnline && (
@@ -213,35 +245,35 @@ function GeneratedHistory() {
               {/* ── Quiz Table ── */}
               {selectedGen === 'Quiz' && (
                 <>
-                  <div  className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
-                    <p>Name</p>
-                    <p className='text-center'>Score</p>
-                    <p className='text-center'>Items</p>
-                    <p className='text-center'>View</p>
-                    <p className='text-center'>Retake</p>
-                    <p className='text-center'>Delete</p>
+                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium'>
+                    <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Score</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Retake</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
                   </div>
 
                   {filteredQuiz.length === 0 ? (
-                    <p className='text-gray-400 font-roboto text-center py-10'>No quiz history found.</p>
+                    <p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
                   ) : (
                     filteredQuiz.map((item) => (
-                      <div key={item.id} className='border-b py-3'>
-                        <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
+                      <div key={item.id} className='  py-2 lg:py-1 2xl:py-2 3xl:py-3'>
+                        <div className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center'>
                           <div className='min-w-0'>
-                            <p className='text-xs md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
+                            <p className='text-xs md:text-sm   lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
                               {item.fileName}
                             </p>
-                            <p className='text-xs md:text-sm text-gray-400'>{formatDate(item.dateTaken)}</p>
+                            <p className='text-xs  md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateTaken)}</p>
                           </div>
-                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.score}</p>
-                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
+                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.score}</p>
+                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.total}</p>
                           <div  className='flex justify-center'>
                             <img
                             id='viewBtn'
                               src='/View.png'
                               alt='View'
-                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
                               onClick={() => handleViewQuiz(item)}
                             />
                           </div>
@@ -250,7 +282,7 @@ function GeneratedHistory() {
                             id='retakeBtn'
                               src='/Retake.png'
                               alt='Retake'
-                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
                               onClick={() => handleRetakeQuiz(item)}
                             />
                           </div>
@@ -259,7 +291,7 @@ function GeneratedHistory() {
                           id='deleteBtn'
                             src='/delete.png'
                             alt='Delete'
-                            className={`lg:w-7 lg:h-7 w-5 h-5 transition
+                            className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition
                               ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
                             onClick={() => isOnline
                               ? setPendingDelete({ id: item.id, name: item.fileName })
@@ -277,31 +309,31 @@ function GeneratedHistory() {
               {/* ── Flashcard Table ── */}
               {selectedGen === 'Flashcard' && (
                 <>
-                  <div  className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
-                    <p>Name</p>
-                    <p className='text-center'>Items</p>
-                    <p className='text-center'>View</p>
-                    <p className='text-center'>Delete</p>
+                  <div  className='grid lg:pb-2 grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                    <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
+                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
                   </div>
 
                   {filteredFlashcard.length === 0 ? (
                     <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
                   ) : (
                     filteredFlashcard.map((item) => (
-                      <div key={item.id} className='border-b py-3'>
+                      <div key={item.id} className=' py-2 lg:py-1 2xl:py-2 3xl:py-3'>
                         <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
                           <div className='min-w-0'>
-                            <p className='text-xs md:text-sm lg:text-xl font-semibold text-primary-600 break-all leading-tight'>
+                            <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
                               {item.fileName}
                             </p>
-                            <p className='text-xs md:text-sm lg:text-sm text-gray-400'>{formatDate(item.dateSaved)}</p>
+                            <p className='text-xs  md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateSaved)}</p>
                           </div>
-                          <p className='text-center text-sm md:text-base lg:text-lg text-primary-600'>{item.total}</p>
+                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
                           <div className='flex justify-center'>
                             <img
                               src='/View.png'
                               alt='View'
-                              className='lg:w-7 lg:h-7 w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
                               onClick={() => handleViewFlashcard(item)}
                             />
                           </div>
@@ -309,7 +341,7 @@ function GeneratedHistory() {
                               <img
                                 src='/delete.png'
                                 alt='Delete'
-                                className={`lg:w-7 lg:h-7 w-5 h-5 transition
+                                className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition
                                   ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
                                 onClick={() => isOnline
                                   ? setPendingDelete({ id: item.id, name: item.fileName })
@@ -337,22 +369,22 @@ function GeneratedHistory() {
   />
 )}
 
-<button
-  id='tour-btn'
-  onClick={() => startTour()}
-  className='fixed bottom-6 right-6 z-50
-    flex flex-col items-center gap-1
-    hover:opacity-80 active:scale-95 transition-all
-    lg:bottom-8 lg:right-8'
-  title='Take a Tour'
->
-  <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
-    <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-  </div>
-  <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
-</button>
+          <button
+            id='tour-btn'
+            onClick={() => startTour()}
+            className='hidden lg:flex fixed bottom-6 right-6 z-50
+            flex-col items-center gap-1
+            hover:opacity-80 active:scale-95 transition-all
+            lg:bottom-8 lg:right-8'
+            title='Take a Tour'
+          >
+            <div className='bg-white w-14 h-14 lg:w-10 lg:h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12    rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12  lg:w-10 xl:w-11 2xl:w-12 block mx-auto mt-1' />
+            </div>  
+            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-primary-600 font-inter font-medium'>Need Help?</p>
+          </button>
       </main>
-
+</div>
 
     </div>
   )

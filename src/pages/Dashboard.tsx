@@ -156,7 +156,7 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
     
     {/* ID Card */}
 <div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[320px] xl:max-w-[390px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
-h-auto pb-3 bg-white border-2 md:bg-pink-600 lg:bg-green-600 xl:bg-blue-600 2xl:bg-yellow-600 3xl:bg-purple-500 border-primary-800 rounded-2xl overflow-hidden relative'>
+h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden relative'>
                         
       {/* Yellow header strip */}
       <div className='w-full h-8 md:h-9 lg:h-7 xl:h-8 2xl:h-9 3xl:h-10  bg-[#FFF1AB] rounded-t-2xl border-b-2 border-primary-800 relative'>
