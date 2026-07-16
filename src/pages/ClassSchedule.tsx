@@ -263,18 +263,18 @@ const handleSave = () => {
     return (
       <div id='scheduleGrid'
       className='flex flex-col   mt-2 pb-2 bg-primary-800
-        rounded-lg 
+        rounded-lg 3xl:mt-5
       border border-white/10
         hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
         transition-all duration-300
         self-start w-full'>
-        <p className='text-white text-center text-[23px] md:text-3xl lg:text-[23px] xl:text-[24px] 2xl:text-[25px] uppercase mt-2 font-fustat'>{day}</p>
-        <div className='space-y-1  pb-2'>
+        <p className='text-white text-center text-[23px] md:text-3xl lg:text-[23px] xl:text-[24px] 2xl:text-[25px] 3xl:text-[30px] uppercase mt-2 font-fustat'>{day}</p>
+        <div className='space-y-1 2xl:space-y-2 2xl:px-2  pb-2'>
           {daySchedules.length > 0 ? (
             daySchedules.map((s) => (
               <div key={s.id} className='bg-white px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
-                <div className='flex flex-row  items-center pt-1'>
-                  <p className='text-[10px] leading-tight md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] font-roboto font-bold text-primary-600'>
+                <div className='flex flex-row 3xl:py-2  items-center pt-1'>
+                  <p className='text-[10px] leading-tight md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'>
                     {s.subject}
                   </p>
 
@@ -285,7 +285,7 @@ const handleSave = () => {
                       title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
-                      <img src="subM.png" alt="menu" className='h-[15px] w-[3px] lg:h-[15px] lg:w-[3px] xl:h-[16px] xl:w-[4px] 2xl:h-[17px] 2xl:w-[5px]' />
+                      <img src="subM.png" alt="menu" className='h-[15px] w-[3px] lg:h-[16px] lg:w-[3px] xl:h-[15px] xl:w-[3px] 2xl:h-[15px] 2xl:w-[3px] 3xl:h-[19px] 3xl:w-[4px]  shrink-0 ' />
                     </button>
 
                     {menuOpenIndex === s.id && (
@@ -314,16 +314,16 @@ const handleSave = () => {
                   </div>
                 </div>
 
-                <p className='text-[9px] leading-tight md:text-[9px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px] font-roboto text-primary-600 '>
+                <p className='text-[9px] leading-tight md:text-[9px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
-                <p className='text-[9px] leading-tight lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-gray-600 pb-2'>
+                <p className='text-[9px] leading-tight lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[14px] text-gray-600 pb-2'>
                   {s.instructor}
                 </p>
               </div>
             ))
           ) : (
-            <p className='text-white  text-center lg:text-xs mt-4 lg:mt-3 mb-5 lg:mb-2 font-fustat'>No scheduled class here.</p>
+            <p className='text-white  text-center lg:text-xs 3xl:text-[15px] mt-4 lg:mt-3 mb-5 lg:mb-2 font-fustat'>No scheduled class here.</p>
           )}
         </div>
       </div>
@@ -365,7 +365,7 @@ const handleSave = () => {
 
               <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
                 pl-1 
-                lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
+                lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3 
                 md:justify-between md:items-start sm:items-center gap-1 p-2">
                 <button
                   id='clearScheduleBtn'
@@ -375,6 +375,7 @@ const handleSave = () => {
                   font-inter font-black
                   text-[10px] lg:text-[8px]
                   xl:text-[10px] 2xl:text-[12px]
+                  3xl:text-[14px]
 
                   hover:opacity-90 w-auto
                   backdrop-blur-xs
@@ -394,6 +395,7 @@ const handleSave = () => {
                   font-inter font-black
                   text-[10px] lg:text-[8px]
                   xl:text-[10px] 2xl:text-[12px]
+                  3xl:text-[14px]
                   hover:opacity-90 w-auto
                   backdrop-blur-xs
                   hover:-translate-y-1 

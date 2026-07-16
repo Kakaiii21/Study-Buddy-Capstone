@@ -474,7 +474,7 @@ function TaskCard({
       style={style}
       {...attributes}
       className={`
-        rounded-md p-2  2xl:px-3 2xl:py-2 pt-0  mb-3
+        rounded-md p-2  2xl:px-3 2xl:py-2 3xl:px-4 3xl:py-3 pt-0  mb-3
         hover:shadow-md
       
         w-full select-none relative
@@ -484,18 +484,18 @@ function TaskCard({
       `}
     >
       <div {...listeners} className="cursor-grab active:cursor-grabbing">
-        <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
+        <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px] 3xl:text-[14px]'>
           <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
             month: '2-digit', day: '2-digit', year: 'numeric',
           })}</p>
         </div>
         <div className="flex justify-between items-start">
-          <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-black' : 'text-primary-800'}`}>
+          <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-black' : 'text-primary-800'}`}>
             {task.name}
           </p>
         </div>
         {task.deadline && (
-          <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-black font-semibold' : 'text-primary-800'}`}>
+          <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] 3xl:text-[11px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-black font-semibold' : 'text-primary-800'}`}>
             {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
             {toDisplayFormat(task.deadline)}
           </p>
@@ -542,19 +542,19 @@ function DragCard({ task }: { task: Task }) {
   const isOverdue = task.deadline && task.deadline < nowISO && task.status !== 'done'
   const isDone = task.status === 'done'
   return (
-    <div className={`rounded-md p-2 2xl:px-3 2xl:py-2 pt-0 mb-3 w-full select-none relative shadow-xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
-      <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px]'>
+    <div className={`rounded-md p-2 2xl:px-3 2xl:py-2 3xl:px-4 3xl:py-3 pt-0 mb-3 w-full select-none relative shadow-xl rotate-1 scale-105 ${getCardStyle(task, nowISO)}`}>
+      <div className='flex justify-end text-primary-800 font-medium font-fustat text-sm lg:text-[8px] xl:text-[10px] 2xl:text-[12px] 3xl:text-[14px]'>
         <p>{new Date(task.createdAt).toLocaleDateString('en-US', {
           month: '2-digit', day: '2-digit', year: 'numeric',
         })}</p>
       </div>
       <div className="flex justify-between items-start">
-        <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-800'}`}>
+        <p className={`font-medium font-fustat overflow-hidden text-ellipsis lg:text-[12px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] ${isDone ? 'text-green-700 line-through' : isOverdue ? 'text-primary-50' : 'text-primary-800'}`}>
           {task.name}
         </p>
       </div>
       {task.deadline && (
-        <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-primary-800 font-semibold' : 'text-primary-800'}`}>
+        <p className={`text-sm font-fustat font-medium lg:text-[8px] xl:text-[9px] 2xl:text-[10px] 3xl:text-[11px] mt-1 ${isDone ? 'text-primary-800' : isOverdue ? 'text-primary-800 font-semibold' : 'text-primary-800'}`}>
           {isOverdue ? 'Past Deadline: ' : 'Deadline: '}
           {toDisplayFormat(task.deadline)}
         </p>
@@ -584,7 +584,7 @@ function Column({
       className={`
         w-full lg:flex-1
         md:px-32 
-        flex flex-col items-center p-4 py-0 pt-4 md:py-0 md:pt-3 sm:p-6 lg:px-10 2xl:px-16 lg:p-0 lg:pt-0 lg:pb-5 rounded-3xl
+        flex flex-col items-center p-4 py-0 pt-4 md:py-0 md:pt-3 sm:p-6 lg:px-10 2xl:px-16 3xl:px-20 lg:p-0 lg:pt-0 lg:pb-5 rounded-3xl
         transition-colors duration-200
         ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
         ${isOver ? 'bg-primary-50' : ''}
@@ -593,7 +593,7 @@ function Column({
       <div className="bg-primary-800 
       shadow-[0_0px_5px_rgba(0,0,0,.3)]
       max-w-full w-full p-3 flex items-center justify-between">
-        <p className="text-white pl-5 lg:pl-0 text-xl lg:text-sm 2xl:text-lg lg:text-center text-start font-semibold flex-1">{label}</p>
+        <p className="text-white pl-5 lg:pl-0 text-xl lg:text-sm 2xl:text-lg 3xl:text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
         <button
         id='colCollapseBtn'
           onClick={onToggleCollapse}
@@ -792,12 +792,12 @@ function ToDoList() {
       <main  className="flex-1   w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
           <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
-            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
             mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>To do list</p>
 
           <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
           pl-1   
-          lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3
+          lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 3xl:pr-20 lg:px-2 lg:gap-3
            md:justify-between md:items-start sm:items-center gap-1 p-2">
             <hr className='lg:hidden md:hidden w-full border-t border-[#E9E9E9]' />
 <button
@@ -808,7 +808,7 @@ id='clearAllBtn'
   py-1 px-4 rounded-sm 
   font-inter font-black
    text-[10px] lg:text-[8px]
-   xl:text-[10px] 2xl:text-[12px]
+   xl:text-[10px] 2xl:text-[12px] 3xl:text-[14px]
 
    hover:opacity-90 w-auto
    backdrop-blur-xs
@@ -826,7 +826,7 @@ id='clearAllBtn'
               py-1 px-4 rounded-sm 
               font-inter font-black
                text-[10px] lg:text-[8px]
-               xl:text-[10px] 2xl:text-[12px]
+               xl:text-[10px] 2xl:text-[12px] 3xl:text-[14px]
                hover:opacity-90 w-auto
                backdrop-blur-xs
                hover:-translate-y-1 
@@ -906,10 +906,10 @@ id='clearAllBtn'
             lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-              <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10  flex items-center justify-center text-2xl font-bold'>
+              <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
             </div>  
-    <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px]
+    <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
     font-inter font-semibold'>Need Help?</p>          </button>
       </main>
     </div>

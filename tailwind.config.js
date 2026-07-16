@@ -2,10 +2,11 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-      extend: {
-        screens: {
-          'short': { 'raw': '(max-height: 650px)' },
-        },
+    extend: {
+      screens: {
+        'short': { 'raw': '(max-height: 650px)' },
+        '3xl': '1920px',
+      },
       colors: {
         primary: {
           50: '#EFF3FB',

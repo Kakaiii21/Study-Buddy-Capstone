@@ -249,7 +249,7 @@ const { startTour } = useTour(
             </div>
           ) : (
             <div id='coursesGrid'
-            className='grid grid-cols-2  pl-8 lg:pl-0 lg:grid-cols-5 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-1'>
+            className='grid grid-cols-2  pl-8 lg:pl-0 lg:grid-cols-5 3xl:grid-cols-6 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-1'>
               {courses.length === 0 ? (
               <div className='col-span-2 md:col-span-3  lg:col-span-5 flex items-center justify-center py-20 w-full'>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>

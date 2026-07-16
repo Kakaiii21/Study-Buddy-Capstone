@@ -7,9 +7,6 @@ export default function SplashScreen() {
         alt="Study Buddy logo"
         className="w-24 h-24 md:w-32 md:h-32 animate-pulse"
       />
-      <p className="mt-4 text-primary-600 font-fustat font-bold text-sm md:text-base">
-        Loading Study Buddy...
-      </p>
     </div>
   )
 }
