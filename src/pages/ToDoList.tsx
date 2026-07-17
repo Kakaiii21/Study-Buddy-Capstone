@@ -906,11 +906,12 @@ id='clearAllBtn'
             lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-              <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
+            <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
             </div>  
-    <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
-    font-inter font-semibold'>Need Help?</p>          </button>
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+              font-inter font-semibold'>Need Help?</p>         
+           </button>
       </main>
     </div>
     </div>

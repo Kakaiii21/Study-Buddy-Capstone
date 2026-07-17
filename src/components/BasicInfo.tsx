@@ -255,12 +255,12 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
         </div>
       )}
 
-      <div className='w-full px-4 md:px-16 lg:px-24 xl:px-40 py-6'>
+      <div className='w-full px-4 md:px-16 lg:px-5 xl:px-7 2xl:px-9 3xl:px-11 py-6 lg:py-0 '>
 
-        <h1 className='text-primary-600 font-semibold font-inter text-xl md:text-2xl lg:text-[28px] xl:text-[30px] mb-4 md:mb-6'>Basic Info</h1>
-        <p className='text-primary-600 font-inter text-sm md:text-[15px] xl:text-[16px] w-28 shrink-0'>Profile Picture</p>
+        <h1 className='text-primary-600  font-semibold font-inter text-xl md:text-2xl lg:text-[24px] xl:text-[28px] 2xl:text-[30px] 3xl:text-[35px] mb-4 md:mb-6 lg:mb-0 xl:mb-2 2xl:mb-3 3xl:mb-6'>Basic Info</h1>
+        <p className='text-primary-600  w-auto font-inter text-sm md:text-[15px] lg:text-[10px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px]  shrink-0'>Profile Picture</p>
 
-        <div className='flex flex-row items-center justify-center gap-6 mb-6'>
+        <div className='flex flex-row items-center justify-center gap-6 lg:gap-0 lg:gap-y-0  mb-6 lg:mb-0'>
           <div className='flex flex-col items-center gap-1'>
             <div className='relative w-fit'>
               <button
@@ -272,10 +272,10 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
                 <img
                   src={profilePic}
                   alt="Profile"
-                  className={`w-28 h-28 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+                  className={`w-28 h-28 md:w-24 md:h-24 lg:w-24 lg:h-24 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
                 />
                 <div className='absolute bottom-0 left-0 right-0 h-1/4 flex items-end justify-center pb-1 transition-opacity rounded-b-full'>
-                  <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7" />
+                  <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7 lg:w-5 lg:h-5" />
                 </div>
               </button>
               <input
@@ -290,43 +290,43 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className='text-primary-600 text-xs md:text-sm font-inter font-medium hover:underline'
+              className='text-primary-600 text-xs md:text-sm lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px]  font-inter font-medium hover:underline'
             >
               Upload a new photo.
             </button>
             <button
               onClick={handleRemoveProfilePic}
-              className='text-red-500 text-xs md:text-sm font-inter hover:underline'
+              className='text-red-500 text-xs md:text-sm  lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px] font-inter hover:underline'
             >
               Remove
             </button>
           </div>
         </div>
 
-        <hr className='border-t border-gray-300 mb-4 md:mb-6' />
+        <hr className='border-t border-gray-300 mb-4 md:mb-6 lg:mb-0 2xl:mb-4' />
 
-        <div className='flex flex-col gap-1 mb-3 md:mb-4'>
-          <label className='text-primary-600 font-inter text-sm md:text-md'>First Name</label>
+        <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
+          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name</label>
           <input
             type="text"
             value={firstName}
             onChange={(e) => { setFirstName(e.target.value); setFirstNameError(false) }}
             placeholder='First name'
-            className={`border rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
+            className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
           {firstNameError && (
             <span className='text-red-500 text-xs font-inter'>First name is required</span>
           )}
         </div>
 
-        <div className='flex flex-col gap-1 mb-3 md:mb-4'>
-          <label className='text-primary-600 font-inter text-sm md:text-md'>Last Name</label>
+        <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
+          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name</label>
           <input
             type="text"
             value={lastName}
             onChange={(e) => { setLastName(e.target.value); setLastNameError(false) }}
             placeholder='Last name'
-            className={`border rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
+            className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
           {lastNameError && (
             <span className='text-red-500 text-xs font-inter'>Last name is required</span>
@@ -334,19 +334,19 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
         </div>
 
         <div className='flex flex-col gap-1 mb-4 md:mb-6'>
-          <label className='text-primary-600 font-inter text-sm md:text-md'>Email</label>
+          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
           <div className='flex flex-row gap-2 items-stretch'>
             <input
               aria-label='Email'
               type="text"
               value={maskEmail(email)}
               readOnly
-              className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 flex-1 px-4 py-2 cursor-not-allowed opacity-70 text-sm md:text-base'
+              className='border border-gray-300 rounded-sm bg-gray-50 text-primary-600 flex-1 px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 cursor-not-allowed opacity-70 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'
             />
             <button
               onClick={() => setActiveTab('changeEmail')}
               className='bg-primary-600 text-white px-4 md:px-6 rounded-md font-inter font-medium text-sm md:text-base
-              shadow-[0_2px_4px_rgba(0,0,0,0.25)]
+              shadow-[0_2px_4px_rgba(0,0,0,0.25)] lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]
               hover:bg-white hover:text-primary-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.3)]
               transition-all duration-300 whitespace-nowrap uppercase'
             >
@@ -364,8 +364,8 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
               !lastName.trim() ||
               (firstName.trim() === originalFirstName.trim() && lastName.trim() === originalLastName.trim())
             }
-            className='w-full md:w-[400px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-3 xl:py-3 2xl:py-3
-            disabled:opacity-50
+            className='w-full md:w-[250px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3
+            disabled:opacity-50 lg:text-[12px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px]
             shadow-[0_2px_1px_rgba(0,0,0,0.35)]
             rounded-md backdrop-blur-xs
             hover:-translate-y-1 hover:shadow-[0_4px_8px_rgba(0,0,0,0.35)]'
@@ -374,7 +374,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           </button>
         </div>
 
-        {/* ── NEW: Logout button ── */}
+        {/* ── NEW: Logout button ──
         <div className='flex md:hidden justify-center mt-4'>
           <button
             onClick={() => setShowLogoutModal(true)}
@@ -382,7 +382,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           >
             Logout
           </button>
-        </div>
+        </div> */}
 
         {/* ── NEW: Logout confirmation modal ── */}
         {showLogoutModal && (

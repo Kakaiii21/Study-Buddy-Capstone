@@ -22,12 +22,12 @@ function DaysBadge({ days }: { days: number }) {
 
   return (
     <span
-      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+      className={`text-xs lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px] font-semibold px-2 py-0.5 rounded-full ${
         isUrgent
-          ? 'bg-red-100 text-red-600'
+          ? 'bg-red-100 text-red-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
           : isWarning
-          ? 'bg-yellow-100 text-yellow-600'
-          : 'bg-green-100 text-green-600'
+          ? 'bg-yellow-100 text-yellow-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
+          : 'bg-green-100 text-green-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
       }`}
     >
       {days}d left
@@ -151,16 +151,29 @@ const filtered = useMemo(() => {
                   />
                 )}
 
-      <main className='flex-1 overflow-auto p-4 md:p-8 mt-1 lg:mt-0'>
-        <div className='min-h-screen flex flex-col'>
+        <div className='flex-1 flex flex-col overflow-hidden'>
 
-          {/* Header */}
-          <div className='flex flex-col md:flex-row lg:flex-row lg:items-center w-full gap-3 mb-6 lg:mt-0 md:mt-0 mt-4'>
-            <p className='text-2xl lg:ml-0  md:ml-16 md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
-              Recently Deleted
-            </p>
-          </div>
-          <hr className='w-full border-t border-primary-600 mb-6' />
+              {/* Top Bar — mobile only */}
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Recently Deleted</p>
+            <button
+            id='tour-btn'
+              onClick={() => startTour()}
+              className='flex flex-col items-center gap-1 ml-auto pt-3
+              hover:opacity-80 active:scale-95 transition-all'
+              title='Take a Tour'
+            >
+              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              </div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+            </button>
+        </div>
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
+        <div className="min-h-screen  w-full flex flex-col">
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Recently Deleted</p>
 
           {/* Restore Error Toast */}
           {restoreError && (
@@ -178,12 +191,15 @@ const filtered = useMemo(() => {
           {/* Dropdown and Search Bar */}
           <div className='flex flex-row justify-end items-center gap-3 mb-7'>
             <div className='flex items-center gap-2'>
-              <span className='text-sm font-semibold text-primary-600 whitespace-nowrap'>Filter by:</span>
               <select
               id='filterTypeSelect'
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
-                className='border-2 border-primary-600 rounded-lg px-4 py-2 text-primary-600 font-semibold bg-white focus:outline-none text-sm'
+                className='w-40 border border-primary-800 rounded-md
+                px-3 py-1 lg:py-auto lg:rounded-sm
+                text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
+                font-roboto text-primary-600
+                focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
                 aria-label='Filter by page type'
               >
                 {PAGE_TYPES.map((t) => (
@@ -191,39 +207,56 @@ const filtered = useMemo(() => {
                 ))}
               </select>
             </div>
-            <input
-            id='deletedSearchBar'
-              type='text'
-              placeholder='Search...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full sm:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 bg-white focus:outline-none text-sm'
-            />
+           <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search"
+                className="w-full border border-primary-800 rounded-md
+                  py-2 pl-3 pr-8 
+                  text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[14px] 3xl:text-[17px]
+                  font-inter text-primary-800 placeholder:text-primary-800
+                  focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
+                  transition-all duration-200"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="absolute right-2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
           </div>
 
           {/* Table header */}
  <div  id='deletedTable'>
            <div id='deletedTable' className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
-            <p>Name</p>
-            <p className='text-center'>Expires</p>
-            <p className='text-center'>Restore</p>
-            <p className='text-center'>Delete</p>
+            <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
+            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Expires</p>
+            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Restore</p>
+            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
           </div>
 
           {/* Rows */}
           {!loading  && !error && (
-            <ul  className='divide-y divide-gray-100'>
+            <ul  className=''>
               {filtered.map((item) => {
                 const days = daysRemaining(item.deletedAt)
                 const isActing = actionLoading === item.id
                 return (
                   <li
                     key={item.id}
-                    className={`grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 px-3 hover:bg-gray-50 rounded-xl transition-colors ${
+                    className={`grid grid-cols-[1fr_70px_44px_44px]  md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 lg:py-1 2xl:py-2 px-3 rounded-xl transition-colors ${
                       isActing ? 'opacity-50 pointer-events-none' : ''
                     }`}
                   >
-          <p  className='font-medium text-primary-600 text-sm md:text-base lg:text-xl break-all leading-tight'>
+          <p  className='font-medium  text-primary-600 text-sm md:text-base lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px] break-all leading-tight'>
             {item.name}
             {item.type === 'Course' && (
               <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
@@ -235,7 +268,7 @@ const filtered = useMemo(() => {
               </span>
             )}
           </p>          
-            <div className='flex justify-center'>
+            <div className='flex justify-center lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]  '>
             <DaysBadge days={days} />
           </div>
               <div className='flex justify-center'>
@@ -255,7 +288,7 @@ const filtered = useMemo(() => {
                   {isActing ? (
                     <span className='w-6 h-6 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
                   ) : (
-                    <img src='/Restore.png' alt='Restore' className='w-6 h-6 md:w-8 md:h-8' />
+                    <img src='/Restore.png' alt='Restore' className='lg:w-5 lg:h-5 2xl:w-6 2xl:h-6 3xl:w-7 3xl:h-7  w-5 h-5' />
                   )}
                 </button>
               </div>
@@ -268,7 +301,7 @@ const filtered = useMemo(() => {
               disabled={isActing}
               className='p-2 rounded-lg hover:bg-red-50 transition-colors'
             >
-              <img src='/delete.png' alt='Delete' className='w-5 h-5 md:w-7 md:h-7' />
+              <img src='/delete.png' alt='Delete' className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5' />
             </button>
           </div>
         </li>
@@ -303,19 +336,21 @@ const filtered = useMemo(() => {
         </div>
           <button
             id='tour-btn'
-            onClick={() => startTour()}
-            className='fixed bottom-6 right-6 z-50
-              flex flex-col items-center gap-1
-              hover:opacity-80 active:scale-95 transition-all
-              lg:bottom-8 lg:right-8'
+            onClick={() => startTour(                             )}
+            className='hidden lg:flex fixed bottom-6 right-6 z-50
+            flex-col items-center gap-1
+            hover:opacity-80 active:scale-95 transition-all
+            lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+            <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-            </div>
-            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
-          </button>
+            </div>  
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+              font-inter font-semibold'>Need Help?</p>         
+           </button>
       </main>
+      </div>
     </div>
   )
 }

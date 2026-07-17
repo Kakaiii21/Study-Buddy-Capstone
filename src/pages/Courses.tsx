@@ -80,7 +80,7 @@ const { startTour } = useTour(
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedColor, setSelectedColor] = useState<CourseColor>('blue')
+  const [selectedColor, setSelectedColor] = useState<CourseColor>('grey')
   const [isSaving, setIsSaving] = useState(false)
 
   const [folderError, setFolderError] = useState('')
@@ -352,7 +352,7 @@ const { startTour } = useTour(
               {/* Folder color picker */}
               <div className='flex flex-c gap-3 mb-2 justify-center'>
                
-                {(['blue', 'yellow', 'grey'] as const).map((color) => (
+                {(['grey', 'yellow', 'blue'] as const).map((color) => (
                   <button
                     key={color}
                     type='button'
@@ -412,18 +412,19 @@ const { startTour } = useTour(
 
           <button
             id='tour-btn'
-            onClick={() => startTour()}
+            onClick={() => startTour(                             )}
             className='hidden lg:flex fixed bottom-6 right-6 z-50
             flex-col items-center gap-1
             hover:opacity-80 active:scale-95 transition-all
             lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-            <div className='bg-white w-14 h-14 lg:w-10 lg:h-10 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12    rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12  lg:w-10 xl:w-11 2xl:w-12 block mx-auto mt-1' />
+            <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
             </div>  
-            <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[12px] text-primary-600 font-inter font-medium'>Need Help?</p>
-          </button>
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+              font-inter font-semibold'>Need Help?</p>         
+           </button>
       </main>
       </div>
         {pendingDelete && (

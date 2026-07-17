@@ -8,19 +8,19 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
   return (
     <div className="max-w-5xl mx-auto px-2 py-1">
 
-      <h1 className="text-4xl text-center font-bold text-gray-900 mb-2">
+      <h1 className="text-4xl text-center font-bold text-gray-900 mb-2 lg:text-2xl 2xl:text-3xl 3xl:text-4xl">
         Privacy Policy
       </h1>
 
-      <p className="text-gray-500 text-center mb-8">
+      <p className="text-gray-500 text-center mb-8 lg:text-xs 2xl:text-sm 3xl:text-md ">
         Last Updated: June 2026
       </p>
       <hr className='w-full border-t mb-2 border-primary-600 ' />
 
-      <div className="space-y-8 text-gray-700 mx-5 leading-relaxed">
+      <div className="space-y-8 text-gray-700 mx-5 leading-relaxed ">
         <section>
-          <h2 className="text-xl font-semibold mb-3">1. Introduction</h2>
-          <p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md ">1. Introduction</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">
             Study Buddy ("we", "our", or "us") respects your privacy and is
             committed to protecting your personal information. This Privacy
             Policy explains how we collect, use, store, and protect your
@@ -29,9 +29,9 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">2. Information We Collect</h2>
-          <p className="mb-3">We may collect the following information:</p>
-          <ul className="list-disc ml-6 space-y-2">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md ">2. Information We Collect</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">We may collect the following information:</p>
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li>Name and email address</li>
             <li>Authentication information</li>
             <li>Notes, schedules, tasks, and study materials</li>
@@ -43,9 +43,9 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">3. How We Use Your Information</h2>
-          <p className="mb-3">We use collected information to:</p>
-          <ul className="list-disc ml-6 space-y-2">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">3. How We Use Your Information</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">We use collected information to:</p>
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li>Provide and maintain the Service</li>
             <li>Authenticate user accounts</li>
             <li>Generate study materials from uploaded files</li>
@@ -57,12 +57,12 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">4. AI-Generated Study Materials</h2>
-          <p className="mb-3">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">4. AI-Generated Study Materials</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">
             Study Buddy uses artificial intelligence to generate quizzes,
             flashcards, and study materials.
           </p>
-          <ul className="list-disc ml-6 space-y-2">
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li>Generated content is based solely on files uploaded by the user.</li>
             <li>We do not retrieve external educational resources when generating study materials.</li>
             <li>Uploaded files may be processed temporarily to create study materials.</li>
@@ -71,20 +71,20 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">5. Third-Party Services</h2>
-          <p className="mb-3">We use trusted third-party providers to operate our Service:</p>
-          <ul className="list-disc ml-6 space-y-2">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">5. Third-Party Services</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">We use trusted third-party providers to operate our Service:</p>
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li><strong>Firebase</strong> for authentication, database management, analytics, and hosting.</li>
             <li><strong>Cloudinary</strong> for cloud file storage and media delivery.</li>
           </ul>
-          <p className="mt-3">
+          <p className="mt-3 lg:text-xs 2xl:text-sm 3xl:text-md">
             These providers may process information in accordance with their own privacy policies.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">6. Data Storage and Security</h2>
-          <p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">6. Data Storage and Security</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">
             We implement reasonable security measures to protect your data.
             However, no method of electronic storage or transmission over the
             internet can be guaranteed to be 100% secure.
@@ -92,8 +92,8 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">7. Offline Access</h2>
-          <p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">7. Offline Access</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">
             As a Progressive Web Application (PWA), Study Buddy may store
             certain data locally on your device to support offline viewing of
             Notes, To-Do Lists, and Class Schedules. This locally stored data
@@ -102,8 +102,8 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">8. Data Retention</h2>
-          <p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">8. Data Retention</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">
             We retain your information for as long as your account remains
             active or as necessary to provide our services, comply with legal
             obligations, resolve disputes, and enforce our agreements.
@@ -111,9 +111,9 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">9. Your Rights</h2>
-          <p className="mb-3">Depending on applicable laws, you may have the right to:</p>
-          <ul className="list-disc ml-6 space-y-2">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">9. Your Rights</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">Depending on applicable laws, you may have the right to:</p>
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li>Access your personal information</li>
             <li>Correct inaccurate information</li>
             <li>Request deletion of your account and data</li>
@@ -122,8 +122,8 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">10. Children's Privacy</h2>
-          <p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">10. Children's Privacy</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">
             Study Buddy is intended for students and educational use.
             Individuals under the age required by applicable laws should use
             the Service under the supervision of a parent, guardian, or
@@ -132,13 +132,13 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">11. Account Deletion</h2>
-          <p className="mb-3">
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">11. Account Deletion</h2>
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">
             Users may request deletion of their Study Buddy account at any time through
             the application settings or by contacting support.
           </p>
-          <p className="mb-3">Upon account deletion:</p>
-          <ul className="list-disc ml-6 space-y-2">
+          <p className="mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">Upon account deletion:</p>
+          <ul className="list-disc ml-6 space-y-2 lg:text-xs 2xl:text-sm 3xl:text-md">
             <li>Your account information will be permanently removed.</li>
             <li>Your notes, schedules, tasks, and uploaded files may be deleted.</li>
             <li>AI-generated study materials associated with your account may be deleted.</li>
@@ -147,9 +147,9 @@ function PrivacyPolicy({ hideButton = false }: PrivacyPolicyProps) {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">12. Contact Us</h2>
-          <p>If you have questions regarding this Privacy Policy, please contact us at:</p>
-          <p className="mt-2 font-medium">support@studybuddyph.site</p>
+          <h2 className="text-xl font-semibold mb-3 lg:text-xs 2xl:text-sm 3xl:text-md">12. Contact Us</h2>
+          <p className="lg:text-xs 2xl:text-sm 3xl:text-md">If you have questions regarding this Privacy Policy, please contact us at:</p>
+          <p className="mt-2 font-medium lg:text-xs 2xl:text-sm 3xl:text-md">support@studybuddyph.site</p>
         </section>
 
         <hr className='w-full border-t border-primary-600  ' />
