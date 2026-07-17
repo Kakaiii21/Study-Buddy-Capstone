@@ -131,8 +131,8 @@ const { startTour } = useTour(
         </div>
       </div>
 
-      {/* Bottom nav — ONLY on mobile/tablet */}
-<div className='lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.08)] z-20'>
+{/* Bottom nav — ONLY on mobile/tablet */}
+<div className='lg:hidden fixed bottom-0 left-0 right-0 bg-primary-800 border-t border-gray-200 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.08)] z-20'>
     <div className='flex items-stretch justify-around px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]'>
 
     <button
@@ -141,11 +141,13 @@ const { startTour } = useTour(
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
       <div className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'bg-primary-0' : ''}`}>
-        <img src='/basicInfo.png' alt='Basic Info' className={`w-7 h-7 object-contain transition-opacity duration-200 ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'opacity-100' : 'opacity-40'}`} />
+        <img
+          src={(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? '/basicInfoNavAcc.png' : '/basicInfoNav.png'}
+          alt='Basic Info'
+          className='w-8 h-8 object-contain'
+        />
       </div>
-      <span className={`text-[10px] font-inter leading-none transition-colors duration-200 ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
-        Basic Info
-      </span>
+
     </button>
 
     <button
@@ -154,11 +156,13 @@ const { startTour } = useTour(
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
       <div className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 ${activeTab === 'password' ? 'bg-primary-0' : ''}`}>
-        <img src='/passIcon.png' alt='Password' className={`w-7 h-7 object-contain transition-opacity duration-200 ${activeTab === 'password' ? 'opacity-100' : 'opacity-40'}`} />
+        <img
+          src={activeTab === 'password' ? '/passIconAcc.png' : '/passIconNav.png'}
+          alt='Password'
+          className='w-8 h-8 object-contain'
+        />
       </div>
-      <span className={`text-[10px] font-inter leading-none transition-colors duration-200 ${activeTab === 'password' ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
-        Password
-      </span>
+
     </button>
 
     <button
@@ -167,11 +171,13 @@ const { startTour } = useTour(
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
       <div className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 ${activeTab === 'terms' ? 'bg-primary-0' : ''}`}>
-        <img src='/tos.png' alt='Terms' className={`w-7 h-7 object-contain transition-opacity duration-200 ${activeTab === 'terms' ? 'opacity-100' : 'opacity-40'}`} />
+        <img
+          src={activeTab === 'terms' ? '/tosNavAcc.png' : '/tosNav.png'}
+          alt='Terms'
+          className='w-8 h-8 object-contain'
+        />
       </div>
-      <span className={`text-[10px] font-inter leading-none transition-colors duration-200 ${activeTab === 'terms' ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
-        Terms
-      </span>
+
     </button>
 
     <button
@@ -180,11 +186,13 @@ const { startTour } = useTour(
       className='flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-xl transition-colors duration-200'
     >
       <div className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 ${activeTab === 'privacy' ? 'bg-primary-0' : ''}`}>
-        <img   src='/pp.png' alt='Privacy' className={`w-7 h-7 object-contain transition-opacity duration-200 ${activeTab === 'privacy' ? 'opacity-100' : 'opacity-40'}`} />
+        <img
+          src={activeTab === 'privacy' ? '/ppNavAcc.png' : '/ppNav.png'}
+          alt='Privacy'
+          className='w-8 h-8 object-contain'
+        />
       </div>
-      <span className={`text-[10px] font-inter leading-none transition-colors duration-200 ${activeTab === 'privacy' ? 'text-primary-600 font-semibold' : 'text-gray-400'}`}>
-        Privacy
-      </span>
+
     </button>
 
   </div>
