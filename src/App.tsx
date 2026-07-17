@@ -581,9 +581,6 @@ useEffect(() => {
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Developers</button>
         <button onClick={() => contactRef.current?.scrollIntoView({behavior: 'smooth'})}
          className='hover:opacity-75 text-xs md:text-xs lg:text-[13px] text-white font-fustat font-medium text-left'>Contact Us</button>
-         <a href="https://lordicon.com/" className="text-xs text-gray-400 hover:underline">
-          Icons by Lordicon.com
-        </a>
       </div>
 
     </div>

@@ -117,7 +117,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         {/* LOGO */}
         <div className="p-6  ml-2 lg:ml-0 flex gap-2 justify-start items-center">
           <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-9 xl:w-14 2xl:w-16 3xl:w-20" />
-            <p className='font-roboto lg:text-[9px] xl:text-xs 2xl:text-[16px] 3xl:text-[20px] text-white uppercase'>Study <br></br> Buddy</p>
+            <p className='font-roboto text-[9px] lg:text-[9px] xl:text-xs 2xl:text-[16px] 3xl:text-[20px] text-white uppercase'>Study <br></br> Buddy</p>
         </div>
 
         {/* NAV SECTIONS */}

@@ -22,12 +22,12 @@ function DaysBadge({ days }: { days: number }) {
 
   return (
     <span
-      className={`text-xs lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px] font-semibold px-2 py-0.5 rounded-full ${
+      className={`text-xs lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] font-semibold px-2 py-0.5 rounded-full ${
         isUrgent
-          ? 'bg-red-100 text-red-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
+          ? 'bg-red-100 text-red-600'
           : isWarning
-          ? 'bg-yellow-100 text-yellow-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
-          : 'bg-green-100 text-green-600 lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]'
+          ? 'bg-yellow-100 text-yellow-600'
+          : 'bg-green-100 text-green-600'
       }`}
     >
       {days}d left
@@ -82,12 +82,12 @@ function DaysBadge({ days }: { days: number }) {
   }
 
 function RecentlyDeleted() {
-  const { user } = useAuth()   // ← NEW
+  const { user } = useAuth()
   const [selectedType, setSelectedType] = useState<DeletedItemType>('To Do')
   const [searchQuery, setSearchQuery] = useState('')
   const [confirmItem, setConfirmItem] = useState<{ id: string; name: string } | null>(null)
-  const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null) // ← add this
-  const { startTour } = useTour(   // ← NEW
+  const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null)
+  const { startTour } = useTour(
     'recentlydeleted',
     false,
     () => {}, () => {},
@@ -102,7 +102,7 @@ function RecentlyDeleted() {
     actionLoading,
     handleRestore,
     handlePermanentDelete,
-    orphanedFileIds, //
+    orphanedFileIds,
   } = useRecentlyDeleted()
 
   
@@ -188,26 +188,25 @@ const filtered = useMemo(() => {
             </div>
           )}
 
-          {/* Dropdown and Search Bar */}
-          <div className='flex flex-row justify-end items-center gap-3 mb-7'>
-            <div className='flex items-center gap-2'>
-              <select
+          {/* Filters — matched to GeneratedHistory spacing */}
+          <div className='flex flex-row lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
+            <select
               id='filterTypeSelect'
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
-                className='w-40 border border-primary-800 rounded-md
-                px-3 py-1 lg:py-auto lg:rounded-sm
-                text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
-                font-roboto text-primary-600
-                focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
-                aria-label='Filter by page type'
-              >
-                {PAGE_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-           <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
+              className='w-40 border border-primary-800 rounded-md
+              px-3 py-1 lg:py-auto lg:rounded-sm
+              text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
+              font-roboto text-primary-600
+              focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+              aria-label='Filter by page type'
+            >
+              {PAGE_TYPES.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+
+            <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
               <input
                 type="text"
                 value={searchQuery}
@@ -234,88 +233,105 @@ const filtered = useMemo(() => {
             </div>
           </div>
 
-          {/* Table header */}
- <div  id='deletedTable'>
-           <div id='deletedTable' className='grid grid-cols-[1fr_70px_44px_44px] md:grid-cols-[1fr_100px_100px_80px] gap-2 pb-3 border-b border-gray-200 text-gray-500 text-xs font-medium px-3'>
-            <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
-            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Expires</p>
-            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Restore</p>
-            <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
+          {/* Recent label — matched to GeneratedHistory */}
+          <div className='flex items-center gap-3 mb-4'>
+            <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
+            <hr className='flex-1 border-t border-primary-100' />
           </div>
 
-          {/* Rows */}
-          {!loading  && !error && (
-            <ul  className=''>
-              {filtered.map((item) => {
-                const days = daysRemaining(item.deletedAt)
-                const isActing = actionLoading === item.id
-                return (
-                  <li
-                    key={item.id}
-                    className={`grid grid-cols-[1fr_70px_44px_44px]  md:grid-cols-[1fr_100px_100px_80px] gap-2 items-center py-4 lg:py-1 2xl:py-2 px-3 rounded-xl transition-colors ${
-                      isActing ? 'opacity-50 pointer-events-none' : ''
-                    }`}
-                  >
-          <p  className='font-medium  text-primary-600 text-sm md:text-base lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px] break-all leading-tight'>
-            {item.name}
-            {item.type === 'Course' && (
-              <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
-                item.data?.fileUrl
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'bg-orange-100 text-orange-600'
-              }`}>
-                {item.data?.fileUrl ? '📄 File' : '📁 Folder'}
-              </span>
-            )}
-          </p>          
-            <div className='flex justify-center lg:text-[12px] xl:text-[15px] 2xl:text-[17px] 3xl:text-[19px]  '>
-            <DaysBadge days={days} />
-          </div>
-              <div className='flex justify-center'>
-                <button
-                id='restoreBtn'
-                  aria-label={`Restore ${item.name}`}
-                  onClick={() => {
-                    if (orphanedFileIds.has(item.id)) {
-                      setOrphanRestoreItem(item) // ← show modal instead
-                    } else {
-                      handleRestore(item)
-                    }
-                  }}
-                  disabled={isActing}
-                  className='p-2 rounded-lg hover:bg-primary-50 transition-colors'
-                >
-                  {isActing ? (
-                    <span className='w-6 h-6 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
-                  ) : (
-                    <img src='/Restore.png' alt='Restore' className='lg:w-5 lg:h-5 2xl:w-6 2xl:h-6 3xl:w-7 3xl:h-7  w-5 h-5' />
-                  )}
-                </button>
+          {/* Table */}
+          {!loading && !error && (
+            <div id='deletedTable' className='w-full'>
+              <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium'>
+                <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
+                <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Expires</p>
+                <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Restore</p>
+                <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
               </div>
 
-          <div className='flex justify-center'>
-            <button
-            id='permaDeleteBtn'
-              aria-label={`Delete ${item.name}`}
-              onClick={() => handleDeleteClick(item.id, item.name)}
-              disabled={isActing}
-              className='p-2 rounded-lg hover:bg-red-50 transition-colors'
-            >
-              <img src='/delete.png' alt='Delete' className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5' />
-            </button>
-          </div>
-        </li>
-      )
-    })}
-  </ul>
-)}
- </div>
+              {filtered.length === 0 ? (
+                <p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>
+                  No deleted {selectedType} items
+                </p>
+              ) : (
+                filtered.map((item) => {
+                  const days = daysRemaining(item.deletedAt)
+                  const isActing = actionLoading === item.id
+                  return (
+                    <div
+                      key={item.id}
+                      className={`py-2 lg:py-1 2xl:py-2 3xl:py-3 ${isActing ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
+                      <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center'>
+                        <div className='min-w-0'>
+                          <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px] font-semibold text-primary-600 break-all leading-tight'>
+                            {item.name}
+                            {item.type === 'Course' && (
+                              <span className={`ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                item.data?.fileUrl
+                                  ? 'bg-blue-100 text-blue-600'
+                                  : 'bg-orange-100 text-orange-600'
+                              }`}>
+                                {item.data?.fileUrl ? '📄 File' : '📁 Folder'}
+                              </span>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className='flex justify-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]'>
+                          <DaysBadge days={days} />
+                        </div>
+
+                        <div className='flex justify-center'>
+                          <button
+                            id='restoreBtn'
+                            aria-label={`Restore ${item.name}`}
+                            onClick={() => {
+                              if (orphanedFileIds.has(item.id)) {
+                                setOrphanRestoreItem(item)
+                              } else {
+                                handleRestore(item)
+                              }
+                            }}
+                            disabled={isActing}
+                          >
+                            {isActing ? (
+                              <span className='w-5 h-5 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
+                            ) : (
+                              <img
+                                src='/Restore.png'
+                                alt='Restore'
+                                className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70'
+                              />
+                            )}
+                          </button>
+                        </div>
+
+                        <div className='flex justify-center'>
+                          <button
+                            id='permaDeleteBtn'
+                            aria-label={`Delete ${item.name}`}
+                            onClick={() => handleDeleteClick(item.id, item.name)}
+                            disabled={isActing}
+                          >
+                            <img
+                              src='/delete.png'
+                              alt='Delete'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70'
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          )}
 
           {/* States */}
           {loading && (
-            <div className='flex-1 flex items-center justify-center py-20 text-primary-600 text-sm font-medium'>
-              Loading...
-            </div>
+            <p className='text-gray-400 font-roboto text-center py-10'>Loading...</p>
           )}
 
           {error && (
@@ -323,15 +339,6 @@ const filtered = useMemo(() => {
               {error}
             </div>
           )}
-
-          {!loading && !error && filtered.length === 0 && (
-            <div className='flex-1 flex flex-col items-center justify-center py-20 text-gray-400 gap-2'>
-              <img src='/delete.png' alt='Empty' className='w-12 h-12 opacity-30' />
-              <p className='text-sm font-medium'>No deleted {selectedType} items</p>
-            </div>
-          )}
-
-
 
         </div>
           <button
