@@ -1,11 +1,10 @@
 import Sidebar from '../components/Sidebar'
-import { useState , useRef} from 'react'
+import { useState } from 'react'
 import BasicInfo from '../components/BasicInfo'
 import Terms from '../terms'
 import Privacy from '../privacy'
 import ChangeEmail from './ChangeEmail' 
 import ChangePassword from './ChangePassword'
-import { Player, } from '@lordicon/react'
 
 
 import { useAuth } from '../hooks/useAuth'
@@ -23,8 +22,6 @@ const { startTour } = useTour(
   () => setTourActive(false)
 )
   const [activeTab, setActiveTab] = useState('basicinfo')
-  const playerRef = useRef<Player>(null);
-
 
 
   return (
@@ -68,9 +65,6 @@ const { startTour } = useTour(
   <nav className='flex flex-col'>
     <button
     id='navBasicInfo'
-      onMouseEnter={() => {
-      playerRef.current?.playFromBeginning();
-      }}
       onClick={() => setActiveTab('basicinfo')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 lg:py-1.5 xl:py-2.5 2xl:py-3.5 3xl:py-4.5 text-left font-medium transition ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 lg:pl-4 xl:pl-10 2xl:pl-11'>

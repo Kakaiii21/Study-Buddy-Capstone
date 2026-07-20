@@ -48,21 +48,34 @@ const { tasks, loading: tasksLoading } = useTasks(user)
     ).length
     return total === 0 ? 0 : Math.round((done / total) * 100)
   }, [tasks])
-  // Cached task progress — mirrors firstName/profilePic below, so the bar
-  // shows the last known % instantly instead of flashing to 0 on navigation.
-const cachedPercent = useMemo(() => {
-  if (!user) return 0
-  const cacheKey = `taskProgress_${user.uid}`
-  const cached = sessionStorage.getItem(cacheKey)
+ 
+// Cached task progress — read synchronously on first render (before `user`
+  // resolves) so the bar never flashes to 0 on remount.
+const [initialCachedPercent] = useState<number>(() => {
+  const uid = user?.uid ?? sessionStorage.getItem('lastUid')
+  if (!uid) return 0
+  const cached = sessionStorage.getItem(`taskProgress_${uid}`)
   return cached ? Number(cached) : 0
-}, [user])
-const completedPercent = tasksLoading ? cachedPercent : computedPercent
+})
+
+// Derived, not stored — swaps from the cached snapshot to the live value
+// the moment tasksLoading flips to false. No setState needed here.
+const completedPercent = tasksLoading ? initialCachedPercent : computedPercent
+
+// keep lastUid fresh so the next remount can find the cache key
+// even before useAuth resolves
 useEffect(() => {
   if (!user) return
-  if (tasksLoading) return
-  const cacheKey = `taskProgress_${user.uid}`
-  sessionStorage.setItem(cacheKey, String(computedPercent))
+  sessionStorage.setItem('lastUid', user.uid)
+}, [user])
+
+// sync the fresh value out to sessionStorage (external system) — no setState here
+useEffect(() => {
+  if (!user || tasksLoading) return
+  sessionStorage.setItem(`taskProgress_${user.uid}`, String(computedPercent))
 }, [computedPercent, tasksLoading, user])
+
+
   const [firstName, setFirstName] = useState<string | null>(null)
   const [profilePic, setProfilePic] = useState('/profile.png')
   useEffect(() => {

@@ -10,14 +10,13 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   onConfirm: () => void
   onCancel: () => void 
 }) {
-  const [confirming, setConfirming] = useState(false)  // ← add this
+  const [confirming, setConfirming] = useState(false)
 
   const handleConfirm = () => {
-    if (confirming) return          // ← block double click
+    if (confirming) return
     setConfirming(true)
     onConfirm()
   }
-  
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
@@ -47,7 +46,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
             className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
           >
             {confirming ? 'Deleting...' : 'Move to Trash'}
-          </button>pendingDelete
+          </button>
         </div>
       </div>
     </div>
@@ -62,13 +61,14 @@ function Notes() {
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
-    const { startTour } = useTour(
+  const { startTour } = useTour(
     'notes',
     false,
     () => {},
     () => {},
     user
   )
+
   function handleSubjectDelete(subject: string) {
     const affectedNotes = notes.filter((n) => n.subject === subject)
     affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Subject' }))
@@ -78,7 +78,11 @@ function Notes() {
   }
 
   function handleCloseAttempt() {
-    if (modalMode === 'edit') {
+    const hasUnsavedContent =
+      modalMode === 'edit' ||
+      (modalMode === 'create' && (noteTitle.trim() !== '' || noteContent.trim() !== ''))
+
+    if (hasUnsavedContent) {
       setShowDiscardConfirm(true)
     } else {
       closeNoteModal()
@@ -133,12 +137,12 @@ function Notes() {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
 
-
   function getUntitledTitle() {
-  const untitledNotes = notes.filter((n) => n.title === 'Untitled' || n.title.match(/^Untitled \(\d+\)$/))
-  if (untitledNotes.length === 0) return 'Untitled'
-  return `Untitled (${untitledNotes.length})`
-}
+    const untitledNotes = notes.filter((n) => n.title === 'Untitled' || n.title.match(/^Untitled \(\d+\)$/))
+    if (untitledNotes.length === 0) return 'Untitled'
+    return `Untitled (${untitledNotes.length})`
+  }
+
   // ── Subject handlers ──
   function handleSubjectSave() {
     if (subjectName.trim() === '') return
@@ -198,19 +202,19 @@ function Notes() {
     setNoteTitle('')
     setNoteSubject('All Subject')
     setNoteContent('')
-    setIsNoteModalOpen(false)   // close immediately
-    addNote(title, noteSubject, noteContent)  // fire and forget
+    setIsNoteModalOpen(false)
+    addNote(title, noteSubject, noteContent)
   }
 
   async function handleNoteUpdate() {
     if (!selectedNote) return
     const title = noteTitle.trim() || getUntitledTitle()
-    closeNoteModal()            // close immediately
+    closeNoteModal()
     updateNote(selectedNote.id, {
       title,
       subject: noteSubject,
       content: noteContent.trim(),
-    })                          // fire and forget
+    })
   }
 
   // ── Download as .txt ──
@@ -267,207 +271,346 @@ function Notes() {
       <div className='lg:p-3 '>
         <Sidebar />        
       </div>
+      
+ {/* Top App Bar — mobile only */}
+<div className='lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-1 py-3 bg-white shadow-sm gap-2'>
+  <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>
+    Notes
+  </p>
+  <button
+    id='tour-btn'
+    onClick={() => startTour()}
+    className='flex flex-col items-center gap-1 ml-auto pt-3
+    hover:opacity-80 active:scale-95 transition-all'
+    title='Take a Tour'
+  >
+    <div className='bg-white w-9 h-9 rounded-full flex items-center justify-center text-2xl font-bold'>
+      <img src="/needhelp.png" alt="?" className='w-9 block mx-auto' />
+    </div>
+    <p className='text-[9px] text-primary-600 font-inter font-medium'>Need Help?</p>
+  </button>
+</div>
 
-      <main className='flex-1 overflow-auto p-8'>
+{/* Spacer so fixed bar doesn't cover content underneath */}
+<div className='lg:hidden h-[72px]'  />
+
+      <main  className="flex-1  mt-24 lg:mt-2  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1">
         <div className='min-h-screen flex flex-col'>
 
-          {/* ── Header ── */}
-          <div className='flex flex-col lg:flex-row lg:items-center md:flex-row md:items-center w-full gap-3 mb-6'>
-            <p className='text-3xl lg:text-4xl md:text-4xl lg:pl-0 md:pl-16 font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
-              Notes
-            </p>
+          <div className='w-full flex  flex-col lg:flex-row gap-1'>
+            {/* ── Notes Area ── */}
+            <div className='flex-1 min-w-0  '>
 
-            <div className='flex items-center gap-2 lg:gap-4 lg:ml-auto md:gap-4 md:ml-auto'>
-              {/* + Subject Button */}
-                <button
-                id='addSubjectBtn'
-                aria-label='add Sub'
-                  onClick={() => setIsSubjectModalOpen(true)}
-                  className='flex-shrink-0 flex items-center justify-center h-8 w-8 bg-primary-600 text-white font-bold border rounded-full'
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
+              {/* ── Desktop search (lg and up) ── */}
+              <div className='hidden lg:flex flex-col items-end w-full pl-3 pr-2
+                mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 gap-2'>
+                <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
+                  Notes
+                </p>
+
+                {/* Search Bar */}
+                <div id='notesSearchBar' className='relative mr-5'>
+                  <input
+                    type='text'
+                    placeholder='Search'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-64    border-primary-800 rounded-md
+                      py-2 pl-3 pr-8 font-roboto text-sm
+                      text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
+                      font-inter text-primary-800 border-2 placeholder:text-primary-800
+                      focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
+                      transition-all duration-200"
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
-                </button>
-
-              {/* Subject Dropdown */}
-              <div
-              id='subjectDropdown'
-              className='relative
-              ' ref={dropdownRef}>
-                <button
-                  onClick={() => setIsDropdownOpen((prev) => !prev)}
-                  className='flex justify-between items-center border-primary-600 w-36 lg:w-52 md:w-52 border-2 shadow-md text-primary-600 px-3 lg:px-5 md:px-5 py-2 rounded-md text-sm lg:text-md font-bold'
-                >
-                  <span className='truncate'>{selectedSubject}</span>
-                  <span className='ml-1'>▼</span>
-                </button>
-
-                {isDropdownOpen && (
-                  <div className='absolute top-full left-0 mt-2 w-36 lg:w-52 bg-white border rounded-md shadow-md z-50'>
+                  {searchQuery && (
                     <button
-                      className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-xs lg:text-sm font-semibold
-                        ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
-                      onClick={() => { setSelectedSubject('All Subject'); setIsDropdownOpen(false) }}
+                      onClick={() => setSearchQuery('')}
+                      className='absolute right-8 top-1/2 -translate-y-1/2 text-primary-600 font-bold'
                     >
-                      All Subject
+                      ✕
                     </button>
-                    {allSubjects.map((subject, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
-                          ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
-                      >
-                        <button
-                          className='flex-1 text-left text-xs lg:text-sm truncate font-semibold text-primary-600'
-                          onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
-                        >
-                          {subject}
-                        </button>
-                        {subjects.includes(subject) && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
-                            className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
-                            aria-label={`Delete ${subject}`}
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              {/* Search Bar */}
-              <div id='notesSearchBar'
-               className='relative'>
-                <input
-                  type='text'
-                  placeholder='Search...'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className='
-                shadow-[0_0px_2px_rgba(0,0,0,1)]
-                hover:opacity-80
-                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
-                  
-                  w-32 lg:w-72 md:w-72 border-2 border-primary-600 rounded-full px-4 py-2 text-primary-600 focus:outline-none'
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-primary-600 font-bold'
+              {/* ── Mobile / md search + subject dropdown (below lg) ── */}
+              <div className='flex lg:hidden flex-col gap-3 px-2 mt-3'>
+                {/* Search bar */}
+                <div className='relative w-full'>
+                  <input
+                    type='text'
+                    placeholder='Search'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className='w-full border-2 border-primary-800 rounded-md py-3 pl-4 pr-10 font-roboto text-sm font-inter text-primary-800 placeholder:text-primary-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200'
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-800 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
                   >
-                    ✕
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className='absolute right-9 top-1/2 -translate-y-1/2 text-primary-600 font-bold'
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* + button and subject dropdown */}
+                <div className='flex items-center gap-3'>
+                  <button
+                    id='addSubjectBtnMobile'
+                    aria-label='add Sub'
+                    onClick={() => setIsSubjectModalOpen(true)}
+                    className='flex-shrink-0 h-12 w-12 flex items-center justify-center bg-[#FEE248] text-primary-800 font-bold rounded-md'
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
                   </button>
-                )}
+
+                  <div className='relative flex-1' ref={dropdownRef}>
+                    <button
+                      onClick={() => setIsDropdownOpen((prev) => !prev)}
+                      className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm'
+                    >
+                      <span className='truncate'>{selectedSubject === 'All Subject' ? 'All Subjects' : selectedSubject}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {isDropdownOpen && (
+                      <div className='absolute top-full left-0 mt-2 w-full bg-white border rounded-md shadow-md z-50 max-h-64 overflow-y-auto'>
+                        <button
+                          className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
+                            ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
+                          onClick={() => { setSelectedSubject('All Subject'); setIsDropdownOpen(false) }}
+                        >
+                          All Subject
+                        </button>
+                        {allSubjects.map((subject, index) => (
+                          <div
+                            key={index}
+                            className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
+                              ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
+                          >
+                            <button
+                              className='flex-1 text-left text-sm truncate font-semibold text-primary-600'
+                              onClick={() => { setSelectedSubject(subject); setIsDropdownOpen(false) }}
+                            >
+                              {subject}
+                            </button>
+                            {subjects.includes(subject) && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                                className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
+                                aria-label={`Delete ${subject}`}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <hr className=' lg:hidden w-full border-t lg:mt-6 lg:mb-6 border-2 my-3 ' />
+
+
+              {loading ? (
+                <div className='flex-1 flex items-center justify-center text-primary-400 text-xl mt-3'>
+                  Loading notes...
+                </div>
+              ) : (
+                <div className='grid grid-cols-2 lg:flex mb-5 lg:flex-row lg:flex-wrap lg:justify-start mt-3 lg:items-start gap-4 lg:py-2 px-2'>
+                  {/* Mobile new note button */}
+                  <button
+                    id='newNoteBtnMobile'
+                    onClick={openNoteModal}
+                    className='flex lg:hidden 
+                    shadow-[0_3px_5px_rgba(0,0,0,.5)]
+                    hover:opacity-80 w-44 h-44
+                    hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
+                    items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-2xl text-black'
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg> 
+                  </button>
+
+                  {/* Desktop new note button */}
+                  <button
+                    id='newNoteBtnDesktop'
+                    onClick={openNoteModal}
+                    className='hidden lg:flex 
+                    shadow-[0_3px_5px_rgba(0,0,0,.5)]
+                    hover:opacity-80 w-44 lg:mr-8
+                    hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
+                    items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-7xl text-black'
+                  >
+                    +
+                  </button>
+
+                  {/* ── Note Cards ── */}
+                  {filteredNotes.map((note) => (
+                    <div
+                      id='notesGrid'
+                      key={note.id}
+                      onClick={() => openViewModal(note)}
+                      className='relative bg-white border-2 border-primary-800  rounded-xl p-5 w-full lg:w-52  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
+                    >
+                      <div className='flex justify-between items-center'>
+                        <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
+                        <div
+                          className='relative ml-2'
+                          data-note-menu
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button
+                            id='noteOptionsBtn'
+                            title='More Options'
+                            onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
+                            className='text-primary-600 hover:opacity-40 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
+                            aria-label='Note options'
+                          >
+                            ⋮
+                          </button>
+
+                          {openMenuId === note.id && (
+                            <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
+                              <button
+                                onClick={() => { openEditModal(note); setOpenMenuId(null) }}
+                                className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                              >
+                                <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+                              </button>
+                              <hr className='my-1 border-gray-100' />
+                              <button
+                                onClick={() => { setConfirmDownload(note); setOpenMenuId(null) }}
+                                className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                              >
+                                <img className='w-5 h-5' src="download.png" alt="download icon" />Download
+                              </button>
+                              <hr className='my-1 border-gray-100' />
+                              <button
+                                onClick={() => setPendingDelete({ id: note.id, name: note.title })}
+                                className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                              >
+                                <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <hr className='border-t border-primary-600 my-2' />
+                      <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{note.content}</p>
+                      <div className='flex justify-between items-center mt-3'>
+                        <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
+                        <p className='text-xs text-gray-400 shrink-0 ml-2'>
+                          {new Date(note.createdAt).toLocaleDateString('en-US', {
+                            month: 'long', day: 'numeric', year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            </div>
+
+            {/* ── Right column: subject button list — desktop (lg) only ── */}
+            <div className='hidden lg:flex flex-col lg:w-72 xl:w-80 shrink-0 rounded-xl pr-2 mt-5'>
+              <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
+                SUBJECT SECTION
+              </p>
+
+              <div className='flex flex-col gap-y-5 mt-5'>
+                <div className='flex items-center gap-2 lg:gap-4 md:gap-4'>
+                  {/* + Subject Button */}
+                  <button
+                    id='addSubjectBtn'
+                    aria-label='add Sub'
+                    onClick={() => setIsSubjectModalOpen(true)}
+                    className='flex-shrink-0 w-full flex items-center text-xs justify-center h-10 bg-[#FEE248] text-primary-800 font-bold  rounded-md'
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    ADD NEW SUBJECT NAME
+                  </button>
+                </div>
+
+                {/* Subject Buttons */}
+                <div className='flex flex-col gap-2'>
+                  <button
+                    onClick={() => setSelectedSubject('All Subject')}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
+                      ${selectedSubject === 'All Subject'
+                        ? 'bg-primary-600 text-white border-primary-600'
+                        : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
+                  >
+                    All Subject
+                  </button>
+
+                  {allSubjects.map((subject, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between px-3 py-2 rounded-md border-2 transition-colors
+                        ${selectedSubject === subject
+                          ? 'bg-primary-600 border-primary-600'
+                          : 'bg-white border-primary-600 hover:bg-primary-50'}`}
+                    >
+                      <button
+                        onClick={() => setSelectedSubject(subject)}
+                        className={`flex-1 text-left truncate text-sm lg:text-md font-bold
+                          ${selectedSubject === subject ? 'text-white' : 'text-primary-600'}`}
+                      >
+                        {subject}
+                      </button>
+                      {subjects.includes(subject) && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                          className={`ml-2 font-bold text-xs flex-shrink-0
+                            ${selectedSubject === subject ? 'text-white hover:text-red-200' : 'text-primary-600 hover:text-red-500'}`}
+                          aria-label={`Delete ${subject}`}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-
-          <hr className='w-full border-t border-primary-600 mb-6' />
-
-          {/* ── Notes Area ── */}
-          {loading ? (
-            <div className='flex-1 flex items-center justify-center text-primary-400 text-xl'>
-              Loading notes...
-            </div>
-          ) : (
-            <div className='grid grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:justify-start lg:items-start gap-4 lg:p-5'>
-              {/* Mobile new note button */}
-              <button
-              id='newNoteBtnMobile'
-                onClick={openNoteModal}
-                className='col-span-2 lg:hidden
-                shadow-[0_0px_2px_rgba(0,0,0,1)]
-                hover:opacity-80
-                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
-                hover:text-green-500 border mx-14 md:mx-72 md:items-ce py-2 rounded-md bg-green-500 font-bold font-roboto text-md text-white'
-              >
-                + New Note
-              </button>
-
-              {/* Desktop new note button */}
-              <button
-              id='newNoteBtnDesktop'
-                onClick={openNoteModal}
-                className='hidden lg:flex 
-                shadow-[0_0px_4px_rgba(0,0,0,1)]
-                hover:opacity-80
-                hover:shadow-[0_0px_4px_rgba(0,0,0,1)]
-                items-center justify-center border px-12 py-16 rounded-xl bg-green-500 font-bold font-roboto text-7xl text-white'
-              >
-                +
-              </button>
-
-              {/* ── Note Cards ── */}
-              {filteredNotes.map((note) => (
-                <div
-                id='notesGrid'
-                  key={note.id}
-                  onClick={() => openViewModal(note)}
-                  className='relative bg-slate-50 rounded-xl p-5 w-full lg:w-64  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
-                >
-                  <div className='flex justify-between items-center'>
-                    <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
-                    <div
-                      className='relative ml-2'
-                      data-note-menu
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                      id='noteOptionsBtn'
-                        title='More Options'
-                        onClick={() => setOpenMenuId(openMenuId === note.id ? null : note.id)}
-                        className='text-primary-600 hover:opacity-40 hover:text-primary-600 font-bold text-xl px-1 leading-none select-none'
-                        aria-label='Note options'
-                      >
-                        ⋮
-                      </button>
-
-                      {openMenuId === note.id && (
-                        <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
-                          <button
-                            onClick={() => { openEditModal(note); setOpenMenuId(null) }}
-                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                          >
-                            <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
-                          </button>
-                          <hr className='my-1 border-gray-100' />
-                          <button
-                            onClick={() => { setConfirmDownload(note); setOpenMenuId(null) }}
-                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                          >
-                            <img className='w-5 h-5' src="download.png" alt="download icon" />Download
-                          </button>
-                          <hr className='my-1 border-gray-100' />
-                          <button
-                            onClick={() => setPendingDelete({ id: note.id, name: note.title })}
-                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
-                          >
-                            <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <hr className='border-t border-primary-600 my-2' />
-                  <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{note.content}</p>
-                  <div className='flex justify-between items-center mt-3'>
-                    <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
-                    <p className='text-xs text-gray-400 shrink-0 ml-2'>
-                      {new Date(note.createdAt).toLocaleDateString('en-US', {
-                        month: 'long', day: 'numeric', year: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
 
           {pendingDelete && (
             <SoftDeleteModal
@@ -693,8 +836,8 @@ function Notes() {
                 </div>
 
                 {/* ── DESKTOP layout ── */}
-                <div className='hidden lg:flex flex-col flex-1 py-10 px-5 relative'>
-                  <div className='flex justify-between items-center gap-1 mb-2'>
+                <div className='hidden lg:flex flex-col flex-1 py-10 lg:py-3 px-5 relative'>
+                  <div className='flex justify-between items-center gap-1 mb-0'>
                     <input
                       className='min-w-20 py-2 text-primary-600 text-2xl font-bold placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
                       type='text'
@@ -722,10 +865,10 @@ function Notes() {
                   </div>
 
                   <p className='text-sm text-primary-600 mb-2'>{modalTime.date} — {modalTime.time}</p>
-                  <hr className='w-full border-t border-primary-600 mb-6' />
+                  <hr className='w-full border-t border-primary-600 mb-2' />
 
                   <textarea
-                    className='w-full flex-1 min-h-[400px] rounded-md px-3 py-2 pb-16 mb-4 resize-none read-only:cursor-default'
+                    className='w-full flex-1 min-h-[400px]  rounded-md px-1 py-1 pb-16 mb-4 resize-none read-only:cursor-default'
                     placeholder='Write your notes here...'
                     value={displayContent}
                     onChange={(e) => setNoteContent(e.target.value)}
@@ -790,18 +933,19 @@ function Notes() {
           )}
           <button
             id='tour-btn'
-            onClick={() => startTour()}
-            className='fixed bottom-6 right-6 z-50
-              flex flex-col items-center gap-1
-              hover:opacity-80 active:scale-95 transition-all
-              lg:bottom-8 lg:right-8'
+            onClick={() => startTour(                             )}
+            className='hidden lg:flex fixed bottom-6 right-6 z-50
+            flex-col items-center gap-1
+            hover:opacity-80 active:scale-95 transition-all
+            lg:bottom-8 lg:right-8'
             title='Take a Tour'
           >
-            <div className='bg-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl font-bold'>
+            <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
-            </div>
-            <p className='text-xs text-primary-600 font-inter font-medium'>Need Help?</p>
-          </button>
+            </div>  
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+              font-inter font-semibold'>Need Help?</p>         
+           </button>
         </div>
       </main>
 
