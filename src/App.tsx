@@ -131,6 +131,7 @@ useEffect(() => {
           xl:py-3 xl:px-5
           2xl:py-3 2xl:px-5
 
+
         text-white uppercase font-fustat font-bold 
           text-xs 
           md:text-xl 
@@ -163,7 +164,7 @@ useEffect(() => {
 
       <section className='w-full mt-4 md:mt-10'>
         <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-20'>
-          <p className='flex flex-wrap justify-center items-center  gap-x-1 font-fustat text-primary-600 text-sm md:text-lg 2xl:text-2xl lg:mb-20 xl:mb-24 2xl:mb-32 px-4 text-center'>
+          <p className='flex flex-wrap justify-center items-center  gap-x-1 font-fustat text-primary-600 text-sm md:text-lg 2xl:text-2xl lg:mb-20 xl:mb-24 2xl:mb-32 px-4 mb-10 text-center'>
             <span>Your all-in-one study companion &mdash;</span>
             <b>plan, organize,</b>
             <span>and</span>
@@ -388,18 +389,18 @@ useEffect(() => {
  {/*Developers Section*/}
 <section ref={aboutRef} className="py-10 w-full flex flex-col justify-center">
     <div className='flex flex-col mt-10 gap-2 justify-center items-center md:items-start'>
-    <h1 className='text-primary-600 px- 4 text-center md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[350px] w-full font-inter font-extrabold'>Developers</h1>
-    <p className='text-primary-600 px-4   font-inter  text-center md:ml-0 md:text-left md:px-[50px] lg:px-[150px] xl:px-[30px] 2xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
+    <h1 className='text-primary-600 px- 4 text-center md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] w-full font-inter font-extrabold'>Developers</h1>
+    <p className='text-primary-600 px-4   font-inter  text-center md:ml-0 md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
 
     {/*Proponents*/}
-<div className='flex flex-col md:flex-row justify-between items-start w-full max-w-6xl mx-auto gap-12 md:gap-8 px-4 md:px-[60px] lg:px-[100px] xl:px-[120px] 2xl:px-[80px]'>
+<div className='flex flex-col md:flex-row justify-between items-center md:items-start w-full max-w-6xl mx-auto gap-12 md:gap-8 px-4 md:px-[60px] lg:px-[100px] xl:px-[120px] 2xl:px-[80px]'>
 
   {/*Column 1: Programmer & QA Tester*/}
-  <div className='flex flex-col gap-10 w-full md:w-1/2'>
+<div className='flex flex-col gap-10 w-full items-start md:items-start md:w-1/2 max-w-[280px] mx-auto md:max-w-none md:mx-0'>
 
     {/*Programmer*/}
     <div className='flex flex-row gap-5'>
-      <img src="./profile.png" alt="Programmer" className='w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 2xl:w-32 2xl:h-32 object-cover border border-primary-600 rounded-full shrink-0 select-none'
+      <img src="./programmer.png" alt="Programmer" className='w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 2xl:w-32 2xl:h-32 object-cover border border-primary-600 rounded-full shrink-0 select-none'
         onContextMenu={(e) => e.preventDefault()}
         draggable={false}/>
       <div className='flex flex-col justify-center items-start'>
@@ -442,11 +443,10 @@ useEffect(() => {
   </div>
 
   {/*Column 2: Project Manager & UI Designer*/}
-  <div className='flex flex-col gap-10 w-full md:w-1/2'>
-
+<div className='flex flex-col gap-10 w-full items-start md:items-start md:w-1/2 max-w-[280px] mx-auto md:max-w-none md:mx-0'>
     {/*Project Manager*/}
     <div className='flex flex-row gap-5'>
-      <img src="./profile.png" alt="Project Manager" className='w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 2xl:w-32 2xl:h-32 object-cover border border-primary-600 rounded-full shrink-0 select-none'
+      <img src="./projMan.png" alt="Project Manager" className='w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 2xl:w-32 2xl:h-32 object-cover border border-primary-600 rounded-full shrink-0 select-none'
         onContextMenu={(e) => e.preventDefault()}
         draggable={false}/>
       <div className='flex flex-col justify-center items-start'>
@@ -495,8 +495,8 @@ useEffect(() => {
 <section ref={contactRef} className='py-2 md:py-10 lg:py-10 xl:py-10 2xl:py-10 w-full overflow-hidden'>
   <div className='flex flex-col items-center md:items-start mt-0 md:mt-10 lg:mt-10 xl:mt-10 2xl:mt-10 gap-2 justify-start'>
 
-    <h1 className='text-primary-600 text-center md:text-start lg:text-start xl:text-start 2xl:text-start px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] w-full font-inter font-extrabold'>Contact Us!</h1>
-    <p className='text-primary-600 text-center text-sm lg:text-base font-inter px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[350px] mb-10 font-medium'>
+    <h1 className='text-primary-600 text-center md:text-start lg:text-start xl:text-start 2xl:text-start px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] w-full font-inter font-extrabold'>Contact Us!</h1>
+    <p className='text-primary-600 text-center text-sm lg:text-base font-inter px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] mb-10 font-medium'>
       Have questions about StudyBuddy? We'd love to hear from you — reach us at:
     </p>
     <div className='flex flex-col md:flex-row w-full justify-center items-center gap-8 md:gap-10 lg:gap-20 2xl:gap-52'>

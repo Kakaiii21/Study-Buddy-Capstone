@@ -159,7 +159,7 @@ const [passwordUpdated] = useState<boolean>(() => {
     Don't have an account?{' '}
     <button
       onClick={() => onSwitchToSignup ? onSwitchToSignup() : navigate('/signup')}
-      className="font-bold underline"
+      className="font-bold underline bg-white text-primary-800 px-2 rounded-lg"
     >
       Sign Up
     </button>

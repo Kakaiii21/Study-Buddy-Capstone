@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTimerContext } from '../context/TimerContext'
 
 const PRESETS = [
@@ -40,23 +40,39 @@ function StudyTimer() {
     setErrorMsg('')
     setTimer(hrs, mins, secs)
   }
+const [isScrolling, setIsScrolling] = useState(false)
+const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+const handleScroll = () => {
+  setIsScrolling(true)
+  if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+  scrollTimeout.current = setTimeout(() => setIsScrolling(false), 800)
+}
+
+useEffect(() => {
+  return () => {
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
+  }
+}, [])
   return (
-    <div className='flex flex-col h-full w-full bg-white
-      px-3 xs:px-4 sm:px-5 md:px-6
-      lg:px-0 lg:pr-5
-      xl:px-0 xl:pr-5
-      2xl:px-0 2xl:pr-7
-      py-6 md:py-8
-      pt-14
-      md:pt-12
-      lg:pt-10
-      xl:pt-11
-      2xl:pt-12
-      xl:py-2 
-      2xl:py-6 
-      gap-4  md:gap-5 lg:gap-2 xl:gap-3 2xl:gap-5
-      items-start justify-start overflow-y-auto overflow-x-hidden box-border'>
+    <div  onScroll={handleScroll}
+  className={`flex flex-col h-full w-full bg-white
+    px-3 xs:px-4 sm:px-5 md:px-6
+    lg:px-0 lg:pr-5
+    xl:px-0 xl:pr-5
+    2xl:px-0 2xl:pr-7
+    py-6 md:py-8
+    pt-14
+    md:pt-12
+    lg:pt-10
+    xl:pt-11
+    2xl:pt-12
+    xl:py-2 
+    2xl:py-6 
+    gap-4  md:gap-5 lg:gap-2 xl:gap-3 2xl:gap-5
+    items-start justify-start overflow-y-auto overflow-x-hidden box-border
+    custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}
+>
 
       <div id='timer' className='w-full flex flex-col gap-4 md:gap-5 lg:gap-3 xl:gap-4 2xl:gap-y-10 
       rounded-2xl lg:rounded-xl pb-10 lg:pb-0

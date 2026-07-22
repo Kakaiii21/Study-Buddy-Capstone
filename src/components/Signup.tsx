@@ -235,7 +235,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     Already have an account?{' '}
     <button
       onClick={() => onSwitchToLogin ? onSwitchToLogin() : navigate('/login')}
-      className="font-bold underline"
+      className="font-bold underline bg-white text-primary-800 px-2 rounded-lg"
     >
       Log In
     </button>

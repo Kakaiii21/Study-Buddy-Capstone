@@ -54,28 +54,28 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
 function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
-        <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="delete icon" className='w-7 h-7' />
-          <h2 className='text-lg font-bold text-gray-800'>Clear All Schedules?</h2>
+      <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-3 2xl:p-4 3xl:p-5 w-80  lg:w-[250px] xl:w-[280px] 2xl:w-[350px] 3xl:w-[420px]'>
+        <div className='flex items-center gap-3 xl:gap-2 2xl:gap-3  mb-1 2xl:mb-2 3xl:mb-3 '>
+          <img src="/delete.png" alt="delete icon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9' />
+          <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800'>Clear All Schedules?</h2>
         </div>
-        <p className='text-sm text-gray-500 mb-1'>
+        <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3'>
           This will  delete{' '}
-          <span className='font-semibold text-gray-700'>all subjects</span> from your class schedule.
+          <span className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3'>all subjects</span> from your class schedule.
         </p>
-        <p className='text-xs text-gray-400 mb-6'>
+        <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3'>
           This action <span className='font-semibold text-red-400'>cannot be undone</span>.
         </p>
         <div className='flex gap-3 justify-end'>
           <button
             onClick={onCancel}
-            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'
+            className='text-sm  lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px] py-1 px-2 rounded-md lg:py-1 2xl:py-2 lg:px-2 xl font-medium text-gray-600 hover:bg-gray-100 transition-colors'
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'
+            className='text-sm  lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px] py-1 px-2 rounded-md lg:py-1 2xl:py-2 lg:px-2 xl font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'
           >
             Clear All
           </button>

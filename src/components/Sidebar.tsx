@@ -182,19 +182,19 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50" />
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-xl shadow-xl p-8 w-80 text-center">
-              <h2 className="text-xl font-bold text-primary-600 font-roboto mb-2">Logout</h2>
-              <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
-              <div className="flex gap-4">
+            <div className="bg-white rounded-md 3xl:rounded-lg shadow-xl p-8 lg:p-0 lg:py-4 lg:px-5 2xl:py-6 2xl:px-5 3xl:py-8 3xl:px-5 w-80 lg:w-52 xl:w-64 2xl:w-72 3xl:w-80 text-center">
+              <h2 className="text-xl lg:text-sm xl:text-lg  2xl:text-xl 3xl:text-2xl font-bold text-primary-600 font-roboto mb-2">Logout</h2>
+              <p className="text-gray-600 lg:text-[10px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] mb-6">Are you sure you want to logout?</p>
+              <div className="flex gap-4 3xl:gap-6">
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 lg:text-xs 2xl:text-sm 3xl:text-lg lg:rounded-md font-bold lg:py-1 2xl:py-2 3xl:py-2 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex-1 bg-primary-600 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
+                  className="flex-1 bg-primary-600 text-white font-roboto lg:text-xs 2xl:text-sm 3xl:text-lg lg:rounded-md font-bold lg:py-1 2xl:py-2 3xl:py-2 py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
                 >
                   Logout
                 </button>

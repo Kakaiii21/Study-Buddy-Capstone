@@ -316,7 +316,7 @@ function Notes() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-64    border-primary-800 rounded-md
-                      py-2 pl-3 pr-8 font-roboto text-sm
+                      py-2 pl-3 pr-8  text-md
                       text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
                       font-inter text-primary-800 border-2 placeholder:text-primary-800
                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
@@ -453,7 +453,7 @@ function Notes() {
                     onClick={openNoteModal}
                     className='flex lg:hidden 
                     shadow-[0_3px_5px_rgba(0,0,0,.5)]
-                    hover:opacity-80 w-44 h-44
+                    hover:opacity-80 w-36 lg:w-44 h-36 lg:h-44 
                     hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
                     items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-2xl text-black'
                   >

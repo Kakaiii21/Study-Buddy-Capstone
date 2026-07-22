@@ -345,25 +345,25 @@ function ClearAllModal({ count, onConfirm, onCancel }: {
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
-        <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
-          <h2 className='text-lg font-bold text-gray-800'>Move all tasks to Recently Deleted?</h2>
+      <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-3 2xl:p-4 3xl:p-5 w-80  lg:w-[250px] xl:w-[280px] 2xl:w-[350px] 3xl:w-[420px]'>
+        <div className='flex items-center gap-3 xl:gap-2 2xl:gap-3  mb-1 2xl:mb-2 3xl:mb-3 '>
+          <img src="/delete.png" alt="deleteicon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9' />
+          <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800'>Move all tasks to Recently Deleted?</h2>
         </div>
-        <p className='text-sm text-gray-500 mb-1'>
+        <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3 '>
           <span className='font-semibold text-gray-700'>{count} task{count !== 1 ? 's' : ''}</span> will be moved to{' '}
           <span className='font-semibold text-primary-800'>Recently Deleted</span>.
         </p>
-        <p className='text-xs text-gray-400 mb-6'>
+        <p className='text-xs lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-400 mb-6 lg:mb-2 xl:mb-5 2xl:mb-6 3xl:mb-8'>
           You can restore any of them within <span className='font-semibold text-red-400'>30 days</span>, after which they'll be permanently deleted.
         </p>
         <div className='flex gap-3 justify-end'>
           <button onClick={onCancel} disabled={confirming}
-            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'>
+            className='px-4 py-2 rounded-lg text-sm  lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px] lg:py-1 2xl:py-2  font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'>
             Cancel
           </button>
           <button onClick={handleConfirm} disabled={confirming}
-            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'>
+            className='px-4 py-2 rounded-lg text-sm  lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px] lg:py-1 2xl:py-2 font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'>
             {confirming ? 'Clearing...' : 'Clear All'}
           </button>
         </div>
