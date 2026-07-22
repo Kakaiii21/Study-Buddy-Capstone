@@ -10,24 +10,25 @@ function VerifyEmail() {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(false)
 
+  
   // Auto-check every 5 seconds if user verified their email
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const user = auth.currentUser
-      if (!user) return
+useEffect(() => {
+  const interval = setInterval(async () => {
+    const user = auth.currentUser
+    if (!user) return
 
-      setChecking(true)
-      await reload(user) // refresh user data from Firebase
+    setChecking(true)
+    await reload(user)
 
-      if (user.emailVerified) {
-        clearInterval(interval)
-        navigate('/login')
-      }
-      setChecking(false)
-    }, 5000)
+    if (user.emailVerified) {
+      clearInterval(interval)
+      navigate('/', { state: { showLogin: true } })
+    }
+    setChecking(false)
+  }, 5000)
 
-    return () => clearInterval(interval)
-  }, [])
+  return () => clearInterval(interval)
+}, [])
   const handleContinue = async () => {
   const user = auth.currentUser
   if (!user) return
@@ -61,29 +62,29 @@ function VerifyEmail() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="bg-white p-8 rounded-xl 
+      <div className="bg-white p-8 lg:p-4 xl:p-5 2xl:p-6 3xl:p-10 rounded-xl  md:bg-pink-800 lg:bg-white
       shadow-[0_0px_40px_rgba(0,0,0,.30)]
-      max-w-md w-full text-center">
+       w-full lg:w-[350px] xl:w-[450px] 2xl:w-[550px] 3xl:w-[650px] text-center">
 
-        <img src="/logo.png" alt="Study Buddy" className="w-40 mx-auto mb-6" />
+        <img src="/logo.png" alt="Study Buddy" className="w-40 lg:w-20 xl:w-24 2xl:w-28 3xl:w-32 mx-auto mb-6" />
 
-        <h2 className="text-2xl font-bold font-inter uppercase text-primary-600 mb-2
+        <h2 className="text-2xl lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl font-bold font-inter uppercase text-primary-600 mb-2
           ">Verify Your Email</h2>
-        <p className="text-gray-600 text-sm mb-10">
+        <p className="text-gray-600 text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl mb-5">
           We sent a verification link to your email. Please check your inbox and click the link to activate your account.
         </p>
 
-        {checking && (
+        {/* {checking && (
           <p className="text-sm text-gray-400 mb-4">Checking verification status...</p>
-        )}
+        )} */}
 
-        {message && <p className="text-green-500 font-semibold mb-4">{message}</p>}
-        {error && <p className="text-red-500 font-semibold mb-4">{error}</p>}
+        {message && <p className="text-green-500  text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xlfont-semibold mb-4">{message}</p>}
+        {error && <p className="text-red-500 text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl font-semibold mb-4">{error}</p>}
 
         <button
           onClick={handleResend}
           disabled={loading}
-          className="w-full bg-primary-600 text-white  uppercase font-bold p-4 rounded-xl backdrop-blur-xs
+          className="w-full bg-primary-600 text-white text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl  uppercase font-bold p-4 rounded-xl backdrop-blur-xs
           hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
           transition-all duration-300 mb-4 disabled:opacity-50"
         >
@@ -93,7 +94,7 @@ function VerifyEmail() {
             onClick={handleContinue}
             disabled={checking}
             className="w-full border-2 border-primary-600 uppercase
-            rounded-xl backdrop-blur-xs
+            rounded-xl backdrop-blur-xs text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl
             hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
             transition-all duration-300
             bg-white text-primary-600 font-bold p-4  mb-4 disabled:opacity-50"
@@ -102,9 +103,9 @@ function VerifyEmail() {
           </button>
 
         <button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/', { state: { showLogin: true } })}
           className="w-full border-2 border-primary-600 uppercase 
-          rounded-xl backdrop-blur-xs
+          rounded-xl backdrop-blur-xs text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl
           hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]
           transition-all duration-300
           text-primary-600 font-bold p-4 "

@@ -1,4 +1,3 @@
-// src/components/AuthGate.tsx
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { onAuthChange, type User } from '../services/authService'
@@ -24,7 +23,7 @@ export default function AuthGate({ children }: AuthGateProps) {
     return <SplashScreen />
   }
 
-  if (user) {
+  if (user && user.emailVerified) {
     return <Navigate to="/dashboard" replace />
   }
 

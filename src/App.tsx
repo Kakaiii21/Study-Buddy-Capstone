@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import Signup from './components/Signup'
 import Login from './components/Login'
 import { useInstallPWA } from './hooks/useInstallPWA'
+import { useLocation } from 'react-router-dom'
 
 
 
 function App() {
-  const [activeForm, setActiveForm] = useState<'signup' | 'login'>('signup')
+const location = useLocation()
+const [activeForm, setActiveForm] = useState<'signup' | 'login'>(
+  location.state?.showLogin ? 'login' : 'signup'
+)
 
   const signupRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
@@ -29,7 +33,13 @@ useEffect(() => {
   const { isInstallable, installApp, isMacSafari} = useInstallPWA();
   const [showIOSModal, setShowIOSModal] = useState(false);
   const [showMacModal, setShowMacModal] = useState(false);
-
+useEffect(() => {
+  if (location.state?.showLogin) {
+    setTimeout(() => {
+      signupRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+  }
+}, [location.state])
   
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
   const isAndroid = /Android/.test(navigator.userAgent)

@@ -267,7 +267,7 @@ export const sendPasswordReset = onRequest(
       const { email } = req.body as { email: string }
       if (!email) { res.status(400).json({ error: 'Email is required' }); return }
       const resetLink = await admin.auth().generatePasswordResetLink(email, {
-        url: 'https://studybuddyph.site/login',
+        url: 'https://studybuddyph.site/',
       })
       const resend = new Resend(process.env.RESEND_API_KEY!)
       await resend.emails.send({
@@ -304,7 +304,7 @@ export const sendVerificationEmail = onRequest(
       const { email } = req.body as { email: string }
       if (!email) { res.status(400).json({ error: 'Email is required' }); return }
       const verifyLink = await admin.auth().generateEmailVerificationLink(email, {
-        url: 'https://studybuddyph.site/login',
+        url: 'https://studybuddyph.site/',
       })
       const resend = new Resend(process.env.RESEND_API_KEY!)
       await resend.emails.send({
