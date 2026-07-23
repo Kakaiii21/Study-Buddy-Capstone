@@ -539,18 +539,18 @@ const notesMobile: DriveStep[] = [
 // ─── Class Schedule Desktop (lg+, 1024px+) ──────────────────────────────────
 const classscheduleDesktop: DriveStep[] = [
   {
-    element: '#addScheduleBtn',
-    popover: {
-      title: '➕ Add a Class',
-      description: 'Click here to add a new class with its day, time, room, and instructor.',
-      side: 'left',
-    },
-  },
-  {
     element: '#clearScheduleBtn',
     popover: {
       title: '🗑️ Clear All Schedules',
       description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#addScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Click here to add a new class with its day, time, room, and instructor.',
       side: 'left',
     },
   },
@@ -575,18 +575,26 @@ const classscheduleDesktop: DriveStep[] = [
 // ─── Class Schedule Tablet (md, 768px–1023px) ───────────────────────────────
 const classscheduleTablet: DriveStep[] = [
   {
-    element: '#addScheduleBtn',
+    element: '#scheduleFabBtn',
     popover: {
-      title: '➕ Add a Class',
-      description: 'Tap here to add a new class with its day, time, room, and instructor.',
+      title: '➕ Quick Actions',
+      description: 'Tap this floating button to add a new class or clear all schedules at once.',
       side: 'left',
     },
   },
   {
-    element: '#clearScheduleBtn',
+    element: '#fabClearScheduleBtn',
     popover: {
       title: '🗑️ Clear All Schedules',
       description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabAddScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Tap here to add a new class with its day, time, room, and instructor.',
       side: 'left',
     },
   },
@@ -611,19 +619,27 @@ const classscheduleTablet: DriveStep[] = [
 // ─── Class Schedule Mobile (below 768px) ────────────────────────────────────
 const classscheduleMobile: DriveStep[] = [
   {
-    element: '#addScheduleBtn',
+    element: '#scheduleFabBtn',
     popover: {
-      title: '➕ Add a Class',
-      description: 'Tap here to add a new class with its day, time, room, and instructor.',
-      side: 'bottom',
+      title: '➕ Quick Actions',
+      description: 'Tap this floating button to add a new class or clear all schedules at once.',
+      side: 'left',
     },
   },
   {
-    element: '#clearScheduleBtn',
+    element: '#fabClearScheduleBtn',
     popover: {
       title: '🗑️ Clear All Schedules',
       description: 'This removes every class from your schedule. Use with care — it can\'t be undone.',
-      side: 'bottom',
+      side: 'left',
+    },
+  },
+  {
+    element: '#fabAddScheduleBtn',
+    popover: {
+      title: '➕ Add a Class',
+      description: 'Tap here to add a new class with its day, time, room, and instructor.',
+      side: 'left',
     },
   },
   {
@@ -631,7 +647,7 @@ const classscheduleMobile: DriveStep[] = [
     popover: {
       title: '📅 Your Weekly Schedule',
       description: 'See all your classes organized by day, Monday through Sunday.',
-      side: 'top',
+      side: 'right',
     },
   },
   {
@@ -639,7 +655,7 @@ const classscheduleMobile: DriveStep[] = [
     popover: {
       title: '⋮ Class Options',
       description: 'Tap this icon on any class to edit its details or delete it.',
-      side: 'top',
+      side: 'right',
     },
   },
 ]
@@ -1577,8 +1593,7 @@ export function startTour(
   // Some elements only appear once the user opens something mid-tour
   // (sidebar, FAB quick actions) — never filter those out even though
   // they're not in the DOM yet when the tour starts.
-  const dynamicIds = ['#sidebar', '#fabClearAllBtn', '#fabAddTaskBtn']
-
+  const dynamicIds = ['#sidebar', '#fabClearAllBtn', '#fabAddTaskBtn', '#fabClearScheduleBtn', '#fabAddScheduleBtn']
   // Skip any step whose target simply doesn't exist right now — e.g. a
   // new user with no tasks yet has no #taskCard / #taskOptionsBtn to show.
   const steps = rawSteps.filter((step) => {
@@ -1635,6 +1650,18 @@ export function startTour(
         setTimeout(() => driverObj.moveNext(), 300)
         return
       }
+     // ── Class Schedule FAB: open it when leaving the FAB trigger step ──
+     if (step.element === '#scheduleFabBtn') {
+       document.querySelector<HTMLButtonElement>('#scheduleFabBtn')?.click()
+       setTimeout(() => driverObj.moveNext(), 300)
+       return
+     }
+     // ── Class Schedule FAB: close it after showing the last FAB action ──
+     if (step.element === '#fabAddScheduleBtn') {
+       document.querySelector<HTMLButtonElement>('#scheduleFabBtn')?.click()
+       setTimeout(() => driverObj.moveNext(), 300)
+       return
+     }
       driverObj.moveNext()
     },
     onDestroyed: () => {          // ← NEW: fires on Done, ✕, Escape, overlay click

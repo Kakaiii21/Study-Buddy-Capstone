@@ -274,7 +274,7 @@ const handleSave = () => {
             daySchedules.map((s) => (
               <div key={s.id} className='bg-white px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
                 <div className='flex flex-row 3xl:py-2  items-center pt-1'>
-                  <p className='text-[10px] leading-tight md:text-[10px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'>
+                  <p className='text-[12px] leading-tight md:text-[12px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'>
                     {s.subject}
                   </p>
 
@@ -296,7 +296,7 @@ const handleSave = () => {
                             onClick={() => handleEditOpen(s)}
                             className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] xl:text-[13px] 2xl:text-[14px] text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' src="edit.png" alt="edit icon" />Edit
+                            <img className='w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' src="edit.png" alt="edit icon" />Edit
                           </button>
                           <hr className='my-1 mx-1 border-primary-800 ' />
                           <button
@@ -306,7 +306,7 @@ const handleSave = () => {
                             }}
                             className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] text-primary-600 hover:bg-red-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-5 lg:w-3 h-5 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' />Delete
+                            <img src="delete.png" alt="delete icon" className='w-3.5 h-3.5 lg:w-3  lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' />Delete
                           </button>
                         </div>
                       </>
@@ -314,10 +314,10 @@ const handleSave = () => {
                   </div>
                 </div>
 
-                <p className='text-[9px] leading-tight md:text-[9px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '>
+                <p className='text-[10px] leading-tight md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '>
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
-                <p className='text-[9px] leading-tight lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[14px] text-gray-600 pb-2'>
+                <p className='text-[10px] leading-tight lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[14px] text-gray-600 pb-2'>
                   {s.instructor}
                 </p>
               </div>
