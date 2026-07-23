@@ -208,12 +208,16 @@ const { startTour } = useTour(
               backdrop-blur-xs
               hover:-translate-y-1 
               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-              transition-all duration-300"            >
+              transition-all duration-300 disabled:bg-[#B0A030]
+              disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
+              disabled:hover:translate-y-0 disabled:hover:shadow-none"            
+           >
               + Course Folder
             </button>
             {/* Search bar */}
             <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
               <input
+                id='courseSearchBar'
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -262,24 +266,26 @@ const { startTour } = useTour(
                     <div className="relative">
                       <button
                         title={`Open ${course.name} Folder`}
+                        disabled={!isOnline}
                         onClick={() => navigate(`/courses/${course.id}`, { state: { folderName: course.name } })}
                       >
                       <img
                         src={`${course.fileCount && course.fileCount > 0 ? "storefolder" : "folder"}-${course.color || 'blue'}.png`}
                         alt="folder"
-                        className='hover:opacity-90'
+                        className={`hover:opacity-90 ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
                       />                      
                       </button>
 
                       <button
                       id='courseOptionsBtn'
+                      disabled= {!isOnline}
+                      title={!isOnline ? 'You are offline' : 'More Options'}
                         onClick={(e) => {
                           e.stopPropagation()
                           setActiveMenu(activeMenu === course.id ? null : course.id)
                         }}
-                        className="absolute bottom-2  right-2 w-10 lg:right-0 lg:w-10 xl:right-1 xl:w-11 2xl:right-2 2xl:w-12  h-6 flex items-center justify-center transition group"
-                        title='More Options'
-                      >
+                      className={`absolute bottom-2 right-2 w-10 lg:right-0 lg:w-10 xl:right-1 xl:w-11 2xl:right-2 2xl:w-12 h-6 flex items-center justify-center transition group ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        >
                         <div  className="flex flex-row items-center justify-center gap-[8px] lg:gap-[3px] 2xl:gap-[5px] lg:pr-0 pr-0 md:pr-5">
                           <span className="w-2 h-2 lg:w-1 lg:h-1 2xl:w-2 2xl:h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
                           <span className="w-2 h-2 lg:w-1 lg:h-1 2xl:w-2 2xl:h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>

@@ -457,6 +457,8 @@ lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                 py-2 lg:py-1 px-4 rounded-sm
                 font-inter font-black
+                disabled:bg-[#B0A030]
+                disabled:hover:flex-none
                 text-[10px] lg:text-[8px]
                 xl:text-[10px] 2xl:text-[12px]
                 hover:opacity-90
@@ -465,7 +467,7 @@ lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
                 transition-all duration-300"            
                 >
-                {!isOnline ? '📶 Offline' : '+ Upload Files'}
+                {!isOnline ? 'Upload Files' : '+ Upload Files'}
               </button>
             </div>
           </div>

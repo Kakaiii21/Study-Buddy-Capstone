@@ -671,6 +671,14 @@ const coursesDesktop: DriveStep[] = [
     },
   },
   {
+    element: '#courseSearchBar',
+    popover: {
+      title: '🔍 Search Course Folder',
+      description: 'Quickly find a folder by typing part of its name here.',
+      side: 'left',
+    },
+  },
+  {
     element: '#coursesGrid',
     popover: {
       title: '📁 Your Course Folders',
@@ -700,11 +708,19 @@ const coursesDesktop: DriveStep[] = [
 // ─── Courses Tablet (md, 768px–1023px) ──────────────────────────────────────
 const coursesTablet: DriveStep[] = [
   {
+    element: '#courseSearchBar',
+    popover: {
+      title: '🔍 Search Course Folder',
+      description: 'Quickly find a folder by typing part of its name here.',
+      side: 'bottom',
+    },
+  },
+  {
     element: '#addCourseBtn',
     popover: {
       title: '➕ Add a Course Folder',
       description: 'Tap here to create a new folder for organizing files under a specific course.',
-      side: 'left',
+      side: 'bottom',
     },
   },
   {
@@ -736,6 +752,14 @@ const coursesTablet: DriveStep[] = [
 
 // ─── Courses Mobile (below 768px) ───────────────────────────────────────────
 const coursesMobile: DriveStep[] = [
+  {
+    element: '#courseSearchBar',
+    popover: {
+      title: '🔍 Search Course Folder',
+      description: 'Quickly find a folder by typing part of its name here.',
+      side: 'bottom',
+    },
+  },
   {
     element: '#addCourseBtn',
     popover: {
