@@ -57,9 +57,9 @@ function ChangeEmail({ setActiveTab }: ChangeEmailProps) {
             pendingEmail: null
           })
           await signOut(auth)
-          navigate('/login', {
-            state: { message: 'Email updated successfully! Please sign in with your new email.' }
-          })
+          navigate('/?emailUpdated=true', { state: { showLogin: true } })
+            
+    
         }
       } catch (err) {
         console.error('Polling error:', err)

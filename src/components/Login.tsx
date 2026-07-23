@@ -28,18 +28,18 @@ function Login({ onSwitchToSignup} : {onSwitchToSignup?: () => void}) {
 
   const [emailUpdated] = useState(() => {
     const val = new URLSearchParams(window.location.search).get('emailUpdated')
-    if (val) window.history.replaceState({}, '', '/login')
+    if (val) window.history.replaceState({}, '', '/')
     return val
   })
   const [cancelResult] = useState(() => {
   const val = new URLSearchParams(window.location.search).get('cancelResult')
-  if (val) window.history.replaceState({}, '', '/login')
+  if (val) window.history.replaceState({}, '', '/')
   return val
 })
 
 const [passwordUpdated] = useState<boolean>(() => {
   const fromQuery = new URLSearchParams(window.location.search).get('passwordUpdated') === 'true'
-  if (fromQuery) window.history.replaceState({}, '', '/login')
+  if (fromQuery) window.history.replaceState({}, '', '/')
   return fromQuery
 })
   const [email, setEmail] = useState('')
@@ -116,11 +116,13 @@ const [passwordUpdated] = useState<boolean>(() => {
       setLoading(true)
       const user = await login(email, password)
 
-      if (!user.emailVerified) {
-        await getAuth().signOut()
-        setFieldErrors(prev => ({ ...prev, email: 'Please verify your email first. Check your inbox.' }))
-        return
-      }
+    // in Login.tsx, handleLogin:
+    if (!user.emailVerified) {
+      sessionStorage.setItem('intentionalLogout', 'true')
+      await getAuth().signOut()
+      setFieldErrors(prev => ({ ...prev, email: 'Please verify your email first. Check your inbox.' }))
+      return
+    }
 
       navigate('/dashboard')
       } catch (err: unknown) {

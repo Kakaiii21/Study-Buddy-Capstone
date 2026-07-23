@@ -22,7 +22,7 @@ function EmailChangeWatcher() {
       // If pendingEmail was just cleared and email changed, sign out
       if (!data?.pendingEmail && data?.email && data.email !== user.email) {
         await signOut(auth)
-        window.location.href = '/login?emailUpdated=true'
+        window.location.href = '/?emailUpdated=true'
       }
     })
 

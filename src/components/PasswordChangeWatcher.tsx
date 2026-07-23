@@ -20,7 +20,7 @@ function PasswordChangeWatcher() {
         const isIntentional = sessionStorage.getItem('intentionalLogout') === 'true'
         sessionStorage.removeItem('intentionalLogout')
         if (!isIntentional && !window.location.href.includes('emailUpdated')) {
-          window.location.replace('/login?passwordUpdated=true')
+          window.location.replace('/?passwordUpdated=true')
         }
         return
       }
@@ -45,7 +45,7 @@ function PasswordChangeWatcher() {
             clearInterval(pollingRef.current!)
             await signOut(auth)
             if (!window.location.href.includes('emailUpdated')) {
-              window.location.replace('/login?passwordUpdated=true')
+              window.location.replace('/?passwordUpdated=true')
             }
           }
         }

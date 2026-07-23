@@ -9,9 +9,12 @@ import { useLocation } from 'react-router-dom'
 
 function App() {
 const location = useLocation()
-const [activeForm, setActiveForm] = useState<'signup' | 'login'>(
-  location.state?.showLogin ? 'login' : 'signup'
-)
+const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
+  const params = new URLSearchParams(window.location.search)
+  const hasAuthQueryFlag =
+    params.has('emailUpdated') || params.has('passwordUpdated') || params.has('cancelResult')
+  return (location.state?.showLogin || hasAuthQueryFlag) ? 'login' : 'signup'
+})
 
   const signupRef = useRef<HTMLDivElement>(null)
   const aboutRef = useRef<HTMLDivElement>(null)
@@ -19,27 +22,30 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(
   const navigate = useNavigate()
   const [showPoliciesMenu, setShowPoliciesMenu] = useState(false)
   const policiesRef = useRef<HTMLDivElement>(null)
-useEffect(() => {
-  if (!showPoliciesMenu) return
-  function handleOutsideClick(e: MouseEvent) {
-    if (policiesRef.current && !policiesRef.current.contains(e.target as Node)) {
-      setShowPoliciesMenu(false)
+  useEffect(() => {
+    if (!showPoliciesMenu) return
+    function handleOutsideClick(e: MouseEvent) {
+      if (policiesRef.current && !policiesRef.current.contains(e.target as Node)) {
+        setShowPoliciesMenu(false)
+      }
     }
-  }
-  document.addEventListener('mousedown', handleOutsideClick)
-  return () => document.removeEventListener('mousedown', handleOutsideClick)
-}, [showPoliciesMenu])
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [showPoliciesMenu])
 
-  const { isInstallable, installApp, isMacSafari} = useInstallPWA();
-  const [showIOSModal, setShowIOSModal] = useState(false);
-  const [showMacModal, setShowMacModal] = useState(false);
-useEffect(() => {
-  if (location.state?.showLogin) {
-    setTimeout(() => {
-      signupRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, 100)
-  }
-}, [location.state])
+    const { isInstallable, installApp, isMacSafari} = useInstallPWA();
+    const [showIOSModal, setShowIOSModal] = useState(false);
+    const [showMacModal, setShowMacModal] = useState(false);
+    useEffect(() => {
+      const params = new URLSearchParams(window.location.search)
+      const hasAuthQueryFlag =
+        params.has('emailUpdated') || params.has('passwordUpdated') || params.has('cancelResult')
+      if (location.state?.showLogin || hasAuthQueryFlag) {
+        setTimeout(() => {
+          signupRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      }
+    }, [location.state])
   
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
   const isAndroid = /Android/.test(navigator.userAgent)
@@ -56,7 +62,7 @@ useEffect(() => {
 
         {/* NAV LINKS */}
         <div className="flex items-center gap-2 md:gap-4 lg:gap-5 xl:gap-6 2xl:gap-20  
-        md:mr-18
+        md:mr-18  
         lg:mr-20
         xl:mr-20
         2xl:mr-20">

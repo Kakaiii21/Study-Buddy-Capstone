@@ -112,7 +112,7 @@ useEffect(() => {
             tabIndex={isActive ? 0 : -1}
             className='px-5 sm:px-6 md:px-7 lg:px-5 xl:px-6 2xl:px-7 py-2 md:py-3 lg:py-0 xl:py-1 2xl:py-2 
             rounded-md lg:rounded-sm xl:rounded-md
-            bg-[#4A4A49] text-white font-inter font-extrabold uppercase 
+            bg-[#4A4A49] text-white font-inter font-extrabold uppercase  hover:text-primary-800
             text-xs sm:text-sm md:text-base lg:text-[8px] xl:text-[10px] 2xl:text-[12px] hover:bg-red-50'>
             Stop
           </button>

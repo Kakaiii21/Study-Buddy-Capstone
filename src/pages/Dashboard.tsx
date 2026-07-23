@@ -178,7 +178,7 @@ useEffect(() => {
 font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
 mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
-<div className='w-full md:bg-pink-600 lg:bg-green-600 xl:bg-blue-600 2xl:bg-yellow-600 3xl:bg-red-600  max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
+<div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
 <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-8 3xl:gap-10 mt-0 justify-center items-center'>
     
     {/* ID Card */}

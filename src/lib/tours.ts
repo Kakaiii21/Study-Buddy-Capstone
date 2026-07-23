@@ -382,6 +382,14 @@ const todolistMobile: DriveStep[] = [
 // ─── Notes Desktop (lg+, 1024px+) ───────────────────────────────────────────
 const notesDesktop: DriveStep[] = [
   {
+    element: '#notesSearchBar',
+    popover: {
+      title: '🔍 Search Notes',
+      description: 'Quickly find a note by typing part of its title here.',
+      side: 'left',
+    },
+  },
+  {
     element: '#addSubjectBtn',
     popover: {
       title: '➕ Add a Subject',
@@ -390,21 +398,14 @@ const notesDesktop: DriveStep[] = [
     },
   },
   {
-    element: '#subjectDropdown',
+    element: '#subjectDropdownDesktop',
     popover: {
       title: '🗂️ Filter by Subject',
       description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
       side: 'left',
     },
   },
-  {
-    element: '#notesSearchBar',
-    popover: {
-      title: '🔍 Search Notes',
-      description: 'Quickly find a note by typing part of its title here.',
-      side: 'left',
-    },
-  },
+
   {
     element: '#newNoteBtnDesktop',
     popover: {
@@ -435,7 +436,7 @@ const notesDesktop: DriveStep[] = [
 const notesTablet: DriveStep[] = [
 
   {
-    element: '#addSubjectBtn',
+    element: '#addSubjectBtnMobile',
     popover: {
       title: '➕ Add a Subject',
       description: 'Create a new subject to organize your notes by class or topic.',
@@ -486,9 +487,16 @@ const notesTablet: DriveStep[] = [
 
 // ─── Notes Mobile (below 768px) ─────────────────────────────────────────────
 const notesMobile: DriveStep[] = [
-
   {
-    element: '#addSubjectBtn',
+    element: '#notesSearchBarMobile',
+    popover: {
+      title: '🔍 Search Notes',
+      description: 'Quickly find a note by typing part of its title here.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#addSubjectBtnMobile',
     popover: {
       title: '➕ Add a Subject',
       description: 'Create a new subject to organize your notes by class or topic.',
@@ -500,14 +508,6 @@ const notesMobile: DriveStep[] = [
     popover: {
       title: '🗂️ Filter by Subject',
       description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#notesSearchBar',
-    popover: {
-      title: '🔍 Search Notes',
-      description: 'Quickly find a note by typing part of its title here.',
       side: 'bottom',
     },
   },

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
@@ -90,6 +90,7 @@ function Notes() {
   }
 
   const { schedules } = useClassSched(user)
+  const schedSubjects = useMemo(() => schedules.map((s) => s.subject), [schedules])
 
   // ── Subject & filter state ──
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
@@ -112,14 +113,13 @@ function Notes() {
   // ── 3-dot menu state ──
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
-  useEffect(() => {
+useEffect(() => {
     if (notes.length === 0) return
-    const schedSubjects = schedules.map((s) => s.subject)
     const fromNotes = notes
       .map((n) => n.subject)
       .filter((s) => s !== 'All Subject' && !schedSubjects.includes(s))
     setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
-  }, [notes])
+ }, [notes, schedSubjects])
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
@@ -311,6 +311,7 @@ function Notes() {
                 {/* Search Bar */}
                 <div id='notesSearchBar' className='relative mr-5'>
                   <input
+                  id='notesSearchBar'
                     type='text'
                     placeholder='Search'
                     value={searchQuery}
@@ -345,15 +346,17 @@ function Notes() {
               </div>
 
               {/* ── Mobile / md search + subject dropdown (below lg) ── */}
-              <div className='flex lg:hidden flex-col gap-3 px-2 mt-3'>
+              <div className='flex lg:hidden flex-col gap-3 px-2  mt-3'>
                 {/* Search bar */}
-                <div className='relative w-full'>
+                <div 
+                className='relative w-full '>
                   <input
+                  id='notesSearchBarMobile'
                     type='text'
                     placeholder='Search'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className='w-full border-2 border-primary-800 rounded-md py-3 pl-4 pr-10 font-roboto text-sm font-inter text-primary-800 placeholder:text-primary-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200'
+                    className='w-full border-2 border-primary-800 rounded-md py-3 pl-4 pr-10  text-sm font-inter text-primary-800 placeholder:text-primary-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200'
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -392,6 +395,7 @@ function Notes() {
 
                   <div className='relative flex-1' ref={dropdownRef}>
                     <button
+                    id='subjectDropdown'
                       onClick={() => setIsDropdownOpen((prev) => !prev)}
                       className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm'
                     >
@@ -402,7 +406,7 @@ function Notes() {
                     </button>
 
                     {isDropdownOpen && (
-                      <div className='absolute top-full left-0 mt-2 w-full bg-white border rounded-md shadow-md z-50 max-h-64 overflow-y-auto'>
+                      <div  className='absolute  top-full left-0 mt-2 w-full bg-white border rounded-md shadow-md z-50 max-h-64 overflow-y-auto'>
                         <button
                           className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
                             ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
@@ -412,6 +416,7 @@ function Notes() {
                         </button>
                         {allSubjects.map((subject, index) => (
                           <div
+                          id='subjectDropdown'
                             key={index}
                             className={`flex items-center justify-between px-3 py-2 hover:bg-gray-100
                               ${selectedSubject === subject ? 'bg-primary-50' : ''}`}
@@ -422,7 +427,7 @@ function Notes() {
                             >
                               {subject}
                             </button>
-                            {subjects.includes(subject) && (
+                             {!schedSubjects.includes(subject) && (
                               <button
                                 onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
                                 className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
@@ -569,7 +574,7 @@ function Notes() {
                 </div>
 
                 {/* Subject Buttons */}
-                <div className='flex flex-col gap-2'>
+                <div id='subjectDropdown' className='flex flex-col gap-2'>
                   <button
                     onClick={() => setSelectedSubject('All Subject')}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
@@ -582,6 +587,7 @@ function Notes() {
 
                   {allSubjects.map((subject, index) => (
                     <div
+                    id='subjectDropdownDesktop'
                       key={index}
                       className={`flex items-center justify-between px-3 py-2 rounded-md border-2 transition-colors
                         ${selectedSubject === subject
@@ -595,7 +601,7 @@ function Notes() {
                       >
                         {subject}
                       </button>
-                      {subjects.includes(subject) && (
+                       {!schedSubjects.includes(subject) && (
                         <button
                           onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
                           className={`ml-2 font-bold text-xs flex-shrink-0
