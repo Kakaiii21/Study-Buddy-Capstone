@@ -179,36 +179,36 @@ font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:te
 mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
 <div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
-<div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-8 3xl:gap-10 mt-0 justify-center items-center'>
+<div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
     
     {/* ID Card */}
-<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[320px] xl:max-w-[390px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
-h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden relative'>
+<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[310px] xl:max-w-[340px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
+h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-      <div className='w-full h-8 md:h-9 lg:h-7 xl:h-8 2xl:h-9 3xl:h-10  bg-[#FFF1AB] rounded-t-2xl border-b-2 border-primary-800 relative'>
+      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] lg:bg-blue-700 xl:bg-pink-700 2xl:bg-green-700 3xl:bg-orange-700 rounded-t-lg border-b-2 border-primary-800 relative'>
         {/* White pill notch */}
         <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
       {/* Main content: photo + text + logo */}
-      <div className='flex  flex-row items-start gap-3 px-4 md:px-4 lg:px-2 xl:px-3 2xl:px-4 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
+      <div className='flex  flex-row items-start gap-3 px-4 md:px-4 lg:px-3 lg:py-1 xl:px-5 xl:py-2 2xl:px-6 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
         <img 
           src={profilePic} 
           alt="Profile" 
-          className='w-[70px] h-[95px] sm:w-[72px] sm:h-[97px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[100px] xl:w-[100px] xl:h-[120px] 2xl:w-[120px] 2xl:h-[150px] 3xl:w-[145px] 3xl:h-[180px] object-cover border-2 border-primary-800'
+          className='w-[70px] h-[95px] sm:w-[72px] sm:h-[97px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[100px] lg:my-1  xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[120px] 2xl:h-[150px] 2xl:my-3 3xl:w-[145px] 3xl:h-[180px] object-cover border-2 border-primary-800'
         />
         <div className='flex flex-col flex-1 pl-1'>
-          <div className='flex flex-row items-start justify-between'>
+          <div className='flex flex-row items-start xl:my-2 2xl:my-0 2xl:mt-3  justify-between border'>
             <span className='font-kapakana italic  text-[28px] sm:text-[29px] md:text-[30px] lg:text-[28px] xl:text-[34px] 2xl:text-[40px] 3xl:text-[46px] font-extrabold text-primary-800 leading-tight'>Welcome,</span>
-            <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-12 2xl:h-10 3xl:w-14 3xl:h-12' />
+            <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-11 2xl:h-9 3xl:w-14 3xl:h-12' />
           </div>
           <span className='font-bold font-inter text-primary-800 text-xl md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl leading-tight -mt-3 md:-mt-3 lg:-mt-2 xl:-mt-3 2xl:-mt-2 3xl:-mt-2'> {firstName ?? ''}</span>
-          <span className='text-[8px] md:text-[9px] lg:text-[8px] xl:text-[9px] 2xl:text-[10px] 3xl:text-[11px] font-inter font-medium text-primary-800 tracking-wide mt-2'>
+          <span className='text-[8px] md:text-[9px] lg:text-[6px] xl:text-[8px] 2xl:text-[10px] 3xl:text-[11px] font-inter font-medium text-primary-800 tracking-wide mt-2'>
             START YOUR DAY BY BEING PRODUCTIVE.
           </span>
           {/* Barcode right under the subtitle */}
           <div 
-            className='w-full h-4 md:h-4 lg:h-4 xl:h-5 2xl:h-6 3xl:h-7 mt-2 lg:mt-1'
+            className='w-full h-4 md:h-4 lg:h-4 xl:h-5 xl:w-[175px] 2xl:h-6 3xl:h-7 mt-2 lg:mt-1'
             style={{
               backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
             }}
@@ -255,7 +255,7 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-2xl overflow-hidden rel
 </div>
 {/* TASK PROGRESS heading with percent aligned right */}
 <div id='progressC' >
-  <div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] lg:pr-3 mx-auto lg:mt-4 2xl:mt-5 3xl:mt-6 mt-6 sm:mt-5 md:mt-5'>
+  <div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] lg:pr-3 mx-auto lg:mt-1 2xl:mt-5 3xl:mt-6 mt-6 sm:mt-5 md:mt-5'>
   <p className='font-inter font-semibold text-sm md:text-md 
   lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
   <span className='font-inter font-semibold text-sm md:text-md 

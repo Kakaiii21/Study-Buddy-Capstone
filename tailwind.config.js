@@ -24,6 +24,7 @@ export default {
         fustat:['Fustat', 'sans-serif'],
         inter:['Inter', 'sans-serif'],
         kapakana:['Kapakana', 'cursive'],
+        intelOneMono: ['"Intel One Mono"', 'monospace'],
       }
     },
   },

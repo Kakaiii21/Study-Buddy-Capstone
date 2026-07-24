@@ -83,7 +83,7 @@ useEffect(() => {
         </p>
 
         {/* TIMER DISPLAY */}
-        <div  className='flex items-end gap-2 mt-3 md:mt-3 md:gap-2 lg:mt-0 xs:gap-2 flex-wrap justify-center px-2'>
+        <div  className='flex items-end gap-2 mt-3 md:mt-3 md:gap-2 lg:mt-0 xs:gap-2 flex-wrap font-intelOneMono justify-center px-2'>
           {[
             { val: formatTime(hours),   label: 'HOUR' },
             { val: formatTime(minutes), label: 'MIN'  },
@@ -91,12 +91,12 @@ useEffect(() => {
           ].map((item, i) => (
             <div key={i} className='flex items-end gap-1 xs:gap-2'>
               <div className='flex flex-col items-center'>
-                <span className='font-orbitron leading-none text-white text-4xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[25px] xl:text-[35px] 2xl:text-[40px]'>{item.val}</span>
+                <span className='font-intelOneMono leading-none text-white text-4xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[35px] xl:text-[45px] 2xl:text-[50px]'>{item.val}</span>
                 <span className='text-xs xs:text-sm sm:text-base md:text-lg font-roboto font-medium leading-none mt-1 sm:mt-2 lg:mt-1 lg:text-[14px] xl:text-[16px] 2xl:text-[20px] text-white tracking-widest'>{item.label}</span>
               </div>
               {i < 2 && (
                 <div className='flex flex-col items-center'>
-                  <span className='font-orbitron font-bold leading-none text-white text-3xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[20px] xl:text-[35px] 2xl:text-[40px]'>:</span>
+                  <span className='font-intelOneMono font-bold leading-none text-white text-3xl xs:text-3xl sm:text-4xl md:text-4xl lg:text-[20px] xl:text-[35px] 2xl:text-[40px]'>:</span>
                   <span aria-hidden className='invisible text-xs xs:text-sm sm:text-base md:text-lg font-roboto font-medium leading-none mt-1 lg:text-[18px] xl:text-[20px] 2xl:text-[40px] tracking-widest'>0</span>
                 </div>
               )}
