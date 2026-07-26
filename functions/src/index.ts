@@ -6,13 +6,13 @@ import axios from 'axios'
 import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
-
+import { acquireCooldown, releaseCooldown } from './rateLimit'
 if (!admin.apps.length) admin.initializeApp()
 
 function setCors(res: any) {
   res.set('Access-Control-Allow-Origin', '*')
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.set('Access-Control-Allow-Headers', 'Content-Type')
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 }
 
 function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
@@ -100,10 +100,42 @@ export const generateStudyMaterial = onRequest(
     setCors(res)
     if (req.method === 'OPTIONS') { res.status(204).send(''); return }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+    // Declared OUTSIDE the try so catch/finally can see them
+    let callerUid: string | undefined
+    let succeeded = false
+
     try {
       const apiKey = process.env.GROQ_API_KEY
       if (!apiKey) { res.status(500).json({ error: 'GROQ_API_KEY not set' }); return }
-      const contentType = req.headers['content-type'] || ''
+
+      // ── VERIFY AUTH TOKEN ─────────────────────────────────────────────────
+      const authHeader = req.headers.authorization
+      if (!authHeader?.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Unauthorized. Please log in and try again.' })
+        return
+      }
+      try {
+    const idToken = authHeader.split('Bearer ')[1]
+    const decoded = await admin.auth().verifyIdToken(idToken)
+    callerUid = decoded.uid
+    console.log(`[Auth] callerUid: ${callerUid}`)
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired session. Please log in again.' })
+    return
+  }
+
+// ── COOLDOWN CHECK ────────────────────────────────────────────────────
+  const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
+  if (!cooldown.allowed) {
+    res.status(429).json({
+      error: `Please wait ${cooldown.retryAfter}s before generating again.`,
+      retryAfter: cooldown.retryAfter,
+    })
+    return
+  }
+  // ─────────────────────────────────────────────────────────────────────
+
+const contentType = req.headers['content-type'] || ''
       let fileBuffer: Buffer | null = null
       let fileType = ''
       let mode: 'quiz' | 'flashcard' = 'quiz'
@@ -217,14 +249,19 @@ ${textSample}`
       // ─────────────────────────────────────────────────────────────────────
 
       console.log(`[Parsed Items Count] ${items.length}`)
-      res.status(200).json({ mode, items, usage })
-    } catch (err: unknown) {
-      console.error('generateStudyMaterial error:', err)
-      const message = err instanceof Error ? err.message : 'Internal server error'
-      res.status(500).json({ error: message })
-    }
-  }
-)
+            res.status(200).json({ mode, items, usage })
+            succeeded = true
+          } catch (err: unknown) {
+            console.error('generateStudyMaterial error:', err)
+            const message = err instanceof Error ? err.message : 'Internal server error'
+            res.status(500).json({ error: message })
+          } finally {
+            if(callerUid){
+            await releaseCooldown(`generateStudyMaterial:${callerUid}`, succeeded)
+          }
+        }
+        }
+      )
 
 function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: string; mode: 'quiz' | 'flashcard'; numItems: number }> {
   return new Promise((resolve, reject) => {

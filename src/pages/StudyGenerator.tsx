@@ -316,8 +316,11 @@ function StudyGenerator() {
     sessionStorage.removeItem(SESSION_KEY_RESULT) 
 
     try {
+      if (!user) { setFileError('Please log in to generate study materials.'); setIsGenerating(false); return }
+      const idToken = await user.getIdToken()
+
       let body: BodyInit
-      const headers: Record<string, string> = {}
+      const headers: Record<string, string> = { Authorization: `Bearer ${idToken}` }
 
       if (uploadedFile.source === 'local' && uploadedFile.file) {
         const formData = new FormData()
@@ -339,7 +342,12 @@ function StudyGenerator() {
       const data = await response.json()
 
       if (!response.ok) {
-        if (data.suggested_max) {
+        if (data.retryAfter) {
+          const cooldownUntil = Date.now() + data.retryAfter * 1000
+          localStorage.setItem(COOLDOWN_KEY, String(cooldownUntil))
+          startCooldownTimer(data.retryAfter)
+          setFileError(data.error)
+        } else if (data.suggested_max) {
           setFileError(data.error)
           setSuggestedMax(data.suggested_max)
         } else {
