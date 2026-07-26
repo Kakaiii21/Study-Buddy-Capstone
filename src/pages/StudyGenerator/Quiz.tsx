@@ -80,6 +80,7 @@ function Quiz() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [finalScore, setFinalScore] = useState(0)
+  const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null)
 
       useEffect(() => {
       if (submitted) return
@@ -228,10 +229,21 @@ function Quiz() {
     navigate('/studyGenerator')
   }
 
-  const handleDelete = (qIndex: number) => {
+  const handleDeleteRequest = (qIndex: number) => {
+    setOpenMenuIndex(null)
+    setDeleteConfirmIndex(qIndex)
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmIndex(null)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (deleteConfirmIndex === null) return
+    const qIndex = deleteConfirmIndex
+
     const updated = questions.filter((_, i) => i !== qIndex)
     saveQuestions(updated)
-    setOpenMenuIndex(null)
 
     const updatedSelected: Record<number, string> = {}
     Object.entries(selected).forEach(([key, val]) => {
@@ -241,6 +253,8 @@ function Quiz() {
     })
     setSelected(updatedSelected)
     sessionStorage.setItem('quiz_selected', JSON.stringify(updatedSelected))
+
+    setDeleteConfirmIndex(null)
   }
 
   const handleEditOpen = (qIndex: number) => {
@@ -271,21 +285,36 @@ function Quiz() {
 
      <Sidebar quizActive={!submitted} />
      </div>
-      <main className='flex-1 overflow-auto p-8'>
+      <main className='flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1'>
 
-        <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6'>
-          <p className='text-3xl md:text-4xl lg:text-4xl font-bold text-primary-600 uppercase font-roboto text-center lg:text-start'>
+        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
+          <p className=' text-center font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz</p>
+          {result.fileName && (
+            <p className=' text-center font-inter mt-3 font-semibold  text-xs uppercase'>from: {result.fileName}</p>
+          )}
+        </div>
+
+        <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6 border mt-4 lg:mt-0'>
+          <p className=' hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>
             Quiz
           </p>
           {result.fileName && (
-            <span className='text-sm text-gray-400 font-roboto lg:ml-4'>from: {result.fileName}</span>
+            <span className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>
+              from: {result.fileName}
+            </span>
           )}
         </div>
-        <hr className='w-full border-t border-primary-600 mb-6' />
 
         {submitted && (
-          <div className='mb-6 px-6 py-4 bg-primary-50 border-2 border-primary-600 rounded-xl text-center'>
-            <p className='text-primary-600 font-roboto font-bold text-xl'>
+          <div className='mb-6 px-6 py-4 
+          lg:py-2 lg:rounded-lg lg:mb-3
+           bg-primary-50 border-2 border-primary-600 rounded-xl text-center'>
+            <p className='text-primary-600 font-roboto font-bold text-xl
+            lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
               Your Score: {finalScore} / {questions.length}
             </p>
           </div>
@@ -296,15 +325,15 @@ function Quiz() {
             <div
               key={qIndex}
               ref={(el) => void (questionRefs.current[qIndex] = el)}
-              className={`flex flex-col border-2 py-2 px-5 rounded-xl transition ${getCardBorderStyle(qIndex)}`}
+              className={`flex flex-col border-2 py-2 px-5 rounded-xl transition lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg ${getCardBorderStyle(qIndex)}`}
             >
               <div className='flex flex-row items-start gap-2 pt-5 w-full'>
-                <p className='flex-1 text-sm md:text-xl lg:text-xl text-primary-600 font-bold font-roboto'>
+                <p className='flex-1 text-sm md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 font-bold font-roboto'>
                   {qIndex + 1}. {q.question}
                 </p>
 
                 {attempted && !submitted && selected[qIndex] === undefined && (
-                  <span className='text-xs text-red-400 font-roboto whitespace-nowrap pt-1'>
+                  <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-red-400 font-roboto whitespace-nowrap pt-1'>
                     Not answered
                   </span>
                 )}
@@ -313,7 +342,7 @@ function Quiz() {
                   <div className='relative ml-2'>
                     <button
                       onClick={() => setOpenMenuIndex(openMenuIndex === qIndex ? null : qIndex)}
-                      className='text-primary-600 hover:text-primary-800 text-3xl'
+                      className='text-primary-600 hover:text-primary-800 text-3xl lg:text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl'
                       title='EDIT/DELETE'
                     >
                       ⋮
@@ -324,14 +353,14 @@ function Quiz() {
                         <button
                           onPointerDown={(e) => e.stopPropagation()}
                           onClick={() => handleEditOpen(qIndex)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 hover:bg-primary-50 font-semibold'
                         >
                           <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
                         </button>
                         <hr className='my-1 border-gray-100' />
                         <button
-                          onClick={() => handleDelete(qIndex)}
-                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                          onClick={() => handleDeleteRequest(qIndex)}
+                          className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 hover:bg-red-50 font-semibold'
                         >
                           <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
                         </button>
@@ -343,22 +372,22 @@ function Quiz() {
 
               {editIndex === qIndex && editDraft ? (
                 <div className='flex flex-col gap-3 mt-4 pb-4'>
-                  <label className='text-xs text-gray-500 font-roboto'>Question</label>
+                  <label className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Question</label>
                   <input
                     aria-label='Edit question'
-                    className='border border-gray-300 rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
+                    className='border border-gray-300 rounded-lg px-3 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-roboto focus:outline-none focus:border-primary-600'
                     value={editDraft.question}
                     onChange={(e) => setEditDraft({ ...editDraft, question: e.target.value })}
                   />
 
                   {editDraft.options.map((opt, oIndex) => (
                     <div key={oIndex} className='flex items-center gap-2'>
-                      <span className='text-xs font-bold text-primary-600 w-5'>
+                      <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base font-bold text-primary-600 w-5'>
                         {optionLetters[oIndex]}
                       </span>
                       <input
                         aria-label={`Edit option ${optionLetters[oIndex]}`}
-                        className='flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
+                        className='flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-roboto focus:outline-none focus:border-primary-600'
                         value={opt}
                         onChange={(e) => {
                           const updatedOptions = editDraft.options.map((o, i) =>
@@ -368,16 +397,16 @@ function Quiz() {
                         }}
                       />
                       {editDraft.answer === optionLetters[oIndex] && (
-                        <span className='text-xs text-green-500 whitespace-nowrap'>✓ Correct</span>
+                        <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-green-500 whitespace-nowrap'>✓ Correct</span>
                       )}
                     </div>
                   ))}
 
                   <div className='flex items-center gap-2'>
-                    <label className='text-xs text-gray-500 font-roboto'>Correct answer:</label>
+                    <label className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Correct answer:</label>
                     <select
                       aria-label='Select correct answer'
-                      className='border border-gray-300 rounded-lg px-3 py-1 text-sm font-roboto focus:outline-none focus:border-primary-600'
+                      className='border border-gray-300 rounded-lg px-3 py-1 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-roboto focus:outline-none focus:border-primary-600'
                       value={editDraft.answer}
                       onChange={(e) => setEditDraft({ ...editDraft, answer: e.target.value })}
                     >
@@ -390,13 +419,13 @@ function Quiz() {
                   <div className='flex gap-2 mt-1'>
                     <button
                       onClick={handleEditSave}
-                      className='bg-primary-600 text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
+                      className='bg-primary-600 text-white text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
                     >
                       Save
                     </button>
                     <button
                       onClick={handleEditCancel}
-                      className='bg-gray-200 text-gray-600 text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
+                      className='bg-gray-200 text-gray-600 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
                     >
                       Cancel
                     </button>
@@ -409,7 +438,7 @@ function Quiz() {
                     return (
                       <label
                         key={oIndex}
-                        className={`flex items-center gap-3 border-2 rounded-lg px-3 py-2 transition
+                        className={`flex items-center gap-3 border-2 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl rounded-lg px-3 py-2 transition
                           ${getOptionStyle(qIndex, letter)}
                           ${submitted ? 'cursor-default' : 'cursor-pointer'}`}
                       >
@@ -427,7 +456,7 @@ function Quiz() {
                           }}
                           aria-label={letter}
                         />
-                        <span className='text-xs md:text-xl lg:text-[18px]'>
+                        <span className='text-xs md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
                           {letter}) {option}
                         </span>
                       </label>
@@ -437,7 +466,7 @@ function Quiz() {
               )}
 
               {submitted && (
-                <p className='text-xs md:text-sm text-green-600 font-roboto font-semibold px-5 pb-3'>
+                <p className='text-xs md:text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-green-600 font-roboto font-semibold px-5 pb-3'>
                   ✓ Correct Answer: {questions[qIndex].answer}
                 </p>
               )}
@@ -452,23 +481,23 @@ function Quiz() {
             >
               <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
-            <p className='text-xs md:text-sm font-semibold text-primary-600'>SAVE GENERATED</p>
+            <p className='text-xs md:text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-semibold text-primary-600'>SAVE GENERATED</p>
           </div>
 
           <div className='flex flex-row ml-auto gap-4 mb-10 items-center'>
             {attempted && !submitted && !allAnswered && (
-              <p className='text-xs text-gray-400 font-roboto'>
+              <p className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-400 font-roboto'>
                 Answer all questions to submit
               </p>
             )}
             <button
-              className='hover:opacity-50 bg-gray-500 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase'
+              className='hover:opacity-50 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl lg:py-1 xl:py-1.5 2xl:py-2 3xl:py-2.5 bg-gray-500 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase'
                 onClick={submitted ? handleDiscard : handleDiscardAttempt}
             >
               Discard
             </button>
             <button
-              className='hover:opacity-50 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase disabled:opacity-40'
+              className='hover:opacity-50 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl lg:py-1 xl:py-1.5 2xl:py-2 3xl:py-2.5 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase disabled:opacity-40'
               onClick={handleSubmit}
               disabled={submitted}
             >
@@ -546,6 +575,33 @@ function Quiz() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {deleteConfirmIndex !== null && (
+        <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/50'>
+          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
+            <p className='text-xl font-bold text-primary-600 uppercase text-center font-roboto'>
+              Delete Question?
+            </p>
+            <p className='text-sm text-gray-500 text-center'>
+              This question will be removed from the quiz and can't be undone.
+            </p>
+            <div className='flex gap-4 w-full'>
+              <button
+                onClick={handleDeleteCancel}
+                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50 font-roboto uppercase'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600 font-roboto uppercase'
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

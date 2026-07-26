@@ -141,7 +141,7 @@ useEffect(() => {
     { label: 'Class Schedule', path: '/schedule',       color: '#B5E8A0' },
     { label: 'Courses',        path: '/courses',        color: '#C9A9F0' },
     { label: 'Study Generator',path: '/studyGenerator', color: '#FFB8D9' },
-    { label: 'Generated History', path: '/generatedHistory', color: '#FFB870' },
+    { label: 'Generated History', path: '/history', color: '#FFB870' },
   ]
   if (!authChecked) return null  
   return (
@@ -186,7 +186,7 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] lg:bg-blue-700 xl:bg-pink-700 2xl:bg-green-700 3xl:bg-orange-700 rounded-t-lg border-b-2 border-primary-800 relative'>
+      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] rounded-t-lg border-b-2 border-primary-800 relative'>
         {/* White pill notch */}
         <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
@@ -198,7 +198,7 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden rela
           className='w-[70px] h-[95px] sm:w-[72px] sm:h-[97px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[100px] lg:my-1  xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[120px] 2xl:h-[150px] 2xl:my-3 3xl:w-[145px] 3xl:h-[180px] object-cover border-2 border-primary-800'
         />
         <div className='flex flex-col flex-1 pl-1'>
-          <div className='flex flex-row items-start xl:my-2 2xl:my-0 2xl:mt-3  justify-between border'>
+          <div className='flex flex-row items-start xl:my-2 2xl:my-0 2xl:mt-3  justify-between '>
             <span className='font-kapakana italic  text-[28px] sm:text-[29px] md:text-[30px] lg:text-[28px] xl:text-[34px] 2xl:text-[40px] 3xl:text-[46px] font-extrabold text-primary-800 leading-tight'>Welcome,</span>
             <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-11 2xl:h-9 3xl:w-14 3xl:h-12' />
           </div>
@@ -230,7 +230,7 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden rela
           className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px]  lg:w-[40px] xl:h-[50px] xl:w-[50px] 2xl:h-16 2xl:w-16 3xl:h-20 3xl:w-20 flex-shrink-0' />
         <div className='flex flex-col flex-1 items-center'>
           <p className='text-[10px] md:text-[10px] lg:text-[12px] xl:text-[16px] 2xl:min-text-lg 3xl:text-xl font-extrabold font-inter text-center text-primary-600'>Current Time Spent</p>
-          <p className='text-xs md:text-sm lg:text-[18px] xl:text-[25px] 2xl:min-text-[35px] 3xl:text-[42px] font-orbitron font-normal text-center text-primary-600'>
+          <p className='text-xs md:text-sm lg:text-[18px] xl:text-[25px] 2xl:min-text-[35px] 3xl:text-[42px] font-intelOneMono font-normal text-center text-primary-600'>
             {formatElapsed(elapsedSeconds)}
           </p>
         </div>
@@ -300,7 +300,7 @@ className='relative flex flex-col justify-between text-left p-2
   border-2 border-black rounded-2xl lg:rounded-lg
   hover:scale-[1.02] active:scale-[0.98] transition-transform'
       >
-        <span className='font-inter font-black text-base sm:text-base md:text-lg lg:text-[16px] xl:text-[20px] 2xl:text-[26px] 3xl:text-[30px] text-black uppercase leading-tight  pr-8'>
+        <span className='font-inter font-black text-base sm:text-base md:text-lg lg:text-[14px] xl:text-[20px] 2xl:text-[26px] 3xl:text-[30px] text-black uppercase leading-tight  pr-8'>
           {activity.label}
         </span>
         <div className='absolute bottom-3 

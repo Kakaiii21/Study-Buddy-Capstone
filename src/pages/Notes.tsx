@@ -474,9 +474,9 @@ useEffect(() => {
                     onClick={openNoteModal}
                     className='hidden lg:flex 
                     shadow-[0_3px_5px_rgba(0,0,0,.5)]
-                    hover:opacity-80 w-44 lg:mr-8
+                    hover:opacity-80 w-36  2xl:w-52 2xl:h-44  lg:mr-8 2xl:mr-0 3xl:mr-4
                     hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
-                    items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-7xl text-black'
+                    items-center justify-center  px-12 py-8 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-7xl text-black'
                   >
                     +
                   </button>
@@ -487,7 +487,7 @@ useEffect(() => {
                       id='notesGrid'
                       key={note.id}
                       onClick={() => openViewModal(note)}
-                      className='relative bg-white border-2 border-primary-800  rounded-xl p-5 w-full lg:w-52  lg:min-h-48  2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
+                      className='relative bg-white border-2 border-primary-800  rounded-xl p-5 w-full lg:w-44  lg:min-h-44  2xl:w-52 3xl:w-56 2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
                     >
                       <div className='flex justify-between items-center'>
                         <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
@@ -551,7 +551,7 @@ useEffect(() => {
             </div>
 
             {/* ── Right column: subject button list — desktop (lg) only ── */}
-            <div className='hidden lg:flex flex-col lg:w-72 xl:w-80 shrink-0 rounded-xl pr-2 mt-5'>
+            <div className='hidden lg:flex flex-col lg:w-56 xl:w-80 shrink-0 rounded-xl pr-2 mt-5'>
               <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
                 SUBJECT SECTION
               </p>
@@ -563,7 +563,8 @@ useEffect(() => {
                     id='addSubjectBtn'
                     aria-label='add Sub'
                     onClick={() => setIsSubjectModalOpen(true)}
-                    className='flex-shrink-0 w-full flex items-center text-xs justify-center h-10 bg-[#FEE248] text-primary-800 font-bold  rounded-md'
+                    className='flex-shrink-0 w-full flex items-center shadow-[0_3px_5px_rgba(0,0,0,.5)]
+ text-xs justify-center h-10 bg-[#FEE248] text-primary-800 font-bold  rounded-md'
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <line x1="12" y1="5" x2="12" y2="19" />

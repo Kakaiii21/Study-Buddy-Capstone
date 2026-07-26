@@ -414,57 +414,57 @@ const handleSave = () => {
           {/* Add / Edit Modal */}
           {isAddSubOpen && (
             <div className='fixed inset-0   bg-black/50 flex items-center justify-center z-50'>
-              <div className='bg-white rounded-lg p-6 w-full max-w-md mx-5 shadow-lg'>
-                <h2 className='text-2xl text-primary-800 uppercase text-center font-bold font-roboto mb-4'>
+              <div className='bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-lg p-6 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-md mx-5 shadow-lg'>
+                <h2 className='text-2xl lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl  text-primary-800 uppercase text-center font-bold font-roboto mb-4'>
                   {editTargetId ? 'Edit Schedule' : 'Add Schedule'}
                 </h2>
 
                 <div className='flex flex-row gap-2 w-full'>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md font-roboto font-medium mb-1'>DAY</label>
-                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={`border rounded-sm  border-primary-800 px-3 py-2 w-full ${errClass('selectedDay')}`}>
+                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto font-medium mb-1 lg:mb-2'>DAY</label>
+                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={`border rounded-sm lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl border-primary-800 px-3 py-2 lg:py-1 w-full ${errClass('selectedDay')}`}>
                       <option value='' disabled>Select a day</option>
                       {days.map((day) => <option key={day} value={day}>{day}</option>)}
                     </select>
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md font-roboto mb-1'>SUBJECT NAME</label>
-                    <input type='text' placeholder='Enter Subject' className={`py-2 rounded-sm border border-primary-800 pl-4 text-md w-full ${errClass('subjectName')}`} 
+                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>SUBJECT NAME</label>
+                    <input type='text' placeholder='Enter Subject' className={`py-2 lg:py-1 rounded-sm border border-primary-800 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl w-full ${errClass('subjectName')}`} 
                       value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
                   </div>
                 </div>
 
-                <div className='flex flex-row gap-2 w-full mt-4'>
+                <div className='flex flex-row gap-2 w-full mt-4 lg:mt-2 xl:mt-4 '>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md font-roboto mb-1'>TIME START</label>
-                    <input aria-label='Time Start' type='time' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('timeStart')}`}
+                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>TIME START</label>
+                    <input aria-label='Time Start' type='time' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('timeStart')}`}
                       value={timeStart} onChange={(e) => setTimeStart(e.target.value)} />
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md font-roboto mb-1'>TIME END</label>
-                    <input aria-label='Time End' type='time' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('timeEnd')}`}
+                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>TIME END</label>
+                    <input aria-label='Time End' type='time' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('timeEnd')}`}
                       value={timeEnd} onChange={(e) => setTimeEnd(e.target.value)} />
                   </div>
                 </div>
 
-                <div className='flex flex-row gap-2 w-full mt-4'>
+                <div className='flex flex-row gap-2 w-full mt-4 lg:mt-2 xl:mt-4 '>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 uppercase text-md font-roboto mb-1'>Room Assigned</label>
-                    <input type='text' placeholder='Enter Room' className={`py-2 pl-4 text-md rounded-sm border border-primary-800 w-full ${errClass('roomAssigned')}`}
+                    <label className='text-primary-800 uppercase text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>Room Assigned</label>
+                    <input type='text' placeholder='Enter Room' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('roomAssigned')}`}
                       value={roomAssigned} onChange={(e) => setRoomAssigned(e.target.value)} />
                   </div>
                   <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md uppercase font-roboto mb-1'>Room Type</label>
-                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className={`border rounded-sm  border-primary-800 py-2 px-3 w-full ${errClass('selectedRoomType')}`}>
+                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl uppercase font-roboto mb-1 lg:mb-2'>Room Type</label>
+                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className={`border rounded-sm lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl border-primary-800 py-2 lg:py-1 px-3 w-full ${errClass('selectedRoomType')}`}>
                       <option value='' disabled>Select type</option>
                       {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
                     </select>
                   </div>
                 </div>
 
-                <div className='flex flex-col mt-4'>
-                  <label className='uppercase text-primary-800 font-roboto mb-1'>Teacher / Instructor</label>
-                  <input type='text' placeholder='Enter Teacher/Instructor Name' className={`rounded-sm border border-primary-800 py-2 pl-4 w-full ${errClass('instructor')}`}
+                <div className='flex flex-col mt-4 lg:mt-2 xl:mt-4 '>
+                  <label className='uppercase lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl text-primary-800 font-roboto mb-1 lg:mb-2'>Teacher / Instructor</label>
+                  <input type='text' placeholder='Enter Teacher/Instructor Name' className={`rounded-sm border border-primary-800 lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl py-2 lg:py-1 pl-4 w-full ${errClass('instructor')}`}
                     value={instructor} onChange={(e) => setInstructor(e.target.value)} />
                 </div>
 
@@ -474,13 +474,13 @@ const handleSave = () => {
                   {Object.keys(fieldErrors).length > 0 && !fieldErrors.timeEnd?.includes('already has') && !fieldErrors.timeEnd?.includes('later') && (
                     <p className='text-yellow-300 text-sm text-center font-roboto mt-4'>Please fill in all highlighted fields.</p>
                   )}
-                <div className='flex flex-row justify-center items-center gap-6 mt-6'>
+                <div className='flex flex-row justify-center items-center gap-6 mt-6 lg:mt-6 xl:mt-5 2xl:mt-4 3xl:mt-8'>
                   <button onClick={() => { setIsAddSubOpen(false); resetForm() }}
-                    className='bg-white text-primary-600 uppercase border border-primary-800 font-bold font-roboto px-8 rounded-full py-1'>
+                    className='bg-white lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl text-primary-600 uppercase border border-primary-800 font-bold font-roboto px-8 rounded-full py-1'>
                     Cancel
                   </button>
                   <button onClick={handleSave}
-                    className='bg-orange-500 text-white uppercase font-bold font-roboto px-8 rounded-full py-1'>
+                    className='bg-orange-500   lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl text-white uppercase font-bold font-roboto px-8 rounded-full py-1'>
                     {editTargetId ? 'Update' : 'Save'}
                   </button>
                 </div>

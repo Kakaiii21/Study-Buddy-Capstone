@@ -128,8 +128,11 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
 
     if (!trimmedFirst || !trimmedLast) return
 
-    await handleSave('firstName')
-    await handleSave('lastName')
+    const firstChanged = trimmedFirst !== originalFirstName.trim()
+    const lastChanged = trimmedLast !== originalLastName.trim()
+
+    if (firstChanged) await handleSave('firstName')
+    if (lastChanged) await handleSave('lastName')
 
     setOriginalFirstName(trimmedFirst)
     setOriginalLastName(trimmedLast)
@@ -319,7 +322,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           )}
         </div>
 
-        <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
+        <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1 2xl:mt-3 '>
           <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name</label>
           <input
             type="text"
@@ -333,7 +336,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           )}
         </div>
 
-        <div className='flex flex-col gap-1 mb-4 md:mb-6'>
+        <div className='flex flex-col gap-1 mb-4 md:mb-6 2xl:mt-3'>
           <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
           <div className='flex flex-row gap-2 items-stretch'>
             <input

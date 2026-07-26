@@ -116,10 +116,10 @@ function TaskModal({
   const calendarRef = useRef<HTMLInputElement>(null)
 
   const [initialDateDisplay, initialTime] = (() => {
-    if (!initialDeadline) return ['', '09:00']
+    if (!initialDeadline) return ['', '00:00']
     const [datePart, timePart] = initialDeadline.split('T')
     const [yyyy, mm, dd] = datePart.split('-')
-    return [`${mm}/${dd}/${yyyy}`, timePart ?? '09:00']
+    return [`${mm}/${dd}/${yyyy}`, timePart ?? '00:00']
   })()
 
   const [taskName, setTaskName] = useState(initialName)
@@ -179,14 +179,23 @@ function TaskModal({
       className="fixed inset-0  bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white rounded-2xl p-7 mx-6 w-full max-w-md"
+        className="bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-6 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-center font-bold text-primary-600 text-3xl pt-4 ">{title}</p>
+        <p className="text-center font-bold text-primary-600 
+        lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 
+         pt-0">{title}</p>
 
-        <label className="flex font-semibold text-primary-600 text-xl py-2">Task</label>
+        <label className="flex font-semibold text-primary-600 text-xl 
+       lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl
+         py-2">Task</label>
         <input
-          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 py-3 px-3"
+          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 
+          lg:text-sm lg:py-1 lg:rounded-sm lg:my-0
+          xl:text-sm xl:py-2 xl:my-0
+          2xl:text-[18px] 2xl:py-2 
+          3xl:text-2xl 3xl:py-2
+          py-3 px-3"
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSave()}
@@ -197,13 +206,24 @@ function TaskModal({
         />
 
         <div className="flex flex-col gap-1">
-          <label className="flex text-primary-800 font-semibold text-xl py-3">Suggested Tasks:</label>
+          <label className="flex text-primary-800 font-semibold text-xl 
+          lg:text-sm lg:py-2
+          xl:text-[16px] xl:py-2
+          2xl:text-lg
+          3xl:text-2xl 3xl:py-3
+          py-3">Suggested Tasks:</label>
           <div className="flex flex-wrap gap-2">
             {['Prepare report', 'Review', 'Study', 'Plan', 'Research', 'Advance Study', 'Read'].map((s) => (
               <button
                 key={s}
                 onClick={() => setTaskName(s)}
-                className="text-sm px-3 py-1 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors"
+                className="text-sm px-3 py-1
+                lg:text-xs
+                xl:text-sm
+                2xl:text-[18px]
+                3xl:text-[23px]
+                3xl:px-5 3xl:py-2
+                rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors"
               >
                 {s}
               </button>
@@ -211,15 +231,24 @@ function TaskModal({
           </div>
         </div>
 
-        <label className="flex text-primary-600 text-xl font-semibold pt-3 gap-1">
+        <label className="flex text-primary-600 text-xl font-semibold
+        lg:text-sm 
+        xl:text-[16px]
+        2xl:text-lg
+        3xl:text-2xl
+        pt-3 gap-1">
           Deadline
           {requireDeadline && <span className="text-red-500">*</span>}
         </label>
 
-        <div className="flex gap-3 my-3">
+        <div className="flex gap-3 3xl:gap-8 my-3">
           <div className="relative flex items-center flex-1">
             <input
-              className={`border-2 rounded-md w-full py-3 text-sm px-3 pr-11 font-mono
+              className={`border-2 rounded-sm w-full py-3 text-sm px-3 pr-11 font-mono
+                lg:text-sm lg:py-1
+                xl:text-[15px] xl:py-2
+                2xl:text-lg
+                3xl:text-xl
                 ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
               value={taskDeadline}
               onChange={(e) => handleDeadlineChange(e.target.value)}
@@ -230,7 +259,8 @@ function TaskModal({
             <button
               type="button"
               onClick={() => calendarRef.current?.showPicker()}
-              className="absolute right-3 text-primary-600 hover:text-primary-800 transition-colors"
+              className="absolute right-3
+              text-primary-600 hover:text-primary-800 transition-colors"
               tabIndex={-1}
               title="Pick a date"
             >
@@ -258,24 +288,38 @@ function TaskModal({
             type="time"
             value={taskTime}
             onChange={(e) => handleTimeChange(e.target.value)}
-            className={`border-2 rounded-md py-3 px-3 w-36 font-mono
+            className={`border-2 rounded-md py-3 px-3 w-36 3xl:w-44 font-mono 
+            lg:text-sm lg:py-1 lg:rounded-sm
+            xl:text-[15px] xl:py-2
+            2xl:text-[16px]
+            3xl:text-lg
               ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
           />
         </div>
 
         {dateError && <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>}
 
-        <div className="flex flex-row justify-between gap-10">
+        <div className="flex flex-row justify-between  gap-10">
           <button
             onClick={onClose}
-            className="flex-1 bg-white border-2 rounded-md font-bold border-primary-600 items-center mt-5 text-primary-600 font-roboto py-2 hover:bg-primary-50"
+            className="flex-1 bg-white border-2 rounded-md font-bold border-primary-600 items-center mt-5
+            lg:mt-4 lg:py-1 lg:rounded-sm lg:text-sm
+            xl:mt-6 xl:py-2 xl:text-[16px]
+            2xl:mt-8 2xl:py-2 2xl:text-lg
+            3xl:mt-10 3xl:py-3 3xl:text-xl
+            text-primary-600 font-roboto py-2 hover:bg-primary-50"
           >
             CANCEL
           </button>
           <button
             onClick={handleSave}
             disabled={!canSave }
-            className="flex-1 bg-[#FEE248] border-2 rounded-md text-primary-800 font-bold border-primary-800 items-center mt-5  font-roboto
+            className="flex-1 bg-[#FEE248] border-2 rounded-md text-primary-800 font-bold border-primary-800 items-center mt-5 
+            lg:mt-4 lg:py-1 lg:rounded-sm lg:text-sm
+            xl:mt-6 xl:py-2 xl:text-[16px]
+            2xl:mt-8 2xl:py-2 2xl:text-lg
+            3xl:mt-10 3xl:py-3 3xl:text-xl
+            font-roboto
              hover:bg-primary-50 hover:text-primary-800 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             SAVE
