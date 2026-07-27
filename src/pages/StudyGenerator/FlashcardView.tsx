@@ -193,7 +193,9 @@ function FlashcardView() {
                       e.stopPropagation()
                       setOpenMenuIndex(openMenuIndex === index ? null : index)
                     }}
-                    className='text-white hover:opacity-70 text-3xl leading-none'
+                    className={`hover:opacity-70 text-3xl leading-none transition-colors duration-500 ${
+                      flipped[index] ? 'text-primary-600' : 'text-white'
+                    }`}
                     title='EDIT/DELETE'
                   >
                     ⋮
@@ -218,7 +220,7 @@ function FlashcardView() {
                       >
                         <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
                       </button>
-                      </div>
+                    </div>
                   )}
                 </div>
 

@@ -158,7 +158,7 @@ useEffect(() => {
         {/* Right of sidebar */}
         <div className='flex-1  flex flex-col overflow-hidden'>
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white fixed top-0 left-0 right-0 z-10 relative'>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white fixed top-0 left-0 right-0 z-10 '>
           <p className='absolute left-1/2 -translate-x-1/2 font-inter font-semibold text-md text-[#B3B3B3] uppercase'>Dashboard</p>
           <div className='w-10' />
           <button
@@ -186,7 +186,8 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] 2xl:bg-pink-800 rounded-t-lg border-b-2 border-primary-800 relative'>
+
+      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB]  rounded-t-lg border-b-2 border-primary-800 relative'>
         {/* White pill notch */}
         <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
