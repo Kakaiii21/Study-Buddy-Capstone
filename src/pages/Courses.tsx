@@ -206,13 +206,15 @@ const { startTour } = useTour(
               xl:text-[10px] 2xl:text-[12px]
               hover:opacity-90 lg:w-auto
               backdrop-blur-xs
+              flex items-center gap-1.5
               hover:-translate-y-1 
               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
               transition-all duration-300 disabled:bg-[#B0A030]
               disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
               disabled:hover:translate-y-0 disabled:hover:shadow-none"            
            >
-              + Course Folder
+            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />
+            Course Folder
             </button>
             {/* Search bar */}
             <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">

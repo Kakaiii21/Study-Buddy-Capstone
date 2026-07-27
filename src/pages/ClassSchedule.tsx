@@ -372,26 +372,33 @@ const handleSave = () => {
                   onClick={() => setShowClearModal(true)}
                   className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                   py-1 px-4 rounded-sm 
+                  flex items-center gap-1.5
                   font-inter font-black
+<<<<<<< Updated upstream
                   text-[10px] lg:text-[8px]
                   xl:text-[10px] 2xl:text-[12px]
                   3xl:text-[14px]
 
+=======
+                  text-[10px] lg:text-[9px]
+                  xl:text-[12px] 2xl:text-[14px]
+                  3xl:text-[18px]
+>>>>>>> Stashed changes
                   hover:opacity-90 w-auto
                   backdrop-blur-xs
                   hover:-translate-y-1 
                   hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-                  transition-all duration-300 uppercase
-                  disabled:opacity-40 disabled:cursor-not-allowed"
+                  transition-all duration-300 uppercase"
                 >
-                    X  CLEAR ALL schedules
+                  <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0' />
+                    CLEAR ALL schedules
                 </button>
-
                 <button
                   id='addScheduleBtn'
                   onClick={() => { resetForm(); setIsAddSubOpen(true) }}
                   className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                   py-1 px-4 rounded-sm 
+                  flex items-center gap-1.5
                   font-inter font-black
                   text-[10px] lg:text-[8px]
                   xl:text-[10px] 2xl:text-[12px]
@@ -402,7 +409,8 @@ const handleSave = () => {
                   hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
                   transition-all duration-300"
                 >
-                  + Add Schedule
+                  <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />
+                  Add Schedule
                 </button>
 
 

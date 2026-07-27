@@ -461,13 +461,15 @@ lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 disabled:hover:flex-none
                 text-[10px] lg:text-[8px]
                 xl:text-[10px] 2xl:text-[12px]
+                flex items-center gap-1.5
                 hover:opacity-90
                 backdrop-blur-xs
                 hover:-translate-y-1 
                 hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
                 transition-all duration-300"            
                 >
-                {!isOnline ? 'Upload Files' : '+ Upload Files'}
+                
+                {!isOnline ? 'Upload Files' : ' Upload Files'}
               </button>
             </div>
           </div>

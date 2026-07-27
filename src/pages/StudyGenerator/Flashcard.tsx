@@ -203,38 +203,40 @@ function Flashcard() {
             <div key={index} className='flex justify-center'>
               <div className='perspective w-full max-w-md lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl relative'>
 
-                {/* ── Menu Button ── */}
-                <div className='absolute top-3 right-3 z-20'>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setOpenMenuIndex(openMenuIndex === index ? null : index)
-                    }}
-                    className='text-white hover:opacity-70 text-3xl leading-none'
-                    title='EDIT/DELETE'
-                  >
-                    ⋮
-                  </button>
+            {/* ── Menu Button ── */}
+            <div className='absolute top-3 right-3 z-20'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setOpenMenuIndex(openMenuIndex === index ? null : index)
+                }}
+                className={`hover:opacity-70 text-3xl leading-none transition-colors duration-500 ${
+                  flipped[index] ? 'text-primary-600' : 'text-white'
+                }`}
+                title='EDIT/DELETE'
+              >
+                ⋮
+              </button>
 
-                  {openMenuIndex === index && (
-                    <div className='absolute right-0 top-8 z-30 bg-white border border-gray-200 rounded-lg shadow-lg w-32 overflow-hidden'>
-                      <button
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => handleEditOpen(index)}
-                        className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                      >
-                        <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
-                      </button>
-                      <hr className='my-1 border-gray-100' />
-                      <button
-                        onClick={() => handleDelete(index)}
-                        className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
-                      >
-                        <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
-                      </button>
-                    </div>
-                  )}
+              {openMenuIndex === index && (
+                <div className='absolute right-0 top-8 z-30 bg-white border border-gray-200 rounded-lg shadow-lg w-32 overflow-hidden'>
+                  <button
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => handleEditOpen(index)}
+                    className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                  >
+                    <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
+                  </button>
+                  <hr className='my-1 border-gray-100' />
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                  >
+                    <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
+                  </button>
                 </div>
+              )}
+            </div>
 
                 {/* ── Edit Mode ── */}
                 {editIndex === index && editDraft ? (
@@ -327,7 +329,7 @@ function Flashcard() {
       {/* ── Result Modal ─────────────────────────────────────────────────────── */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-8 lg:pb-16 lg:pt-10 flex flex-col items-center gap-10'>
+          <div className='bg-white rounded-2xl shadow-xl h-auto  w-full max-w-md mx-4 p-8 lg:pb-16 lg:pt-10 flex flex-col items-center gap-10'>
 
             {enabled ? (
               <>
