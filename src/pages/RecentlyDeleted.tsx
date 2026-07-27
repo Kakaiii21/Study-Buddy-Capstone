@@ -81,12 +81,126 @@ function DaysBadge({ days }: { days: number }) {
     )
   }
 
+  function RestoreConfirmModal({
+    itemName,
+    onConfirm,
+    onCancel,
+  }: {
+    itemName: string
+    onConfirm: () => void
+    onCancel: () => void
+  }) {
+    const [restoring, setRestoring] = useState(false)
+
+    const handleConfirm = async () => {
+      if (restoring) return
+      setRestoring(true)
+      await onConfirm()
+    }
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+        <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+          <h2 className='text-lg font-bold text-gray-800 mb-2'>Restore Item?</h2>
+          <p className='text-sm text-gray-500 mb-6'>
+            <span className='font-semibold text-gray-700'>"{itemName}"</span> will be restored
+            to its original location.
+          </p>
+          <div className='flex gap-3 justify-end'>
+            <button
+              onClick={onCancel}
+              disabled={restoring}
+              className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50'
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={restoring}
+              className='px-4 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {restoring ? 'Restoring...' : 'Restore'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  function FolderRestoreModal({
+    itemName,
+    fileCount,
+    onRestoreFolderOnly,
+    onRestoreWithFiles,
+    onCancel,
+  }: {
+    itemName: string
+    fileCount: number
+    onRestoreFolderOnly: () => void
+    onRestoreWithFiles: () => void
+    onCancel: () => void
+  }) {
+    const [restoring, setRestoring] = useState<'folder' | 'withFiles' | null>(null)
+
+    const handleFolderOnly = async () => {
+      if (restoring) return
+      setRestoring('folder')
+      await onRestoreFolderOnly()
+    }
+
+    const handleWithFiles = async () => {
+      if (restoring) return
+      setRestoring('withFiles')
+      await onRestoreWithFiles()
+    }
+
+    return (
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+        <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+          <h2 className='text-lg font-bold text-gray-800 mb-2'>Restore Folder?</h2>
+          <p className='text-sm text-gray-500 mb-6'>
+            <span className='font-semibold text-gray-700'>"{itemName}"</span> also has{' '}
+            <span className='font-semibold text-gray-700'>
+              {fileCount} deleted {fileCount === 1 ? 'file' : 'files'}
+            </span>{' '}
+            in Recently Deleted. Would you like to restore those too?
+          </p>
+          <div className='flex flex-col gap-2'>
+            <button
+              onClick={handleWithFiles}
+              disabled={restoring !== null}
+              className='px-4 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {restoring === 'withFiles' ? 'Restoring...' : 'Restore Folder + Files'}
+            </button>
+            <button
+              onClick={handleFolderOnly}
+              disabled={restoring !== null}
+              className='px-4 py-2 rounded-lg text-sm font-medium border border-primary-600 text-primary-600 hover:bg-primary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {restoring === 'folder' ? 'Restoring...' : 'Restore Folder Only'}
+            </button>
+            <button
+              onClick={onCancel}
+              disabled={restoring !== null}
+              className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50'
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
 function RecentlyDeleted() {
   const { user } = useAuth()
   const [selectedType, setSelectedType] = useState<DeletedItemType>('To Do')
   const [searchQuery, setSearchQuery] = useState('')
   const [confirmItem, setConfirmItem] = useState<{ id: string; name: string } | null>(null)
   const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null)
+  const [restoreConfirmItem, setRestoreConfirmItem] = useState<DeletedItem | null>(null)
+  const [folderRestoreItem, setFolderRestoreItem] = useState<DeletedItem | null>(null)
   const { startTour } = useTour(
     'recentlydeleted',
     false,
@@ -126,6 +240,57 @@ const filtered = useMemo(() => {
     setConfirmItem(null)
   }
 
+  const getChildDeletedFiles = (folderItem: DeletedItem) => {
+    return items.filter((i) => {
+      if (i.type !== 'Course' || !i.data?.fileUrl) return false
+      const parts = i.originalCollection.split('/')
+      const parentCourseId = parts[3]
+      return parentCourseId === folderItem.originalDocId
+    })
+  }
+
+  const handleRestoreClick = (item: DeletedItem) => {
+    if (orphanedFileIds.has(item.id)) {
+      setOrphanRestoreItem(item)
+      return
+    }
+
+    const isFolder = item.type === 'Course' && !item.data?.fileUrl
+    if (isFolder) {
+      const childFiles = getChildDeletedFiles(item)
+      if (childFiles.length > 0) {
+        setFolderRestoreItem(item)
+        return
+      }
+    }
+
+    setRestoreConfirmItem(item)
+  }
+
+  const handleConfirmRestore = async () => {
+    if (!restoreConfirmItem) return
+    await handleRestore(restoreConfirmItem)
+    setRestoreConfirmItem(null)
+  }
+
+  const handleRestoreFolderOnly = async () => {
+    if (!folderRestoreItem) return
+    await handleRestore(folderRestoreItem)
+    setFolderRestoreItem(null)
+  }
+
+  const handleRestoreFolderWithFiles = async () => {
+    if (!folderRestoreItem) return
+    const childFiles = getChildDeletedFiles(folderRestoreItem)
+    // Restore the folder first so it exists again before its files are restored,
+    // otherwise the files would fall back to the orphan "Restored Files" folder.
+    await handleRestore(folderRestoreItem)
+    for (const file of childFiles) {
+      await handleRestore(file)
+    }
+    setFolderRestoreItem(null)
+  }
+
   return (
     <div className='flex h-screen'>
       <div className='lg:p-3 '>
@@ -140,6 +305,22 @@ const filtered = useMemo(() => {
           onCancel={() => setConfirmItem(null)}
         />
       )}
+              {restoreConfirmItem && (
+                  <RestoreConfirmModal
+                    itemName={restoreConfirmItem.name}
+                    onConfirm={handleConfirmRestore}
+                    onCancel={() => setRestoreConfirmItem(null)}
+                  />
+                )}
+              {folderRestoreItem && (
+                  <FolderRestoreModal
+                    itemName={folderRestoreItem.name}
+                    fileCount={getChildDeletedFiles(folderRestoreItem).length}
+                    onRestoreFolderOnly={handleRestoreFolderOnly}
+                    onRestoreWithFiles={handleRestoreFolderWithFiles}
+                    onCancel={() => setFolderRestoreItem(null)}
+                  />
+                )}
               {orphanRestoreItem && (
                   <OrphanRestoreModal
                     itemName={orphanRestoreItem.name}
@@ -286,13 +467,7 @@ const filtered = useMemo(() => {
                           <button
                             id='restoreBtn'
                             aria-label={`Restore ${item.name}`}
-                            onClick={() => {
-                              if (orphanedFileIds.has(item.id)) {
-                                setOrphanRestoreItem(item)
-                              } else {
-                                handleRestore(item)
-                              }
-                            }}
+                            onClick={() => handleRestoreClick(item)}
                             disabled={isActing}
                           >
                             {isActing ? (
