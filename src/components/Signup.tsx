@@ -219,10 +219,10 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm text-[13px] lg:text-[12px] p-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-0.5 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen md:h-auto flex flex-col md:px-32 lg:flex-row bg-primary-600 2xl:px-[150px]">
+    <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
 {/* MOBILE HEADER - visible only on mobile */}
 <div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
   <h1 className="text-white font-inter font-extrabold text-3xl">
@@ -300,10 +300,10 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     </div>
 
     {/*FORM*/}
-    <div className="w-full lg:w-1/2 flex items-center justify-center pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 mt-2">
-      <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full lg:max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 lg:rounded-xl xl:rounded-xl 2xl:rounded-xl shadow-md border-4 border-primary-600">
+    <div className="w-full lg:w-1/2 flex items-center justify-center pb-8 lg:pt-10 xl:pt-0 lg:pb-20 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 mt-2">
+      <div className="w-full lg:w-[360px] xl:w-[400px]  lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full 3xl:w-full lg:max-w-md bg-white p-6 lg:p-0 lg:px-4 lg:py-2 xl:py-4 2xl:py-6 lg:rounded-xl xl:rounded-xl 2xl:rounded-xl shadow-md border-4 border-primary-600">
 
-          <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Sign UP</p>
+          <p className='text-primary-600 font-inter font-extrabold uppercase text-center text-sm lg:text-sm xl:text-xl 2xl:text-2xl'>Sign UP</p>
 
           {/* SUCCESS MESSAGE */}
           {success && (
@@ -311,10 +311,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* FIRST NAME */}
-          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">FIRST NAME</p>
           <input
             type="text"
@@ -325,14 +327,16 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             placeholder="Enter Your First Name"
           />
           {touched.firstName && fieldErrors.firstName && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.firstName}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-2 px-1">⚠ {fieldErrors.firstName}</p>
           )}
 
           {/* LAST NAME */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">LAST NAME</p>
           <input
             type="text"
@@ -343,14 +347,16 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             placeholder="Enter Your Last Name"
           />
           {touched.lastName && fieldErrors.lastName && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.lastName}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px]  text-xs mb-2 px-1">⚠ {fieldErrors.lastName}</p>
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">EMAIL</p>
           <input
             type="email"
@@ -361,14 +367,16 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             placeholder="Enter Your Email Address"
           />
           {touched.email && fieldErrors.email && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">PASSWORD</p>
           <input
             type="password"
@@ -389,25 +397,27 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
           {/* Show single error ONLY when blurred and invalid */}
           {!passwordFocused && touched.password && fieldErrors.password && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs  mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
 
           {/* CONFIRM PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">CONFIRM PASSWORD</p>
           <input
             type="password"
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-2 p-2 border text-[13px] lg:text-[12px] border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-0.5 xl:py-1 2xl:py-1.5 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
-            <p className="text-red-500 text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
           )}
 
           {/* ✅ TERMS & PRIVACY CHECKBOX */}
@@ -422,18 +432,18 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 }}
                 className="mt-1 accent-primary-600"
               />
-              <span className="text-xs lg:text-[12px] text-gray-600">
+              <span className="text-xs lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-gray-600">
                 I have read and agree to the{' '}
                 <span
                   onClick={() => navigate('/terms')}
-                  className="text-primary-600 lg:text-[12px] font-semibold cursor-pointer hover:underline"
+                  className="text-primary-600 lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] font-semibold cursor-pointer hover:underline"
                 >
                   Terms of Service
                 </span>{' '}
                 and{' '}
                 <span
                   onClick={() => navigate('/privacy')}
-                  className="text-primary-600 lg:text-[12px] font-semibold cursor-pointer hover:underline"
+                  className="text-primary-600 lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] font-semibold cursor-pointer hover:underline"
                 >
                   Privacy Policy
                 </span>
@@ -442,7 +452,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             </label>
             {/* ✅ Show error if they try to sign up without checking */}
             {agreedTouched && !agreed && (
-              <p className="text-red-500 text-xs mt-1 px-1">⚠ You must agree to the Terms of Service and Privacy Policy.</p>
+              <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mt-1 px-1">⚠ You must agree to the Terms of Service and Privacy Policy.</p>
             )}
           </div>
 
@@ -468,12 +478,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
               disabled={loading}
                 className="
                 flex items-center gap-4
-                m-2 mt-3
+                 mt-1 
                 px-2 py-2
                 md:px-10 md:py-3
-                lg:px-10 lg:py-3
-                xl:px-10 xl:py-3
-                2xl:px-10 2xl:py-3
+                lg:px-10 lg:py-1
+                xl:px-10 xl:py-1
+                2xl:px-10 2xl:py-1
                 rounded-full 
                 font-bold uppercase
                 text-primary-600

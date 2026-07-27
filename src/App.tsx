@@ -194,20 +194,22 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
             lg:w-[130px] lg:h-[120px]
             xl:w-[130px] xl:h-[130px] 
             2xl:w-[200px] 2xl:h-[200px]' />
-            <div className='text-primary-600 font-inter'>
+            <div className='text-primary-600 font-inter  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
               <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Timer</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying.</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Start the timer whenever you sit down to work,</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>and watch your study hours add up.</p>
+              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying. 
+                Start the timer whenever you sit down to work,
+                and watch your study hours add up.
+                </p>
             </div>
           </div>
 
           <div className='flex flex-row gap-4 justify-end items-center'>
-            <div className='text-right text-primary-600 font-inter'>
+            <div className='text-right text-primary-600 font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px]'>
               <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Add, check off, and manage your tasks so</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>nothing slips through the cracks.</p>
+              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
+                Add, check off, and manage your tasks so
+                nothing slips through the cracks.
+              </p>
             </div>
             <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl shrink-0
             w-[80px] h-[80px] 
@@ -226,21 +228,21 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px] 
           2xl:w-[200px] 2xl:h-[200px]' />
-          <div className='text-primary-600 font-inter'>
+          <div className='text-primary-600 font-inter  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Notes</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>place. Create, edit, and revisit your notes</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>anytime, so nothing gets lost between</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>subjects and deadlines.</p>
+            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized
+            place. Create, edit, and revisit your notes
+            anytime, so nothing gets lost between
+            subjects and deadlines.</p>
           </div>
         </div>
 
         <div className='flex flex-row gap-4 justify-end items-center'>
-          <div className='text-right text-primary-600 font-inter'>
+          <div className='text-right text-primary-600 font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Class Schedule</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>glance. Plan your week and stay on top</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>of where you need to be and when.</p>
+            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a
+            glance. Plan your week and stay on top
+            of where you need to be and when.</p>
           </div>
           <img src="./assets/classschedule.gif" alt="Class Schedgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
@@ -253,7 +255,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 
       {/*Third*/}
       <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-32'>
-        <div className='flex flex-row gap-x-4 justify-start items-center mb-6'>
+        <div className='flex flex-row gap-x-4 justify-start items-center mb-6  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
           <img src="./assets/courses.gif" alt="coursesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
           md:w-[150px] md:h-[150px]  
@@ -262,19 +264,19 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           2xl:w-[200px] 2xl:h-[200px]' />
           <div className='text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Course</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>materials by course. Keep</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>everything related to each class</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>neatly grouped and easy to find.</p>
+            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and
+            materials by course. Keep
+            everything related to each class
+            neatly grouped and easy to find.</p>
           </div>
         </div>
 
         <div className='flex flex-row gap-4 justify-end items-center'>
-          <div className='text-right text-primary-600 font-inter'>
+          <div className='text-right text-primary-600  font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Generator</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>flashcards in seconds. A smarter, faster way</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>to review and test what you've learned.</p>
+            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and
+            flashcards in seconds. A smarter, faster way
+            to review and test what you've learned.</p>
           </div>
           <img src="./assets/studygen.gif" alt="Study Gen gif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
@@ -288,7 +290,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       </section>
     <section ref={signupRef} className="w-full h-auto bg-primary-600">
       {activeForm === 'signup'
-        ? <Signup onSwitchToLogin={() => setActiveForm('login')}  />
+        ? <Signup  onSwitchToLogin={() => setActiveForm('login')}   />
         : <Login onSwitchToSignup={() => setActiveForm('signup')} />
       }
     </section>
@@ -297,7 +299,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
     {/* Download Section */}
  <section ref={downloadRef} className="py-10">
   <div className='flex flex-col mt-10 gap-10 justify-start items-center'>
-    <p className='text-center font-fustat text-2xl font-medium text-primary-600 uppercase'>download study buddy</p>
+    <p className='text-center font-fustat text-2xl font-medium text-primary-600 uppercase'>Add to Home</p>
     <p className='text-center font-fustat text-lg font-normal text-primary-600'>Get Study Buddy on any device:</p>
     <div className='grid grid-cols-2 md:flex md:flex-row gap-5 2xl:gap-x-8 mt-10 px-6'>
 
