@@ -178,15 +178,15 @@ useEffect(() => {
 font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
 mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
-<div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
+<div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
 <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
     
     {/* ID Card */}
-<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(320px,34vw,400px)] xl:min-w-[310px] xl:max-w-[340px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
+<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
 h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] rounded-t-lg border-b-2 border-primary-800 relative'>
+      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] 2xl:bg-pink-800 rounded-t-lg border-b-2 border-primary-800 relative'>
         {/* White pill notch */}
         <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
@@ -208,7 +208,7 @@ h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden rela
           </span>
           {/* Barcode right under the subtitle */}
           <div 
-            className='w-full h-4 md:h-4 lg:h-4 xl:h-5 xl:w-[175px] 2xl:h-6 3xl:h-7 mt-2 lg:mt-1'
+            className='w-full h-4 md:h-4 lg:h-4 xl:h-5 xl:w-[175px] 2xl:w-[219px] 3xl:w-[250px] 2xl:h-6 3xl:h-7 mt-2 lg:mt-1'
             style={{
               backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
             }}
