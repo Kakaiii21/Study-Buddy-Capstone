@@ -25,6 +25,8 @@ export default {
         inter:['Inter', 'sans-serif'],
         kapakana:['Kapakana', 'cursive'],
         intelOneMono: ['"Intel One Mono"', 'monospace'],
+        monomaniac: ['"Monomaniac One"', 'sans-serif'],
+
       }
     },
   },

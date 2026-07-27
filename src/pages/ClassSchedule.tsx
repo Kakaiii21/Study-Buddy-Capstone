@@ -363,9 +363,9 @@ const handleSave = () => {
           {/* Header */}
           <div className='flex flex-col md:flex-row lg:flex-row  justify-between items-center w-full'>
 
-              <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
+              <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center  lg:mb-1 2xl:mb-3 3xl:mb-4
                 pl-1 
-                lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 lg:px-2 lg:gap-3 
+                lg:justify-end  lg:items-start lg:pr-6 2xl:pr-20 lg:px-2 lg:gap-3 
                 md:justify-between md:items-start sm:items-center gap-1 p-2">
                 <button
                   id='clearScheduleBtn'
@@ -373,9 +373,9 @@ const handleSave = () => {
                   className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                   py-1 px-4 rounded-sm 
                   font-inter font-black
-                  text-[10px] lg:text-[8px]
-                  xl:text-[10px] 2xl:text-[12px]
-                  3xl:text-[14px]
+                  text-[10px] lg:text-[9px]
+                  xl:text-[12px] 2xl:text-[14px]
+                  3xl:text-[18px]
 
                   hover:opacity-90 w-auto
                   backdrop-blur-xs
@@ -390,12 +390,12 @@ const handleSave = () => {
                 <button
                   id='addScheduleBtn'
                   onClick={() => { resetForm(); setIsAddSubOpen(true) }}
-                  className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+                  className="bg-[#FEE248]  uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                   py-1 px-4 rounded-sm 
                   font-inter font-black
-                  text-[10px] lg:text-[8px]
-                  xl:text-[10px] 2xl:text-[12px]
-                  3xl:text-[14px]
+                  text-[10px] lg:text-[9px]
+                  xl:text-[12px] 2xl:text-[14px]
+                  3xl:text-[18px]
                   hover:opacity-90 w-auto
                   backdrop-blur-xs
                   hover:-translate-y-1 

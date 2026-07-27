@@ -79,6 +79,7 @@ const { startTour } = useTour(
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editColor, setEditColor] = useState<CourseColor>('grey')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedColor, setSelectedColor] = useState<CourseColor>('grey')
   const [isSaving, setIsSaving] = useState(false)
@@ -125,9 +126,10 @@ const { startTour } = useTour(
     await deleteCourse(pendingDelete.id)
     setPendingDelete(null)
   }
-  const handleEditOpen = (id: string, name: string) => {
+  const handleEditOpen = (id: string, name: string, color?: CourseColor) => {
     setEditingId(id)
     setEditName(name)
+    setEditColor(color || 'grey')
     setActiveMenu(null)
     setShowEditModal(true)
   }
@@ -146,9 +148,10 @@ const { startTour } = useTour(
       return
     }
 
-    await updateCourse(editingId, editName.trim())
+    await updateCourse(editingId, editName.trim(), editColor)
     setEditingId(null)
     setEditName('')
+    setEditColor('grey')
     setEditError('')
     setShowEditModal(false)
   }
@@ -156,6 +159,7 @@ const { startTour } = useTour(
   const handleEditClose = () => {
     setEditingId(null)
     setEditName('')
+    setEditColor('grey')
     setEditError('')
     setShowEditModal(false)
   }
@@ -252,8 +256,10 @@ const { startTour } = useTour(
               Loading courses...
             </div>
           ) : (
-            <div id='coursesGrid'
-            className='grid grid-cols-2  pl-8 lg:pl-0 lg:grid-cols-5 3xl:grid-cols-6 md:grid-cols-3  md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-1'>
+<div id='coursesGrid'
+  className='grid grid-cols-2 justify-items-center place-content-center
+  lg:pl-4 lg:justify-items-stretch
+  lg:grid-cols-5 3xl:grid-cols-6 md:grid-cols-3 md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-1'>
               {courses.length === 0 ? (
               <div className='col-span-2 md:col-span-3  lg:col-span-5 flex items-center justify-center py-20 w-full'>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
@@ -262,7 +268,7 @@ const { startTour } = useTour(
               </div>
               ) : (
                 courses.map((course) => (
-                  <div id='courseFolder' key={course.id} className='max-w-36 md:max-w-52   lg:max-w-[130px]  xl:max-w-[150px] 2xl:max-w-[180px]'>
+                  <div id='courseFolder' key={course.id} className='max-w-32 md:max-w-52   lg:max-w-[130px]  xl:max-w-[150px] 2xl:max-w-[180px]'>
                     <div className="relative">
                       <button
                         title={`Open ${course.name} Folder`}
@@ -287,9 +293,9 @@ const { startTour } = useTour(
                       className={`absolute bottom-2 right-2 w-10 lg:right-0 lg:w-10 xl:right-1 xl:w-11 2xl:right-2 2xl:w-12 h-6 flex items-center justify-center transition group ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                         <div  className="flex flex-row items-center justify-center gap-[8px] lg:gap-[3px] 2xl:gap-[5px] lg:pr-0 pr-0 md:pr-5">
-                          <span className="w-2 h-2 lg:w-1 lg:h-1 2xl:w-2 2xl:h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
-                          <span className="w-2 h-2 lg:w-1 lg:h-1 2xl:w-2 2xl:h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
-                          <span className="w-2 h-2 lg:w-1 lg:h-1 2xl:w-2 2xl:h-2 rounded-full bg-white group-hover:bg-primary-600 transition"></span>
+                          <span className="w-2 h-2 lg:w-1.5 lg:h-1.5 2xl:w-2 2xl:h-2 rounded-full ring-1 ring-black ring-inset group-hover:ring-primary-600 bg-white transition"></span>
+                          <span className="w-2 h-2 lg:w-1.5 lg:h-1.5 2xl:w-2 2xl:h-2 rounded-full ring-1 ring-black ring-inset group-hover:ring-primary-600 bg-white transition"></span>
+                          <span className="w-2 h-2 lg:w-1.5 lg:h-1.5 2xl:w-2 2xl:h-2 rounded-full ring-1 ring-black ring-inset group-hover:ring-primary-600 bg-white transition"></span>
                         </div>
                       </button>
 
@@ -300,10 +306,10 @@ const { startTour } = useTour(
                           className="absolute top-[70px] left-32 lg:left-32 xl:left-[140px] xl:top-[95px] 2xl:left-[165px] 2xl:top-[115px] bg-white border border-primary-800 rounded-sm shadow-lg z-20 w-[110px] overflow-hidden"
                         >
                           <button
-                            onClick={() => handleEditOpen(course.id, course.name)}
+                            onClick={() => handleEditOpen(course.id, course.name, course.color)}
                             className='flex items-center lg:text-[12px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5 lg:w-3 lg:h-3' src="edit.png" alt="edit icon" /> Rename
+                            <img className='w-5 h-5 lg:w-3 lg:h-3' src="edit.png" alt="edit icon" /> Edit
                           </button>
                           <hr className='my-0 border-primary-800 mx-2' />
                           <button
@@ -356,9 +362,9 @@ const { startTour } = useTour(
               </div>
               <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
               {/* Folder color picker */}
-              <div className='flex flex-c gap-3 mb-2 justify-center'>
+              <div className='flex flex-wrap gap-3 mb-2 justify-center'>
                
-                {(['grey', 'yellow', 'blue'] as const).map((color) => (
+                {(['grey', 'yellow', 'blue', 'green', 'pink', 'purple', 'orange'] as const).map((color) => (
                   <button
                     key={color}
                     type='button'
@@ -366,7 +372,15 @@ const { startTour } = useTour(
                     title={`${color.charAt(0).toUpperCase() + color.slice(1)} folder`}
                     className={`w-8 h-8 rounded-sm border-2 transition-all
                       ${selectedColor === color ? 'border-white scale-110' : 'border-transparent opacity-70'}
-                      ${color === 'yellow' ? 'bg-[#FEE248]' : color === 'blue' ? 'bg-[#95CAFF]' : 'bg-[#D9D9D9]'}`}
+                      ${
+                        color === 'yellow' ? 'bg-[#FEE248]' :
+                        color === 'blue' ? 'bg-[#95CAFF]' :
+                        color === 'green' ? 'bg-[#A8E6A1]' :
+                        color === 'pink' ? 'bg-[#FFB6C6]' :
+                        color === 'purple' ? 'bg-[#C9A8FF]' :
+                        color === 'orange' ? 'bg-[#FFC08A]' :
+                        'bg-[#D9D9D9]'
+                      }`}
                   />
                 ))}
               </div>
@@ -406,6 +420,30 @@ const { startTour } = useTour(
                   <button onClick={handleEditSave} className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'>
                     <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert' />
                   </button>
+                </div>
+
+                <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
+                {/* Folder color picker */}
+                <div className='flex flex-wrap gap-3 mb-2 justify-center'>
+                  {(['grey', 'yellow', 'blue', 'green', 'pink', 'purple', 'orange'] as const).map((color) => (
+                    <button
+                      key={color}
+                      type='button'
+                      onClick={() => setEditColor(color)}
+                      title={`${color.charAt(0).toUpperCase() + color.slice(1)} folder`}
+                      className={`w-8 h-8 rounded-sm border-2 transition-all
+                        ${editColor === color ? 'border-white scale-110' : 'border-transparent opacity-70'}
+                        ${
+                          color === 'yellow' ? 'bg-[#FEE248]' :
+                          color === 'blue' ? 'bg-[#95CAFF]' :
+                          color === 'green' ? 'bg-[#A8E6A1]' :
+                          color === 'pink' ? 'bg-[#FFB6C6]' :
+                          color === 'purple' ? 'bg-[#C9A8FF]' :
+                          color === 'orange' ? 'bg-[#FFC08A]' :
+                          'bg-[#D9D9D9]'
+                        }`}
+                    />
+                  ))}
                 </div>
 
                 {/* ← Add this below the input row */}

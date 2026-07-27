@@ -13,7 +13,7 @@ import {
 import { db } from '../services/firebase'
 import { type User } from 'firebase/auth'
 
-export type CourseColor = 'yellow' | 'blue' | 'grey'
+export type CourseColor = 'yellow' | 'blue' | 'grey' | 'green' | 'pink' | 'purple' | 'orange'
 
 export interface Course {
   id: string
@@ -63,10 +63,12 @@ export function useCourses(user: User | null) {
     })
   }
 
-  async function updateCourse(courseId: string, name: string) {
+  async function updateCourse(courseId: string, name: string, color?: CourseColor) {
     if (!user || !name.trim()) return
     const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
-    await updateDoc(courseRef, { name: name.trim() })
+    const updates: { name: string; color?: CourseColor } = { name: name.trim() }
+    if (color) updates.color = color
+    await updateDoc(courseRef, updates)
   }
 
   async function deleteCourse(courseId: string) {
