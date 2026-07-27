@@ -186,11 +186,8 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
                         
       {/* Yellow header strip */}
-<<<<<<< Updated upstream
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB] lg:bg-blue-700 xl:bg-pink-700 2xl:bg-green-700 3xl:bg-orange-700 rounded-t-lg border-b-2 border-primary-800 relative'>
 =======
       <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB]  rounded-t-lg border-b-2 border-primary-800 relative'>
->>>>>>> Stashed changes
         {/* White pill notch */}
         <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
       </div>
