@@ -145,7 +145,7 @@ const [passwordUpdated] = useState<boolean>(() => {
         }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 xl:text-sm p-2 text-[13px] lg:text-[12px]  border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-0.5 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col md:px-32 lg:flex-row bg-primary-600 2xl:px-[150px]">
@@ -229,8 +229,8 @@ const [passwordUpdated] = useState<boolean>(() => {
 
       {/* FORM */}
     <div className="w-full lg:w-1/2 flex items-center justify-center pb-8 lg:pb-28 xl:pb-28 2xl:pb-28 pt-1 order-2 lg:order-1 mt-2">
-      <div className="w-full lg:w-[400px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full lg:max-w-md bg-white p-6 lg:py-4 xl:py-4 2xl:py-6 lg:rounded-xl xl:rounded-xl 2xl:rounded-xl shadow-md border-4 border-primary-600">
-        <p className='text-primary-600 mb-4 lg:mb-12 font-inter font-extrabold uppercase text-center text-sm lg:text-lg xl:text-xl 2xl:text-2xl'>Log In</p>
+      <div className="w-full lg:w-[360px] xl:w-[400px] lg:mt-5 xl:mt-5 2xl:mt-0 2xl:w-full 3xl:w-full lg:max-w-md bg-white p-6 lg:p-0 lg:px-4 lg:py-2 xl:py-4 2xl:py-6 lg:rounded-xl xl:rounded-xl 2xl:rounded-xl shadow-md border-4 border-primary-600">
+        <p className='text-primary-600 mb-4 lg:mb-12 font-inter font-extrabold uppercase text-center text-sm lg:text-sm xl:text-xl 2xl:text-2xl'>Log In</p>
 
           {emailUpdated && (
             <div className="bg-primary-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
@@ -261,10 +261,12 @@ const [passwordUpdated] = useState<boolean>(() => {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600 font-inter font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">EMAIL</p>
           <input
             type="email"
@@ -275,14 +277,16 @@ const [passwordUpdated] = useState<boolean>(() => {
             placeholder="Enter Your Email"
           />
           {touched.email && fieldErrors.email && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-2 px-1">⚠ {fieldErrors.email}</p>
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-1 xl:p-1 2xl:pl-2
+          <p className="text-primary-600 font-inter mt-4 font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
           text-[13px]
-          lg:text-[12px]
+          lg:text-[10px]
           xl:text-[13px]
+          2xl:text-[16px]
+          3xl:text-[19px]
           ">PASSWORD</p>
           <input
             type="password"
@@ -293,7 +297,7 @@ const [passwordUpdated] = useState<boolean>(() => {
             placeholder="Enter Your password"
           />
           {touched.password && fieldErrors.password && (
-            <p className="text-red-500 text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
+            <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
 
           <div className="flex justify-end">
