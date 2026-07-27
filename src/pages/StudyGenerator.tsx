@@ -435,13 +435,13 @@ const { startTour } = useTour(
             <p className='mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
               Make your own Quiz/Flashcard Now!
             </p>
-            <p className='mt-2 lg:mt-0 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
+            <p className='mt-2 lg:mt-0 xl:mt-1 2xl:mt-2 3xl:mt-3 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
               Generate your own quiz or flashcards by uploading a file.
             </p>
 
             {/* ── NEW: cooldown banner ── */}
             {isCoolingDown && (
-              <div className='mt-2  flex items-center gap-3 lg:text-[9px] 3xl:text-lg bg-yellow-50 border border-yellow-300 text-yellow-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+              <div className='mt-2  flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-yellow-50 border border-yellow-300  text-yellow-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
                 <span>⏳</span>
                 <span>You can generate again in <span className='font-bold text-yellow-800'>{formatCountdown(cooldownSeconds)}</span></span>
               </div>
@@ -467,7 +467,7 @@ const { startTour } = useTour(
                    id='localFilesBtn'
                     onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
                     disabled={isGenerating || !isOnline}
-                    className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
+                    className='bg-[#FEE248]  disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
                   >
                     Local Files
                   </button>
