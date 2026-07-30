@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import StudyTimer from '../components/StudyTimer'
 import { useAuth } from '../hooks/useAuth'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { useTimerContext } from '../context/TimerContext' 
 import { useQuizHistory } from '../hooks/useQuizHistory'
@@ -11,12 +11,13 @@ import { useTasks } from '../hooks/useTasks'
 import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
+
 function Dashboard() {
   const [showSidebar, setShowSidebar] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)  
   
   const [isScrolling, setIsScrolling] = useState(false)
-const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleScroll = () => {
     setIsScrolling(true)
@@ -46,7 +47,7 @@ const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
     }, [])
   const { startTour } = useTour(
     'dashboard',
-    true,
+    false,
     () => setShowSidebar(true), // onOpenSidebar
     () => setShowSidebar(false), // onCloseSidebar
     user
@@ -54,7 +55,7 @@ const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { elapsedSeconds } = useTimerContext() 
   const { quizHistory } = useQuizHistory(user)
   const latestQuiz = quizHistory[0] ?? null
-const { tasks, loading: tasksLoading } = useTasks(user)
+  const { tasks, loading: tasksLoading } = useTasks(user)
   const computedPercent = useMemo(() => {
     const total = tasks.length
     const done = tasks.filter(
@@ -62,39 +63,59 @@ const { tasks, loading: tasksLoading } = useTasks(user)
     ).length
     return total === 0 ? 0 : Math.round((done / total) * 100)
   }, [tasks])
- 
-// Cached task progress — read synchronously on first render (before `user`
+
+  // Cached task progress — read synchronously on first render (before `user`
   // resolves) so the bar never flashes to 0 on remount.
-const [initialCachedPercent] = useState<number>(() => {
-  const uid = user?.uid ?? sessionStorage.getItem('lastUid')
-  if (!uid) return 0
-  const cached = sessionStorage.getItem(`taskProgress_${uid}`)
-  return cached ? Number(cached) : 0
-})
+  const [initialCachedPercent] = useState<number>(() => {
+    const uid = user?.uid ?? sessionStorage.getItem('lastUid')
+    if (!uid) return 0
+    const cached = sessionStorage.getItem(`taskProgress_${uid}`)
+    return cached ? Number(cached) : 0
+  })
 
-// Derived, not stored — swaps from the cached snapshot to the live value
-// the moment tasksLoading flips to false. No setState needed here.
-const completedPercent = tasksLoading ? initialCachedPercent : computedPercent
+  // Derived, not stored — swaps from the cached snapshot to the live value
+  // the moment tasksLoading flips to false. No setState needed here.
+  const completedPercent = tasksLoading ? initialCachedPercent : computedPercent
 
-// keep lastUid fresh so the next remount can find the cache key
-// even before useAuth resolves
-useEffect(() => {
-  if (!user) return
-  sessionStorage.setItem('lastUid', user.uid)
-}, [user])
+  // keep lastUid fresh so the next remount can find the cache key
+  // even before useAuth resolves
+  useEffect(() => {
+    if (!user) return
+    sessionStorage.setItem('lastUid', user.uid)
+  }, [user])
 
-// sync the fresh value out to sessionStorage (external system) — no setState here
-useEffect(() => {
-  if (!user || tasksLoading) return
-  sessionStorage.setItem(`taskProgress_${user.uid}`, String(computedPercent))
-}, [computedPercent, tasksLoading, user])
-
+  // sync the fresh value out to sessionStorage (external system) — no setState here
+  useEffect(() => {
+    if (!user || tasksLoading) return
+    sessionStorage.setItem(`taskProgress_${user.uid}`, String(computedPercent))
+  }, [computedPercent, tasksLoading, user])
 
   const [firstName, setFirstName] = useState<string | null>(null)
   const [profilePic, setProfilePic] = useState('/profile.png')
+
   const [lastName, setLastName] = useState<string | null>(null)
-  const [age, setAge] = useState<string | null>(null)
+  const [age, setAge] = useState<number | null>(null)
   const [yearLevel, setYearLevel] = useState<string | null>(null)
+  const [hasCustomizedCard, setHasCustomizedCard] = useState<boolean | null>(null)
+
+  const [showCustomize, setShowCustomize] = useState(false)
+  const [cardColor, setCardColor] = useState('#D9CBF5')
+  const [formCardColor, setFormCardColor] = useState('#D9CBF5') // draft color while modal is open; only committed to cardColor on Save
+
+  const [formFirstName, setFormFirstName] = useState('')
+  const [formLastName, setFormLastName] = useState('')
+  const [formAge, setFormAge] = useState('')
+  const [formYearLevel, setFormYearLevel] = useState('')
+  const [savingField, setSavingField] = useState<string | null>(null)
+
+  const openCustomize = () => {
+    setFormFirstName(firstName ?? '')
+    setFormLastName(lastName ?? '')
+    setFormAge(age !== null ? String(age) : '')
+    setFormYearLevel(yearLevel ?? '')
+    setFormCardColor(cardColor) // reset draft to current saved color
+    setShowCustomize(true)
+  }
 
   useEffect(() => {
     if (!user) return
@@ -105,6 +126,18 @@ useEffect(() => {
         const data = JSON.parse(cached)
         setFirstName(data.firstName || 'Student')
         setProfilePic(data.photoURL || '/profile.png')
+        setLastName(data.lastName || '')
+        setAge(data.age ?? null)
+        setYearLevel(data.yearLevel || '')
+        setCardColor(data.cardColor || '#D9CBF5')
+        setHasCustomizedCard(data.hasCustomizedCard ?? false)
+        if (data.hasCustomizedCard === false) {
+          setFormFirstName(data.firstName || '')
+          setFormLastName(data.lastName || '')
+          setFormAge(data.age !== undefined && data.age !== null ? String(data.age) : '')
+          setFormYearLevel(data.yearLevel || '')
+          setShowCustomize(true)
+        }
         return
       }
       try {
@@ -113,6 +146,18 @@ useEffect(() => {
           const data = snap.data()
           setFirstName(data.firstName || 'Student')
           setProfilePic(data.photoURL || '/profile.png')
+          setLastName(data.lastName || '')
+          setAge(data.age ?? null)
+          setYearLevel(data.yearLevel || '')
+          setCardColor(data.cardColor || '#D9CBF5')
+          setHasCustomizedCard(data.hasCustomizedCard ?? false)
+          if (data.hasCustomizedCard === false) {
+            setFormFirstName(data.firstName || '')
+            setFormLastName(data.lastName || '')
+            setFormAge(data.age !== undefined && data.age !== null ? String(data.age) : '')
+            setFormYearLevel(data.yearLevel || '')
+            setShowCustomize(true)
+          }
           sessionStorage.setItem(cacheKey, JSON.stringify(data))
         }
       } catch {
@@ -121,6 +166,7 @@ useEffect(() => {
       }
     }
     loadUser()
+
     const handleUpdate = () => {
       const cacheKey = `user_${user.uid}`
       const cached = sessionStorage.getItem(cacheKey)
@@ -133,6 +179,7 @@ useEffect(() => {
     window.addEventListener('profilePicUpdated', handleUpdate)
     return () => window.removeEventListener('profilePicUpdated', handleUpdate)
   }, [user])
+
   const formatElapsed = (total: number): string => {
     const h = Math.floor(total / 3600)
     const m = Math.floor((total % 3600) / 60)
@@ -147,6 +194,63 @@ useEffect(() => {
     { label: 'Study Generator',path: '/studyGenerator', color: '#FFB8D9' },
     { label: 'Generated History', path: '/history', color: '#FFB870' },
   ]
+
+  const YEAR_LEVEL_GROUPS = [
+    { label: 'Elementary', options: ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'] },
+    { label: 'Junior High', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'] },
+    { label: 'Senior High', options: ['Grade 11', 'Grade 12'] },
+    { label: 'College', options: ['1st Year', '2nd Year', '3rd Year', '4th Year'] },
+  ]
+
+  const handleSaveCardField = async (
+    field: 'firstName' | 'lastName' | 'age' | 'yearLevel' | 'cardColor',
+    value: string | number
+  ) => {
+    if (!user) return
+    setSavingField(field)
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { [field]: value })
+      const cacheKey = `user_${user.uid}`
+      const cached = sessionStorage.getItem(cacheKey)
+      if (cached) {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
+      }
+    } catch (err) {
+      console.error(`Failed to save ${field}:`, err)
+    } finally {
+      setSavingField(null)
+    }
+  }
+
+  const handleSaveCustomizeAll = async () => {
+    const trimmedFirst = formFirstName.trim()
+    const trimmedLast = formLastName.trim()
+    const numericAge = formAge ? Number(formAge) : null
+
+    if (trimmedFirst && trimmedFirst !== firstName) await handleSaveCardField('firstName', trimmedFirst)
+    if (trimmedLast && trimmedLast !== lastName) await handleSaveCardField('lastName', trimmedLast)
+    if (numericAge !== null && numericAge !== age) await handleSaveCardField('age', numericAge)
+    if (formYearLevel && formYearLevel !== yearLevel) await handleSaveCardField('yearLevel', formYearLevel)
+    await handleSaveCardField('cardColor', formCardColor)
+    setCardColor(formCardColor) // commit draft color to the real dashboard card only on Save
+
+    if (!hasCustomizedCard && user) {
+      await updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true })
+      const cacheKey = `user_${user.uid}`
+      const cached = sessionStorage.getItem(cacheKey)
+      if (cached) {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), hasCustomizedCard: true }))
+      }
+      setHasCustomizedCard(true)
+    }
+
+    setFirstName(trimmedFirst || firstName)
+    setLastName(trimmedLast)
+    setAge(numericAge)
+    setYearLevel(formYearLevel)
+    setShowCustomize(false)
+  }
+
   if (!authChecked) return null  
   return (
     <div className='h-screen w-full  overflow-hidden bg-white'>
@@ -186,14 +290,17 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-start'>
     
 {/* ID Card */}
-<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
+<div onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
   lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px]
   2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
   h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
   shadow-lg group cursor-pointer'>
 
-  {/* Purple header strip */}
-  <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 bg-[#D9CBF5] relative'>
+  {/* Header strip — color now driven by cardColor */}
+  <div
+    className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 relative'
+    style={{ backgroundColor: cardColor }}
+  >
     <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
   </div>
 
@@ -239,13 +346,13 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3'>First Name:</p>
             <span className='font-bold uppercase font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
-              {firstName ?? 'Student'}
+              {firstName ?? '—'}
             </span>
           </div>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2'>Age:</p>
             <span className='font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
-              {age ?? '21'}
+              {age ?? '—'}
             </span>
           </div>
         </div>
@@ -255,13 +362,13 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3 '>Last Name:</p>
             <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
-              {lastName ?? 'Dellamas'}
+              {lastName ?? '—'}
             </span>
           </div>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2 '>Year Level:</p>
             <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
-              {yearLevel ?? '4th Year'}
+              {yearLevel ?? '—'}
             </span>
           </div>
         </div>
@@ -390,6 +497,144 @@ className='relative flex flex-col justify-between text-left p-2
           </div>
         </div>
       </div>
+
+      {showCustomize && (
+        <div className='fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4'>
+          <div className='bg-white rounded-lg border-2 border-black w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8'>
+
+            <p className='text-center font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
+              Customize Card
+            </p>
+
+            <div className='flex flex-col md:flex-row gap-8'>
+              <div className='flex-1 min-w-0'>
+
+                {/* Live mini preview */}
+                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-auto border-2 border-primary-800 rounded-lg overflow-hidden mb-6'>
+                  <div className='w-full h-9 3xl:h-10 relative' style={{ backgroundColor: formCardColor }}>
+                    <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-24 h-3 border-2 border-primary-800 rounded-full' />
+                  </div>
+                  <div className='flex flex-row items-start gap-3 px-4 pt-2 pb-3'>
+                    <div className='flex flex-col'>
+                      <img src={profilePic} alt="Profile" className='w-[75px] h-[100px] object-cover border-2 border-primary-800' />
+                      <div
+                        className='w-full h-3 mt-2'
+                        style={{
+                          backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
+                        }}
+                      />
+                    </div>
+                    <div className='flex flex-col flex-1 min-w-0'>
+                      <div className='flex flex-row items-start justify-between'>
+                        <span className='font-kapakana italic text-2xl font-extrabold text-primary-800 leading-tight'>Welcome to</span>
+                        <img src='/idLogo.png' alt="Logo" className='w-7 h-6 flex-shrink-0' />
+                      </div>
+                      <p className='text-xl uppercase font-black font-inter text-primary-800 leading-tight -mt-1'>Study Buddy</p>
+                      <span className='text-[8px] font-inter font-medium text-primary-800 leading-tight'>START YOUR DAY BY BEING PRODUCTIVE.</span>
+                      <div className='flex flex-row w-full mt-2'>
+                        <div className='flex flex-col w-1/2'>
+                          <p className='text-[#636363] font-inter text-[8px] uppercase'>First Name:</p>
+                          <span className='font-bold uppercase font-inter text-primary-800 text-sm leading-tight truncate'>{formFirstName || 'Student'}</span>
+                          <p className='text-[#636363] font-inter text-[8px] uppercase mt-1'>Age:</p>
+                          <span className='font-bold font-inter text-primary-800 text-sm leading-tight'>{formAge || '—'}</span>
+                        </div>
+                        <div className='flex flex-col w-1/2'>
+                          <p className='text-[#636363] font-inter text-[8px] uppercase'>Last Name:</p>
+                          <span className='uppercase font-bold font-inter text-primary-800 text-sm leading-tight truncate'>{formLastName || '—'}</span>
+                          <p className='text-[#636363] font-inter text-[8px] uppercase mt-1'>Year Level:</p>
+                          <span className='uppercase font-bold font-inter text-primary-800 text-sm leading-tight'>{formYearLevel || '—'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Form */}
+                <div className='flex flex-col gap-2'>
+                  <div>
+                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name</label>
+                    <input
+                      type='text'
+                      value={formFirstName}
+                      onChange={(e) => setFormFirstName(e.target.value)}
+                      className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+                    />
+                  </div>
+                  <div>
+                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name</label>
+                    <input
+                      type='text'
+                      value={formLastName}
+                      onChange={(e) => setFormLastName(e.target.value)}
+                      className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+                    />
+                  </div>
+                  <div className='flex gap-4'>
+                    <div className='flex-1'>
+                      <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Age</label>
+                      <input
+                        type='number'
+                        min={1}
+                        max={120}
+                        value={formAge}
+                        onChange={(e) => setFormAge(e.target.value)}
+                        className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+                      />
+                    </div>
+                    <div className='flex-1'>
+                      <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Year Level</label>
+                      <select
+                        value={formYearLevel}
+                        onChange={(e) => setFormYearLevel(e.target.value)}
+                        className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+                      >
+                        <option value=''>Select...</option>
+                        {YEAR_LEVEL_GROUPS.map((group) => (
+                          <optgroup key={group.label} label={group.label}>
+                            {group.options.map((opt) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions + color picker */}
+              <div className='w-full md:w-56 flex flex-col gap-3'>
+                <button
+                  onClick={() => setShowCustomize(false)}
+                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCustomizeAll}
+                  disabled={savingField !== null}
+                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
+                >
+                  {savingField ? 'Saving...' : 'Save'}
+                </button>
+
+                <p className='text-center font-inter text-gray-400 uppercase text-sm mt-4 mb-2'>Color</p>
+                <div className='border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
+                  {['#C9C9C9', '#000000', '#FFD84D', '#7FC4FF', '#B5E8A0', '#D9CBF5', '#FFB8D9', '#FFA55E'].map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setFormCardColor(color)}
+                      className={`w-10 h-10 rounded-md border-2 ${formCardColor === color ? 'border-black ring-2 ring-offset-1 ring-black' : 'border-gray-300'}`}
+                      style={{ backgroundColor: color }}
+                      aria-label={`Choose color ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

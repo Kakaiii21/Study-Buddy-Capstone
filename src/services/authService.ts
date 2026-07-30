@@ -30,6 +30,7 @@ export const googleLogin = async () => {
       lastName: lastParts.join(' ') || '',
       email: user.email,
       createdAt: new Date(),
+      hasCustomizedCard: false
     })
   }
   return user
@@ -53,7 +54,8 @@ export const signup = async (
       firstName,
       lastName,
       email,
-      createdAt: new Date()
+      createdAt: new Date(),
+      hasCustomizedCard: false
     })
     await setDoc(doc(db, 'emails', email), { uid: user.uid })
   } catch {

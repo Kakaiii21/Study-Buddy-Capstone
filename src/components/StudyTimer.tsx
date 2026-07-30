@@ -75,7 +75,7 @@ useEffect(() => {
 >
 
       <div id='timer' className='w-full flex flex-col gap-4 md:gap-5 lg:gap-3 xl:gap-4 2xl:gap-y-10 
-      rounded-2xl lg:rounded-xl pb-10 lg:pb-0 lg:bg-green-800 xl:bg-blue-800 2xl:bg-pink-300 3xl:bg-yellow-200
+      rounded-2xl lg:rounded-xl pb-10 lg:pb-0 
        justify-center items-center  bg-primary-800'>
         <p className='font-bold text-center font-inter text-white tracking-widest 
         mt-10 md:mt-10 lg:mt-5 xl:mt-6 2xl:mt-7 text-xl md:text-xl lg:text-lg xl:text-xl 2xl:text-2xl uppercase px-2'>
