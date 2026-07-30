@@ -92,6 +92,10 @@ useEffect(() => {
 
   const [firstName, setFirstName] = useState<string | null>(null)
   const [profilePic, setProfilePic] = useState('/profile.png')
+  const [lastName, setLastName] = useState<string | null>(null)
+  const [age, setAge] = useState<string | null>(null)
+  const [yearLevel, setYearLevel] = useState<string | null>(null)
+
   useEffect(() => {
     if (!user) return
     const loadUser = async () => {
@@ -158,7 +162,7 @@ useEffect(() => {
         {/* Right of sidebar */}
         <div className='flex-1  flex flex-col overflow-hidden'>
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white fixed top-0 left-0 right-0 z-10 '>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white fixed top-0 left-0 right-0 z-10 relative'>
           <p className='absolute left-1/2 -translate-x-1/2 font-inter font-semibold text-md text-[#B3B3B3] uppercase'>Dashboard</p>
           <div className='w-10' />
           <button
@@ -179,44 +183,102 @@ font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:te
 mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
 <div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
-<div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
+<div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-start'>
     
-    {/* ID Card */}
-<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px] xl:mt-0  2xl:mt-0 3xl:mt-0 lg:min-w-[260px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px] 2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
-h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative'>
-                        
-      {/* Yellow header strip */}
+{/* ID Card */}
+<div className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
+  lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px]
+  2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
+  h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
+  shadow-lg group cursor-pointer'>
 
-      <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14  bg-[#FFF1AB]  rounded-t-lg border-b-2 border-primary-800 relative'>
-        {/* White pill notch */}
-        <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
+  {/* Purple header strip */}
+  <div className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 bg-[#D9CBF5] relative'>
+    <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
+  </div>
+
+  {/* Main content: photo + text + logo */}
+  <div className='flex flex-row items-start gap-3 px-4 md:px-4 lg:px-3 lg:py-0 xl:px-5 xl:py-0 2xl:px-6 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
+
+    <div className='flex flex-col h-auto '>
+      <img
+        src={profilePic}
+        alt="Profile"
+        className='w-[80px] h-[100px]  md:w-[85px] md:h-[115px]
+        lg:w-[70px] lg:h-[85px] lg:my-1 xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[110px] 2xl:h-[130px] 2xl:my-3 3xl:w-[135px] 3xl:h-[160px] object-cover border-2 border-primary-800'
+      />
+      <div
+        className='w-full h-3 md:h-5 lg:h-3 xl:h-5 2xl:h-6 3xl:h-7 mt-2 lg:mt-1 2xl:-mt-1'
+        style={{
+          backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
+        }}
+      />
+      <p className='w-full text-center text-[#B3B3B3] font-inter text-[4px] md:text-[4px] lg:text-[3.5px] xl:text-[5px] 2xl:text-[5.5px] 3xl:text-[7px] leading-tight mt-1'>
+        THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
+      </p>
+    </div>
+
+    <div className='flex flex-col flex-1 min-w-0 pl-0 3xl:pl-5'>
+      <div className='flex flex-row items-start justify-between'>
+        <span className='font-kapakana italic text-[28px] sm:text-[29px] md:text-[30px] lg:text-[28px] xl:text-[34px] 2xl:text-[40px] 3xl:text-[46px] font-extrabold text-primary-800 leading-tight'>
+          Welcome, to
+        </span>
+        <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-11 2xl:h-9 3xl:w-14 3xl:h-12 flex-shrink-0' />
       </div>
-      {/* Main content: photo + text + logo */}
-      <div className='flex  flex-row items-start gap-3 px-4 md:px-4 lg:px-3 lg:py-1 xl:px-5 xl:py-2 2xl:px-6 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
-        <img 
-          src={profilePic} 
-          alt="Profile" 
-          className='w-[70px] h-[95px] sm:w-[72px] sm:h-[97px] md:w-[75px] md:h-[100px] lg:w-[80px] lg:h-[100px] lg:my-1  xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[120px] 2xl:h-[150px] 2xl:my-3 3xl:w-[145px] 3xl:h-[180px] object-cover border-2 border-primary-800'
-        />
-        <div className='flex flex-col flex-1 pl-1'>
-          <div className='flex flex-row items-start xl:my-2 2xl:my-0 2xl:mt-3  justify-between '>
-            <span className='font-kapakana italic  text-[28px] sm:text-[29px] md:text-[30px] lg:text-[28px] xl:text-[34px] 2xl:text-[40px] 3xl:text-[46px] font-extrabold text-primary-800 leading-tight'>Welcome,</span>
-            <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-11 2xl:h-9 3xl:w-14 3xl:h-12' />
+
+      <p className='text-xl md:text-2xl lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 
+      uppercase font-black font-inter text-primary-800 leading-tight -mt-2 lg:-mt-3'>Study Buddy</p>
+
+      <span className='text-[6px] md:text-[9px] lg:text-[6px] xl:text-[8px] 2xl:text-[10px] 3xl:text-[11px] font-inter font-medium text-primary-800 leading-tight lg:mt-0 2xl:mt-1'>
+        START YOUR DAY BY BEING PRODUCTIVE.
+      </span>
+
+      <div className='flex flex-row w-full'>
+        {/* First Name and Age */}
+        <div className='flex flex-col justify-start w-2/4'>
+          <div className='flex flex-col'>
+            <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3'>First Name:</p>
+            <span className='font-bold uppercase font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
+              {firstName ?? 'Student'}
+            </span>
           </div>
-          <span className='font-bold font-inter text-primary-800 text-xl md:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl leading-tight -mt-3 md:-mt-3 lg:-mt-2 xl:-mt-3 2xl:-mt-2 3xl:-mt-2'> {firstName ?? ''}</span>
-          <span className='text-[8px] md:text-[9px] lg:text-[6px] xl:text-[8px] 2xl:text-[10px] 3xl:text-[11px] font-inter font-medium text-primary-800 tracking-wide mt-2'>
-            START YOUR DAY BY BEING PRODUCTIVE.
-          </span>
-          {/* Barcode right under the subtitle */}
-          <div 
-            className='w-full h-4 md:h-4 lg:h-4 xl:h-5 xl:w-[175px] 2xl:w-[219px] 3xl:w-[250px] 2xl:h-6 3xl:h-7 mt-2 lg:mt-1'
-            style={{
-              backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
-            }}
-          />
+          <div className='flex flex-col'>
+            <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2'>Age:</p>
+            <span className='font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
+              {age ?? '21'}
+            </span>
+          </div>
+        </div>
+
+        {/* Last Name and Year Level */}
+        <div className='flex flex-col w-2/4'>
+          <div className='flex flex-col'>
+            <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3 '>Last Name:</p>
+            <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
+              {lastName ?? 'Dellamas'}
+            </span>
+          </div>
+          <div className='flex flex-col'>
+            <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2 '>Year Level:</p>
+            <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
+              {yearLevel ?? '4th Year'}
+            </span>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  {/* Hover overlay */}
+  <div className='absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 
+    transition-opacity duration-200 flex flex-col items-center justify-center gap-2 z-10'>
+
+    <img src="./idCustom.png" alt="" className='w-6 h-6 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 3xl:w-10 3xl:h-10' />
+    <span className='font-inter font-medium text-xs md:text-sm lg:text-[8px] xl:text-sm 2xl:text-base 3xl:text-lg text-black uppercase'>
+      Customize Card
+    </span>
+  </div>
+</div>
     {/* Stats column */}
 <div className='flex w-full flex-1 min-w-0 flex-row gap-x-4  md:flex-col md:flex-1 lg:flex-1 
   sm:min-w-[220px] sm:max-w-[280px] md:min-w-[240px] md:max-w-[300px] lg:min-w-[200px] lg:max-w-[clamp(260px,28vw,320px)] xl:min-w-[260px] xl:max-w-[320px] 2xl:max-w-[360px] 3xl:max-w-[440px]
