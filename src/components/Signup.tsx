@@ -219,7 +219,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-0.5 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-2  xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
@@ -413,7 +413,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-0.5 xl:py-1 2xl:py-1.5 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-2 xl:py-1 2xl:py-1.5 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
@@ -459,7 +459,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           <button
             onClick={handleSignup}
             disabled={loading}
-            className="w-full bg-primary-600 
+            className="w-full bg-primary-600  md:bg-pink-700
               hover:opacity-90   
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]

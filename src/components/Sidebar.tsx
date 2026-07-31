@@ -159,11 +159,11 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
           ))}
 
           {/* LOGOUT */}
-              <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5  ml-2 xl:px-3'>
+              <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0  ml-2 xl:px-3'>
                 <button
                   onClick={() => !isBlocked && setShowLogoutModal(true)}
                   className="
-                     w-full text-left py-2 lg:py-0 pl-1   mb-1
+                     w-full text-left py-2 lg:py-1 pl-1   mb-1
                     font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
                     transition-colors duration-200 rounded-lg
                     flex items-center gap-2 

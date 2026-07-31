@@ -372,7 +372,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
             />
             <button
               onClick={() => setActiveTab('changeEmail')}
-              className='bg-primary-600 text-white px-4 md:px-6 rounded-md font-inter font-medium text-sm md:text-base
+              className='bg-primary-600 text-white px-2 md:px-6 rounded-md font-inter font-medium text-xs md:text-base
               shadow-[0_2px_4px_rgba(0,0,0,0.25)] lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]
               hover:bg-white hover:text-primary-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.3)]
               transition-all duration-300 whitespace-nowrap uppercase'

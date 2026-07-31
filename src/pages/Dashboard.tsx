@@ -186,6 +186,14 @@ function Dashboard() {
     const s = total % 60
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
+
+  // Display-safe fallbacks — catches null AND empty string ('') so a saved-but-blank
+  // field never collapses the card layout; always renders a placeholder instead.
+  const displayFirstName = firstName || '—'
+  const displayLastName = lastName || '—'
+  const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
+  const displayYearLevel = yearLevel || '—'
+
   const activities = [
     { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
     { label: 'Notes',          path: '/notes',          color: '#7FC4FF' },
@@ -281,7 +289,7 @@ function Dashboard() {
           {/* Body: main content + timer side by side */}
 <div className='flex w-full  flex-1 overflow-hidden mt-0 lg:mt-0'>
      {/* Scrollable Main Content */}
-<main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white px-8 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
+<main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white px-3 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
 <p className='hidden md:flex w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto 
 font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
 mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
@@ -320,9 +328,11 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
           backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
         }}
       />
-      <p className='w-full text-center text-[#B3B3B3] font-inter text-[4px] md:text-[4px] lg:text-[3.5px] xl:text-[5px] 2xl:text-[5.5px] 3xl:text-[7px] leading-tight mt-1'>
-        THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
-      </p>
+<div className='relative w-full h-[8px] md:h-[8px] lg:h-[7px] xl:h-[9px] 2xl:h-[10px] 3xl:h-[13px] mt-1 overflow-hidden'>
+  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[4px] md:text-[4px] lg:text-[3.5px] xl:text-[5px] 2xl:text-[5.5px] 3xl:text-[7px] leading-tight'>
+    THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
+  </p>
+</div>
     </div>
 
     <div className='flex flex-col flex-1 min-w-0 pl-0 3xl:pl-5'>
@@ -346,13 +356,13 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3'>First Name:</p>
             <span className='font-bold uppercase font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
-              {firstName ?? '—'}
+              {displayFirstName}
             </span>
           </div>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2'>Age:</p>
             <span className='font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
-              {age ?? '—'}
+              {displayAge}
             </span>
           </div>
         </div>
@@ -362,13 +372,13 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-3 '>Last Name:</p>
             <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0 truncate'>
-              {lastName ?? '—'}
+              {displayLastName}
             </span>
           </div>
           <div className='flex flex-col'>
             <p className='text-[#636363] font-inter font-normal uppercase text-[8px]  md:text-[9px] lg:text-[7px] 2xl:text-[10px] 3xl:text-[13px] mt-1 sm:mt-1 md:mt-2 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-2 '>Year Level:</p>
             <span className='uppercase font-bold font-inter text-primary-800 text-sm md:text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-2xl leading-tight mt-0 md:mt-0 lg:-mt-0 xl:mt-0 2xl:-mt-1 3xl:mt-0'>
-              {yearLevel ?? '—'}
+              {displayYearLevel}
             </span>
           </div>
         </div>
@@ -499,7 +509,7 @@ className='relative flex flex-col justify-between text-left p-2
       </div>
 
       {showCustomize && (
-        <div className='fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4'>
+        <div className='fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-1 md:p-4'>
           <div className='bg-white rounded-lg border-2 border-black w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8'>
 
             <p className='text-center font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
@@ -510,11 +520,11 @@ className='relative flex flex-col justify-between text-left p-2
               <div className='flex-1 min-w-0'>
 
                 {/* Live mini preview */}
-                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-auto border-2 border-primary-800 rounded-lg overflow-hidden mb-6'>
-                  <div className='w-full h-9 3xl:h-10 relative' style={{ backgroundColor: formCardColor }}>
+                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-0 md:mx-auto border-2 border-primary-800 rounded-lg overflow-hidden mb-6'>
+                  <div className='w-full h-8 3xl:h-10 relative' style={{ backgroundColor: formCardColor }}>
                     <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-24 h-3 border-2 border-primary-800 rounded-full' />
                   </div>
-                  <div className='flex flex-row items-start gap-3 px-4 pt-2 pb-3'>
+                  <div className='flex flex-row items-start gap-3 px-2 md:px-4 pt-2 pb-3'>
                     <div className='flex flex-col'>
                       <img src={profilePic} alt="Profile" className='w-[75px] h-[100px] object-cover border-2 border-primary-800' />
                       <div
@@ -523,26 +533,32 @@ className='relative flex flex-col justify-between text-left p-2
                           backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
                         }}
                       />
+  <div className='relative w-full h-[8px] mt-1 overflow-hidden'>
+  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[4px] leading-tight'>
+    THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
+  </p>
+</div>
                     </div>
                     <div className='flex flex-col flex-1 min-w-0'>
                       <div className='flex flex-row items-start justify-between'>
                         <span className='font-kapakana italic text-2xl font-extrabold text-primary-800 leading-tight'>Welcome to</span>
                         <img src='/idLogo.png' alt="Logo" className='w-7 h-6 flex-shrink-0' />
+
                       </div>
-                      <p className='text-xl uppercase font-black font-inter text-primary-800 leading-tight -mt-1'>Study Buddy</p>
-                      <span className='text-[8px] font-inter font-medium text-primary-800 leading-tight'>START YOUR DAY BY BEING PRODUCTIVE.</span>
+                      <p className='text-sm md:text-xl uppercase font-black font-inter text-primary-800 leading-tight -mt-1'>Study Buddy</p>
+                      <span className='text-[6px] md:text-[8px] font-inter font-medium text-primary-800 leading-tight'>START YOUR DAY BY BEING PRODUCTIVE.</span>
                       <div className='flex flex-row w-full mt-2'>
                         <div className='flex flex-col w-1/2'>
                           <p className='text-[#636363] font-inter text-[8px] uppercase'>First Name:</p>
-                          <span className='font-bold uppercase font-inter text-primary-800 text-sm leading-tight truncate'>{formFirstName || 'Student'}</span>
+                          <span className='font-bold uppercase font-inter text-primary-800 text-xs md:text-sm leading-tight truncate'>{formFirstName || '—'}</span>
                           <p className='text-[#636363] font-inter text-[8px] uppercase mt-1'>Age:</p>
-                          <span className='font-bold font-inter text-primary-800 text-sm leading-tight'>{formAge || '—'}</span>
+                          <span className='font-bold font-inter text-primary-800 text-xs md:text-sm leading-tight'>{formAge || '—'}</span>
                         </div>
                         <div className='flex flex-col w-1/2'>
                           <p className='text-[#636363] font-inter text-[8px] uppercase'>Last Name:</p>
-                          <span className='uppercase font-bold font-inter text-primary-800 text-sm leading-tight truncate'>{formLastName || '—'}</span>
+                          <span className='uppercase font-bold font-inter text-primary-800 text-xs md:text-sm leading-tight truncate'>{formLastName || '—'}</span>
                           <p className='text-[#636363] font-inter text-[8px] uppercase mt-1'>Year Level:</p>
-                          <span className='uppercase font-bold font-inter text-primary-800 text-sm leading-tight'>{formYearLevel || '—'}</span>
+                          <span className='uppercase font-bold font-inter text-primary-800 text-xs md:text-sm leading-tight'>{formYearLevel || '—'}</span>
                         </div>
                       </div>
                     </div>
@@ -557,6 +573,7 @@ className='relative flex flex-col justify-between text-left p-2
                       type='text'
                       value={formFirstName}
                       onChange={(e) => setFormFirstName(e.target.value)}
+                      placeholder='Optional'
                       className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
                     />
                   </div>
@@ -566,6 +583,7 @@ className='relative flex flex-col justify-between text-left p-2
                       type='text'
                       value={formLastName}
                       onChange={(e) => setFormLastName(e.target.value)}
+                      placeholder='Optional'
                       className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
                     />
                   </div>
@@ -578,6 +596,7 @@ className='relative flex flex-col justify-between text-left p-2
                         max={120}
                         value={formAge}
                         onChange={(e) => setFormAge(e.target.value)}
+                        placeholder='Optional'
                         className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
                       />
                     </div>
@@ -588,7 +607,7 @@ className='relative flex flex-col justify-between text-left p-2
                         onChange={(e) => setFormYearLevel(e.target.value)}
                         className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
                       >
-                        <option value=''>Select...</option>
+                        <option value=''>Select... (optional)</option>
                         {YEAR_LEVEL_GROUPS.map((group) => (
                           <optgroup key={group.label} label={group.label}>
                             {group.options.map((opt) => (
@@ -602,24 +621,11 @@ className='relative flex flex-col justify-between text-left p-2
                 </div>
               </div>
 
-              {/* Actions + color picker */}
+              {/* Actions + color picker — reordered on mobile: color first, buttons last */}
               <div className='w-full md:w-56 flex flex-col gap-3'>
 
-                <button
-                  onClick={handleSaveCustomizeAll}
-                  disabled={savingField !== null}
-                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
-                >
-                  {savingField ? 'Saving...' : 'Save'}
-                </button>
-                <button
-                  onClick={() => setShowCustomize(false)}
-                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
-                >
-                  Cancel
-                </button>
-                <p className='text-center font-inter text-gray-400 uppercase text-sm mt-4 mb-2'>Color</p>
-                <div className='border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
+                <p className='order-1 md:order-3 text-center font-inter text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
+                <div className='order-2 md:order-4 border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
                   {['#C9C9C9', '#000000', '#FFD84D', '#7FC4FF', '#B5E8A0', '#D9CBF5', '#FFB8D9', '#FFA55E'].map((color) => (
                     <button
                       key={color}
@@ -630,6 +636,20 @@ className='relative flex flex-col justify-between text-left p-2
                     />
                   ))}
                 </div>
+
+                <button
+                  onClick={handleSaveCustomizeAll}
+                  disabled={savingField !== null}
+                  className='order-3 md:order-1 mt-1 md:mt-0 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
+                >
+                  {savingField ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={() => setShowCustomize(false)}
+                  className='order-4 md:order-2 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

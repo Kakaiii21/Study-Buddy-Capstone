@@ -179,7 +179,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       <hr className='lg:hidden md:hidden mt-4  w-full border-t opacity-5 border-primary-600 ' />
 
       <section className='w-full mt-4 md:mt-10'>
-        <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-20'>
+        <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-1'>
           <p className='flex flex-wrap justify-center items-center  gap-x-1 font-fustat text-primary-600 text-sm md:text-lg 2xl:text-2xl lg:mb-20 xl:mb-24 2xl:mb-32 px-4 mb-10 text-center'>
             <span>Your all-in-one study companion &mdash;</span>
             <b>plan, organize,</b>
@@ -187,37 +187,37 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
             <b>learn smarter.</b>
           </p>
 
-          <div className='flex flex-row gap-x-4 justify-start items-center mb-6'>
-            <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl shrink-0
-            w-[80px] h-[80px] 
-            md:w-[150px] md:h-[150px] 
-            lg:w-[130px] lg:h-[120px]
-            xl:w-[130px] xl:h-[130px] 
-            2xl:w-[200px] 2xl:h-[200px]' />
-            <div className='text-primary-600 font-inter  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
-              <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Timer</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying. 
-                Start the timer whenever you sit down to work,
-                and watch your study hours add up.
-                </p>
-            </div>
-          </div>
+<div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6'>
+  <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl shrink-0
+  w-[80px] h-[80px] 
+  md:w-[150px] md:h-[150px] 
+  lg:w-[130px] lg:h-[120px]
+  xl:w-[130px] xl:h-[130px] 
+  2xl:w-[200px] 2xl:h-[200px]' />
+  <div className='text-primary-600 font-inter'>
+    <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Timer</p>
+    <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying. 
+      Start the timer whenever you sit down to work,
+      and watch your study hours add up.
+      </p>
+  </div>
+</div>
 
-          <div className='flex flex-row gap-4 justify-end items-center'>
-            <div className='text-right text-primary-600 font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px]'>
-              <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
-              <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
-                Add, check off, and manage your tasks so
-                nothing slips through the cracks.
-              </p>
-            </div>
-            <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl shrink-0
-            w-[80px] h-[80px] 
-            md:w-[150px] md:h-[150px] 
-            lg:w-[130px] lg:h-[120px]
-            xl:w-[130px] xl:h-[130px] 
-            2xl:w-[200px] 2xl:h-[200px]' />
-          </div>
+<div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
+  <div className='text-right text-primary-600 font-inter'>
+    <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
+    <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
+      Add, check off, and manage your tasks so
+      nothing slips through the cracks.
+    </p>
+  </div>
+  <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl shrink-0
+  w-[80px] h-[80px] 
+  md:w-[150px] md:h-[150px] 
+  lg:w-[130px] lg:h-[120px]
+  xl:w-[130px] xl:h-[130px] 
+  2xl:w-[200px] 2xl:h-[200px]' />
+</div>
         </div>
       {/*Second*/}
       <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
@@ -230,7 +230,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           2xl:w-[200px] 2xl:h-[200px]' />
           <div className='text-primary-600 font-inter  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Notes</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized
+            <p className=' mr-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized
             place. Create, edit, and revisit your notes
             anytime, so nothing gets lost between
             subjects and deadlines.</p>
@@ -240,7 +240,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         <div className='flex flex-row gap-4 justify-end items-center'>
           <div className='text-right text-primary-600 font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Class Schedule</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a
+            <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a
             glance. Plan your week and stay on top
             of where you need to be and when.</p>
           </div>
@@ -254,7 +254,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       </div>
 
       {/*Third*/}
-      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-32'>
+      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-16'>
         <div className='flex flex-row gap-x-4 justify-start items-center mb-6  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
           <img src="./assets/courses.gif" alt="coursesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
@@ -264,7 +264,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           2xl:w-[200px] 2xl:h-[200px]' />
           <div className='text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Course</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and
+            <p className=' mr-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and
             materials by course. Keep
             everything related to each class
             neatly grouped and easy to find.</p>
@@ -274,7 +274,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         <div className='flex flex-row gap-4 justify-end items-center'>
           <div className='text-right text-primary-600  font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Generator</p>
-            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and
+            <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and
             flashcards in seconds. A smarter, faster way
             to review and test what you've learned.</p>
           </div>
@@ -468,7 +468,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         onContextMenu={(e) => e.preventDefault()}
         draggable={false}/>
       <div className='flex flex-col justify-center items-start'>
-        <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>Project Manager</p>
+        <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>Project Manager / UI Designer</p>
         <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Eunice Jayce F. De Vero</p>
         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=eunicejaycedevero@gmail.com"
           target="_blank"
@@ -489,7 +489,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         onContextMenu={(e) => e.preventDefault()}
         draggable={false}/>
       <div className='flex flex-col justify-center items-start'>
-        <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>UI Designer</p>
+        <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>System Analyst</p>
         <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Jerwin L. Zamorao</p>
         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=zamorajerwin0@gmail.com"
           target="_blank"
