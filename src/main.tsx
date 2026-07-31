@@ -32,6 +32,7 @@ import PrivacyPolicy from './privacy'
 import TermsOfService from './terms'
 import AuthGate from './components/AuthGate'
 import StudyTimerPage from './pages/StudyTimerPage'
+import ReactivatePage from './pages/ReactivatePage'
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
@@ -49,16 +50,20 @@ const router = createBrowserRouter([
     ),
   },
   {
-  path: '/terms',
-  element: <TermsOfService />
-},
-{
-  path: '/privacy',
-  element: <PrivacyPolicy />
-},
-    {
+    path: '/terms',
+    element: <TermsOfService />
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPolicy />
+  },
+  {
     path: '/verify-email',
     element: <VerifyEmail />,
+  },
+  {
+    path: '/reactivate',
+    element: <ReactivatePage />
   },
   {
     path: '/forgotPassword',

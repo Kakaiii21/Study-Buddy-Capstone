@@ -4,7 +4,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
 import { auth } from '../services/firebase'
-import { logout } from '../services/authService'
+import { logout, deactivateAccount } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 
 interface BasicInfoProps {
@@ -30,8 +30,13 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
   const [firstNameError, setFirstNameError] = useState(false)
   const [lastNameError, setLastNameError] = useState(false)
 
-  // ── NEW: logout state ──────────────────────────────────────────────────
+  // ── logout state ──────────────────────────────────────────────────
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  // ────────────────────────────────────────────────────────────────────────
+
+  // ── NEW: deactivate state ─────────────────────────────────────────
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false)
+  const [deactivating, setDeactivating] = useState(false)
   // ────────────────────────────────────────────────────────────────────────
 
   const showToast = (message: string) => {
@@ -214,7 +219,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
     }
   }
 
-  // ── NEW: logout handler ──────────────────────────────────────────────────
+  // ── logout handler ──────────────────────────────────────────────────
   const handleLogout = async () => {
     sessionStorage.clear()
     sessionStorage.setItem('intentionalLogout', 'true')
@@ -222,6 +227,25 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
     setShowLogoutModal(false)
     navigate('/')
     window.history.replaceState(null, '', '/')
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  // ── NEW: deactivate handler ───────────────────────────────────────
+  const handleDeactivate = async () => {
+    setDeactivating(true)
+    try {
+      await deactivateAccount()
+      sessionStorage.clear()
+      sessionStorage.setItem('intentionalLogout', 'true')
+      await logout()
+      navigate('/')
+      window.history.replaceState(null, '', '/')
+    } catch (err) {
+      console.error('Failed to deactivate account:', err)
+      showToast('Failed to deactivate. Please try again.')
+      setDeactivating(false)
+      setShowDeactivateModal(false)
+    }
   }
   // ──────────────────────────────────────────────────────────────────────────
 
@@ -377,7 +401,17 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           </button>
         </div>
 
-        {/* ── NEW: Logout button ──
+        {/* ── NEW: Deactivate Account button ── */}
+        <div className='flex justify-center mt-4'>
+          <button
+            onClick={() => setShowDeactivateModal(true)}
+            className='w-full md:w-[250px] text-red-500 border-2 border-red-500 font-inter font-semibold uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3 rounded-md hover:bg-red-500 hover:text-white transition-all duration-300'
+          >
+            Deactivate Account
+          </button>
+        </div>
+
+        {/* ── Logout button ──
         <div className='flex md:hidden justify-center mt-4'>
           <button
             onClick={() => setShowLogoutModal(true)}
@@ -387,7 +421,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           </button>
         </div> */}
 
-        {/* ── NEW: Logout confirmation modal ── */}
+        {/* ── Logout confirmation modal ── */}
         {showLogoutModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowLogoutModal(false)} />
@@ -406,6 +440,35 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
                   className="flex-1 bg-primary-600 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200"
                 >
                   Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── NEW: Deactivate confirmation modal ── */}
+        {showDeactivateModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => !deactivating && setShowDeactivateModal(false)} />
+            <div className="relative bg-white rounded-xl shadow-xl p-8 w-80 text-center">
+              <h2 className="text-xl font-bold text-red-500 font-roboto mb-2">Deactivate Account</h2>
+              <p className="text-gray-600 mb-6 text-sm">
+                Your account will be deactivated immediately. Log back in within 30 days to reactivate — after that, your account and all data will be permanently deleted.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowDeactivateModal(false)}
+                  disabled={deactivating}
+                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeactivate}
+                  disabled={deactivating}
+                  className="flex-1 bg-red-500 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
+                >
+                  {deactivating ? 'Deactivating...' : 'Deactivate'}
                 </button>
               </div>
             </div>

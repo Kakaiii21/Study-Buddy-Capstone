@@ -105,6 +105,43 @@ export const changeEmail = async (newEmail: string) => {
   }
 }
 
+// DEACTIVATE ACCOUNT
+export const deactivateAccount = async () => {
+  const user = auth.currentUser
+  if (!user) throw { code: 'auth/no-user', message: 'No user logged in' }
+  const token = await user.getIdToken()
+  const response = await fetch(`${FUNCTIONS_BASE}/deactivateAccount`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({}),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
+}
+
+// REACTIVATE ACCOUNT
+export const reactivateAccount = async () => {
+  const user = auth.currentUser
+  if (!user) throw { code: 'auth/no-user', message: 'No user logged in' }
+  const token = await user.getIdToken()
+  const response = await fetch(`${FUNCTIONS_BASE}/reactivateAccount`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({}),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
+}
 // LOGIN
 export const login = async (email: string, password: string) => {
   const userCredential = await signInWithEmailAndPassword(auth, email, password)

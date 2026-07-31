@@ -615,4 +615,74 @@ export const cancelEmailChange = onRequest(
   }
 )
 
+export const deactivateAccount = onRequest(
+  { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Unauthorized' }); return }
+    try {
+      const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1])
+      const uid = decoded.uid
+      const userSnap = await admin.firestore().doc(`users/${uid}`).get()
+      const email = userSnap.data()?.email
+      await admin.firestore().doc(`users/${uid}`).update({
+        status: 'deactivated',
+        deactivatedAt: Date.now(),
+      })
+      if (email) {
+        const { Resend } = await import('resend')
+        const resend = new Resend(process.env.RESEND_API_KEY!)
+        await resend.emails.send({
+          from: 'Study Buddy <support@studybuddyph.site>',
+          to: email,
+          subject: 'Your Study Buddy account has been deactivated',
+          html: emailTemplate(`
+            <p style="font-size:16px; margin-bottom:8px;">We're sorry to see you go 😔</p>
+            <p style="font-size:15px; line-height:1.6; color:#444;">
+              Your account has been deactivated. Simply log back in within <strong>30 days</strong> to reactivate — after that, your account and data will be permanently deleted.
+            </p>
+          `),
+        })
+      }
+      res.status(200).json({ success: true })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    }
+  }
+)
+
+export const reactivateAccount = onRequest(
+  { timeoutSeconds: 60, memory: '256MiB' },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Unauthorized' }); return }
+    try {
+      const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1])
+      const uid = decoded.uid
+      const userRef = admin.firestore().doc(`users/${uid}`)
+      const snap = await userRef.get()
+      const data = snap.data()
+      if (data?.status !== 'deactivated') { res.status(400).json({ error: 'Account is not deactivated.' }); return }
+      const thirtyDaysMs = 1000 * 60 * 60 * 24 * 30
+      if (Date.now() - data.deactivatedAt > thirtyDaysMs) {
+        res.status(410).json({ error: 'Reactivation window has expired.' })
+        return
+      }
+      await userRef.update({ status: 'active', deactivatedAt: admin.firestore.FieldValue.delete() })
+      res.status(200).json({ success: true })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    }
+  }
+)
+
 export { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
+export { cleanupDeactivatedAccounts } from './cleanup'

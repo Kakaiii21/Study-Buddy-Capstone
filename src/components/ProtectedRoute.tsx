@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import type { User } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../services/firebase'
 import { onAuthChange } from '../services/authService'
-import EmailChangeWatcher from './EmailChangeWatcher'  // ← add this
+import EmailChangeWatcher from './EmailChangeWatcher'
 
 type Props = {
   children: React.ReactNode
@@ -10,11 +12,22 @@ type Props = {
 
 function ProtectedRoute({ children }: Props) {
   const [user, setUser] = useState<User | null>(null)
+  const [status, setStatus] = useState<'active' | 'deactivated' | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
+    const unsubscribe = onAuthChange(async (user) => {
       setUser(user)
+      if (user) {
+        try {
+          const snap = await getDoc(doc(db, 'users', user.uid))
+          setStatus(snap.data()?.status ?? 'active')
+        } catch {
+          setStatus('active') // fail open, don't lock the user out on a read error
+        }
+      } else {
+        setStatus(null)
+      }
       setLoading(false)
     })
     return () => unsubscribe()
@@ -28,7 +41,10 @@ function ProtectedRoute({ children }: Props) {
     return <Navigate to="/" replace />
   }
 
-  // ↓ wrap children with the watcher
+  if (status === 'deactivated') {
+    return <Navigate to="/reactivate" replace />
+  }
+
   return (
     <>
       <EmailChangeWatcher />
