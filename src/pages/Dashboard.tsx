@@ -290,7 +290,7 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
 <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-start'>
     
 {/* ID Card */}
-<div onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
+<div id='idCard' onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
   lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px]
   2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
   h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
@@ -604,12 +604,7 @@ className='relative flex flex-col justify-between text-left p-2
 
               {/* Actions + color picker */}
               <div className='w-full md:w-56 flex flex-col gap-3'>
-                <button
-                  onClick={() => setShowCustomize(false)}
-                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
-                >
-                  Cancel
-                </button>
+
                 <button
                   onClick={handleSaveCustomizeAll}
                   disabled={savingField !== null}
@@ -617,7 +612,12 @@ className='relative flex flex-col justify-between text-left p-2
                 >
                   {savingField ? 'Saving...' : 'Save'}
                 </button>
-
+                <button
+                  onClick={() => setShowCustomize(false)}
+                  className='border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
+                >
+                  Cancel
+                </button>
                 <p className='text-center font-inter text-gray-400 uppercase text-sm mt-4 mb-2'>Color</p>
                 <div className='border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
                   {['#C9C9C9', '#000000', '#FFD84D', '#7FC4FF', '#B5E8A0', '#D9CBF5', '#FFB8D9', '#FFA55E'].map((color) => (

@@ -13,6 +13,14 @@ const dashboardDesktop: DriveStep[] = [
   },
   },
   {
+    element: '#idCard',
+    popover: {
+      title: '🪪 Your Student ID Card',
+      description: 'Tap this card anytime to customize your name, age, year level, and card color.',
+      side: 'bottom',
+    },
+  },
+  {
     element: '#currentTime',
     popover: {
       title: '⏱️ Total Study Time',
@@ -71,6 +79,14 @@ const dashboardTablet: DriveStep[] = [
     description: 'Click this button whenever you need a tour of the current page.',
     side: 'top',
   },
+  },
+  {
+    element: '#idCard',
+    popover: {
+      title: '🪪 Your Student ID Card',
+      description: 'Tap this card anytime to customize your name, age, year level, and card color.',
+      side: 'right',
+    },
   },
   {
     element: '#sidebar-btn',
@@ -139,6 +155,14 @@ const dashboardMobile: DriveStep[] = [
     description: 'Click this button whenever you need a tour of the current page.',
     side: 'top',
   },
+  },
+  {
+    element: '#idCard',
+    popover: {
+      title: '🪪 Your Student ID Card',
+      description: 'Tap this card anytime to customize your name, age, year level, and card color.',
+      side: 'bottom',
+    },
   },
   {
     element: '#sidebar-btn',
