@@ -18,7 +18,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-4 max-w-sm lg:max-w-[300px] xl:max-w-[350px] w-full mx-4'>
         <div className='flex items-center gap-3 lg:gap-1.5 mb-3 lg:mb-1.5'>
-          <img src="/delete.png" alt="delteicon" className='w-7 h-7 lg:w-4 lg:h-4 xl:w-5 xl:h-5' />
+          <img src="/delete.png" alt="delteicon" className='w-7 h-7 lg:w-4 lg:h-4 xl:w-5 xl:h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-lg lg:text-xs xl:text-sm font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm lg:text-[10px] xl:text-[11px] mb-1'>
@@ -182,7 +182,7 @@ const { startTour } = useTour(
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
@@ -197,27 +197,28 @@ const { startTour } = useTour(
           px-14 sm:px-12 justify-center items-center py-1
           lg:justify-end lg:items-start lg:pr-10 2xl:pr-16 lg:px-0 lg:gap-3
           md:justify-between md:items-start sm:items-center gap-1 p-0">
-            <button
-              id='addCourseBtn'
-              onClick={() => setShowModal(true)}
-              disabled={!isOnline}
-              title={!isOnline ? 'You are offline' : undefined}
-              className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-              py-1 px-4 rounded-sm 
-              flex items-center gap-1.5
-              font-inter font-black
-              text-[10px] lg:text-[9px]
-              xl:text-[12px] 2xl:text-[14px]
-              3xl:text-[18px]
-              hover:opacity-90 lg:w-auto
-              backdrop-blur-xs
-              hover:-translate-y-1 
-              hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-              transition-all duration-300 disabled:bg-[#B0A030]
-              disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
-              disabled:hover:translate-y-0 disabled:hover:shadow-none"            
-           >
-            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />
+<button
+  id='addCourseBtn'
+  onClick={() => setShowModal(true)}
+  disabled={!isOnline}
+  title={!isOnline ? 'You are offline' : undefined}
+  className="order-2 lg:order-1 bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+  py-2 lg:py-1 px-4 rounded-sm 
+  flex items-center justify-center gap-2
+  font-inter font-black
+  text-[10px] lg:text-[10px] md:ml-10
+  xl:text-[13px] 2xl:text-[15px]
+  3xl:text-[19px]
+  hover:opacity-90
+  w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]
+  backdrop-blur-xs
+  hover:-translate-y-1 
+  hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+  transition-all duration-300 disabled:bg-[#B0A030]
+  disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
+  disabled:hover:translate-y-0 disabled:hover:shadow-none"            
+>
+            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3 2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             Course Folder
             </button>
             {/* Search bar */}
@@ -280,7 +281,7 @@ const { startTour } = useTour(
                       <img
                         src={`${course.fileCount && course.fileCount > 0 ? "storefolder" : "folder"}-${course.color || 'blue'}.png`}
                         alt="folder"
-                        className={`hover:opacity-90 ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        className={`hover:opacity-90 ${!isOnline ? 'opacity-40 cursor-not-allowed select-none' : ''}`} onContextMenu={(e) => e.preventDefault()} draggable={false}
                       />                      
                       </button>
 
@@ -309,22 +310,22 @@ const { startTour } = useTour(
                         >
                           <button
                             onClick={() => handleEditOpen(course.id, course.name, course.color)}
-                            className='flex items-center lg:text-[12px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                            className='flex items-center lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[15px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5 lg:w-3 lg:h-3' src="edit.png" alt="edit icon" /> Edit
+                            <img className='w-5 h-5 lg:w-3 lg:h-3 xl:w-3 xl:h-3 2xl:w-5 2xl:h-5 3xl:w-5 3xl:h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="edit.png" alt="edit icon" /> Edit
                           </button>
                           <hr className='my-0 border-primary-800 mx-2' />
                           <button
                             onClick={() => { setPendingDelete({ id: course.id, name: course.name }); setActiveMenu(null) }}
-                            className='flex items-center lg:text-[12px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                            className='flex items-center lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[15px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-5 h-5 lg:w-3 lg:h-3' /> Delete
+                            <img src="delete.png" alt="delete icon" className='w-5 h-5 lg:w-3 lg:h-3 xl:w-3 xl:h-3 2xl:w-5 2xl:h-5 3xl:w-5 3xl:h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
                           </button>
                         </div>
                       )}
                     </div>
 
-                    <p className='text-center  font-normal font-inter text-md md:text-2xl  lg:text-[14px] xl:text-[15px] 2xl:text-[16px] text-primary-600'>
+                    <p className='text-center  font-normal font-inter text-md md:text-2xl  lg:text-[14px] xl:text-[15px] 2xl:text-[16px] text-primary-600 truncate'>
                       {course.name}
                     </p>
                   </div>
@@ -340,7 +341,7 @@ const { startTour } = useTour(
             <div className='bg-primary-600 rounded-xl shadow-xl p-8 lg:p-0 lg:px-6 lg:py-4 xl:p-0 xl:px-5 xl:py-3 2xl:p-0 2xl:px-4 2xl:py-4 w-[95%] lg:w-[350px] xl:w-[360px] 2xl:w-[370px] max-w-md flex flex-col gap-5'>
               <div className='flex flex-row'>
                 <button onClick={handleClose} className='w-5 lg:w-3 xl:w-4 2xl:w-5'>
-                  <img src="X.png" alt="X" />
+                  <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
                 <p className='ml-12 md:ml-24 text-2xl text-center lg:ml-[80px] lg:text-lg xl:ml-[80px] xl:text-xl font-bold font-roboto text-white uppercase'>
                   Add a course
@@ -359,7 +360,7 @@ const { startTour } = useTour(
                   }`}
                 />
                 <button onClick={handleSave} disabled={isSaving} className='flex items-center justify-center w-12 h-12 lg:w-8 lg:h-8 xl:w-9 xl:h-9 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed'>
-                  <img src="saveIcon.png" alt="saveicon" className='w-5 lg:w-4 xl:w-5 brightness-0 invert hover:invert-0' />
+                  <img src="saveIcon.png" alt="saveicon" className='w-5 lg:w-4 xl:w-5 brightness-0 invert hover:invert-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
               </div>
               <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
@@ -401,7 +402,7 @@ const { startTour } = useTour(
             <div className='bg-primary-600 rounded-xl shadow-xl p-8 w-[95%] max-w-md flex flex-col gap-5'>
               <div className='flex flex-row'>
                 <button onClick={handleEditClose} className='w-5'>
-                  <img src="X.png" alt="X" />
+                  <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
                 <p className='ml-12 md:ml-20 text-2xl font-bold font-roboto text-white uppercase'>
                   Edit Course
@@ -420,7 +421,7 @@ const { startTour } = useTour(
                     }`}
                   />
                   <button onClick={handleEditSave} className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'>
-                    <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert' />
+                    <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                   </button>
                 </div>
 
@@ -466,7 +467,7 @@ const { startTour } = useTour(
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         
