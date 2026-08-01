@@ -125,7 +125,7 @@ function CoursePicker({
                       <img
                         src={`/folder-${course.color || 'blue'}.png`}
                         alt='folder'
-                        className='w-16 2xl:w-20 3xl:w-24 group-hover:opacity-80'
+                        className='w-16 2xl:w-20 3xl:w-24 group-hover:opacity-80 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                       />
                       <p className='font-roboto font-bold text-primary-600 text-sm 3xl:text-lg text-center truncate w-full'>{course.name}</p>
                     </button>
@@ -166,7 +166,7 @@ function CoursePicker({
                             '/txtIcon.png'
                           }
                           alt={file.fileType}
-                          className='w-10 h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0'
+                          className='w-10 h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                         />
                         <div className='flex-1 min-w-0'>
                           <p className='font-roboto font-semibold text-primary-600 text-sm 3xl:text-lg truncate'>{file.fileName}</p>
@@ -413,7 +413,7 @@ const { startTour } = useTour(
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}/>
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
@@ -462,7 +462,7 @@ const { startTour } = useTour(
 
               <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 mt-4 lg:mt-2 2xl:mt-3'>                
                 <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36' src='Localbtn.png' alt='localbtnicon' />
+                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Localbtn.png' alt='localbtnicon' />
                   <button
                    id='localFilesBtn'
                     onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
@@ -476,7 +476,7 @@ const { startTour } = useTour(
                 <p className='flex-shrink-0 text-center lg:mt-10 text-primary-600 lg:text-sm 2xl:text-lg 3xl:text-2xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
 
                 <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 ' src='Coursesbtn.png' alt='coursesbtnicon' />
+                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Coursesbtn.png' alt='coursesbtnicon' />
                   <button
                   id='courseFilesBtn'
                     onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
@@ -503,7 +503,7 @@ const { startTour } = useTour(
     className='w-full mt-2 flex items-center justify-between gap-2 bg-white bg-opacity-90 border border-primary-600 rounded-md px-4 py-3 lg:py-1 3xl:px-6 3xl:py-4'
   >
     <div className='flex items-center gap-2 min-w-0'>
-      <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 lg:w-7 2xl:w-10 lg:h-7 2xl:h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0' />
+      <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 lg:w-7 2xl:w-10 lg:h-7 2xl:h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
       <div className='min-w-0 max-w-[180px] lg:max-w-[200px] 2xl:max-w-[180px] 3xl:max-w-[260px]'>
         <p className='font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
         <p className='font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
@@ -601,7 +601,7 @@ const { startTour } = useTour(
                     }}
                     disabled={isGenerating}
                   >
-                    <img src='/RandomIcon.png' alt='Random' className='w-6 h-6 lg:w-5 lg:h-5 3xl:w-8 3xl:h-8 object-contain' />
+                    <img src='/RandomIcon.png' alt='Random' className='w-6 h-6 lg:w-5 lg:h-5 3xl:w-8 3xl:h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                     <span className='text-white uppercase text-sm 3xl:text-lg font-semibold font-roboto'>Random</span>
                   </button>
                 </div>
@@ -636,7 +636,7 @@ const { startTour } = useTour(
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         
