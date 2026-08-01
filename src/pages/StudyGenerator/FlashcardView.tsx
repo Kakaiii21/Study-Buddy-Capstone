@@ -208,7 +208,7 @@ function FlashcardView() {
                         onClick={() => handleEditOpen(index)}
                         className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                       >
-                        <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
+                        <img className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='/edit.png' alt='edit icon' />Edit
                       </button>
                       <hr className='my-1 border-gray-100' />
                       <button
@@ -218,7 +218,7 @@ function FlashcardView() {
                         }}
                         className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                       >
-                        <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
+                        <img src='/delete.png' alt='delete icon' className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />Delete
                       </button>
                     </div>
                   )}
@@ -309,7 +309,7 @@ function FlashcardView() {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
           <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
             <div className='flex flex-col items-center gap-2'>
-              <img src='/Saved.png' alt='Saved' className='w-16 h-16' />
+              <img src='/Saved.png' alt='Saved' className='w-16 h-16 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
               <p className='text-primary-600 font-roboto font-bold text-xl text-center uppercase'>
                 Flashcards Updated!
               </p>

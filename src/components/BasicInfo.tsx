@@ -299,10 +299,11 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
                 <img
                   src={profilePic}
                   alt="Profile"
-                  className={`w-28 h-28 md:w-24 md:h-24 lg:w-24 lg:h-24 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+                  className={`w-28 h-28 md:w-24 md:h-24 lg:w-24 lg:h-24 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 select-none border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+                  onContextMenu={(e) => e.preventDefault()} draggable={false}
                 />
                 <div className='absolute bottom-0 left-0 right-0 h-1/4 flex items-end justify-center pb-1 transition-opacity rounded-b-full'>
-                  <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7 lg:w-5 lg:h-5" />
+                  <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7 lg:w-5 lg:h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
               </button>
               <input
@@ -466,7 +467,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
                 <button
                   onClick={handleDeactivate}
                   disabled={deactivating}
-                  className="flex-1 bg-red-500 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
+                  className="flex-1 bg-red-500 mb-5 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
                 >
                   {deactivating ? 'Deactivating...' : 'Deactivate'}
                 </button>

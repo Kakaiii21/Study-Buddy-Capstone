@@ -45,7 +45,7 @@ const { startTour } = useTour(
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
@@ -68,10 +68,10 @@ const { startTour } = useTour(
       onClick={() => setActiveTab('basicinfo')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 lg:py-1.5 xl:py-2.5 2xl:py-3.5 3xl:py-4.5 text-left font-medium transition ${(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 lg:pl-4 xl:pl-10 2xl:pl-11'>
-        <img src='/basicInfo.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
+        <img src='/basicInfo.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         <span className='font-inter text-base lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[17px] font-medium text-primary-600'>Basic Info</span>
       </div>
-      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3' />
+      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
     </button>
     <hr className='border-t border-gray-400 ml-5 xl:ml-10 2xl:ml-11' />
 
@@ -80,10 +80,10 @@ const { startTour } = useTour(
       onClick={() => setActiveTab('password')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 lg:py-1.5 xl:py-2.5 2xl:py-3.5 3xl:py-4.5 text-left font-medium transition ${activeTab === 'password' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 lg:pl-4 xl:pl-10 2xl:pl-11'>
-        <img src='/passIcon.png' alt='Profleicon' className='w-6 h-6 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 object-cover' />
+        <img src='/passIcon.png' alt='Profleicon' className='w-6 h-6 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 object-cover select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         <span className='font-inter text-base lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[17px] font-medium text-primary-600'>Password</span>
       </div>
-      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3' />
+      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
     </button>
     <hr className='border-t border-gray-400 ml-5 xl:ml-10 2xl:ml-11' />
 
@@ -93,10 +93,10 @@ const { startTour } = useTour(
       onClick={() => setActiveTab('terms')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 lg:py-1.5 xl:py-2.5 2xl:py-3.5 3xl:py-4.5 text-left font-medium transition ${activeTab === 'terms' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 lg:pl-4 xl:pl-10 2xl:pl-11'>
-        <img src='/tos.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
+        <img src='/tos.png' alt='Termsicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         <span className='font-inter text-base lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[17px] font-medium text-primary-600'>Terms of Service</span>
       </div>
-      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3' />
+      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
     </button>
     <hr className='border-t border-gray-400 ml-5 xl:ml-10 2xl:ml-11' />
 
@@ -105,10 +105,10 @@ const { startTour } = useTour(
       onClick={() => setActiveTab('privacy')}
       className={`flex items-center justify-between w-full pr-3 py-2.5 lg:py-1.5 xl:py-2.5 2xl:py-3.5 3xl:py-4.5 text-left font-medium transition ${activeTab === 'privacy' ? 'bg-primary-700 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`}>
       <div className='flex items-center gap-2.5 xl:gap-3 2xl:gap-4 pl-9 lg:pl-4 xl:pl-10 2xl:pl-11'>
-        <img src='/pp.png' alt='Privacyicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover' />
+        <img src='/pp.png' alt='Privacyicon' className='w-6 h-6 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 object-cover select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         <span className='font-inter text-base lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[17px] font-medium text-primary-600'>Privacy Policy</span>
       </div>
-      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3' />
+      <img src="./arrowA.png" alt="nextArrow" className='w-1.5 xl:w-2.5 2xl:w-3 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
     </button>
     <hr className='border-t border-gray-400 ml-5 xl:ml-10 2xl:ml-11' />
       </nav>
@@ -138,7 +138,7 @@ const { startTour } = useTour(
         <img
           src={(activeTab === 'basicinfo' || activeTab === 'changeEmail') ? '/basicInfoNavAcc.png' : '/basicInfoNav.png'}
           alt='Basic Info'
-          className='w-8 h-8 object-contain'
+          className='w-8 h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
         />
       </div>
 
@@ -153,7 +153,7 @@ const { startTour } = useTour(
         <img
           src={activeTab === 'password' ? '/passIconAcc.png' : '/passIconNav.png'}
           alt='Password'
-          className='w-8 h-8 object-contain'
+          className='w-8 h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
         />
       </div>
 
@@ -168,7 +168,7 @@ const { startTour } = useTour(
         <img
           src={activeTab === 'terms' ? '/tosNavAcc.png' : '/tosNav.png'}
           alt='Terms'
-          className='w-8 h-8 object-contain'
+          className='w-8 h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
         />
       </div>
 
@@ -183,7 +183,7 @@ const { startTour } = useTour(
         <img
           src={activeTab === 'privacy' ? '/ppNavAcc.png' : '/ppNav.png'}
           alt='Privacy'
-          className='w-8 h-8 object-contain'
+          className='w-8 h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
         />
       </div>
 
@@ -203,7 +203,7 @@ const { startTour } = useTour(
 
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         

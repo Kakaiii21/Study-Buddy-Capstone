@@ -225,14 +225,14 @@ function Flashcard() {
                     onClick={() => handleEditOpen(index)}
                     className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                   >
-                    <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
+                    <img className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='/edit.png' alt='edit icon' />Edit
                   </button>
                   <hr className='my-1 border-gray-100' />
                   <button
                     onClick={() => handleDelete(index)}
                     className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                   >
-                    <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
+                    <img src='/delete.png' alt='delete icon' className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />Delete
                   </button>
                 </div>
               )}
@@ -342,7 +342,7 @@ function Flashcard() {
                   </p>
                 </div>
                 <div>
-                  <img src='/Saved.png' alt='Saved' className='w-32 h-32' />
+                  <img src='/Saved.png' alt='Saved' className='w-32 h-32 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
               </>
             ) : (
@@ -356,7 +356,7 @@ function Flashcard() {
                   </p>
                 </div>
                 <div>
-                  <img src='/notSaved.png' alt='Not Saved' className='w-32 h-32' />
+                  <img src='/notSaved.png' alt='Not Saved' className='w-32 h-32 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
               </>
             )}

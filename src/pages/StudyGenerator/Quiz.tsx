@@ -79,6 +79,7 @@ function Quiz() {
   const [showModal, setShowModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const [finalScore, setFinalScore] = useState(0)
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null)
 
@@ -170,6 +171,7 @@ function Quiz() {
       if (user) {
         setSaving(true)
         setSaveError(null)
+        setSaveSuccess(false)
         try {
           await addDoc(collection(db, 'users', user.uid, 'quizHistory'), {
             fileName: result.fileName ?? 'Untitled',
@@ -179,6 +181,7 @@ function Quiz() {
             items: questions,
             selectedAnswers: selected,
           })
+          setSaveSuccess(true)
         } catch (err) {
           console.error('Save failed:', err)
           setSaveError('Failed to save to history.')
@@ -218,6 +221,7 @@ function Quiz() {
     setAttempted(false)
     setFinalScore(0)
     setSaveError(null)
+    setSaveSuccess(false)
     setQuestions(shuffleQuestions(questions))
     clearQuizSession()
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -294,7 +298,7 @@ function Quiz() {
           )}
         </div>
 
-        <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6 border mt-4 lg:mt-0'>
+        <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6  mt-4 lg:mt-0'>
           <p className=' hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
             mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>
@@ -355,14 +359,14 @@ function Quiz() {
                           onClick={() => handleEditOpen(qIndex)}
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 hover:bg-primary-50 font-semibold'
                         >
-                          <img className='w-5 h-5' src='/edit.png' alt='edit icon' />Edit
+                          <img className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='/edit.png' alt='edit icon' />Edit
                         </button>
                         <hr className='my-1 border-gray-100' />
                         <button
                           onClick={() => handleDeleteRequest(qIndex)}
                           className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 hover:bg-red-50 font-semibold'
                         >
-                          <img src='/delete.png' alt='delete icon' className='w-5 h-5' />Delete
+                          <img src='/delete.png' alt='delete icon' className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />Delete
                         </button>
                       </div>
                     )}
@@ -512,7 +516,7 @@ function Quiz() {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
           <div className='bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-8 lg:pb-16 lg:pt-10 flex flex-col items-center gap-10'>
 
-            {enabled ? (
+            {enabled && saveSuccess ? (
               /* ── SAVED STATE ── */
               <>
                 <div className='flex flex-col text-center gap-3'>
@@ -524,7 +528,7 @@ function Quiz() {
                   </p>
                 </div>
                 <div>
-                  <img src='/Saved.png' alt='Saved' className='w-32 h-32' />
+                  <img src='/Saved.png' alt='Saved' className='w-32 h-32 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
               </>
             ) : (
@@ -539,7 +543,7 @@ function Quiz() {
                   </p>
                 </div>
                 <div>
-                  <img src='/notSaved.png' alt='Not Saved' className='w-32 h-32' />
+                  <img src='/notSaved.png' alt='Not Saved' className='w-32 h-32 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>
               </>
             )}
