@@ -22,7 +22,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
@@ -285,7 +285,7 @@ useEffect(() => {
     title='Take a Tour'
   >
     <div className='bg-white w-9 h-9 rounded-full flex items-center justify-center text-2xl font-bold'>
-      <img src="/needhelp.png" alt="?" className='w-9 block mx-auto' />
+      <img src="/needhelp.png" alt="?" className='w-9 block mx-auto select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
     </div>
     <p className='text-[9px] text-primary-600 font-inter font-medium'>Need Help?</p>
   </button>
@@ -512,21 +512,21 @@ useEffect(() => {
                                 onClick={() => { openEditModal(note); setOpenMenuId(null) }}
                                 className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                               >
-                                <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+                                <img className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="edit.png" alt="edit icon" />Edit
                               </button>
                               <hr className='my-1 border-gray-100' />
                               <button
                                 onClick={() => { setConfirmDownload(note); setOpenMenuId(null) }}
                                 className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                               >
-                                <img className='w-5 h-5' src="download.png" alt="download icon" />Download
+                                <img className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="download.png" alt="download icon" />Download
                               </button>
                               <hr className='my-1 border-gray-100' />
                               <button
                                 onClick={() => setPendingDelete({ id: note.id, name: note.title })}
                                 className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
                               >
-                                <img src="delete.png" alt="delete icon" className='w-5 h-5' />Delete
+                                <img src="delete.png" alt="delete icon" className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />Delete
                               </button>
                             </div>
                           )}
@@ -716,7 +716,13 @@ useEffect(() => {
                   Remove Subject?
                 </p>
                 <p className='text-sm text-gray-500 text-center'>
-                  <span className='font-semibold text-primary-600'>"{deleteSubjectConfirm}"</span> will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
+                  <span
+                    className='block max-w-[260px] mx-auto truncate font-semibold text-primary-600'
+                    title={deleteSubjectConfirm}
+                  >
+                    "{deleteSubjectConfirm}"
+                  </span>
+                  will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
                 </p>
                 <div className='flex gap-4 w-full mt-2'>
                   <button
@@ -948,7 +954,7 @@ useEffect(() => {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         
