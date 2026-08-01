@@ -90,7 +90,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
           ${isOpen ? 'hidden' : ''}
         `}
       >
-        <img src="/menu.png" alt="menu" className="w-10 h-8" />
+        <img src="/menu.png" alt="menu" className="w-10 h-8 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
         <span className="text-xs text-primary-600 mt-1" />
       </button>
 
@@ -116,7 +116,8 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
       >
         {/* LOGO */}
         <div className="p-6  ml-2 lg:ml-0 flex gap-2 justify-start items-center">
-          <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-9 xl:w-14 2xl:w-16 3xl:w-20" />
+          <img src="/sideIcons/sideLogo.png" alt="Study Buddy" className="w-10 lg:w-9 xl:w-14 2xl:w-16 3xl:w-20 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} 
+           />
             <p className='font-roboto text-[9px] lg:text-[9px] xl:text-xs 2xl:text-[16px] 3xl:text-[20px] text-white uppercase'>Study <br></br> Buddy</p>
         </div>
 
@@ -150,7 +151,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                     }
                   `}
                 >
-                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0" />
+                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
                   {item.label}
                 </button>
               ))}
@@ -170,7 +171,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                     text-white hover:bg-[#4A4A49]
                   "
                 >
-                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9  shrink-0" />
+                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9  shrink-0 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
                   Logout
                 </button>
               </div>

@@ -282,63 +282,63 @@ function Dashboard() {
             onClick={() => navigate('/timer')}
             className='flex flex-col items-center gap-1 px-2 mt-3 md:mt-0 py-1'
           >
-            <img src='/timer.png' alt='timer' className='w-10 h-10' />
+            <img src='/timer.png' alt='timer' className='w-10 h-10 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             <span className='text-xs text-primary-600 font-bold'>Timer</span>
           </button>
         </div>
           {/* Body: main content + timer side by side */}
-<div className='flex w-full  flex-1 overflow-hidden mt-0 lg:mt-0'>
-     {/* Scrollable Main Content */}
-<main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white px-3 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
-<p className='hidden md:flex w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto 
-font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
-mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
-{/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
-<div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
-<div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-start'>
-    
-{/* ID Card */}
-<div id='idCard' onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
-  lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px]
-  2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
-  h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
-  shadow-lg group cursor-pointer'>
+        <div className='flex w-full  flex-1 overflow-hidden mt-0 lg:mt-0'>
+            {/* Scrollable Main Content */}
+        <main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white px-3 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
+        <p className='hidden md:flex w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto 
+        font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
+        mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
+        {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
+        <div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
+        <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
+            
+        {/* ID Card */}
+        <div id='idCard' onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
+          lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px] 
+          2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
+          h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
+          shadow-[0_5px_4px_-2px_rgba(0,0,0,0.25)]  group cursor-pointer'>
 
-  {/* Header strip — color now driven by cardColor */}
-  <div
-    className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 relative'
-    style={{ backgroundColor: cardColor }}
-  >
-    <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
-  </div>
+          {/* Header strip — color now driven by cardColor */}
+          <div
+            className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 relative'
+            style={{ backgroundColor: cardColor }}
+          >
+            <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
+          </div>
 
-  {/* Main content: photo + text + logo */}
-  <div className='flex flex-row items-start gap-3 px-4 md:px-4 lg:px-3 lg:py-0 xl:px-5 xl:py-0 2xl:px-6 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
+          {/* Main content: photo + text + logo */}
+          <div className='flex flex-row items-start gap-3 px-4 md:px-4 lg:px-3 lg:py-0 xl:px-5 xl:py-0 2xl:px-6 3xl:px-5 mt-2 lg:mt-2 xl:mt-2 2xl:mt-2 3xl:mt-2'>
 
-    <div className='flex flex-col h-auto '>
-      <img
-        src={profilePic}
-        alt="Profile"
-        className='w-[80px] h-[100px]  md:w-[85px] md:h-[115px]
-        lg:w-[70px] lg:h-[85px] lg:my-1 xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[110px] 2xl:h-[130px] 2xl:my-3 3xl:w-[135px] 3xl:h-[160px] object-cover border-2 border-primary-800'
-      />
-      <div
-        className='w-full h-3 md:h-5 lg:h-3 xl:h-5 2xl:h-6 3xl:h-7 mt-2 lg:mt-1 2xl:-mt-1'
-        style={{
-          backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
-        }}
-      />
-<div className='relative w-full h-[8px] md:h-[8px] lg:h-[7px] xl:h-[9px] 2xl:h-[10px] 3xl:h-[13px] mt-1 overflow-hidden'>
-  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[7px] md:text-[7px] lg:text-[7px] xl:text-[8px] 2xl:text-[8px] 3xl:text-[10px] leading-tight'>
-    NOT A VALID ID
-  </p>
-</div>
+            <div className='flex flex-col h-auto '>
+              <img
+                src={profilePic}
+                alt="Profile"
+                className='w-[80px] h-[100px]  md:w-[85px] md:h-[115px]
+                lg:w-[70px] lg:h-[85px] lg:my-1 xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[110px] 2xl:h-[130px] 2xl:my-3 3xl:w-[135px] 3xl:h-[160px] object-cover border-2 border-primary-800'
+              />
+              <div
+                className='w-full h-3 md:h-5 lg:h-3 xl:h-5 2xl:h-6 3xl:h-7 mt-2 lg:mt-1 2xl:-mt-1'
+                style={{
+                  backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
+                }}
+              />
+        <div className='relative w-full h-[8px] md:h-[8px] lg:h-[7px] xl:h-[9px] 2xl:h-[10px] 3xl:h-[13px] mt-1 overflow-hidden'>
+          <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[7px] md:text-[7px] lg:text-[7px] xl:text-[8px] 2xl:text-[8px] 3xl:text-[10px] leading-tight'>
+            NOT A VALID ID
+          </p>
+        </div>
     </div>
 
     <div className='flex flex-col flex-1 min-w-0 pl-0 3xl:pl-5'>
       <div className='flex flex-row items-start justify-between'>
         <span className='font-kapakana italic text-[28px] sm:text-[29px] md:text-[30px] lg:text-[28px] xl:text-[34px] 2xl:text-[40px] 3xl:text-[46px] font-extrabold text-primary-800 leading-tight'>
-          Welcome, to
+          Welcome to
         </span>
         <img src='/idLogo.png' alt="Logo" className='w-7 h-6 md:w-7 md:h-6 lg:w-8 lg:h-6 xl:w-10 xl:h-8 2xl:w-11 2xl:h-9 3xl:w-14 3xl:h-12 flex-shrink-0' />
       </div>
@@ -390,42 +390,41 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
   <div className='absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 
     transition-opacity duration-200 flex flex-col items-center justify-center gap-2 z-10'>
 
-    <img src="./idCustom.png" alt="" className='w-6 h-6 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 3xl:w-10 3xl:h-10' />
+    <img src="./idCustom.png" alt="" className='w-6 h-6 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 3xl:w-10 3xl:h-10 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
     <span className='font-inter font-medium text-xs md:text-sm lg:text-[8px] xl:text-sm 2xl:text-base 3xl:text-lg text-black uppercase'>
       Customize Card
     </span>
   </div>
 </div>
     {/* Stats column */}
-<div className='flex w-full flex-1 min-w-0 flex-row gap-x-4  md:flex-col md:flex-1 lg:flex-1 
-  sm:min-w-[220px] sm:max-w-[280px] md:min-w-[240px] md:max-w-[300px] lg:min-w-[200px] lg:max-w-[clamp(260px,28vw,320px)] xl:min-w-[260px] xl:max-w-[320px] 2xl:max-w-[360px] 3xl:max-w-[440px]
-  gap-y-3 md:gap-y-3 lg:gap-y-2 xl:gap-y-3 3xl:gap-y-4 justify-between md:justify-center items-center pr-0 md:pr-3'>
+<div className='flex w-full flex-1 min-w-0 flex-row gap-x-4  md:flex-col md:flex-1 lg:flex-1   sm:min-w-[220px] sm:max-w-[280px] md:min-w-[240px] md:max-w-[300px] lg:min-w-[200px] lg:max-w-[clamp(260px,28vw,320px)] xl:min-w-[260px] xl:max-w-[320px] 2xl:max-w-[360px] 3xl:max-w-[440px]
+  gap-y-3 md:gap-y-5 md:mt-1 lg:gap-y-5 lg:mt-1.5 xl:gap-y-7 xl:mt-1 3xl:gap-y-8 justify-between md:justify-center items-center pr-0 md:pr-3'>
       {/* Current Time Spent */}
       <div id='currentTime'           
         className='w-full h-auto px-1 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 3xl:min-px-2 py-3
           border-2 border-primary-600 rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-1 3xl:gap-x-2
           md:min-h-[70px] 3xl:min-h-[85px]
         '>
-        <img src="/currentTime.png" alt="Timer"
-          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px]  lg:w-[40px] xl:h-[50px] xl:w-[50px] 2xl:h-16 2xl:w-16 3xl:h-20 3xl:w-20 flex-shrink-0' />
+        <img src="/currentTime.png" alt="Timer" onContextMenu={(e) => e.preventDefault()} draggable={false}
+          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px]  lg:w-[40px] xl:h-[50px] xl:w-[50px] 2xl:h-16 2xl:w-16 3xl:h-20 3xl:w-20 flex-shrink-0 select-none' />
         <div className='flex flex-col flex-1 items-center'>
-          <p className='text-[10px] md:text-[10px] lg:text-[12px] xl:text-[16px] 2xl:min-text-lg 3xl:text-xl font-extrabold font-inter text-center text-primary-600'>Current Time Spent</p>
-          <p className='text-xs md:text-sm lg:text-[18px] xl:text-[25px] 2xl:min-text-[35px] 3xl:text-[42px] font-intelOneMono font-normal text-center text-primary-600'>
+          <p className='text-[10px] md:text-[10px] lg:text-[12px] xl:text-[16px] 2xl:min-text-lg 3xl:text-xl font-extrabold font-inter text-center text-primary-600 2xl:-mt-2 3xl:mt-0'>Current Time Spent</p>
+          <p className='text-[20px] md:text-[25px] lg:text-[25px] xl:text-[30px] 2xl:text-[35px] 3xl:text-[45px] font-intelOneMono font-normal text-center text-primary-600 2xl:mt-1 3xl:mt-3'>
             {formatElapsed(elapsedSeconds)}
           </p>
         </div>
       </div>
       {/* Current Score */}
-      <div id='currentScore'          
-        className='w-full h-auto px-2 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 3xl:min-px-2 py-3
+      <div id='currentScore' 
+        className='w-full h-auto px-2 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 3xl:min-px-2 py-3 
           border-2 border-primary-600 rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-10 3xl:gap-x-12
           md:min-h-[70px] 3xl:min-h-[85px]
         '>
-        <img src="/currentScore.png" alt="Score"
-          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px] lg:w-[40px] xl:h-[50px] xl:w-[50px] 2xl:h-16 2xl:w-16 3xl:h-20 3xl:w-20 flex-shrink-0' />
-        <div className='flex flex-col flex-1 items-center'>
-          <p className='text-[10px] md:text-[10px] lg:text-[13px] xl:text-[16px] 2xl:min-text-lg 3xl:text-xl font-extrabold font-inter text-center text-primary-600'>Current Score</p>
-          <p className='text-sm md:text-base lg:text-[20px] xl:text-[25px] 2xl:min-text-[35px] 3xl:text-[42px] font-roboto font-bold text-center text-primary-600'>
+        <img src="/currentScore.png" alt="Score" onContextMenu={(e) => e.preventDefault()} draggable={false}         
+          className='h-9 w-9 md:h-10 md:w-10 lg:h-[40px] lg:w-[40px] xl:h-[50px] xl:w-[50px] 2xl:h-16 2xl:w-16 3xl:h-20 3xl:w-20 flex-shrink-0 select-none' />
+        <div className='flex flex-col flex-1 items-center xl:pr-10'>
+          <p className='text-[10px] md:text-[10px] lg:text-[12px] xl:text-[16px] 2xl:min-text-lg 3xl:text-xl font-extrabold font-inter text-center text-primary-600 2xl:-mt-2 3xl:mt-0'>Current Score</p>
+          <p className='text-[20px] md:text-[25px] lg:text-[25px] xl:text-[30px] 2xl:text-[35px] 3xl:text-[45px] font-roboto font-bold text-center text-primary-600 2xl:mt-1 3xl:mt-3'>
             {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total}` : '00/00'}
           </p>
         </div>
@@ -461,7 +460,7 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
     className='flex flex-col items-center justify-center'
   >
     <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-      <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+      <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}          />
     </div>
     <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
     font-inter font-semibold'>Need Help?</p>
@@ -512,7 +511,7 @@ className='relative flex flex-col justify-between text-left p-2
         <div className='fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-1 md:p-4'>
           <div className='bg-white rounded-lg border-2 border-black w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8'>
 
-            <p className='text-center font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
+            <p className='text-center lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
               Customize Card
             </p>
 
@@ -520,7 +519,7 @@ className='relative flex flex-col justify-between text-left p-2
               <div className='flex-1 min-w-0'>
 
                 {/* Live mini preview */}
-                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-0 md:mx-auto border-2 border-primary-800 rounded-lg overflow-hidden mb-6'>
+                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-0 md:mx-auto border-2 border-primary-800  rounded-lg overflow-hidden mb-6 lg:mb-2'>
                   <div className='w-full h-8 3xl:h-10 relative' style={{ backgroundColor: formCardColor }}>
                     <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-24 h-3 border-2 border-primary-800 rounded-full' />
                   </div>
@@ -533,11 +532,11 @@ className='relative flex flex-col justify-between text-left p-2
                           backgroundImage: 'repeating-linear-gradient(90deg, #000 0px, #000 2px, transparent 2px, transparent 4px, #000 4px, #000 5px, transparent 5px, transparent 8px)',
                         }}
                       />
-  <div className='relative w-full h-[8px] mt-1 overflow-hidden'>
-  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[8px] leading-tight'>
-      NOT A VALID ID
-  </p>
-</div>
+                    <div className='relative w-full h-[8px] mt-1 overflow-hidden'>
+                    <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[8px] leading-tight'>
+                        NOT A VALID ID
+                    </p>
+                  </div>
                     </div>
                     <div className='flex flex-col flex-1 min-w-0'>
                       <div className='flex flex-row items-start justify-between'>
@@ -552,7 +551,7 @@ className='relative flex flex-col justify-between text-left p-2
                           <p className='text-[#636363] font-inter text-[8px] uppercase'>First Name:</p>
                           <span className='font-bold uppercase font-inter text-primary-800 text-xs md:text-sm leading-tight truncate'>{formFirstName || '—'}</span>
                           <p className='text-[#636363] font-inter text-[8px] uppercase mt-1'>Age:</p>
-                          <span className='font-bold font-inter text-primary-800 text-xs md:text-sm leading-tight'>{formAge || '—'}</span>
+                          <span className='font-bold font-inter text-primary-800 text-xs md:text-sm leading-tight truncate'>{formAge || '—'}</span>
                         </div>
                         <div className='flex flex-col w-1/2'>
                           <p className='text-[#636363] font-inter text-[8px] uppercase'>Last Name:</p>

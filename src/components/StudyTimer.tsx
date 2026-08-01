@@ -134,23 +134,41 @@ useEffect(() => {
       </div>
 
       {/* SET-TIMER PANEL */}
-      <div id='setTime' className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800'>
-<p className={`text-red-500  text-xs  sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-4 transition-opacity ${
-  errorMsg ? 'opacity-100' : 'opacity-0'
-}`}>
-  {errorMsg || '\u00A0'}
-</p>
+      <div id='setTime' className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800 '>
+      <p className={`text-red-500  text-xs  sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[13px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-4 transition-opacity ${
+        errorMsg ? 'opacity-100' : 'opacity-0'
+      }`}>
+        {errorMsg || '\u00A0'}
+      </p>
 
-        <div className='flex flex-wrap justify-center items-end text-xs gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-2 xl:gap-2 2xl:gap-3 text-primary-600 mt-4  md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 uppercase font-roboto'>
-          {[
-            { label: 'Hours',   val: inputHours,   set: setInputHours,   id: 'hours'   },
-            { label: 'Minutes', val: inputMinutes, set: setInputMinutes, id: 'minutes' },
-            { label: 'Seconds', val: inputSeconds, set: setInputSeconds, id: 'seconds' },
-          ].map((field, i) => (
-            <div key={field.id} className='flex items-end'>
-              <div className='flex flex-col items-center'>
-                <label htmlFor={field.id} className='text-sm md:text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-primary-600 
-                mb-3  md:mb-4 lg:mb-1 xl:mb-3 2xl:mb-4'>{field.label}</label>
+        <div className='flex flex-col items-center gap-2 mt-4 md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 text-primary-600 uppercase font-roboto  mb-5 lg:mb-3 2xl:mb-6'>
+
+          {/* Label row */}
+          <div className='flex justify-center gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-x-2 xl:gap-x-2 2xl:gap-x-3'>
+            {[
+              { label: 'Hours',   id: 'hours'   },
+              { label: 'Minutes', id: 'minutes' },
+              { label: 'Seconds', id: 'seconds' },
+            ].map((field) => (
+              <label
+                key={field.id}
+                htmlFor={field.id}
+                className='w-16 xs:w-14 sm:w-16 md:w-20 lg:w-14 xl:w-16 2xl:w-16 text-center
+                text-sm md:text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[16px] text-primary-600'
+              >
+                {field.label}
+              </label>
+            ))}
+          </div>
+
+          {/* Input row — colon lives here so it centers against the input height */}
+          <div className='flex items-center justify-center gap-x-1 xs:gap-x-0.5 sm:gap-x-1 md:gap-x-2'>
+            {[
+              { val: inputHours,   set: setInputHours,   id: 'hours'   },
+              { val: inputMinutes, set: setInputMinutes, id: 'minutes' },
+              { val: inputSeconds, set: setInputSeconds, id: 'seconds' },
+            ].map((field, i) => (
+              <div key={field.id} className='flex items-center'>
                 <input
                   id={field.id}
                   type='text'
@@ -162,19 +180,22 @@ useEffect(() => {
                     field.set(clean === '' ? '0' : clean)
                   }}
                   onFocus={(e) => e.target.select()}
-                  className='w-16 xs:w-14 sm:w-16 md:w-20 lg:w-14 xl:w-16 2xl:w-16 text-center border-2 border-primary-800 rounded text-lg xs:text-xl sm:text-xl md:text-2xl lg:text-sm xl:text-lg 2xl:text-xl text-primary-600 mb-8 sm:mb-10 md:mb-12 lg:mb-6 xl:mb-8 2xl:mb-6'
+                  className='w-16 xs:w-14 sm:w-16 md:w-20 lg:w-14 xl:w-16 2xl:w-16 text-center border-2 border-primary-800 rounded
+                  text-lg xs:text-xl sm:text-xl md:text-2xl lg:text-sm xl:text-lg 2xl:text-xl text-primary-600'
                 />
+                {i < 2 && (
+                  <span className='text-lg md:text-lg lg:text-xs xl:text-sm 2xl:text-base font-bold text-primary-600 mx-1 leading-none'>
+                    :
+                  </span>
+                )}
               </div>
-              {i < 2 && (
-                <span className='text-16  md:text-lg lg:text-xs xl:text-sm 2xl:text-base font-bold text-primary-600 mb-10 md:mb-12 lg:mb-6 xl:mb-10 2xl:mb-8 mx-0.5 leading-none'>:</span>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <button
           onClick={handleSetTime}
-          className='w-full py-2 md:py-2 lg:py-[1px] xl:py-[2px] 2xl:py-[3px] bg-primary-800 font-inter 
+          className='w-full py-2 md:py-2 lg:py-[2px] xl:py-[2px] 2xl:py-[7px] 3xl:py-[10px] bg-primary-800 font-inter 
           text-xs sm:text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] font-extrabold uppercase text-white
           rounded-md mb-2
           shadow-[0_2px_3px_rgba(107,114,128,0.8)]
@@ -198,8 +219,8 @@ useEffect(() => {
                 setInputMinutes(String(p.m))
                 setInputSeconds(String(p.s))
               }}
-              className='px-1 w-full py-2 md:py-3 lg:py-[1px] xl:py-[2px] 2xl:py-[3px] 
-              text-xs sm:text-sm md:text-base lg:text-[9px] xl:text-[11px] 2xl:text-[13px]
+              className='px-1 w-full py-2 md:py-3 lg:py-[1px] xl:py-[2px] 2xl:py-[5px] 
+              text-xs sm:text-sm md:text-base lg:text-[9px] xl:text-[11px] 2xl:text-[15px]
               uppercase bg-[#4A4A49] rounded-md text-white font-inter font-bold
               shadow-[0_2px_3px_rgba(107,114,128,0.8)]
               hover:opacity-80
