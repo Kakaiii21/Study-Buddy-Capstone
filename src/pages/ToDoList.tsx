@@ -348,7 +348,7 @@ function SoftDeleteModal({ taskName, onConfirm, onCancel }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
@@ -391,7 +391,7 @@ function ClearAllModal({ count, onConfirm, onCancel }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-3 2xl:p-4 3xl:p-5 w-80  lg:w-[250px] xl:w-[280px] 2xl:w-[350px] 3xl:w-[420px]'>
         <div className='flex items-center gap-3 xl:gap-2 2xl:gap-3  mb-1 2xl:mb-2 3xl:mb-3 '>
-          <img src="/delete.png" alt="deleteicon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9' />
+          <img src="/delete.png" alt="deleteicon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800'>Move all tasks to Recently Deleted?</h2>
         </div>
         <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3 '>
@@ -456,7 +456,7 @@ function TaskFab({ onClearAll, onAddTask, disabled }: {
             className={`w-12 h-12 rounded-full shadow-md flex items-center justify-center
               hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.className}`}
           >
-            <img src={action.icon} alt={action.label} className="w-5 h-5" />
+            <img src={action.icon} alt={action.label} className="w-5 h-5 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
           </button>
         </div>
       ))}
@@ -470,7 +470,7 @@ function TaskFab({ onClearAll, onAddTask, disabled }: {
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert" />
+        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
       </button>
     </div>
   )
@@ -551,7 +551,7 @@ function TaskCard({
         id='taskOptionsBtn'
           title='More Options'
           onClick={() => setShowMenu((prev) => !prev)}
-          className="text-primary-800 hover:text-primary-800 text-lg"
+          className="text-primary-800 hover:text-primary-800 text-lg 2xl:text-2xl"
         >
           ⋮
         </button>
@@ -562,7 +562,7 @@ function TaskCard({
               onClick={() => { onEdit(task); setShowMenu(false) }}
               className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-800 hover:bg-primary-50 font-semibold'
             >
-              <img className='w-5 h-5' src="edit.png" alt="edit icon" />Edit
+              <img className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="edit.png" alt="edit icon" />Edit
             </button>
             <hr className='my-1 border-gray-100' />
             <button
@@ -645,8 +645,8 @@ function Column({
           aria-label={collapsed ? 'Expand column' : 'Collapse column'}
         >
           {collapsed
-            ? <img className='w-5 h-5' src="arrowDown.png" alt="" />
-            : <img className='h-5 w-5' src='arrowUp.png' alt='' />}
+            ? <img className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="arrowDown.png" alt="" />
+            : <img className='h-5 w-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src='arrowUp.png' alt='' />}
         </button>
       </div>
 
@@ -804,7 +804,7 @@ function ToDoList() {
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
@@ -863,7 +863,7 @@ function ToDoList() {
               transition-all duration-300
               disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0' />
+              <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
                CLEAR ALL TASKS
             </button>
             <button
@@ -884,7 +884,7 @@ function ToDoList() {
               disabled:opacity-40 disabled:cursor-not-allowed"
 
             >
-            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />
+            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2 xl:w-3 xl:h-2.5 2xl:w-3 2xl:h-3 3xl:w-4.5 3xl:h-4.5 shrink-0 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
               New Task
             </button>
           </div>
@@ -959,7 +959,7 @@ function ToDoList() {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         
