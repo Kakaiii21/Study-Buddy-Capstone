@@ -329,8 +329,8 @@ mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
         }}
       />
 <div className='relative w-full h-[8px] md:h-[8px] lg:h-[7px] xl:h-[9px] 2xl:h-[10px] 3xl:h-[13px] mt-1 overflow-hidden'>
-  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[4px] md:text-[4px] lg:text-[3.5px] xl:text-[5px] 2xl:text-[5.5px] 3xl:text-[7px] leading-tight'>
-    THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
+  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[7px] md:text-[7px] lg:text-[7px] xl:text-[8px] 2xl:text-[8px] 3xl:text-[10px] leading-tight'>
+    NOT A VALID ID
   </p>
 </div>
     </div>
@@ -534,8 +534,8 @@ className='relative flex flex-col justify-between text-left p-2
                         }}
                       />
   <div className='relative w-full h-[8px] mt-1 overflow-hidden'>
-  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[4px] leading-tight'>
-    THIS CARD IS FOR DISPLAY AND <br /> PERSONALIZATION PURPOSES ONLY.
+  <p className='absolute inset-0 text-center text-[#B3B3B3] font-inter text-[8px] leading-tight'>
+      NOT A VALID ID
   </p>
 </div>
                     </div>

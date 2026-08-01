@@ -203,14 +203,14 @@ const { startTour } = useTour(
               disabled={!isOnline}
               title={!isOnline ? 'You are offline' : undefined}
               className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-              py-2 md:py- px-4 rounded-sm  w-full
-              order-2 lg:order-1
+              py-1 px-4 rounded-sm 
+              flex items-center gap-1.5
               font-inter font-black
-              text-[10px] lg:text-[8px]
-              xl:text-[10px] 2xl:text-[12px]
+              text-[10px] lg:text-[9px]
+              xl:text-[12px] 2xl:text-[14px]
+              3xl:text-[18px]
               hover:opacity-90 lg:w-auto
               backdrop-blur-xs
-              flex items-center gap-1.5
               hover:-translate-y-1 
               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
               transition-all duration-300 disabled:bg-[#B0A030]

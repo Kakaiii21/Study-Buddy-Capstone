@@ -873,13 +873,15 @@ function ToDoList() {
               py-1 px-4 rounded-sm 
               flex items-center gap-1.5
               font-inter font-black
-               text-[10px] lg:text-[8px]
-               xl:text-[10px] 2xl:text-[12px] 3xl:text-[14px]
-               hover:opacity-90 w-auto
-               backdrop-blur-xs
-               hover:-translate-y-1 
-               hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-               transition-all duration-300"
+              text-[10px] lg:text-[9px]
+              xl:text-[12px] 2xl:text-[14px]
+              3xl:text-[18px]
+              hover:opacity-90 w-auto
+              backdrop-blur-xs
+              hover:-translate-y-1 
+              hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+              transition-all duration-300
+              disabled:opacity-40 disabled:cursor-not-allowed"
 
             >
             <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />

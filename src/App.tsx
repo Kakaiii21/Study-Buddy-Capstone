@@ -33,6 +33,19 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [showPoliciesMenu])
 
+  const [showFooterPoliciesMenu, setShowFooterPoliciesMenu] = useState(false)
+  const footerPoliciesRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!showFooterPoliciesMenu) return
+    function handleOutsideClick(e: MouseEvent) {
+      if (footerPoliciesRef.current && !footerPoliciesRef.current.contains(e.target as Node)) {
+        setShowFooterPoliciesMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [showFooterPoliciesMenu])
+
     const { isInstallable, installApp, isMacSafari} = useInstallPWA();
     const [showIOSModal, setShowIOSModal] = useState(false);
     const [showMacModal, setShowMacModal] = useState(false);
@@ -46,7 +59,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         }, 100)
       }
     }, [location.state])
-  
+
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
   const isAndroid = /Android/.test(navigator.userAgent)
   const isWindows = /Win/.test(navigator.platform || navigator.userAgent)
@@ -58,7 +71,10 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
     <section className="h-auto xl:h-screen w-full ">
       <nav className=" px-2 md:px-6 lg:px-6 xl:px-6 2xl:px-6 py-2 flex items-center justify-between mt-3 md:mt-3 lg:mt-0 xl:mt-0 2xl:mt-0 ">
         {/* LOGO */}
-        <img src="./logo.png" alt="logo" className="pl-2 h-10 md:pl-5 md:h-16 lg:pl-5 lg:h-16 xl:pl-5 xl:h-16 2xl:pl-5 2xl:h-16 w-auto" />
+        <img src="./logo.png" alt="logo" className="pl-2 h-10 md:pl-5 md:h-16 lg:pl-5 lg:h-16 xl:pl-5 xl:h-16 2xl:pl-5 2xl:h-16 w-auto" 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+        />
 
         {/* NAV LINKS */}
         <div className="flex items-center gap-2 md:gap-4 lg:gap-5 xl:gap-6 2xl:gap-20  
@@ -66,28 +82,21 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         lg:mr-20
         xl:mr-20
         2xl:mr-20">
-          <div ref={policiesRef} className='relative hidden md:block lg:block xl:block 2xl:block'>
-            <button
-              onClick={() => setShowPoliciesMenu(prev => !prev)}
-              className='flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg px-4 uppercase
-              hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full'>
-              Policies
-            </button>
-            {showPoliciesMenu && (
-              <div className='absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-48 py-1'>
-                <button
-                  onClick={() => { navigate('/terms'); setShowPoliciesMenu(false) }}
-                  className='block w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'>
-                  Terms of Service
-                </button>
-                <button
-                  onClick={() => { navigate('/privacy'); setShowPoliciesMenu(false) }}
-                  className='block w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'>
-                  Privacy Policy
-                </button>
-              </div>
-            )}
-          </div>
+          <select
+            defaultValue=''
+            onChange={(e) => {
+              if (e.target.value) navigate(e.target.value)
+            }}
+            className='hidden md:block lg:block xl:block 2xl:block
+            text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg px-1 py-1 uppercase 
+            bg-transparent  rounded-full text-center
+            hover:text-white hover:bg-primary-600 transition-all duration-300
+            focus:outline-none cursor-pointer'
+          >
+            <option value='' disabled>Policies</option>
+            <option value='/terms'>Terms of Service</option>
+            <option value='/privacy'>Privacy Policy</option>
+          </select>
           <button onClick={() => aboutRef.current?.scrollIntoView({behavior:'smooth'})} 
           className='hidden md:flex lg:flex xl:flex 2xl:flex text-primary-600 font-fustat font-bold text-sm lg:text-base 2xl:text-lg uppercase
           hover:text-white transition-all duration-300 py-1 hover:bg-primary-600 rounded-full px-4'>
@@ -170,7 +179,10 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
             md:min-w-[250px] md:min-h-[260px] md:pt-12
             lg:min-w-[350px] lg:min-h-[360px] lg:pt-14
             xl:min-w-[400px] xl:min-h-[450px] xl:pt-16
-            2xl:min-w-[550px] 2xl:min-h-[580px] object-center' />
+            2xl:min-w-[550px] 2xl:min-h-[580px] object-center'
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+            />
         </div>
 
       </div>
@@ -187,48 +199,60 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
             <b>learn smarter.</b>
           </p>
 
-<div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6'>
-  <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl shrink-0
-  w-[80px] h-[80px] 
-  md:w-[150px] md:h-[150px] 
-  lg:w-[130px] lg:h-[120px]
-  xl:w-[130px] xl:h-[130px] 
-  2xl:w-[200px] 2xl:h-[200px]' />
-  <div className='text-primary-600 font-inter'>
-    <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Timer</p>
-    <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying. 
-      Start the timer whenever you sit down to work,
-      and watch your study hours add up.
-      </p>
-  </div>
-</div>
-
-<div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
-  <div className='text-right text-primary-600 font-inter'>
-    <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
-    <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
-      Add, check off, and manage your tasks so
-      nothing slips through the cracks.
-    </p>
-  </div>
-  <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl shrink-0
-  w-[80px] h-[80px] 
-  md:w-[150px] md:h-[150px] 
-  lg:w-[130px] lg:h-[120px]
-  xl:w-[130px] xl:h-[130px] 
-  2xl:w-[200px] 2xl:h-[200px]' />
-</div>
         </div>
+
+      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10 '>
+        <div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6'>
+          <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl shrink-0 select-none
+          w-[80px] h-[80px] 
+          md:w-[150px] md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px] 
+          2xl:w-[200px] 2xl:h-[200px]' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          />
+          <div className='text-primary-600 font-inter'>
+            <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Timer</p>
+            <p className='text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Track how much time you actually spend studying. 
+              Start the timer whenever you sit down to work,
+              and watch your study hours add up.
+              </p>
+          </div>
+        </div>
+
+        <div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
+          <div className='text-right text-primary-600 font-inter'>
+            <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
+            <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
+              Add, Drag & Drop, and manage your tasks so
+              nothing slips through the cracks.
+            </p>
+          </div>
+          <img src="./assets/todolist.gif" alt="Todo list gif" className='border border-black rounded-2xl shrink-0
+          w-[80px] h-[80px] 
+          md:w-[150px] md:h-[150px] 
+          lg:w-[130px] lg:h-[120px]
+          xl:w-[130px] xl:h-[130px] 
+          2xl:w-[200px] 2xl:h-[200px]' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          />
+        </div>
+      </div>
       {/*Second*/}
       <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
-        <div className='flex flex-row gap-x-4 justify-start items-center mb-6'>
+        <div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6 '>
           <img src="./assets/notes.gif" alt="Notesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
           md:w-[150px] md:h-[150px] 
           lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px] 
-          2xl:w-[200px] 2xl:h-[200px]' />
-          <div className='text-primary-600 font-inter  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
+          2xl:w-[200px] 2xl:h-[200px]'
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+           />
+          <div className='text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Notes</p>
             <p className=' mr-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep all your study notes in one organized
             place. Create, edit, and revisit your notes
@@ -237,8 +261,8 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           </div>
         </div>
 
-        <div className='flex flex-row gap-4 justify-end items-center'>
-          <div className='text-right text-primary-600 font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
+        <div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
+          <div className='text-right text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Class Schedule</p>
             <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>See your classes and study sessions at a
             glance. Plan your week and stay on top
@@ -249,19 +273,25 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           md:w-[150px] md:h-[150px]  
           lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px]
-          2xl:w-[200px] 2xl:h-[200px]' />
+          2xl:w-[200px] 2xl:h-[200px]' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          />
         </div>
       </div>
 
       {/*Third*/}
       <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-16'>
-        <div className='flex flex-row gap-x-4 justify-start items-center mb-6  md:mr-60 lg:mr-72 xl:mr-[500px] 2xl:mr-52 3xl:mr-[50px]'>
+        <div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6'>
           <img src="./assets/courses.gif" alt="coursesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
           md:w-[150px] md:h-[150px]  
           lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px]
-          2xl:w-[200px] 2xl:h-[200px]' />
+          2xl:w-[200px] 2xl:h-[200px]' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          />
           <div className='text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Course</p>
             <p className=' mr-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and
@@ -271,8 +301,8 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           </div>
         </div>
 
-        <div className='flex flex-row gap-4 justify-end items-center'>
-          <div className='text-right text-primary-600  font-inter md:ml-60 lg:ml-72 xl:ml-[500px] 2xl:ml-52 3xl:ml-[50px] '>
+        <div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
+          <div className='text-right text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Study Generator</p>
             <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Turn your notes and files into quizzes and
             flashcards in seconds. A smarter, faster way
@@ -283,7 +313,10 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           md:w-[150px] md:h-[150px] 
           lg:w-[130px] lg:h-[120px]
           xl:w-[130px] xl:h-[130px]
-          2xl:w-[200px] 2xl:h-[200px]' />
+          2xl:w-[200px] 2xl:h-[200px]' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+          />
         </div>
       </div>
 
@@ -308,13 +341,13 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           className={`flex flex-col justify-start items-center group ${!(isAndroid && isInstallable) ? 'opacity-40 cursor-not-allowed' : ''}`}
           onClick={isAndroid && isInstallable ? installApp : undefined}
         >
-        <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
+        <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48 select-none'>
           <div className='flex items-center justify-center h-full'>
-            <img src="./android.png" alt="android icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-8 group-hover:hidden' />
-            <img src="./androidH.png" alt="android icon hover" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-8 hidden group-hover:block' />
+            <img src="./android.png" alt="android icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-8 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            <img src="./androidH.png" alt="android icon hover" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-8 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           </div>
-          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' />
-          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' />
+          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         </div>
         <p className='mt-3 font-fustat font-bold text-primary-600 text-sm md:text-base'>Android</p>
       </button>
@@ -326,11 +359,11 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           >
         <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
-            <img src="./iphone.png" alt="iphone icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-5 group-hover:hidden' />
-            <img src="./iphoneH.png" alt="iphone icon hover" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-5 hidden group-hover:block' />
+            <img src="./iphone.png" alt="iphone icon" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-5 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            <img src="./iphoneH.png" alt="iphone icon hover" className='w-16 md:w-24 lg:w-24 2xl:w-30 mb-5 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           </div>
-          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' />
-          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' />
+          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         </div>
         <p className='mt-3 font-fustat font-bold text-primary-600 text-sm md:text-base'>iOS</p>
       </button>
@@ -342,11 +375,11 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         >
         <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
-            <img src="./windows.png" alt="windows icon" className='w-14 md:w-20 mb-5 group-hover:hidden' />
-            <img src="./windowsH.png" alt="windows icon hover" className='w-14 md:w-20 mb-5 hidden group-hover:block' />
+            <img src="./windows.png" alt="windows icon" className='w-14 md:w-20 mb-5 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            <img src="./windowsH.png" alt="windows icon hover" className='w-14 md:w-20 mb-5 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           </div>
-          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' />
-          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' />
+          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         </div>
         <p className='mt-3 font-fustat font-bold text-primary-600 text-sm md:text-base'>Windows</p>
       </button>
@@ -358,11 +391,11 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           >
           <div className='relative border rounded-2xl border-black group-hover:bg-black p-3 w-36 h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 2xl:w-48 2xl:h-48'>
           <div className='flex items-center justify-center h-full'>
-            <img src="./mac.png" alt="mac icon" className='w-16 md:w-24 mb-5 group-hover:hidden' />
-            <img src="./macH.png" alt="mac icon hover" className='w-16 md:w-24 mb-5 hidden group-hover:block' />
+            <img src="./mac.png" alt="mac icon" className='w-16 md:w-24 mb-5 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            <img src="./macH.png" alt="mac icon hover" className='w-16 md:w-24 mb-5 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           </div>
-          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' />
-          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' />
+          <img src="./dlBtn.png" alt="downloadicon" className='absolute bottom-2 right-2 w-5 md:w-7 group-hover:hidden' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+          <img src="./dlBtnH.png" alt="downloadicon hover" className='absolute bottom-2 right-2 w-5 md:w-7 hidden group-hover:block' onContextMenu={(e) => e.preventDefault()} draggable={false} />
         </div>
         <p className='mt-3 font-fustat font-bold text-primary-600 text-sm md:text-base'>MacOS</p>
       </button>
@@ -490,7 +523,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         draggable={false}/>
       <div className='flex flex-col justify-center items-start'>
         <p className='text-primary-600 text-sm md:text-lg lg:text-[16px] 2xl:text-[20px] font-fustat font-extrabold uppercase'>System Analyst</p>
-        <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Jerwin L. Zamorao</p>
+        <p className='text-primary-600 text-xs md:text-md lg:text-[14px] 2xl:text-[16px] font-fustat font-medium'>Jerwin L. Zamora</p>
         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=zamorajerwin0@gmail.com"
           target="_blank"
           rel="noopener noreferrer"
@@ -533,7 +566,10 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         <img src="./mail.png" alt="mail icon" className='w-8 h-8 md:w-10 md:h-10
         lg:w-8 lg:h-8
         xl:w-10 xl:h-10
-        2xl:w-12 2xl:h-12' />
+        2xl:w-12 2xl:h-12' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+        />
       </div>
       <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>
         support@studybuddyph.site
@@ -551,6 +587,8 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           src="./fb.png"
           alt="Facebook"
           className='w-[55px] h-[55px] md:w-[55px] md:h-[55px] lg:w-[55px] lg:h-[55px] xl:w-[65px] xl:h-[65px] 2xl:w-[65px] 2xl:h-[65px]'
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
         />
         <p className='text-sm md:text-sm lg:text-sm 2xl:text-lg text-primary-600 font-fustat font-medium'>
           support@studybuddyph.site
@@ -570,7 +608,10 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 
     {/* Logo */}
     <div className='flex flex-col justify-center items-center gap-1 shrink-0'>
-      <img src="./logoF.png" alt="logo" className='h-14 lg:h-20' />
+      <img src="./logoF.png" alt="logo" className='h-14 lg:h-20' 
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+      />
       <p className='text-[10px] text-white opacity-75 font-fustat font-light text-center'>@2026 Dominican College of Tarlac, Inc.</p>
     </div>
 
@@ -604,6 +645,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
     </div>
   </div>
 </section>
+
 
 
   </>
