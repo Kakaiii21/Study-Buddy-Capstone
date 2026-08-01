@@ -9,10 +9,10 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   onConfirm: () => void
   onCancel: () => void 
 }) {
-  const [confirming, setConfirming] = useState(false)  // ← add this
+  const [confirming, setConfirming] = useState(false)
 
   const handleConfirm = () => {
-    if (confirming) return          // ← block double click
+    if (confirming) return
     setConfirming(true)
     onConfirm()
   }
@@ -21,11 +21,17 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
-          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span
+            className='block max-w-full truncate font-semibold text-gray-700'
+            title={itemName}
+          >
+            "{itemName}"
+          </span>
+          will be moved to{' '}
           <span className='font-semibold text-primary-600'>Recently Deleted</span>.
         </p>
         <p className='text-xs text-gray-400 mb-6'>
@@ -51,12 +57,14 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
     </div>
   )
 }
+
+
 function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-3 2xl:p-4 3xl:p-5 w-80  lg:w-[250px] xl:w-[280px] 2xl:w-[350px] 3xl:w-[420px]'>
         <div className='flex items-center gap-3 xl:gap-2 2xl:gap-3  mb-1 2xl:mb-2 3xl:mb-3 '>
-          <img src="/delete.png" alt="delete icon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9' />
+          <img src="/delete.png" alt="delete icon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
           <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800'>Clear All Schedules?</h2>
         </div>
         <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3'>
@@ -124,7 +132,7 @@ function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
             className={`w-12 h-12 rounded-full shadow-md flex items-center justify-center
               hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${action.className}`}
           >
-            <img src={action.icon} alt={action.label} className="w-5 h-5" />
+            <img src={action.icon} alt={action.label} className="w-5 h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false}  />
           </button>
         </div>
       ))}
@@ -138,7 +146,7 @@ function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
           WebkitTapHighlightColor: 'transparent',
         }}
       >
-        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert" />
+        <img src="/Add.png" alt={open ? 'Close' : 'Open menu'} className="w-6 h-6 invert select-none" onContextMenu={(e) => e.preventDefault()} draggable={false}  />
       </button>
     </div>
   )
@@ -258,7 +266,7 @@ const handleSave = () => {
   const byDay = (day: string) =>
     schedules.filter(s => s.day === day).sort((a, b) => a.timeStart.localeCompare(b.timeStart))
 
-  const DayCard = ({ day }: { day: string }) => {
+const DayCard = ({ day }: { day: string }) => {
     const daySchedules = byDay(day)
     return (
       <div id='scheduleGrid'
@@ -273,19 +281,22 @@ const handleSave = () => {
           {daySchedules.length > 0 ? (
             daySchedules.map((s) => (
               <div key={s.id} className='bg-white px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
-                <div className='flex flex-row 3xl:py-2  items-center pt-1'>
-                  <p className='text-[12px] leading-tight md:text-[12px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'>
+                <div className='flex flex-row 3xl:py-2  items-center pt-1 gap-2'>
+                  <p
+                    title={s.subject}
+                    className='min-w-0 flex-1 truncate text-[12px] leading-tight md:text-[12px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'
+                  >
                     {s.subject}
                   </p>
 
-                  <div data-note-menu className='relative ml-auto '>
+                  <div data-note-menu className='relative ml-auto shrink-0'>
                     <button
                     id='scheduleOptionsBtn'
                     className='hover:opacity-50'
                       title='More Options'
                       onClick={() => setMenuOpenIndex(menuOpenIndex === s.id ? null : s.id)}
                     >
-                      <img src="subM.png" alt="menu" className='h-[15px] w-[3px] lg:h-[16px] lg:w-[3px] xl:h-[15px] xl:w-[3px] 2xl:h-[15px] 2xl:w-[3px] 3xl:h-[19px] 3xl:w-[4px]  shrink-0 ' />
+                      <img src="subM.png" alt="menu" className='h-[15px] w-[3px] lg:h-[16px] lg:w-[3px] xl:h-[15px] xl:w-[3px] 2xl:h-[15px] 2xl:w-[3px] 3xl:h-[19px] 3xl:w-[4px]  shrink-0 select-none ' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
                     </button>
 
                     {menuOpenIndex === s.id && (
@@ -296,7 +307,7 @@ const handleSave = () => {
                             onClick={() => handleEditOpen(s)}
                             className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] xl:text-[13px] 2xl:text-[14px] text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' src="edit.png" alt="edit icon" />Edit
+                            <img className='w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  src="edit.png" alt="edit icon" />Edit
                           </button>
                           <hr className='my-1 mx-1 border-primary-800 ' />
                           <button
@@ -306,7 +317,7 @@ const handleSave = () => {
                             }}
                             className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] text-primary-600 hover:bg-red-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-3.5 h-3.5 lg:w-3  lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 ' />Delete
+                            <img src="delete.png" alt="delete icon" className='w-3.5 h-3.5 lg:w-3  lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />Delete
                           </button>
                         </div>
                       </>
@@ -314,10 +325,16 @@ const handleSave = () => {
                   </div>
                 </div>
 
-                <p className='text-[10px] leading-tight md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '>
+                <p
+                  title={`${formatTime(s.timeStart)} - ${formatTime(s.timeEnd)} — ${s.room} [ ${s.roomType} ]`}
+                  className='truncate text-[10px] leading-tight md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '
+                >
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
-                <p className='text-[10px] leading-tight lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[14px] text-gray-600 pb-2'>
+                <p
+                  title={s.instructor}
+                  className='truncate text-[10px] leading-tight lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[14px] text-gray-600 pb-2'
+                >
                   {s.instructor}
                 </p>
               </div>
@@ -331,7 +348,7 @@ const handleSave = () => {
   }
 
   return (
-      <div className='flex h-full'>
+      <div className='flex h-screen'>
         {/* Sidebar */}
         <div className='lg:p-3 '>
        <Sidebar /> 
@@ -349,7 +366,7 @@ const handleSave = () => {
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}   />
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
@@ -384,7 +401,7 @@ const handleSave = () => {
                   hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
                   transition-all duration-300 uppercase"
                 >
-                  <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0' />
+                  <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
                     CLEAR ALL schedules
                 </button>
                 <button
@@ -403,7 +420,7 @@ const handleSave = () => {
                   hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
                   transition-all duration-300"
                 >
-                  <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0' />
+                  <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2.5 lg:h-2.5 xl:w-3 xl:h-3 2xl:w-4 2xl:h-4 3xl:w-4.5 3xl:h-4.5 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
                   Add Schedule
                 </button>
 
@@ -532,7 +549,7 @@ const handleSave = () => {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         
