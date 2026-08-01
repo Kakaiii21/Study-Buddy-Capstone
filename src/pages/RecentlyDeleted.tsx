@@ -350,7 +350,7 @@ const filtered = useMemo(() => {
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
         </div>
-      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
             <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
@@ -415,7 +415,7 @@ const filtered = useMemo(() => {
           </div>
 
           {/* Recent label — matched to GeneratedHistory */}
-          <div className='flex items-center gap-3 mb-4'>
+          <div className='flex items-center gap-3 mb-4 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
             <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
             <hr className='flex-1 border-t border-primary-100' />
           </div>
@@ -423,7 +423,7 @@ const filtered = useMemo(() => {
           {/* Table */}
           {!loading && !error && (
             <div id='deletedTable' className='w-full'>
-              <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium'>
+              <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                 <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
                 <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Expires</p>
                 <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Restore</p>
@@ -443,7 +443,7 @@ const filtered = useMemo(() => {
                       key={item.id}
                       className={`py-2 lg:py-1 2xl:py-2 3xl:py-3 ${isActing ? 'opacity-50 pointer-events-none' : ''}`}
                     >
-                      <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center'>
+                      <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                         <div className='min-w-0'>
                           <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px] font-semibold text-primary-600 break-all leading-tight'>
                             {item.name}

@@ -36,7 +36,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
         <div className='flex items-center gap-3 mb-3'>
-          <img src="/delete.png" alt="deleteicon" className='w-7 h-7' />
+          <img src="/delete.png" alt="deleteicon" className='w-7 h-7 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
           <h2 className='text-lg font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm text-gray-500 mb-1'>
@@ -167,12 +167,12 @@ function GeneratedHistory() {
               title='Take a Tour'
             >
               <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
         </div>
-      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
+      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
             <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
@@ -223,7 +223,7 @@ function GeneratedHistory() {
           </div>
 
           {/* Recent label */}
-          <div className='flex items-center  gap-3 mb-4'>
+          <div className='flex items-center  gap-3 mb-4 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5 '>
             <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
             <hr className='flex-1 border-t border-primary-100' />
           </div>
@@ -245,7 +245,7 @@ function GeneratedHistory() {
               {/* ── Quiz Table ── */}
               {selectedGen === 'Quiz' && (
                 <>
-                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium'>
+                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                     <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Score</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
@@ -258,7 +258,7 @@ function GeneratedHistory() {
                     <p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
                   ) : (
                     filteredQuiz.map((item) => (
-                      <div key={item.id} className='  py-2 lg:py-1 2xl:py-2 3xl:py-3'>
+                      <div key={item.id} className='  py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                         <div className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center'>
                           <div className='min-w-0'>
                             <p className='text-xs md:text-sm   lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
@@ -273,7 +273,7 @@ function GeneratedHistory() {
                             id='viewBtn'
                               src='/View.png'
                               alt='View'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                               onClick={() => handleViewQuiz(item)}
                             />
                           </div>
@@ -282,7 +282,7 @@ function GeneratedHistory() {
                             id='retakeBtn'
                               src='/Retake.png'
                               alt='Retake'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                               onClick={() => handleRetakeQuiz(item)}
                             />
                           </div>
@@ -291,8 +291,8 @@ function GeneratedHistory() {
                           id='deleteBtn'
                             src='/delete.png'
                             alt='Delete'
-                            className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition
-                              ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
+                            className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
+                              ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}onContextMenu={(e) => e.preventDefault()} draggable={false}
                             onClick={() => isOnline
                               ? setPendingDelete({ id: item.id, name: item.fileName })
                               : undefined
@@ -333,7 +333,7 @@ function GeneratedHistory() {
                             <img
                               src='/View.png'
                               alt='View'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70'
+                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                               onClick={() => handleViewFlashcard(item)}
                             />
                           </div>
@@ -341,8 +341,8 @@ function GeneratedHistory() {
                               <img
                                 src='/delete.png'
                                 alt='Delete'
-                                className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition
-                                  ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
+                                className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
+                                  ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}  onContextMenu={(e) => e.preventDefault()} draggable={false}
                                 onClick={() => isOnline
                                   ? setPendingDelete({ id: item.id, name: item.fileName })
                                   : undefined
@@ -379,7 +379,7 @@ function GeneratedHistory() {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1' />
+              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
               font-inter font-semibold'>Need Help?</p>         

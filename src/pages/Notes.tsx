@@ -303,8 +303,8 @@ useEffect(() => {
 
               {/* ── Desktop search (lg and up) ── */}
               <div className='hidden lg:flex flex-col items-end w-full pl-3 pr-2
-                mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 gap-2'>
-                <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
+                mt-2 md:mt-4 lg:-mt-1 xl:mt-0 2xl:mt-0 gap-2'>
+                <p className='self-start font-inter  font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
                   Notes
                 </p>
 
@@ -749,12 +749,12 @@ useEffect(() => {
               onClick={handleCloseAttempt}
             >
               <div
-                className='bg-white w-full h-screen lg:rounded-2xl lg:h-[85vh] lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
+                className='bg-white w-full h-dvh lg:rounded-2xl lg:h-[85vh] lg:max-w-4xl lg:mx-6 flex flex-col overflow-y-auto'
                 onClick={(e) => e.stopPropagation()}
               >
 
                 {/* ── MOBILE layout ── */}
-                <div className='lg:hidden flex flex-col flex-1 p-6 pt-4 md:mt-24'>
+                <div className='lg:hidden flex flex-col flex-1 p-6 pt-4'>
                   <div className='flex justify-between items-start gap-2 mb-2'>
                     <input
                       className='flex-1 min-w-0 text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 py-2 focus:outline-none read-only:cursor-default'
