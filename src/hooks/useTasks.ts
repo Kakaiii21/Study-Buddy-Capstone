@@ -25,13 +25,24 @@ export interface Task {
 
 export function useTasks(user: User | null) {
   const [tasks, setTasks] = useState<Task[]>([])
-  const [loading, setLoading] = useState(true)
+  // Tracks which uid the current `tasks` array actually belongs to (or
+  // null once we've confirmed there's no signed-in user). Only ever
+  // written from inside a callback (the onSnapshot listener, or the
+  // timeout below) — never synchronously in the effect body.
+  const [tasksOwner, setTasksOwner] = useState<string | null>(null)
+
+  // Derived, not stored: we're "loading" exactly when the tasks we're
+  // holding don't yet correspond to the current user — covers both the
+  // very first fetch for a user and a mid-flight fetch after the user
+  // identity changes, without ever calling setState directly in the
+  // effect body.
+  const loading = (user?.uid ?? null) !== tasksOwner
 
   useEffect(() => {
     if (!user) {
       const timer = setTimeout(() => {
         setTasks([])
-        setLoading(false)
+        setTasksOwner(null)
       }, 0)
       return () => clearTimeout(timer)
     }
@@ -45,7 +56,7 @@ export function useTasks(user: User | null) {
         ...(doc.data() as Omit<Task, 'id'>),
       }))
       setTasks(fetched)
-      setLoading(false)
+      setTasksOwner(user.uid)
     })
 
     return () => unsubscribe()

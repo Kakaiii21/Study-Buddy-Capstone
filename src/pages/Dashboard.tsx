@@ -78,7 +78,12 @@ function Dashboard() {
 
   // Derived, not stored — swaps from the cached snapshot to the live value
   // the moment tasksLoading flips to false. No setState needed here.
-  const completedPercent = tasksLoading ? initialCachedPercent : computedPercent
+  // Also guard on `user` itself: right after remounting (e.g. navigating
+  // back from another module), `user` can briefly still be null while
+  // useTasks already reports loading:false with an empty list — without
+  // this check that empty-list 0% would flash in and stomp the cached
+  // value until the real tasks load back in.
+  const completedPercent = (!user || tasksLoading) ? initialCachedPercent : computedPercent
 
   // keep lastUid fresh so the next remount can find the cache key
   // even before useAuth resolves
@@ -684,7 +689,7 @@ className='relative flex flex-col justify-between text-left p-2
                   disabled={isDownloading}
                   className='order-4 md:order-2 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-white hover:bg-gray-50 disabled:opacity-50'
                 >
-                  {isDownloading ? 'Downloading…' : 'Download'}
+                  {isDownloading ? 'Downloading…' : 'Download as Image'}
                 </button>
                 <button
                   onClick={() => setShowCustomize(false)}
