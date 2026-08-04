@@ -11,6 +11,7 @@ import { useTasks } from '../hooks/useTasks'
 import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
+import { toPng } from 'html-to-image'
 
 function Dashboard() {
   const [showSidebar, setShowSidebar] = useState(false)
@@ -31,6 +32,8 @@ function Dashboard() {
     }
   }, [])
   const mainRef = useRef<HTMLElement>(null)
+  const idCardRef = useRef<HTMLDivElement>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
   const navigate = useNavigate()
   const { user } = useAuth()
   // Auth guard — redirect if not logged in or email not verified
@@ -194,6 +197,38 @@ function Dashboard() {
   const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
   const displayYearLevel = yearLevel || '—'
 
+  // Downloads the ID card as a PNG. Hides the hover overlay during capture
+  // (it's transparent-white and would otherwise wash out the exported image),
+  // then restores it afterward regardless of success/failure.
+  const handleDownloadCard = async () => {
+    if (!idCardRef.current || isDownloading) return
+    setIsDownloading(true)
+    const node = idCardRef.current
+    const overlay = node.querySelector('[data-card-overlay]') as HTMLElement | null
+    const previousOverlayDisplay = overlay?.style.display
+    try {
+      if (overlay) overlay.style.display = 'none'
+      const dataUrl = await toPng(node, {
+        cacheBust: true,
+        pixelRatio: 2,
+        // no canvas-level backgroundColor: the card itself keeps its own
+        // bg-white (clipped by its rounded corners via overflow-hidden),
+        // so only the rounded card is white and the square corners outside
+        // it stay transparent instead of being painted white.
+      })
+      const link = document.createElement('a')
+      const safeName = (displayFirstName || 'student').toString().replace(/[^a-z0-9]/gi, '_').toLowerCase()
+      link.download = `studybuddy-id-${safeName}.png`
+      link.href = dataUrl
+      link.click()
+    } catch (err) {
+      console.error('Failed to export ID card as image:', err)
+    } finally {
+      if (overlay) overlay.style.display = previousOverlayDisplay ?? ''
+      setIsDownloading(false)
+    }
+  }
+
   const activities = [
     { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
     { label: 'Notes',          path: '/notes',          color: '#7FC4FF' },
@@ -298,7 +333,7 @@ function Dashboard() {
         <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
             
         {/* ID Card */}
-        <div id='idCard' onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
+        <div id='idCard' ref={idCardRef} onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
           lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px] 
           2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
           h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
@@ -319,6 +354,7 @@ function Dashboard() {
               <img
                 src={profilePic}
                 alt="Profile"
+                crossOrigin="anonymous"
                 className='w-[80px] h-[100px]  md:w-[85px] md:h-[115px]
                 lg:w-[70px] lg:h-[85px] lg:my-1 xl:w-[90px] xl:h-[110px] xl:my-1.5 2xl:w-[110px] 2xl:h-[130px] 2xl:my-3 3xl:w-[135px] 3xl:h-[160px] object-cover border-2 border-primary-800'
               />
@@ -387,7 +423,7 @@ function Dashboard() {
   </div>
 
   {/* Hover overlay */}
-  <div className='absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 
+  <div data-card-overlay className='absolute inset-0 bg-white/80 opacity-0 group-hover:opacity-100 
     transition-opacity duration-200 flex flex-col items-center justify-center gap-2 z-10'>
 
     <img src="./idCustom.png" alt="" className='w-6 h-6 md:w-7 md:h-7 lg:w-9 lg:h-9 xl:w-8 xl:h-8 2xl:w-9 2xl:h-9 3xl:w-10 3xl:h-10 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
@@ -623,8 +659,8 @@ className='relative flex flex-col justify-between text-left p-2
               {/* Actions + color picker — reordered on mobile: color first, buttons last */}
               <div className='w-full md:w-56 flex flex-col gap-3'>
 
-                <p className='order-1 md:order-3 text-center font-inter text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
-                <div className='order-2 md:order-4 border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
+                <p className='order-1 md:order-4 text-center font-inter text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
+                <div className='order-2 md:order-5 border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
                   {['#C9C9C9', '#000000', '#FFD84D', '#7FC4FF', '#B5E8A0', '#D9CBF5', '#FFB8D9', '#FFA55E'].map((color) => (
                     <button
                       key={color}
@@ -644,8 +680,15 @@ className='relative flex flex-col justify-between text-left p-2
                   {savingField ? 'Saving...' : 'Save'}
                 </button>
                 <button
+                  onClick={handleDownloadCard}
+                  disabled={isDownloading}
+                  className='order-4 md:order-2 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-white hover:bg-gray-50 disabled:opacity-50'
+                >
+                  {isDownloading ? 'Downloading…' : 'Download'}
+                </button>
+                <button
                   onClick={() => setShowCustomize(false)}
-                  className='order-4 md:order-2 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
+                  className='order-5 md:order-3 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
                 >
                   Cancel
                 </button>
