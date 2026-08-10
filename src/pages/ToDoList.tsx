@@ -179,7 +179,7 @@ function TaskModal({
       className="fixed inset-0  bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-6 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
+        className="bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-center font-bold text-primary-600 
@@ -241,14 +241,14 @@ function TaskModal({
           {requireDeadline && <span className="text-red-500">*</span>}
         </label>
 
-        <div className="flex gap-3 3xl:gap-8 my-3">
+        <div className="flex flex-col sm:flex-row gap-3 3xl:gap-8 my-3">
           <div className="relative flex items-center flex-1">
             <input
-              className={`border-2 rounded-sm w-full py-3 text-sm px-3 pr-11 font-mono
-                lg:text-sm lg:py-1
-                xl:text-[15px] xl:py-2
-                2xl:text-lg
-                3xl:text-xl
+              className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono 
+              lg:text-sm lg:py-1 lg:rounded-sm
+              xl:text-[15px] xl:py-2
+              2xl:text-[16px]
+              3xl:text-lg
                 ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
               value={taskDeadline}
               onChange={(e) => handleDeadlineChange(e.target.value)}
@@ -283,18 +283,18 @@ function TaskModal({
             />
           </div>
 
-          <input
-            aria-label="time"
-            type="time"
-            value={taskTime}
-            onChange={(e) => handleTimeChange(e.target.value)}
-            className={`border-2 rounded-md py-3 px-3 w-36 3xl:w-44 font-mono 
-            lg:text-sm lg:py-1 lg:rounded-sm
-            xl:text-[15px] xl:py-2
-            2xl:text-[16px]
-            3xl:text-lg
-              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
-          />
+<input
+  aria-label="time"
+  type="time"
+  value={taskTime}
+  onChange={(e) => handleTimeChange(e.target.value)}
+  className={`border-2 rounded-md py-3 px-3 w-full font-mono 
+  lg:text-sm lg:py-1 lg:rounded-sm
+  xl:text-[15px] xl:py-2
+  2xl:text-[16px]
+  3xl:text-lg
+    ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+/>
         </div>
 
         {dateError && <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>}
