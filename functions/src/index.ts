@@ -7,6 +7,9 @@ import { extractText } from './extractText'
 import { callGroq } from './groqClient'
 import { parseQuiz, parseFlashcards } from './parsers'
 import { acquireCooldown, releaseCooldown } from './rateLimit'
+import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore'
+import { createTicket, cancelTicket, dispatchNext } from './queue'
+import { estimateMaxItems, getTextSample, detectSourceLang, buildPrompt, shuffleQuizOptions, estimateTokens } from './promptBuilder'
 if (!admin.apps.length) admin.initializeApp()
 
 function setCors(res: any) {
@@ -15,38 +18,8 @@ function setCors(res: any) {
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 }
 
-function estimateMaxItems(text: string, mode: 'quiz' | 'flashcard'): number {
-  const wordCount = text.trim().split(/\s+/).length
-  const wordsPerItem = mode === 'quiz' ? 80 : 40
-  return Math.max(10, Math.floor(wordCount / wordsPerItem))
-}
 
-function getTextSample(rawText: string): string {
-  const words = rawText.trim().split(/\s+/)
-  const start = Math.floor(words.length * 0.05) // skip first 5% (TOC/headers)
-  return words.slice(start).join(' ').slice(0, 3000)
-}
 
-function shuffleQuizOptions(items: any[]): any[] {
-  const letters = ['A', 'B', 'C', 'D']
-  return items.map((item) => {
-    const options = [item.a, item.b, item.c, item.d]
-    const correctIndex = letters.indexOf(item.correct?.toUpperCase())
-    if (correctIndex === -1) return item
-
-    // Fisher-Yates shuffle
-    const indices = [0, 1, 2, 3]
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]]
-    }
-
-    const shuffled = indices.map(i => options[i])
-    const newCorrectLetter = letters[indices.indexOf(correctIndex)]
-
-    return { ...item, a: shuffled[0], b: shuffled[1], c: shuffled[2], d: shuffled[3], correct: newCorrectLetter }
-  })
-}
 
 // ── EMAIL HELPER ─────────────────────────────────────────────────────────────
 function emailTemplate(content: string) {
@@ -88,6 +61,170 @@ function actionButton(link: string, label: string) {
     </p>
   `
 }
+
+// ── ENQUEUE (fast — extracts text, validates, creates ticket, returns) ──────
+export const enqueueStudyMaterial = onRequest(
+  {
+    timeoutSeconds: 60,
+    memory: '512MiB',
+    secrets: ['GROQ_API_KEY'], // not used here directly, but keeps env consistent for future
+  },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+
+    let callerUid: string | undefined
+    let succeeded = false
+
+    try {
+      const authHeader = req.headers.authorization
+      if (!authHeader?.startsWith('Bearer ')) {
+        res.status(401).json({ error: 'Unauthorized. Please log in and try again.' })
+        return
+      }
+      try {
+        const idToken = authHeader.split('Bearer ')[1]
+        const decoded = await admin.auth().verifyIdToken(idToken)
+        callerUid = decoded.uid
+      } catch {
+        res.status(401).json({ error: 'Invalid or expired session. Please log in again.' })
+        return
+      }
+
+      // Per-user cooldown — same as before, still prevents one user from spamming enqueue.
+      const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
+      if (!cooldown.allowed) {
+        res.status(429).json({
+          error: `Please wait ${cooldown.retryAfter}s before generating again.`,
+          retryAfter: cooldown.retryAfter,
+        })
+        return
+      }
+
+      const contentType = req.headers['content-type'] || ''
+      let fileBuffer: Buffer | null = null
+      let fileType = ''
+      let mode: 'quiz' | 'flashcard' = 'quiz'
+      let numItems = 10
+      let fileName: string | undefined
+
+      if (contentType.includes('multipart/form-data')) {
+        const result = await parseMultipart(req)
+        fileBuffer = result.fileBuffer
+        fileType = result.fileType
+        mode = result.mode
+        numItems = result.numItems
+      } else if (contentType.includes('application/json')) {
+        const body = req.body as { fileUrl?: string; fileType?: string; mode?: string; numItems?: number }
+        if (!body.fileUrl || !body.fileType) { res.status(400).json({ error: 'fileUrl and fileType are required.' }); return }
+        const response = await axios.get(body.fileUrl, { responseType: 'arraybuffer', timeout: 30000 })
+        fileBuffer = Buffer.from(response.data)
+        fileType = body.fileType
+        mode = (body.mode as 'quiz' | 'flashcard') ?? 'quiz'
+        numItems = body.numItems ?? 10
+      } else {
+        res.status(400).json({ error: 'Unsupported content type.' }); return
+      }
+      if (!fileBuffer) { res.status(400).json({ error: 'No file received.' }); return }
+
+      const rawText = await extractText(fileBuffer, fileType)
+      if (!rawText || rawText.trim().length < 50) {
+        res.status(400).json({ error: 'Could not extract enough text from the file.' }); return
+      }
+
+      const estimatedMax = estimateMaxItems(rawText, mode)
+      if (numItems > estimatedMax) {
+        res.status(400).json({
+          error: `The file may not have enough content for ${numItems} ${mode === 'quiz' ? 'questions' : 'flashcards'}. Try ${estimatedMax} or fewer.`,
+          suggested_max: estimatedMax,
+        })
+        return
+      }
+
+      const textSample = getTextSample(rawText)
+      const sourceLang = detectSourceLang(textSample)
+
+      // Reject early if the sampled prompt text alone would blow the TPM budget.
+      const estimatedTokens = estimateTokens(textSample)
+      const MAX_SAFE_INPUT_TOKENS = 6000 // leaves headroom under the 8K TPM ceiling for output
+      if (estimatedTokens > MAX_SAFE_INPUT_TOKENS) {
+        res.status(400).json({ error: 'This file has too much text to process in one request. Try a shorter file.' })
+        return
+      }
+
+      const { ticketId, position } = await createTicket({
+        userId: callerUid!,
+        mode,
+        numItems,
+        textSample,
+        sourceLang,
+        fileName,
+        estimatedTokens,
+      })
+
+      succeeded = true
+      res.status(200).json({ ticketId, position })
+
+      // Fire-and-forget: try to dispatch immediately in case a slot is free right now.
+      // Errors here don't affect the response already sent.
+      dispatchNext().catch((e) => console.error('dispatchNext error:', e))
+    } catch (err: unknown) {
+      console.error('enqueueStudyMaterial error:', err)
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    } finally {
+      if (callerUid) {
+        await releaseCooldown(`generateStudyMaterial:${callerUid}`, succeeded)
+      }
+    }
+  }
+)
+
+// ── CANCEL ────────────────────────────────────────────────────────────────
+export const cancelStudyMaterialTicket = onRequest(
+  { timeoutSeconds: 30, memory: '256MiB' },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+
+    const authHeader = req.headers.authorization
+    if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Unauthorized' }); return }
+
+    try {
+      const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1])
+      const { ticketId } = req.body as { ticketId?: string }
+      if (!ticketId) { res.status(400).json({ error: 'ticketId is required.' }); return }
+
+      const result = await cancelTicket(ticketId, decoded.uid)
+      if (!result.ok) { res.status(400).json({ error: result.reason }); return }
+      res.status(200).json({ success: true })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    }
+  }
+)
+
+// ── QUEUE TRIGGERS (event-driven, no polling) ────────────────────────────────
+export const onTicketCreated = onDocumentCreated(
+  { document: 'queueTickets/{ticketId}', secrets: ['GROQ_API_KEY'] },
+  async () => {
+    await dispatchNext().catch((e) => console.error('dispatchNext (onTicketCreated) error:', e))
+  }
+)
+
+export const onQueueStateChanged = onDocumentWritten(
+  { document: 'system/groqQueue', secrets: ['GROQ_API_KEY'] },
+  async (event) => {
+    const before = event.data?.before?.data()
+    const after = event.data?.after?.data()
+    if (after && before && (after.active ?? 0) < (before.active ?? 0)) {
+      await dispatchNext().catch((e) => console.error('dispatchNext (onQueueStateChanged) error:', e))
+    }
+  }
+)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const generateStudyMaterial = onRequest(
@@ -100,7 +237,7 @@ export const generateStudyMaterial = onRequest(
     setCors(res)
     if (req.method === 'OPTIONS') { res.status(204).send(''); return }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
-    // Declared OUTSIDE the try so catch/finally can see them
+
     let callerUid: string | undefined
     let succeeded = false
 
@@ -115,27 +252,27 @@ export const generateStudyMaterial = onRequest(
         return
       }
       try {
-    const idToken = authHeader.split('Bearer ')[1]
-    const decoded = await admin.auth().verifyIdToken(idToken)
-    callerUid = decoded.uid
-    console.log(`[Auth] callerUid: ${callerUid}`)
-  } catch {
-    res.status(401).json({ error: 'Invalid or expired session. Please log in again.' })
-    return
-  }
+        const idToken = authHeader.split('Bearer ')[1]
+        const decoded = await admin.auth().verifyIdToken(idToken)
+        callerUid = decoded.uid
+        console.log(`[Auth] callerUid: ${callerUid}`)
+      } catch {
+        res.status(401).json({ error: 'Invalid or expired session. Please log in again.' })
+        return
+      }
 
-// ── COOLDOWN CHECK ────────────────────────────────────────────────────
-  const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
-  if (!cooldown.allowed) {
-    res.status(429).json({
-      error: `Please wait ${cooldown.retryAfter}s before generating again.`,
-      retryAfter: cooldown.retryAfter,
-    })
-    return
-  }
-  // ─────────────────────────────────────────────────────────────────────
+      // ── COOLDOWN CHECK ────────────────────────────────────────────────────
+      const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
+      if (!cooldown.allowed) {
+        res.status(429).json({
+          error: `Please wait ${cooldown.retryAfter}s before generating again.`,
+          retryAfter: cooldown.retryAfter,
+        })
+        return
+      }
+      // ─────────────────────────────────────────────────────────────────────
 
-const contentType = req.headers['content-type'] || ''
+      const contentType = req.headers['content-type'] || ''
       let fileBuffer: Buffer | null = null
       let fileType = ''
       let mode: 'quiz' | 'flashcard' = 'quiz'
@@ -173,69 +310,9 @@ const contentType = req.headers['content-type'] || ''
         return
       }
 
-      // ── SMARTER TEXT SAMPLING ─────────────────────────────────────────────
       const textSample = getTextSample(rawText)
-      // ─────────────────────────────────────────────────────────────────────
-
-      // ── LANGUAGE DETECTION ────────────────────────────────────────────────
-      const sampleWords = textSample.toLowerCase()
-      const tagalogMatches = (sampleWords.match(/\b(ang|mga|ay|ito|niya|hindi|kung|pero|kaya|dahil|siya|namin|tayo)\b/g) || []).length
-      const hasTagalog = tagalogMatches >= 3
-      const sourceLang = hasTagalog ? 'Filipino/Tagalog' : 'English'
-      // ─────────────────────────────────────────────────────────────────────
-
-      let prompt = ''
-      if (mode === 'quiz') {
-        prompt = `You are a quiz generator. Use ONLY the text below to create ${numItems} multiple choice questions.
-
-RULES:
-- Test understanding, not just memorization
-- 4 options per question (A, B, C, D)
-- Only ONE correct answer
-- Wrong options must be related but clearly incorrect
-- IMPORTANT: Spread correct answers across A, B, C, D evenly — do NOT put correct answer in A every time
-- No repeated concepts
-- ${sourceLang} only, keep format keywords in English
-- Do NOT add any intro, outro, or explanations
-
-FORMAT — follow exactly:
-Question 1: [question]
-A) [option]
-B) [option]
-C) [option]
-D) [option]
-Correct: B
-
-Question 2: [question]
-A) [option]
-B) [option]
-C) [option]
-D) [option]
-Correct: D
-
-TEXT:
-${textSample}`
-
-      } else {
-        prompt = `You are a flashcard generator. Use ONLY the text below to create ${numItems} flashcards.
-
-RULES:
-- Each card must cover a unique concept — no repeats
-- Front: short term or question (max 10 words)
-- Back: clear concise definition or answer (1-2 sentences)
-- ${sourceLang} only, keep format keywords in English
-- Do NOT add any intro, outro, or explanations
-
-FORMAT — follow exactly:
-Card 1 Front: [term or question]
-Card 1 Back: [definition or answer]
-
-Card 2 Front: [term or question]
-Card 2 Back: [definition or answer]
-
-TEXT:
-${textSample}`
-      }
+      const sourceLang = detectSourceLang(textSample)
+      const prompt = buildPrompt(mode, numItems, textSample, sourceLang)
 
       const { text: aiResponse, usage, remainingTokens } = await callGroq(prompt, apiKey)
       console.log(`[Token Usage] prompt: ${usage.prompt_tokens} | completion: ${usage.completion_tokens} | total: ${usage.total_tokens}`)
@@ -243,25 +320,22 @@ ${textSample}`
       console.log('[Raw AI Response]', aiResponse)
 
       let items = mode === 'quiz' ? parseQuiz(aiResponse) : parseFlashcards(aiResponse)
-
-      // ── SHUFFLE QUIZ OPTIONS to fix answer-always-A bias ──────────────────
       if (mode === 'quiz') items = shuffleQuizOptions(items)
-      // ─────────────────────────────────────────────────────────────────────
 
       console.log(`[Parsed Items Count] ${items.length}`)
-            res.status(200).json({ mode, items, usage })
-            succeeded = true
-          } catch (err: unknown) {
-            console.error('generateStudyMaterial error:', err)
-            const message = err instanceof Error ? err.message : 'Internal server error'
-            res.status(500).json({ error: message })
-          } finally {
-            if(callerUid){
-            await releaseCooldown(`generateStudyMaterial:${callerUid}`, succeeded)
-          }
-        }
-        }
-      )
+      res.status(200).json({ mode, items, usage })
+      succeeded = true
+    } catch (err: unknown) {
+      console.error('generateStudyMaterial error:', err)
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    } finally {
+      if (callerUid) {
+        await releaseCooldown(`generateStudyMaterial:${callerUid}`, succeeded)
+      }
+    }
+  }
+)
 
 function parseMultipart(req: any): Promise<{ fileBuffer: Buffer; fileType: string; mode: 'quiz' | 'flashcard'; numItems: number }> {
   return new Promise((resolve, reject) => {

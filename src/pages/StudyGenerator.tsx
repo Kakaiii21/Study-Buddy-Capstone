@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { doc, onSnapshot, collection, query, where } from 'firebase/firestore'
+import { db } from '../services/firebase'
 import { useCourses } from '../hooks/useCourses'
 import { useCourseFiles } from '../hooks/useCourseFiles'
 import type { User } from 'firebase/auth'
@@ -31,10 +33,10 @@ interface CourseFile {
 
 const ACCEPTED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.txt'
-const FUNCTION_URL = import.meta.env.VITE_STUDY_GENERATOR_URL as string
-const COOLDOWN_MS = 2 * 60 * 1000 // ── NEW: 2 minutes
-const COOLDOWN_KEY = 'studygen_cooldown_until' // ── NEW: localStorage key
-
+const ENQUEUE_URL = import.meta.env.VITE_STUDY_GENERATOR_ENQUEUE_URL as string
+const CANCEL_URL = import.meta.env.VITE_STUDY_GENERATOR_CANCEL_URL as string
+const COOLDOWN_MS = 2 * 60 * 1000 // 2 minutes
+const COOLDOWN_KEY = 'studygen_cooldown_until'
 
 // Session storage keys
 export const SESSION_KEY_RESULT = 'studygen_result'
@@ -45,7 +47,6 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-// ── NEW: format seconds to mm:ss ─────────────────────────────────────────────
 function formatCountdown(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
@@ -63,10 +64,10 @@ function CoursePicker({
   onError,
 }: {
   user: User | null
-  courses: { id: string; name: string; color?: string }[]   // ← add color
+  courses: { id: string; name: string; color?: string }[]
   onSelect: (file: UploadedFile) => void
   onClose: () => void
-  onError: (msg:string) => void 
+  onError: (msg: string) => void
 }) {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
   const selectedCourse = courses.find((c) => c.id === selectedCourseId)
@@ -191,8 +192,6 @@ function CoursePicker({
   )
 }
 
-
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 function StudyGenerator() {
@@ -205,17 +204,21 @@ function StudyGenerator() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
   const [showCoursePicker, setShowCoursePicker] = useState(false)
   const [fileError, setFileError] = useState('')
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [queueStatus, setQueueStatus] = useState<'idle' | 'queued' | 'processing' | 'done' | 'error'>('idle')
+  const [ticketId, setTicketId] = useState<string | null>(null)
+  const [ticketNumber, setTicketNumber] = useState<number | null>(null)
+  const [queuePosition, setQueuePosition] = useState<number | null>(null)
   const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
-  const [cooldownSeconds, setCooldownSeconds] = useState(0) // ── NEW
+  const [cooldownSeconds, setCooldownSeconds] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false) // guards against double-click before the server responds
 
-  const [tourPreview, setTourPreview] = useState(false) // ── NEW
+  const [tourPreview, setTourPreview] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null) // ── NEW
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const items = [10, 20, 30, 40, 50]
   const isOnline = useNetworkStatus()
 
-//scroll sa div ng options
+  //scroll sa div ng options
   const generateSectionRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (uploadedFile && generateSectionRef.current) {
@@ -226,8 +229,7 @@ function StudyGenerator() {
     }
   }, [uploadedFile])
 
-
-  // ── NEW: initialize cooldown from localStorage on mount ──────────────────
+  // initialize cooldown from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(COOLDOWN_KEY)
     if (stored) {
@@ -235,9 +237,75 @@ function StudyGenerator() {
       if (remaining > 0) startCooldownTimer(remaining)
     }
   }, [])
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // ── NEW: countdown ticker ────────────────────────────────────────────────
+  // ── Listen to my ticket's status ─────────────────────────────────────────
+  useEffect(() => {
+    if (!ticketId) return
+
+    const ref = doc(db, 'queueTickets', ticketId)
+    const unsub = onSnapshot(ref, (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+
+      if (data.status === 'waiting') {
+        setQueueStatus('queued')
+        setTicketNumber(data.ticketNumber)
+      } else if (data.status === 'processing') {
+        setQueueStatus('processing')
+      } else if (data.status === 'done') {
+        setQueueStatus('done')
+
+        const sessionData = {
+          items: data.result?.items ?? [],
+          mode: data.mode,
+          fileName: uploadedFile?.name ?? data.fileName ?? '',
+        }
+        sessionStorage.setItem(SESSION_KEY_RESULT, JSON.stringify(sessionData))
+
+        const cooldownUntil = Date.now() + COOLDOWN_MS
+        localStorage.setItem(COOLDOWN_KEY, String(cooldownUntil))
+        startCooldownTimer(Math.ceil(COOLDOWN_MS / 1000))
+
+        const path = data.mode === 'quiz' ? '/studyGenerator/Quiz' : '/studyGenerator/Flashcard'
+        navigate(path, { state: sessionData })
+
+        setTicketId(null)
+        setTicketNumber(null)
+        setQueuePosition(null)
+      } else if (data.status === 'failed') {
+        setQueueStatus('error')
+        setFileError(data.error || 'Something went wrong. Please try again.')
+        setTicketId(null)
+        setTicketNumber(null)
+        setQueuePosition(null)
+      } else if (data.status === 'cancelled') {
+        setQueueStatus('idle')
+        setTicketId(null)
+        setTicketNumber(null)
+        setQueuePosition(null)
+      }
+    })
+
+    return () => unsub()
+  }, [ticketId])
+
+  // ── Live position + estimated wait ───────────────────────────────────────
+  useEffect(() => {
+    if (!ticketNumber || queueStatus !== 'queued') return
+
+    const q = query(
+      collection(db, 'queueTickets'),
+      where('status', 'in', ['waiting', 'processing']),
+      where('ticketNumber', '<', ticketNumber)
+    )
+    const unsub = onSnapshot(q, (snap) => {
+      setQueuePosition(snap.size + 1)
+    })
+
+    return () => unsub()
+  }, [ticketNumber, queueStatus])
+
+  // ── countdown ticker ────────────────────────────────────────────────
   function startCooldownTimer(seconds: number) {
     setCooldownSeconds(seconds)
     if (cooldownRef.current) clearInterval(cooldownRef.current)
@@ -253,13 +321,11 @@ function StudyGenerator() {
       })
     }, 1000)
   }
-  // ─────────────────────────────────────────────────────────────────────────
 
-  // ── NEW: clear interval on unmount ───────────────────────────────────────
+  // clear interval on unmount
   useEffect(() => {
     return () => { if (cooldownRef.current) clearInterval(cooldownRef.current) }
   }, [])
-  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
@@ -310,13 +376,15 @@ function StudyGenerator() {
     if (!selectItems) { setFileError('Please select the number of items.'); return }
     if (!isOnline) { setFileError('You are offline. Please reconnect to generate.'); return }
     if (cooldownSeconds > 0) return
+    if (isSubmitting) return // extra guard in case of rapid double-clicks
+
+    setIsSubmitting(true) // disable immediately, before any await
     setFileError('')
     setSuggestedMax(null)
-    setIsGenerating(true)
-    sessionStorage.removeItem(SESSION_KEY_RESULT) 
+    sessionStorage.removeItem(SESSION_KEY_RESULT)
 
     try {
-      if (!user) { setFileError('Please log in to generate study materials.'); setIsGenerating(false); return }
+      if (!user) { setFileError('Please log in to generate study materials.'); return }
       const idToken = await user.getIdToken()
 
       let body: BodyInit
@@ -338,7 +406,7 @@ function StudyGenerator() {
         })
       }
 
-      const response = await fetch(FUNCTION_URL, { method: 'POST', headers, body })
+      const response = await fetch(ENQUEUE_URL, { method: 'POST', headers, body })
       const data = await response.json()
 
       if (!response.ok) {
@@ -356,279 +424,309 @@ function StudyGenerator() {
         return
       }
 
-      // ── NEW: start cooldown on success ───────────────────────────────────
-      const cooldownUntil = Date.now() + COOLDOWN_MS
-      localStorage.setItem(COOLDOWN_KEY, String(cooldownUntil))
-      startCooldownTimer(Math.ceil(COOLDOWN_MS / 1000))
-      // ─────────────────────────────────────────────────────────────────────
-
-      const sessionData = {
-        items: data.items,
-        mode: activeTab,
-        fileName: uploadedFile.name,
-      }
-      sessionStorage.setItem(SESSION_KEY_RESULT, JSON.stringify(sessionData))
-
-      const path = activeTab === 'quiz' ? '/studyGenerator/Quiz' : '/studyGenerator/Flashcard'
-      navigate(path, { state: sessionData })
+      setTicketId(data.ticketId)
+      setQueuePosition(data.position)
+      setQueueStatus('queued')
     } catch (err) {
       console.error(err)
       setFileError('Network error. Please check your connection and try again.')
     } finally {
-      setIsGenerating(false)
+      setIsSubmitting(false) // always release the lock, success or failure
     }
   }
 
-  const isCoolingDown = cooldownSeconds > 0 // ── NEW
-const canGenerate = !!uploadedFile && !!selectItems && !isGenerating && !isCoolingDown && isOnline
+  const handleCancelQueue = async () => {
+    if (!ticketId || !user) return
+    try {
+      const idToken = await user.getIdToken()
+      await fetch(CANCEL_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticketId }),
+      })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setQueueStatus('idle')
+      setTicketId(null)
+      setTicketNumber(null)
+      setQueuePosition(null)
+    }
+  }
+
+  const isCoolingDown = cooldownSeconds > 0
+  const isQueuedOrProcessing = queueStatus === 'queued' || queueStatus === 'processing'
+  const isGenerating = isQueuedOrProcessing || isSubmitting
+  const canGenerate = !!uploadedFile && !!selectItems && !isQueuedOrProcessing && !isCoolingDown && !isSubmitting && isOnline
+
   const fileIconSrc = uploadedFile
     ? uploadedFile.type === 'pdf' ? '/pdfIcon.png'
       : ['doc', 'docx'].includes(uploadedFile.type) ? '/docsIcon.png'
       : ['ppt', 'pptx'].includes(uploadedFile.type) ? '/pptIcon.png'
       : '/txtIcon.png'
     : ''
-const { startTour } = useTour(
-  'studygenerator',
-  false,
-  () => {},
-  () => {},
-  user,
-  () => setTourPreview(false)   
-)
+  const { startTour } = useTour(
+    'studygenerator',
+    false,
+    () => {},
+    () => {},
+    user,
+    () => setTourPreview(false)
+  )
   return (
     <div className='flex h-screen'>
       <div className='lg:p-3 '>
-      <Sidebar />
+        <Sidebar />
       </div>
       <div className='flex-1 flex flex-col overflow-hidden'>
 
-              {/* Top Bar — mobile only */}
+        {/* Top Bar — mobile only */}
         <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
           <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Study Generator</p>
-            <button
+          <button
             id='tour-btn'
-              onClick={() => startTour()}
-              className='flex flex-col items-center gap-1 ml-auto pt-3
+            onClick={() => startTour()}
+            className='flex flex-col items-center gap-1 ml-auto pt-3
               hover:opacity-80 active:scale-95 transition-all'
-              title='Take a Tour'
-            >
-              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}/>
-              </div>
-              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-            </button>
+            title='Take a Tour'
+          >
+            <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
+              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            </div>
+            <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+          </button>
         </div>
-      <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 3xl:px-14 3xl:pt-0 pt-1">
-        <div className="min-h-screen  w-full flex flex-col">
+        <main className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 3xl:px-14 3xl:pt-0 pt-1">
+          <div className="min-h-screen  w-full flex flex-col">
             <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4 3xl:p-6  
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px] text-[#B3B3B3] uppercase
             mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-4 '>Study Generator</p>
-          {/* Header */}
-        <div className="flex flex-col w-full lg:flex lg:flex-row md:flex-row 
+            {/* Header */}
+            <div className="flex flex-col w-full lg:flex lg:flex-row md:flex-row 
           px-14 sm:px-12 justify-center items-center py-1
           lg:justify-end lg:items-start lg:pr-10 2xl:pr-16 3xl:pr-20 lg:px-0 lg:gap-3
           md:justify-between md:items-start sm:items-center gap-1 p-0">
-          </div>
-
-          {/* Body */}
-          <div className='h-full flex flex-col justify-start items-center'>
-            <p className='mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
-              Make your own Quiz/Flashcard Now!
-            </p>
-            <p className='mt-2 lg:mt-0 xl:mt-1 2xl:mt-2 3xl:mt-3 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
-              Generate your own quiz or flashcards by uploading a file.
-            </p>
-
-            {/* ── NEW: cooldown banner ── */}
-            {isCoolingDown && (
-              <div className='mt-2  flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-yellow-50 border border-yellow-300  text-yellow-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
-                <span>⏳</span>
-                <span>You can generate again in <span className='font-bold text-yellow-800'>{formatCountdown(cooldownSeconds)}</span></span>
-              </div>
-            )}
-            {!isOnline && (
-              <div className='mt-2 flex items-center gap-3 lg:text-[9px] 3xl:text-lg bg-red-50 border border-red-300 text-red-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
-                <span>📶</span>
-                <span>You're offline. Connect to the internet to use the Study Generator.</span>
-              </div>
-            )}
-            {/* ─────────────────────── */}
-          <hr className='w-72 mt-10 lg:mt-2 md:w-[500px] lg:w-[450px] 2xl:w-[650px] 3xl:w-[800px]  md:mt-10  mx-auto border-t border-primary-600 mb-1 md:mb-0' />
-            {/* File Source Panel */}
-            <div className='flex flex-col justify-center mt-2 md:mt-5 lg:mt-0 gap-1 items-center w-full max-w-[800px] 3xl:max-w-[1000px]  px-6 py-1'>
-              <p className='text-sm lg:text-[14px] 2xl:text-lg 3xl:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10 lg:mb-1 2xl:mt-3'>
-                Choose where to access your files
-              </p>
-
-              <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 mt-4 lg:mt-2 2xl:mt-3'>                
-                <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Localbtn.png' alt='localbtnicon' />
-                  <button
-                   id='localFilesBtn'
-                    onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
-                    disabled={isGenerating || !isOnline}
-                    className='bg-[#FEE248]  disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
-                  >
-                    Local Files
-                  </button>
-                </div>
-
-                <p className='flex-shrink-0 text-center lg:mt-10 text-primary-600 lg:text-sm 2xl:text-lg 3xl:text-2xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
-
-                <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                  <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Coursesbtn.png' alt='coursesbtnicon' />
-                  <button
-                  id='courseFilesBtn'
-                    onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
-                    disabled={coursesLoading || isGenerating || !isOnline}
-                    className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
-                  >
-                    {coursesLoading ? 'Loading...' : 'Course Files'}
-                  </button>
-                </div>
-              </div>
-
-              <input
-                aria-label='File input'
-                ref={fileInputRef}
-                type='file'
-                accept={ACCEPTED_TYPES}
-                className='hidden'
-                onChange={(e) => handleLocalFile(e.target.files)}
-              />
-
-{uploadedFile && (
-  <div
-    ref={generateSectionRef}
-    className='w-full mt-2 flex items-center justify-between gap-2 bg-white bg-opacity-90 border border-primary-600 rounded-md px-4 py-3 lg:py-1 3xl:px-6 3xl:py-4'
-  >
-    <div className='flex items-center gap-2 min-w-0'>
-      <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 lg:w-7 2xl:w-10 lg:h-7 2xl:h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-      <div className='min-w-0 max-w-[180px] lg:max-w-[200px] 2xl:max-w-[180px] 3xl:max-w-[260px]'>
-        <p className='font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
-        <p className='font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
-          {uploadedFile.size} · from {uploadedFile.source === 'local' ? 'Local' : 'Courses'}
-        </p>
-      </div>
-    </div>
-    <button
-      onClick={handleRemoveFile}
-      className='text-gray-400 hover:text-red-500 font-bold text-xl 3xl:text-2xl flex-shrink-0'
-      title='Remove file'
-      disabled={isGenerating}
-    >
-      ✕
-    </button>
-  </div>
-)}
             </div>
 
-            {fileError && (
-              <p className='mt-1 text-red-500 text-sm lg:text-[10px] 3xl:text-base font-roboto text-center'>{fileError}</p>
-            )}
+            {/* Body */}
+            <div className='h-full flex flex-col justify-start items-center'>
+              <p className='mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
+                Make your own Quiz/Flashcard Now!
+              </p>
+              <p className='mt-2 lg:mt-0 xl:mt-1 2xl:mt-2 3xl:mt-3 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
+                Generate your own quiz or flashcards by uploading a file.
+              </p>
 
-            {suggestedMax && (
-              <button
-                className='mt-1 text-sm font-roboto font-bold text-white bg-primary-600 hover:bg-primary-500  py-1 rounded-md uppercase px-2 lg:text-[10px] 2xl:text-lg 3xl:text-xl 3xl:px-4 3xl:py-2 transition'
-                onClick={() => {
-                  setSelectItems(suggestedMax)
-                  setFileError('')
-                }}
-              >
-                Use {suggestedMax} items instead
-              </button>
-            )}
-
-            <p className='mt-6 lg:mt-2 2xl:mt-6 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
-              <i><strong>Reminder:</strong> All files generated by Study Buddy may not be 100% accurate.</i>
-            </p>
-            <p className='mt-0 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
-              <i>Users are advised to review the generated files before proceeding. Thank you.</i>
-            </p>
-            {(uploadedFile || tourPreview) && (
-              <div className='mt-5 flex flex-col justify-start items-center min-w-full'>
-                <div className='flex flex-row gap-2 lg:gap-x-8 md:gap-14'>
-                  <button
-                  id='quizTabBtn'
-                    className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl
-                      ${activeTab === 'quiz' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
-                    onClick={() => setActiveTab('quiz')}
-                    disabled={isGenerating}
-                  >
-                    Quiz
-                  </button>
-                  <button
-                  id='flashcardTabBtn'
-                    className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl                      ${activeTab === 'flashcard' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
-                    onClick={() => setActiveTab('flashcard')}
-                    disabled={isGenerating}
-                  >
-                    Flashcards
+              {/* cooldown banner */}
+              {isCoolingDown && (
+                <div className='mt-2  flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-yellow-50 border border-yellow-300  text-yellow-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+                  <span>⏳</span>
+                  <span>You can generate again in <span className='font-bold text-yellow-800'>{formatCountdown(cooldownSeconds)}</span></span>
+                </div>
+              )}
+              {!isOnline && (
+                <div className='mt-2 flex items-center gap-3 lg:text-[9px] 3xl:text-lg bg-red-50 border border-red-300 text-red-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+                  <span>📶</span>
+                  <span>You're offline. Connect to the internet to use the Study Generator.</span>
+                </div>
+              )}
+              {queueStatus === 'queued' && (
+                <div className='mt-2 flex items-center justify-between gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-blue-50 border border-blue-300 text-blue-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+                  <span>
+                    🕒 You're <span className='font-bold text-blue-800'>#{queuePosition ?? '...'}</span> in queue
+                    {queuePosition ? ` — est. wait ~${Math.max(30, queuePosition * 35)}s` : ''}
+                  </span>
+                  <button onClick={handleCancelQueue} className='text-red-500 hover:text-red-700 font-bold underline flex-shrink-0'>
+                    Cancel
                   </button>
                 </div>
+              )}
+              {queueStatus === 'processing' && (
+                <div className='mt-2 flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-green-50 border border-green-300 text-green-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+                  <span>⚙️ Generating your {activeTab === 'quiz' ? 'quiz' : 'flashcards'} now...</span>
+                </div>
+              )}
+              {/* ─────────────────────── */}
+              <hr className='w-72 mt-10 lg:mt-2 md:w-[500px] lg:w-[450px] 2xl:w-[650px] 3xl:w-[800px]  md:mt-10  mx-auto border-t border-primary-600 mb-1 md:mb-0' />
+              {/* File Source Panel */}
+              <div className='flex flex-col justify-center mt-2 md:mt-5 lg:mt-0 gap-1 items-center w-full max-w-[800px] 3xl:max-w-[1000px]  px-6 py-1'>
+                <p className='text-sm lg:text-[14px] 2xl:text-lg 3xl:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10 lg:mb-1 2xl:mt-3'>
+                  Choose where to access your files
+                </p>
 
-                <div className='mt-2 2xl:mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
-                  <select
-                  id='itemsSelect'
-                    className='w-52 3xl:w-64 border border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
-                    aria-label='Select Number of Items'
-                    value={selectItems}
-                    onChange={(e) => {
-                      setSelectItems(e.target.value === '' ? '' : Number(e.target.value))
-                      setSuggestedMax(null)
-                      setFileError('')
-                    }}
-                    disabled={isGenerating}
-                  >
-                    <option value='' disabled>Select number of items</option>
-                    {items.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
-                    {/* Add suggested max as an option if it's not already in the list */}
-                    {suggestedMax && !items.includes(suggestedMax) && (
-                      <option key={`suggested-${suggestedMax}`} value={suggestedMax}>
-                        {suggestedMax}
-                      </option>
-                    )}
-                  </select>
+                <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 mt-4 lg:mt-2 2xl:mt-3'>
+                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
+                    <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Localbtn.png' alt='localbtnicon' />
+                    <button
+                      id='localFilesBtn'
+                      onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
+                      disabled={isGenerating || !isOnline}
+                      className='bg-[#FEE248]  disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
+                    >
+                      Local Files
+                    </button>
+                  </div>
 
-                  <button
-                  id='randomItemsBtn'
-                    className='sm:w-auto  flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md lg:text-xs 2xl:text-2xl 3xl:text-3xl 2xl:py-2 3xl:py-3 px-4 3xl:px-6 py-1'
-                    onClick={() => {
-                      setSelectItems(items[Math.floor(Math.random() * items.length)])
-                      setFileError('')
-                    }}
-                    disabled={isGenerating}
-                  >
-                    <img src='/RandomIcon.png' alt='Random' className='w-6 h-6 lg:w-5 lg:h-5 3xl:w-8 3xl:h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-                    <span className='text-white uppercase text-sm 3xl:text-lg font-semibold font-roboto'>Random</span>
-                  </button>
+                  <p className='flex-shrink-0 text-center lg:mt-10 text-primary-600 lg:text-sm 2xl:text-lg 3xl:text-2xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
+
+                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
+                    <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Coursesbtn.png' alt='coursesbtnicon' />
+                    <button
+                      id='courseFilesBtn'
+                      onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
+                      disabled={coursesLoading || isGenerating || !isOnline}
+                      className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
+                    >
+                      {coursesLoading ? 'Loading...' : 'Course Files'}
+                    </button>
+                  </div>
                 </div>
 
-                <button
-                id='generateNowBtn'
-                  className={`mt-2 border font-bold font-roboto uppercase text-center lg:text-xs 2xl:text-lg 3xl:text-xl py-1 3xl:py-2 px-2 3xl:px-4 rounded-md mb-20 transition
-                    ${canGenerate
-                      ? 'bg-green-500 text-white hover:bg-green-400 cursor-pointer'
-                      : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
-                  onClick={handleGenerate}
-                  disabled={!canGenerate}
-                >
-                  {isGenerating
-                    ? 'Generating...'
-                    : isCoolingDown
-                      ? `Wait ${formatCountdown(cooldownSeconds)}`
-                      : 'Generate Now'}
-                </button>
+                <input
+                  aria-label='File input'
+                  ref={fileInputRef}
+                  type='file'
+                  accept={ACCEPTED_TYPES}
+                  className='hidden'
+                  onChange={(e) => handleLocalFile(e.target.files)}
+                />
+
+                {uploadedFile && (
+                  <div
+                    ref={generateSectionRef}
+                    className='w-full mt-2 flex items-center justify-between gap-2 bg-white bg-opacity-90 border border-primary-600 rounded-md px-4 py-3 lg:py-1 3xl:px-6 3xl:py-4'
+                  >
+                    <div className='flex items-center gap-2 min-w-0'>
+                      <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 lg:w-7 2xl:w-10 lg:h-7 2xl:h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+                      <div className='min-w-0 max-w-[180px] lg:max-w-[200px] 2xl:max-w-[180px] 3xl:max-w-[260px]'>
+                        <p className='font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
+                        <p className='font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
+                          {uploadedFile.size} · from {uploadedFile.source === 'local' ? 'Local' : 'Courses'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleRemoveFile}
+                      className='text-gray-400 hover:text-red-500 font-bold text-xl 3xl:text-2xl flex-shrink-0'
+                      title='Remove file'
+                      disabled={isGenerating}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
 
+              {fileError && (
+                <p className='mt-1 text-red-500 text-sm lg:text-[10px] 3xl:text-base font-roboto text-center'>{fileError}</p>
+              )}
+
+              {suggestedMax && (
+                <button
+                  className='mt-1 text-sm font-roboto font-bold text-white bg-primary-600 hover:bg-primary-500  py-1 rounded-md uppercase px-2 lg:text-[10px] 2xl:text-lg 3xl:text-xl 3xl:px-4 3xl:py-2 transition'
+                  onClick={() => {
+                    setSelectItems(suggestedMax)
+                    setFileError('')
+                  }}
+                >
+                  Use {suggestedMax} items instead
+                </button>
+              )}
+
+              <p className='mt-6 lg:mt-2 2xl:mt-6 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
+                <i><strong>Reminder:</strong> All files generated by Study Buddy may not be 100% accurate.</i>
+              </p>
+              <p className='mt-0 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
+                <i>Users are advised to review the generated files before proceeding. Thank you.</i>
+              </p>
+              {(uploadedFile || tourPreview) && (
+                <div className='mt-5 flex flex-col justify-start items-center min-w-full'>
+                  <div className='flex flex-row gap-2 lg:gap-x-8 md:gap-14'>
+                    <button
+                      id='quizTabBtn'
+                      className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl
+                      ${activeTab === 'quiz' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
+                      onClick={() => setActiveTab('quiz')}
+                      disabled={isGenerating}
+                    >
+                      Quiz
+                    </button>
+                    <button
+                      id='flashcardTabBtn'
+                      className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl                      ${activeTab === 'flashcard' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
+                      onClick={() => setActiveTab('flashcard')}
+                      disabled={isGenerating}
+                    >
+                      Flashcards
+                    </button>
+                  </div>
+
+                  <div className='mt-2 2xl:mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
+                    <select
+                      id='itemsSelect'
+                      className='w-52 3xl:w-64 border border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
+                      aria-label='Select Number of Items'
+                      value={selectItems}
+                      onChange={(e) => {
+                        setSelectItems(e.target.value === '' ? '' : Number(e.target.value))
+                        setSuggestedMax(null)
+                        setFileError('')
+                      }}
+                      disabled={isGenerating}
+                    >
+                      <option value='' disabled>Select number of items</option>
+                      {items.map((item) => (
+                        <option key={item} value={item}>{item}</option>
+                      ))}
+                      {/* Add suggested max as an option if it's not already in the list */}
+                      {suggestedMax && !items.includes(suggestedMax) && (
+                        <option key={`suggested-${suggestedMax}`} value={suggestedMax}>
+                          {suggestedMax}
+                        </option>
+                      )}
+                    </select>
+
+                    <button
+                      id='randomItemsBtn'
+                      className='sm:w-auto  flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md lg:text-xs 2xl:text-2xl 3xl:text-3xl 2xl:py-2 3xl:py-3 px-4 3xl:px-6 py-1'
+                      onClick={() => {
+                        setSelectItems(items[Math.floor(Math.random() * items.length)])
+                        setFileError('')
+                      }}
+                      disabled={isGenerating}
+                    >
+                      <img src='/RandomIcon.png' alt='Random' className='w-6 h-6 lg:w-5 lg:h-5 3xl:w-8 3xl:h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+                      <span className='text-white uppercase text-sm 3xl:text-lg font-semibold font-roboto'>Random</span>
+                    </button>
+                  </div>
+
+                  <button
+                    id='generateNowBtn'
+                    className={`mt-2 border font-bold font-roboto uppercase text-center lg:text-xs 2xl:text-lg 3xl:text-xl py-1 3xl:py-2 px-2 3xl:px-4 rounded-md mb-20 transition
+                  ${canGenerate
+                        ? 'bg-green-500 text-white hover:bg-green-400 cursor-pointer'
+                        : 'bg-gray-300 text-gray-400 cursor-not-allowed'}`}
+                    onClick={handleGenerate}
+                    disabled={!canGenerate}
+                  >
+                    {isSubmitting
+                      ? 'Submitting...'
+                      : queueStatus === 'queued'
+                        ? `#${queuePosition ?? '...'} in queue`
+                        : queueStatus === 'processing'
+                          ? 'Generating...'
+                          : isCoolingDown
+                            ? `Wait ${formatCountdown(cooldownSeconds)}`
+                            : 'Generate Now'}
+                  </button>
+                </div>
+              )}
+
+            </div>
           </div>
-        </div>
           <button
             id='tour-btn'
-            onClick={() => startTour(                             )}
+            onClick={() => startTour()}
             className='hidden lg:flex fixed bottom-6 right-6 z-50
             flex-col items-center gap-1
             hover:opacity-80 active:scale-95 transition-all
@@ -637,13 +735,13 @@ const { startTour } = useTour(
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
               <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-            </div>  
+            </div>
             <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
-              font-inter font-semibold'>Need Help?</p>         
-           </button>
+              font-inter font-semibold'>Need Help?</p>
+          </button>
 
-      </main>
-</div>
+        </main>
+      </div>
       {showCoursePicker && (
         <CoursePicker
           user={user}
@@ -653,7 +751,6 @@ const { startTour } = useTour(
           onError={(msg) => { setFileError(msg); setShowCoursePicker(false) }}
         />
       )}
-      
     </div>
   )
 }
