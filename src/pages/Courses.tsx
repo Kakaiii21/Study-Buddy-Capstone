@@ -86,6 +86,7 @@ const { startTour } = useTour(
 
   const [folderError, setFolderError] = useState('')
   const [editError, setEditError] = useState('')
+  const [addCourseError, setAddCourseError] = useState('')
 
   const navigate = useNavigate()
 
@@ -106,12 +107,28 @@ const { startTour } = useTour(
     }
 
     setIsSaving(true)
-    await addCourse(folderName.trim(), selectedColor)
+
+    // Close the modal right away — validation already passed, so we don't
+    // need to wait on the network write to know this will succeed. This
+    // also avoids the race with the Firestore onSnapshot listener updating
+    // `courses` (and rendering the new folder) before this promise resolves,
+    // which was causing the folder to appear behind the still-open modal.
+    setShowModal(false)
+    const nameToAdd = folderName.trim()
+    const colorToAdd = selectedColor
     setFolderName('')
     setFolderError('')
     setSelectedColor('blue')
-    setIsSaving(false)
-    setShowModal(false)
+    setAddCourseError('')
+
+    try {
+      await addCourse(nameToAdd, colorToAdd)
+    } catch (err) {
+      console.error('Failed to add course:', err)
+      setAddCourseError('Failed to create folder. Please try again.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleClose = () => {
@@ -252,6 +269,15 @@ const { startTour } = useTour(
 
           </div>
             <hr className=' sm:block w-full border-t mt-3 border-[#E9E9E9] mb-2' />
+
+            {/* Background save error (add-course write failed after modal already closed) */}
+            {addCourseError && (
+              <div className='w-full flex justify-center mb-2'>
+                <p className='text-red-500 text-xs font-roboto font-semibold bg-red-50 border border-red-200 rounded-md px-3 py-1'>
+                  {addCourseError}
+                </p>
+              </div>
+            )}
 
           {/* Folder Area */}
           {loading ? (
