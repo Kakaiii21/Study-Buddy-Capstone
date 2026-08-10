@@ -406,7 +406,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
         <div className='flex justify-center mt-4'>
           <button
             onClick={() => setShowDeactivateModal(true)}
-            className='w-full md:w-[250px] text-red-500 border-2 border-red-500 font-inter font-semibold uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3 rounded-md hover:bg-red-500 hover:text-white transition-all duration-300'
+            className='w-full md:w-[250px] text-red-500 border-2 border-red-500 font-inter font-semibold lg:text-xs lg:mb-5 xl:text-sm 2xl:text-lg uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3 rounded-md hover:bg-red-500 hover:text-white transition-all duration-300'
           >
             Deactivate Account
           </button>

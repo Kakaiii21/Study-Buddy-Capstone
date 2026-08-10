@@ -219,7 +219,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-2  xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
@@ -311,7 +311,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* FIRST NAME */}
-          <p className="text-primary-600 font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
+          <p className="text-primary-600 font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-0
           text-[13px]
           lg:text-[10px]
           xl:text-[13px]
@@ -331,7 +331,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* LAST NAME */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-0
           text-[13px]
           lg:text-[10px]
           xl:text-[13px]
@@ -351,7 +351,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* EMAIL */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-0
           text-[13px]
           lg:text-[10px]
           xl:text-[13px]
@@ -371,7 +371,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal p-2 lg:p-0.5 xl:p-1 2xl:pl-0
           text-[13px]
           lg:text-[10px]
           xl:text-[13px]
@@ -401,7 +401,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           )}
 
           {/* CONFIRM PASSWORD */}
-          <p className="text-primary-600  font-inter font-normal lg:p-0.5 xl:p-1 2xl:pl-2
+          <p className="text-primary-600  font-inter font-normal lg:p-0.5 xl:p-1 2xl:pl-0
           text-[13px]
           lg:text-[10px]
           xl:text-[13px]
@@ -413,7 +413,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
-            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[16px] 3xl:text-[19px] px-2 py-2 xl:py-1 2xl:py-1.5 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (
