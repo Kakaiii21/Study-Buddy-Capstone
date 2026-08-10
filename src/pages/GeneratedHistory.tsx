@@ -16,6 +16,29 @@ function formatDate(date: Date): string {
   })
 }
 
+// ── Shuffle helpers for "Retake" (mirrors Quiz.tsx's shuffleQuestions logic) ──
+interface QuizItem {
+  question: string
+  options: string[]
+  answer: string
+}
+
+const optionLetters = ['A', 'B', 'C', 'D']
+
+const shuffleArray = <T,>(arr: T[]): T[] =>
+  [...arr].sort(() => Math.random() - 0.5)
+
+const shuffleQuizItems = (items: QuizItem[]): QuizItem[] =>
+  shuffleArray(items).map((q) => {
+    const shuffledOptions = shuffleArray(q.options)
+    const newAnswerIndex = shuffledOptions.indexOf(q.options[optionLetters.indexOf(q.answer)])
+    return {
+      ...q,
+      options: shuffledOptions,
+      answer: optionLetters[newAnswerIndex],
+    }
+  })
+
 // This component is copy-pasted in Notes, ToDoList, ClassSchedule, GeneratedHistory
 // Fix it in ALL of them the same way
 
@@ -115,11 +138,11 @@ function GeneratedHistory() {
     })
   }
 
-  // ── Navigate to Quiz as a fresh retake ──
+  // ── Navigate to Quiz as a fresh retake (shuffled) ──
   const handleRetakeQuiz = (item: (typeof quizHistory)[number]) => {
     navigate('/studyGenerator/Quiz', {
       state: {
-        items: item.items,
+        items: shuffleQuizItems(item.items),
         mode: 'quiz' as const,
         fileName: item.fileName,
       },

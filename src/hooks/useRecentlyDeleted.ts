@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react'
-import { useMemo } from 'react' 
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useMemo } from 'react'
 import {
   fetchRecentlyDeleted,
   restoreItem,
@@ -35,29 +35,96 @@ type State = {
   error: string | null
 }
 
+const CACHE_KEY_PREFIX = 'recently_deleted_'
+const cacheKey = (uid: string) => `${CACHE_KEY_PREFIX}${uid}`
+
+function readCache(uid: string): DeletedItem[] | null {
+  try {
+    const raw = sessionStorage.getItem(cacheKey(uid))
+    if (!raw) return null
+    return JSON.parse(raw) as DeletedItem[]
+  } catch {
+    return null
+  }
+}
+
+function writeCache(uid: string, items: DeletedItem[]) {
+  try {
+    sessionStorage.setItem(cacheKey(uid), JSON.stringify(items))
+  } catch {
+    // sessionStorage full or unavailable — fail silently, cache is best-effort
+  }
+}
+
+// Cheap fingerprint so we can skip a re-render/write when nothing actually changed.
+// Sorted by id so ordering differences from the backend don't cause false positives.
+function fingerprint(items: DeletedItem[]): string {
+  return JSON.stringify(
+    [...items]
+      .sort((a, b) => a.id.localeCompare(b.id))
+      .map((i) => ({ id: i.id, type: i.type, data: i.data }))
+  )
+}
+
 export function useRecentlyDeleted() {
   const { user } = useAuth()
   const uid = user?.uid
 
-  const [state, setState] = useState<State>({ items: [], loading: true, error: null })
+  // Seed synchronously from cache on first render so there's no loading flash
+  // when we already have something to show.
+  const [state, setState] = useState<State>(() => {
+    if (!uid) return { items: [], loading: true, error: null }
+    const cached = readCache(uid)
+    return cached
+      ? { items: cached, loading: false, error: null }
+      : { items: [], loading: true, error: null }
+  })
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [restoreError, setRestoreError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    if (!uid) return
-    fetchRecentlyDeleted(uid)
-      .then((data) => setState({ items: data, loading: false, error: null }))
-      .catch(() =>
+  // Tracks the fingerprint of what's currently in state/cache so a background
+  // revalidation can bail out without touching state (and re-rendering) when
+  // nothing changed.
+  const lastFingerprint = useRef<string | null>(state.items.length ? fingerprint(state.items) : null)
+
+  const load = useCallback(
+    async (opts: { silent?: boolean } = {}) => {
+      if (!uid) return
+      const hasCache = lastFingerprint.current !== null
+
+      // Only show the loading spinner when we truly have nothing to show yet.
+      if (!hasCache && !opts.silent) {
+        setState((prev) => ({ ...prev, loading: true }))
+      }
+
+      try {
+        const data = await fetchRecentlyDeleted(uid)
+        const fp = fingerprint(data)
+
+        if (fp === lastFingerprint.current) {
+          // Nothing new or updated — skip the state update/re-render entirely.
+          setState((prev) => (prev.loading ? { ...prev, loading: false } : prev))
+          return
+        }
+
+        lastFingerprint.current = fp
+        writeCache(uid, data)
+        setState({ items: data, loading: false, error: null })
+      } catch {
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: 'Failed to load recently deleted items.',
+          error: hasCache ? prev.error : 'Failed to load recently deleted items.',
         }))
-      )
-  }, [uid])
+      }
+    },
+    [uid]
+  )
 
   useEffect(() => {
-    load()
+    // If we rendered from cache, revalidate silently in the background.
+    // Otherwise this is a normal loading fetch.
+    load({ silent: lastFingerprint.current !== null })
   }, [load])
 
   const handleRestore = useCallback(
@@ -67,7 +134,12 @@ export function useRecentlyDeleted() {
       setRestoreError(null)
       try {
         await restoreItem(uid, item)
-        setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
+        setState((prev) => {
+          const items = prev.items.filter((i) => i.id !== item.id)
+          lastFingerprint.current = fingerprint(items)
+          writeCache(uid, items)
+          return { ...prev, items }
+        })
         // ✅ No storage change on restore — file was never removed from Cloudinary
         // so storageUsed was never decremented and should not be incremented here
       } catch {
@@ -108,7 +180,12 @@ export function useRecentlyDeleted() {
           }
         }
 
-        setState((prev) => ({ ...prev, items: prev.items.filter((i) => i.id !== item.id) }))
+        setState((prev) => {
+          const items = prev.items.filter((i) => i.id !== item.id)
+          lastFingerprint.current = fingerprint(items)
+          writeCache(uid, items)
+          return { ...prev, items }
+        })
       } catch {
         setState((prev) => ({ ...prev, error: 'Failed to permanently delete item.' }))
       } finally {
@@ -141,6 +218,12 @@ export function useRecentlyDeleted() {
     )
   }, [state.items])
 
+  // Force a real refetch that always re-renders, e.g. for a manual "Refresh" button.
+  const reload = useCallback(() => {
+    lastFingerprint.current = null
+    return load()
+  }, [load])
+
   return {
     items: state.items,
     orphanedFileIds,
@@ -152,6 +235,6 @@ export function useRecentlyDeleted() {
     handleRestore,
     handlePermanentDelete,
     filteredByType,
-    reload: load,
+    reload,
   }
 }

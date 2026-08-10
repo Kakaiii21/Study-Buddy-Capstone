@@ -11,7 +11,6 @@ import { useTasks } from '../hooks/useTasks'
 import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
-import { toPng } from 'html-to-image'
 
 function Dashboard() {
   const [showSidebar, setShowSidebar] = useState(false)
@@ -33,7 +32,6 @@ function Dashboard() {
   }, [])
   const mainRef = useRef<HTMLElement>(null)
   const idCardRef = useRef<HTMLDivElement>(null)
-  const [isDownloading, setIsDownloading] = useState(false)
   const navigate = useNavigate()
   const { user } = useAuth()
   // Auth guard — redirect if not logged in or email not verified
@@ -202,37 +200,7 @@ function Dashboard() {
   const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
   const displayYearLevel = yearLevel || '—'
 
-  // Downloads the ID card as a PNG. Hides the hover overlay during capture
-  // (it's transparent-white and would otherwise wash out the exported image),
-  // then restores it afterward regardless of success/failure.
-  const handleDownloadCard = async () => {
-    if (!idCardRef.current || isDownloading) return
-    setIsDownloading(true)
-    const node = idCardRef.current
-    const overlay = node.querySelector('[data-card-overlay]') as HTMLElement | null
-    const previousOverlayDisplay = overlay?.style.display
-    try {
-      if (overlay) overlay.style.display = 'none'
-      const dataUrl = await toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2,
-        // no canvas-level backgroundColor: the card itself keeps its own
-        // bg-white (clipped by its rounded corners via overflow-hidden),
-        // so only the rounded card is white and the square corners outside
-        // it stay transparent instead of being painted white.
-      })
-      const link = document.createElement('a')
-      const safeName = (displayFirstName || 'student').toString().replace(/[^a-z0-9]/gi, '_').toLowerCase()
-      link.download = `studybuddy-id-${safeName}.png`
-      link.href = dataUrl
-      link.click()
-    } catch (err) {
-      console.error('Failed to export ID card as image:', err)
-    } finally {
-      if (overlay) overlay.style.display = previousOverlayDisplay ?? ''
-      setIsDownloading(false)
-    }
-  }
+
 
   const activities = [
     { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
@@ -684,13 +652,7 @@ className='relative flex flex-col justify-between text-left p-2
                 >
                   {savingField ? 'Saving...' : 'Save'}
                 </button>
-                <button
-                  onClick={handleDownloadCard}
-                  disabled={isDownloading}
-                  className='order-4 md:order-2 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-white hover:bg-gray-50 disabled:opacity-50'
-                >
-                  {isDownloading ? 'Downloading…' : 'Download as Image'}
-                </button>
+
                 <button
                   onClick={() => setShowCustomize(false)}
                   className='order-5 md:order-3 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'

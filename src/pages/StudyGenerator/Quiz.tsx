@@ -164,34 +164,48 @@ function Quiz() {
     const score = getScore()
     setFinalScore(score)
     setSubmitted(true)
-    // Do NOT clearQuizSession here — guard relies on result ref, not session
+    setShowModal(true) // ← show result immediately, don't wait on network I/O
 
     if (enabled) {
       const user = auth.currentUser
       if (user) {
-        setSaving(true)
-        setSaveError(null)
-        setSaveSuccess(false)
-        try {
-          await addDoc(collection(db, 'users', user.uid, 'quizHistory'), {
-            fileName: result.fileName ?? 'Untitled',
-            score,
-            total: questions.length,
-            dateTaken: serverTimestamp(),
-            items: questions,
-            selectedAnswers: selected,
-          })
-          setSaveSuccess(true)
-        } catch (err) {
-          console.error('Save failed:', err)
-          setSaveError('Failed to save to history.')
-        } finally {
-          setSaving(false)
+        if (!navigator.onLine) {
+          // Don't show "Saving..." — we already know it can't go through
+          setSaveError('You are offline. Could not save to history.')
+        } else {
+          setSaving(true)
+          setSaveError(null)
+          setSaveSuccess(false)
+
+          const TIMEOUT_MS = 10000
+          try {
+            await Promise.race([
+              addDoc(collection(db, 'users', user.uid, 'quizHistory'), {
+                fileName: result.fileName ?? 'Untitled',
+                score,
+                total: questions.length,
+                dateTaken: serverTimestamp(),
+                items: questions,
+                selectedAnswers: selected,
+              }),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('timeout')), TIMEOUT_MS)
+              ),
+            ])
+            setSaveSuccess(true)
+          } catch (err) {
+            console.error('Save failed:', err)
+            setSaveError(
+              !navigator.onLine
+                ? 'You are offline. Could not save to history.'
+                : 'Failed to save to history.'
+            )
+          } finally {
+            setSaving(false)
+          }
         }
       }
     }
-
-    setShowModal(true)
   }
 
   const handleDiscard = () => {
