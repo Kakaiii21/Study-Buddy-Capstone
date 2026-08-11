@@ -545,7 +545,7 @@ export const confirmEmailChange = onRequest(
       }
 
       // ✅ Redirect to login with success message
-      res.redirect('https://studybuddyph.site/login?emailUpdated=true')
+      res.redirect('https://studybuddyph.site/?emailUpdated=true')
     } catch (err) {
       console.error('confirmEmailChange error:', err)
       res.status(500).send('Something went wrong. Please try again.')
@@ -569,7 +569,7 @@ export const cancelEmailChange = onRequest(
       const cancelDoc = await admin.firestore().doc(`emailCancelTokens/${token}`).get()
 
       if (!cancelDoc.exists) {
-        res.redirect('https://studybuddyph.site/login?cancelResult=already-used')
+        res.redirect('https://studybuddyph.site/?cancelResult=already-used')
         return
       }
 
@@ -577,7 +577,7 @@ export const cancelEmailChange = onRequest(
 
       if (Date.now() > expiresAt) {
         await cancelDoc.ref.delete()
-        res.redirect('https://studybuddyph.site/login?cancelResult=expired')
+        res.redirect('https://studybuddyph.site/?cancelResult=expired')
         return
       }
 
@@ -607,7 +607,7 @@ export const cancelEmailChange = onRequest(
       // ✅ Delete the cancel token — it's been used
       await cancelDoc.ref.delete()
 
-      res.redirect('https://studybuddyph.site/login?cancelResult=success')
+      res.redirect('https://studybuddyph.site/?cancelResult=success')
     } catch (err) {
       console.error('cancelEmailChange error:', err)
       res.status(500).send('Something went wrong. Please try again.')

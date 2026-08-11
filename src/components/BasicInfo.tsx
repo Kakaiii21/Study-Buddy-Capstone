@@ -460,7 +460,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
                 <button
                   onClick={() => setShowDeactivateModal(false)}
                   disabled={deactivating}
-                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
+                  className="flex-1  mb-5 text-primary-800 border border-primary-800 font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
                 >
                   Cancel
                 </button>

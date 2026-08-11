@@ -19,28 +19,35 @@ function ReactivatePage() {
     return () => unsubscribe()
   }, [])
 
-    const handleReactivate = async () => {
-    setReactivating(true)
-    setError(null)
-    try {
-        await reactivateAccount()
-        navigate('/dashboard')
-    } catch (err) {
-        const message = err instanceof Error
+const handleReactivate = async () => {
+  setReactivating(true)
+  setError(null)
+
+  try {
+    await reactivateAccount()
+
+    // Sign the user out after reactivating
+    await logout()
+
+    // Redirect to login page
+    navigate('/', { replace: true })
+  } catch (err) {
+    const message =
+      err instanceof Error
         ? err.message
         : typeof err === 'object' && err !== null && 'message' in err
-            ? String((err as { message?: unknown }).message)
-            : 'Failed to reactivate. Please try again.'
+        ? String((err as { message?: unknown }).message)
+        : 'Failed to reactivate. Please try again.'
 
-        if (message.toLowerCase().includes('expired')) {
-        setExpired(true)
-        } else {
-        setError(message)
-        }
-    } finally {
-        setReactivating(false)
+    if (message.toLowerCase().includes('expired')) {
+      setExpired(true)
+    } else {
+      setError(message)
     }
-    }
+  } finally {
+    setReactivating(false)
+  }
+}
 
   const handleLogout = async () => {
     await logout()
