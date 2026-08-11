@@ -889,6 +889,26 @@ function ToDoList() {
             </button>
           </div>
 <hr className="hidden lg:block mt-3 w-[75vw] mx-auto border-t border-[#E9E9E9]" />
+
+
+<div className='flex items-center justify-center gap-4 xl:gap-6 2xl:gap-8 mt-3 mb-2'>
+  <div className='flex items-center gap-1.5'>
+    <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-white border border-1 border-black shrink-0' />
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Upcoming</p>
+  </div>
+  <div className='flex items-center gap-1.5'>
+    <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-amber-300 border border-1 border-black shrink-0' />
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Due within 1 hour</p>
+  </div>
+  <div className='flex items-center gap-1.5'>
+    <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-[#FF8383] border border-1 border-black shrink-0' />
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Past deadline</p>
+  </div>
+  <div className='flex items-center gap-1.5'>
+    <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-[#C4EAAD] border border-1 border-black shrink-0' />
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Done</p>
+  </div>
+</div>
           {isAddModalOpen && (
             <TaskModal
               title="ADD A TASK"

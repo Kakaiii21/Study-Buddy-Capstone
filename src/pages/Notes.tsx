@@ -71,9 +71,9 @@ function Notes() {
 
   function handleSubjectDelete(subject: string) {
     const affectedNotes = notes.filter((n) => n.subject === subject)
-    affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Subject' }))
+    affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Categories' }))
     setSubjects((prev) => prev.filter((s) => s !== subject))
-    if (selectedSubject === subject) setSelectedSubject('All Subject')
+    if (selectedSubject === subject) setSelectedSubject('All Categories')
     setDeleteSubjectConfirm(null)
   }
 
@@ -98,7 +98,7 @@ function Notes() {
   const [subjects, setSubjects] = useState<string[]>([])
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [selectedSubject, setSelectedSubject] = useState('All Subject')
+  const [selectedSubject, setSelectedSubject] = useState('All Categories')
   const [searchQuery, setSearchQuery] = useState('')
 
   // ── Note modal state ──
@@ -106,7 +106,7 @@ function Notes() {
   const [modalMode, setModalMode] = useState<'create' | 'view' | 'edit'>('create')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [noteTitle, setNoteTitle] = useState('')
-  const [noteSubject, setNoteSubject] = useState('All Subject')
+  const [noteSubject, setNoteSubject] = useState('All Categories')
   const [noteContent, setNoteContent] = useState('')
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
@@ -117,7 +117,7 @@ useEffect(() => {
     if (notes.length === 0) return
     const fromNotes = notes
       .map((n) => n.subject)
-      .filter((s) => s !== 'All Subject' && !schedSubjects.includes(s))
+      .filter((s) => s !== 'All Categories' && !schedSubjects.includes(s))
     setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
  }, [notes, schedSubjects])
 
@@ -162,7 +162,7 @@ useEffect(() => {
       time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     })
     setNoteTitle('')
-    setNoteSubject(selectedSubject !== 'All Subject' ? selectedSubject : 'All Subject')
+    setNoteSubject(selectedSubject !== 'All Categories' ? selectedSubject : 'All Categories')
     setNoteContent('')
     setIsNoteModalOpen(true)
   }
@@ -200,7 +200,7 @@ useEffect(() => {
     if (noteContent.trim() === '') return
     const title = noteTitle.trim() || getUntitledTitle()
     setNoteTitle('')
-    setNoteSubject('All Subject')
+    setNoteSubject('All Categories')
     setNoteContent('')
     setIsNoteModalOpen(false)
     addNote(title, noteSubject, noteContent)
@@ -243,19 +243,19 @@ useEffect(() => {
   // ── Filtered notes ──
   const filteredNotes = notes
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .filter((n) => selectedSubject === 'All Subject' || n.subject === selectedSubject)
+    .filter((n) => selectedSubject === 'All Categories' || n.subject === selectedSubject)
     .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
   // ── Derived modal display values ──
   const displayTitle   = modalMode === 'view' ? (selectedNote?.title   ?? '') : noteTitle
-  const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'All Subject') : noteSubject
+  const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'All Categories') : noteSubject
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
   const isReadOnly     = modalMode === 'view'
 
   const allSubjects = Array.from(
     new Set([
       ...subjects.map((s) => s.trim()),
-      ...notes.map((n) => n.subject).filter((s) => s !== 'All Subject').map((s) => s.trim()),
+      ...notes.map((n) => n.subject).filter((s) => s !== 'All Categories').map((s) => s.trim()),
       ...schedules.map((s) => s.subject.trim()),
     ])
   )
@@ -399,7 +399,7 @@ useEffect(() => {
                       onClick={() => setIsDropdownOpen((prev) => !prev)}
                       className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm'
                     >
-                      <span className='truncate'>{selectedSubject === 'All Subject' ? 'All Subjects' : selectedSubject}</span>
+                      <span className='truncate'>{selectedSubject === 'All Categories' ? 'All Subjects' : selectedSubject}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
@@ -409,10 +409,10 @@ useEffect(() => {
                       <div  className='absolute  top-full left-0 mt-2 w-full bg-white border rounded-md shadow-md z-50 max-h-64 overflow-y-auto'>
                         <button
                           className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
-                            ${selectedSubject === 'All Subject' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
-                          onClick={() => { setSelectedSubject('All Subject'); setIsDropdownOpen(false) }}
+                            ${selectedSubject === 'All Categories' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
+                          onClick={() => { setSelectedSubject('All Categories'); setIsDropdownOpen(false) }}
                         >
-                          All Subject
+                          All Categories
                         </button>
                         {allSubjects.map((subject, index) => (
                           <div
@@ -553,7 +553,7 @@ useEffect(() => {
             {/* ── Right column: subject button list — desktop (lg) only ── */}
             <div className='hidden lg:flex flex-col lg:w-56 xl:w-80 shrink-0 rounded-xl pr-2 mt-5'>
               <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
-                SUBJECT SECTION
+                NOTE CATEGORIES
               </p>
 
               <div className='flex flex-col gap-y-5 mt-5'>
@@ -570,20 +570,20 @@ useEffect(() => {
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
-                    ADD NEW SUBJECT NAME
+                    ADD NEW CATEGORY
                   </button>
                 </div>
 
                 {/* Subject Buttons */}
                 <div id='subjectDropdown' className='flex flex-col gap-2'>
                   <button
-                    onClick={() => setSelectedSubject('All Subject')}
+                    onClick={() => setSelectedSubject('All Categories')}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
-                      ${selectedSubject === 'All Subject'
+                      ${selectedSubject === 'All Categories'
                         ? 'bg-primary-600 text-white border-primary-600'
                         : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
                   >
-                    All Subject
+                    All Categories
                   </button>
 
                   {allSubjects.map((subject, index) => (
@@ -722,7 +722,7 @@ useEffect(() => {
                   >
                     "{deleteSubjectConfirm}"
                   </span>
-                  will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Subject</span>.
+                  will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Categories</span>.
                 </p>
                 <div className='flex gap-4 w-full mt-2'>
                   <button
@@ -777,7 +777,7 @@ useEffect(() => {
                         
                         border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
                       >
-                        <option value='All Subject'>All Subject</option>
+                        <option value='All Categories'>All Categories</option>
                         {allSubjects.map((subject, index) => (
                           <option key={index} value={subject}>{subject}</option>
                         ))}
@@ -869,7 +869,7 @@ useEffect(() => {
                         onChange={(e) => setNoteSubject(e.target.value)}
                         className='max-w-52 border-2 mr-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
                       >
-                        <option value='All Subject'>All Subject</option>
+                        <option value='All Categories'>All Categories</option>
                         {allSubjects.map((subject, index) => (
                           <option key={index} value={subject}>{subject}</option>
                         ))}

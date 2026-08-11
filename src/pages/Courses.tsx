@@ -236,7 +236,7 @@ const { startTour } = useTour(
   disabled:hover:translate-y-0 disabled:hover:shadow-none"            
 >
             <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3 2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-            Course Folder
+            New Folder
             </button>
             {/* Search bar */}
             <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
@@ -292,7 +292,7 @@ const { startTour } = useTour(
               {courses.length === 0 ? (
               <div className='col-span-2 md:col-span-3  lg:col-span-5 flex items-center justify-center py-20 w-full'>
                 <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
-                  No folders yet. Click <span className='text-primary-600 font-bold'>+ Course Folder</span> to create one.
+                  No folders yet. Click <span className='text-primary-600 font-bold'>+ New Folder</span> to create one.
                 </p>
               </div>
               ) : (
@@ -332,7 +332,7 @@ const { startTour } = useTour(
                       {activeMenu === course.id && (
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-[70px] left-32 lg:left-32 xl:left-[140px] xl:top-[95px] 2xl:left-[165px] 2xl:top-[115px] bg-white border border-primary-800 rounded-sm shadow-lg z-20 w-[110px] overflow-hidden"
+                          className="absolute  lg:top-[70px] left-12 top-16 md:top-[130px] lg:left-32 xl:left-[140px] xl:top-[95px] 2xl:left-[165px] 2xl:top-[115px] bg-pink-50 border border-primary-800 rounded-sm shadow-lg z-20 w-[110px] overflow-hidden"
                         >
                           <button
                             onClick={() => handleEditOpen(course.id, course.name, course.color)}

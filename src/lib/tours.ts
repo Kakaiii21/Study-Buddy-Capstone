@@ -689,8 +689,8 @@ const coursesDesktop: DriveStep[] = [
   {
     element: '#addCourseBtn',
     popover: {
-      title: '➕ Add a Course Folder',
-      description: 'Click here to create a new folder for organizing files under a specific course.',
+      title: '➕ Add a new Folder',
+      description: 'Click here to create a new folder for organizing files under a specific files.',
       side: 'left',
     },
   },
@@ -706,7 +706,7 @@ const coursesDesktop: DriveStep[] = [
     element: '#coursesGrid',
     popover: {
       title: '📁 Your Course Folders',
-      description: 'All your course folders live here. Click one to open it and see the files inside.',
+      description: 'All your files folders live here. Click one to open it and see the files inside.',
       side: 'right',
     },
   },
@@ -742,8 +742,8 @@ const coursesTablet: DriveStep[] = [
   {
     element: '#addCourseBtn',
     popover: {
-      title: '➕ Add a Course Folder',
-      description: 'Tap here to create a new folder for organizing files under a specific course.',
+      title: '➕ Add a new Folder',
+      description: 'Tap here to create a new folder for organizing files under a specific files.',
       side: 'bottom',
     },
   },
@@ -751,7 +751,7 @@ const coursesTablet: DriveStep[] = [
     element: '#coursesGrid',
     popover: {
       title: '📁 Your Course Folders',
-      description: 'All your course folders live here. Tap one to open it and see the files inside.',
+      description: 'All your files folders live here. Tap one to open it and see the files inside.',
       side: 'bottom',
     },
   },
@@ -787,8 +787,8 @@ const coursesMobile: DriveStep[] = [
   {
     element: '#addCourseBtn',
     popover: {
-      title: '➕ Add a Course Folder',
-      description: 'Tap here to create a new folder for organizing files under a specific course.',
+      title: '➕ Add a new Folder',
+      description: 'Tap here to create a new folder for organizing files under a specific files.',
       side: 'bottom',
     },
   },
@@ -796,7 +796,7 @@ const coursesMobile: DriveStep[] = [
     element: '#coursesGrid',
     popover: {
       title: '📁 Your Course Folders',
-      description: 'All your course folders live here. Tap one to open it and see the files inside.',
+      description: 'All your files folders live here. Tap one to open it and see the files inside.',
       side: 'bottom',
     },
   },

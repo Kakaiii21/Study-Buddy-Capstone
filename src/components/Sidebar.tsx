@@ -64,7 +64,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
         { label: 'To Do List', path: '/todolist' , icon: '/sideIcons/todo.png' },
         { label: 'Notes', path: '/notes' , icon: '/sideIcons/notes.png' },
         { label: 'Class Schedule', path: '/schedule' , icon: '/sideIcons/classSched.png' },
-        { label: 'Course', path: '/courses' , icon: '/sideIcons/courses.png' },
+        { label: 'My Files', path: '/courses' , icon: '/sideIcons/courses.png' },
         { label: 'Study Generator', path: '/studyGenerator' , icon: '/sideIcons/studyGen.png' },
         { label: 'Generated History', path: '/history' , icon: '/sideIcons/genHis.png' },
         { label: 'Recently Deleted', path: '/delete' , icon: '/sideIcons/RecentD.png' },

@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
-import { useClassSched } from '../hooks/useClassSched'
+import { useClassSched, type MeetingInput } from '../hooks/useClassSched'
 import { useTour } from '../hooks/useTour'
 
-function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
+function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   itemName: string
   onConfirm: () => void
-  onCancel: () => void 
+  onCancel: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
 
@@ -38,14 +38,14 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
           You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
         </p>
         <div className='flex gap-3 justify-end'>
-          <button 
-            onClick={onCancel} 
+          <button
+            onClick={onCancel}
             disabled={confirming}
             className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'
           >
             Cancel
           </button>
-          <button 
+          <button
             onClick={handleConfirm}
             disabled={confirming}
             className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
@@ -151,21 +151,52 @@ function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
     </div>
   )
 }
+
+// One row inside the "Schedule Meetings" section of the Add/Edit Class modal.
+// `id` carries the underlying Firestore doc id when editing an existing meeting;
+// `key` is a stable React key that survives even for brand-new (unsaved) rows.
+interface MeetingRow {
+  key: string
+  id?: string
+  day: string
+  timeStart: string
+  timeEnd: string
+  room: string
+  roomType: string
+}
+
+const newMeetingRow = (): MeetingRow => ({
+  key: crypto.randomUUID(),
+  day: '',
+  timeStart: '',
+  timeEnd: '',
+  room: '',
+  roomType: '',
+})
+
+// Minimum required gap (in minutes) between any two class meetings on the
+// same day. 0 means back-to-back scheduling is allowed (a class ending at
+// 8:00 AM and another starting at 8:00 AM is NOT a conflict) — only true
+// time-range overlaps are blocked. Raise this if you want a mandatory
+// passing-time buffer between classes instead.
+const MIN_GAP_MINUTES = 0
+
+// Minimum allowed duration (in minutes) for a single meeting slot. Guards
+// against accidental tiny/garbage entries like a 1-minute "class".
+const MIN_DURATION_MINUTES = 15
+
 function ClassSchedule() {
   const { user } = useAuth()
-  const { schedules, loading, addSchedule, updateSchedule, deleteSchedule } = useClassSched(user)
+  const { schedules, loading, addClass, updateClass, deleteSchedule } = useClassSched(user)
 
   const [isAddSubOpen, setIsAddSubOpen] = useState(false)
-  const [selectedDay, setSelectedDay] = useState('')
-  const [selectedRoomType, setSelectedRoomType] = useState('')
   const [subjectName, setSubjectName] = useState('')
-  const [timeStart, setTimeStart] = useState('')
-  const [timeEnd, setTimeEnd] = useState('')
-  const [roomAssigned, setRoomAssigned] = useState('')
   const [instructor, setInstructor] = useState('')
+  const [meetings, setMeetings] = useState<MeetingRow[]>([newMeetingRow()])
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [rowErrors, setRowErrors] = useState<Record<string, Record<string, string>>>({})
   const [menuOpenIndex, setMenuOpenIndex] = useState<string | null>(null)
-  const [editTargetId, setEditTargetId] = useState<string | null>(null)
+  const [editTargetClassId, setEditTargetClassId] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const [showClearModal, setShowClearModal] = useState(false)
 
@@ -187,78 +218,166 @@ function ClassSchedule() {
     return `${hour12}:${minute} ${ampm}`
   }
 
-    const resetForm = () => {
-      setSelectedDay(''); setSubjectName(''); setTimeStart(''); setTimeEnd('')
-      setRoomAssigned(''); setSelectedRoomType(''); setInstructor('')
-      setFieldErrors({}); setEditTargetId(null)  // ← replace setFormError with setFieldErrors
-    }
-    const errClass = (field: string) =>
-  fieldErrors[field] ? 'border-2 border-red-400 bg-red-50' : ''
-
-    
-const handleSave = () => {
-  const errors: Record<string, string> = {}
-  if (!selectedDay) errors.selectedDay = 'Required'
-  if (!subjectName.trim()) errors.subjectName = 'Required'
-  if (!timeStart) errors.timeStart = 'Required'
-  if (!timeEnd) errors.timeEnd = 'Required'
-  if (!roomAssigned.trim()) errors.roomAssigned = 'Required'
-  if (!selectedRoomType) errors.selectedRoomType = 'Required'
-  if (!instructor.trim()) errors.instructor = 'Required'
-
-  if (Object.keys(errors).length > 0) { setFieldErrors(errors); return }
-
-  if (timeEnd <= timeStart) {
-    setFieldErrors({ timeEnd: 'Must be later than start time' })
-    return
+  const resetForm = () => {
+    setSubjectName(''); setInstructor('')
+    setMeetings([newMeetingRow()])
+    setFieldErrors({}); setRowErrors({}); setEditTargetClassId(null)
   }
 
-  const conflictExists = schedules
-    .filter(s => s.day === selectedDay && s.id !== editTargetId)
-    .some(s => {
-      const toMinutes = (t: string) => { const [h, m] = t.split(':').map(Number); return h * 60 + m }
-      return toMinutes(timeStart) < toMinutes(s.timeEnd) && toMinutes(timeEnd) > toMinutes(s.timeStart)
+  const errClass = (field: string) =>
+    fieldErrors[field] ? 'border-2 border-red-400 bg-red-50' : ''
+
+  const rowErrClass = (rowKey: string, field: string) =>
+    rowErrors[rowKey]?.[field] ? 'border-2 border-red-400 bg-red-50' : ''
+
+  const addMeetingRow = () => setMeetings((prev) => [...prev, newMeetingRow()])
+
+  // Any row can now be removed — including the last remaining one — since
+  // deletion is the only way to drop a slot now that there's no separate
+  // enable/disable toggle. If the user empties the list, "Add Another Day"
+  // is still available to start over.
+const [confirmRemoveKey, setConfirmRemoveKey] = useState<string | null>(null)
+
+const removeMeetingRow = (key: string) => {
+  setMeetings((prev) => prev.filter((m) => m.key !== key))
+  setConfirmRemoveKey(null)
+}
+  const updateMeetingRow = <K extends keyof MeetingRow>(key: string, field: K, value: MeetingRow[K]) =>
+    setMeetings((prev) => prev.map((m) => (m.key === key ? { ...m, [field]: value } : m)))
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  const handleSave = () => {
+    const topErrors: Record<string, string> = {}
+    if (!subjectName.trim()) topErrors.subjectName = 'Required'
+    if (!instructor.trim()) topErrors.instructor = 'Required'
+
+    const activeRows = meetings
+    if (activeRows.length === 0) topErrors.meetings = 'Add at least one day and time slot'
+
+    const newRowErrors: Record<string, Record<string, string>> = {}
+    activeRows.forEach((row) => {
+      const errs: Record<string, string> = {}
+      if (!row.day) errs.day = 'Required'
+      if (!row.timeStart) errs.timeStart = 'Required'
+      if (!row.timeEnd) errs.timeEnd = 'Required'
+      if (!row.room.trim()) errs.room = 'Required'
+      if (!row.roomType) errs.roomType = 'Required'
+      if (row.timeStart && row.timeEnd && row.timeEnd <= row.timeStart) {
+        errs.timeEnd = 'Must be later than start time'
+      } else if (
+        row.timeStart && row.timeEnd &&
+        toMinutes(row.timeEnd) - toMinutes(row.timeStart) < MIN_DURATION_MINUTES
+      ) {
+        // Catches accidental/garbage entries like a 1-minute class.
+        errs.timeEnd = `Class must be at least ${MIN_DURATION_MINUTES} minutes long`
+      }
+      if (Object.keys(errs).length > 0) newRowErrors[row.key] = errs
     })
 
-  if (conflictExists) {
-    setFieldErrors({ timeStart: 'Time conflict', timeEnd: `${selectedDay} already has a class during this time` })
-    return
+    // Conflict check: each active row against other classes' schedules,
+    // and against the other rows being saved in this same class.
+    // A required gap (MIN_GAP_MINUTES) is applied on both sides of every
+    // comparison range so that back-to-back slots with zero gap between
+    // them (e.g. 12:21–12:22 followed immediately by 12:22–12:50) are also
+    // flagged, not just true overlaps.
+    activeRows.forEach((row, i) => {
+      if (!row.day || !row.timeStart || !row.timeEnd) return
+      // Skip conflict check if this row already failed basic validation
+      // (e.g. end <= start), since the times aren't meaningful yet.
+      if (newRowErrors[row.key]?.timeEnd || newRowErrors[row.key]?.timeStart) return
+
+      const rowStart = toMinutes(row.timeStart)
+      const rowEnd = toMinutes(row.timeEnd)
+
+      const conflictExisting = schedules
+        .filter((s) => s.day === row.day && s.classId !== editTargetClassId)
+        .some((s) =>
+          rowStart < toMinutes(s.timeEnd) + MIN_GAP_MINUTES &&
+          rowEnd + MIN_GAP_MINUTES > toMinutes(s.timeStart)
+        )
+
+      const conflictLocal = activeRows.some((other, j) =>
+        j !== i && other.day === row.day && other.timeStart && other.timeEnd &&
+        rowStart < toMinutes(other.timeEnd) + MIN_GAP_MINUTES &&
+        rowEnd + MIN_GAP_MINUTES > toMinutes(other.timeStart)
+      )
+
+      if (conflictExisting || conflictLocal) {
+        newRowErrors[row.key] = {
+          ...newRowErrors[row.key],
+          timeStart: 'Time conflict',
+          timeEnd: MIN_GAP_MINUTES > 0
+            ? `${row.day} already has a class scheduled too close to this time`
+            : `${row.day} already has a class during this time`,
+        }
+      }
+    })
+
+    if (Object.keys(topErrors).length > 0 || Object.keys(newRowErrors).length > 0) {
+      setFieldErrors(topErrors)
+      setRowErrors(newRowErrors)
+      return
+    }
+
+    const payload: MeetingInput[] = activeRows.map((row) => ({
+      id: row.id,
+      day: row.day,
+      timeStart: row.timeStart,
+      timeEnd: row.timeEnd,
+      room: row.room,
+      roomType: row.roomType,
+    }))
+
+    const targetClassId = editTargetClassId
+
+    setIsAddSubOpen(false)
+    resetForm()
+
+    if (targetClassId) {
+      updateClass(targetClassId, subjectName, instructor, payload)
+    } else {
+      addClass(subjectName, instructor, payload)
+    }
   }
 
-  // ✅ capture before resetForm clears it
-  const targetId = editTargetId
-  const snap = { day: selectedDay, subject: subjectName, timeStart, timeEnd, room: roomAssigned, roomType: selectedRoomType, instructor }
-
-  setIsAddSubOpen(false)
-  resetForm()
-
-  if (targetId) {
-    updateSchedule(targetId, snap)
-  } else {
-    addSchedule(snap.day, snap.subject, snap.timeStart, snap.timeEnd, snap.room, snap.roomType, snap.instructor)
-  }
-}
   async function handleDelete() {
     if (!pendingDelete) return
     await deleteSchedule(pendingDelete.id)
     setPendingDelete(null)
   }
 
-    async function handleClearAll() {
-      await Promise.all(schedules.map(s => deleteSchedule(s.id)))
-      setShowClearModal(false)
-    }
+  async function handleClearAll() {
+    await Promise.all(schedules.map((s) => deleteSchedule(s.id)))
+    setShowClearModal(false)
+  }
 
+  // Opens the modal pre-filled with every meeting that belongs to this class,
+  // so all of a subject's day/time/room slots are edited together.
+  const handleEditOpen = (classId: string) => {
+    const rows = schedules.filter((s) => s.classId === classId)
+    if (rows.length === 0) return
 
-  const handleEditOpen = (s: { id: string; day: string; subject: string; timeStart: string; timeEnd: string; room: string; roomType: string; instructor: string }) => {
-    setSelectedDay(s.day)
-    setSubjectName(s.subject)
-    setTimeStart(s.timeStart)
-    setTimeEnd(s.timeEnd)
-    setRoomAssigned(s.room)
-    setSelectedRoomType(s.roomType)
-    setInstructor(s.instructor)
-    setEditTargetId(s.id)
+    setSubjectName(rows[0].subject)
+    setInstructor(rows[0].instructor)
+    setMeetings(
+      rows
+        .slice()
+        .sort((a, b) => a.timeStart.localeCompare(b.timeStart))
+        .map((s) => ({
+          key: s.id,
+          id: s.id,
+          day: s.day,
+          timeStart: s.timeStart,
+          timeEnd: s.timeEnd,
+          room: s.room,
+          roomType: s.roomType,
+        }))
+    )
+    setEditTargetClassId(classId)
     setMenuOpenIndex(null)
     setIsAddSubOpen(true)
   }
@@ -304,7 +423,7 @@ const DayCard = ({ day }: { day: string }) => {
                         <div className='fixed inset-0 z-0' onClick={() => setMenuOpenIndex(null)} />
                         <div className='absolute right-2 top-0 mt-1 bg-white border border-primary-800 rounded-sm shadow-lg z-10 w-24 py-0'>
                           <button
-                            onClick={() => handleEditOpen(s)}
+                            onClick={() => handleEditOpen(s.classId)}
                             className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] xl:text-[13px] 2xl:text-[14px] text-primary-600 hover:bg-primary-50 font-semibold'
                           >
                             <img className='w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  src="edit.png" alt="edit icon" />Edit
@@ -430,78 +549,228 @@ const DayCard = ({ day }: { day: string }) => {
           </div>
           {/* <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' /> */}
 
-          {/* Add / Edit Modal */}
-          {isAddSubOpen && (
-            <div className='fixed inset-0   bg-black/50 flex items-center justify-center z-50'>
-              <div className='bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-lg p-6 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-md mx-5 shadow-lg'>
-                <h2 className='text-2xl lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl  text-primary-800 uppercase text-center font-bold font-roboto mb-4'>
-                  {editTargetId ? 'Edit Schedule' : 'Add Schedule'}
-                </h2>
+          {/* Add / Edit Class Modal */}
+{isAddSubOpen && (
+  <div className='fixed inset-0 bg-black/50 flex items-end lg:items-center justify-center z-50 lg:p-4'>
+    <div className='bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl w-full lg:max-w-2xl h-[90vh] lg:h-auto lg:max-h-[90vh] flex flex-col'>
+      {/* Header */}
+      <div className='flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
+        <div>
+          <h2 className='text-xl xl:text-2xl font-bold text-gray-900'>
+            {editTargetClassId ? 'Edit Class Schedule' : 'Add Class Schedule'}
+          </h2>
+          <p className='text-xs xl:text-sm text-gray-400 mt-1'>
+            Create a class that meets on multiple days with different times, rooms, or types.
+          </p>
+        </div>
+        <button
+          onClick={() => { setIsAddSubOpen(false); resetForm() }}
+          className='text-gray-400 hover:text-gray-600 text-2xl leading-none px-1'
+          aria-label='Close'
+        >
+          ×
+        </button>
+      </div>
 
-                <div className='flex flex-row gap-2 w-full'>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto font-medium mb-1 lg:mb-2'>DAY</label>
-                    <select aria-label='Select Day' value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} className={`border rounded-sm lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl border-primary-800 px-3 py-2 lg:py-1 w-full ${errClass('selectedDay')}`}>
-                      <option value='' disabled>Select a day</option>
-                      {days.map((day) => <option key={day} value={day}>{day}</option>)}
-                    </select>
+                <div className='overflow-y-auto px-6 py-5 flex-1'>
+                  {/* Class Information */}
+                  <div className='border border-gray-200 rounded-xl p-4 mb-5'>
+                    <p className='text-sm font-bold text-gray-800 mb-3'>Class Information</p>
+                    <div className='flex flex-col sm:flex-row gap-4'>
+                      <div className='flex-1 flex flex-col'>
+                        <label className='text-xs font-semibold text-gray-500 mb-1'>Subject Name</label>
+                        <input
+                          type='text'
+                          placeholder='Enter Subject'
+                          className={`py-2 px-3 rounded-lg border border-gray-300 text-sm w-full ${errClass('subjectName')}`}
+                          value={subjectName}
+                          onChange={(e) => setSubjectName(e.target.value)}
+                        />
+                      </div>
+                      <div className='flex-1 flex flex-col'>
+                        <label className='text-xs font-semibold text-gray-500 mb-1'>Teacher / Instructor</label>
+                        <input
+                          type='text'
+                          placeholder='Enter Teacher/Instructor Name'
+                          className={`py-2 px-3 rounded-lg border border-gray-300 text-sm w-full ${errClass('instructor')}`}
+                          value={instructor}
+                          onChange={(e) => setInstructor(e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>SUBJECT NAME</label>
-                    <input type='text' placeholder='Enter Subject' className={`py-2 lg:py-1 rounded-sm border border-primary-800 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl w-full ${errClass('subjectName')}`} 
-                      value={subjectName} onChange={(e) => setSubjectName(e.target.value)} />
+
+                  {/* Schedule Meetings */}
+                  <div className='border border-gray-200 rounded-xl p-4'>
+                    <p className='text-sm font-bold text-gray-800 mb-3'>Schedule Meetings</p>
+                    <div className='bg-gray-50 text-gray-500 text-xs rounded-lg px-3 py-2 mb-4'>
+                      Add all the days and time slots when this class meets.
+                    </div>
+
+                    {fieldErrors.meetings && (
+                      <p className='text-red-500 text-xs mb-3'>{fieldErrors.meetings}</p>
+                    )}
+
+                    <div className='space-y-3'>
+                      {meetings.map((row) => {
+                        const rowErrs = rowErrors[row.key]
+                        // De-duplicate, since timeStart/timeEnd conflict messages
+                        // are often set together but shouldn't repeat visually.
+                        const errorMessages = rowErrs
+                          ? Array.from(new Set(Object.values(rowErrs)))
+                          : []
+
+                        return (
+                          <div key={row.key} className='border-b border-gray-100 pb-3 last:border-b-0'>
+                            <div className='flex flex-col md:flex-row md:items-center gap-2 border rounded-md p-4'>
+                              <div className='flex items-center gap-2 md:w-32 shrink-0 pt-0'>
+                                <span className='w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0' aria-hidden='true' />
+                                <select
+                                  aria-label='Select Day'
+                                  value={row.day}
+                                  onChange={(e) => updateMeetingRow(row.key, 'day', e.target.value)}
+                                  className={`border rounded-md border-gray-300 text-xs px-1 py-1 w-full ${rowErrClass(row.key, 'day')}`}
+                                >
+                                  <option value='' disabled>Day</option>
+                                  {days.map((day) => <option key={day} value={day}>{day}</option>)}
+                                </select>
+                                  {confirmRemoveKey === row.key ? (
+                                    <div className='flex md:hidden items-center gap-2 shrink-0'>
+                                      <button
+                                        onClick={() => removeMeetingRow(row.key)}
+                                        className='text-[11px] font-semibold text-red-500 hover:text-red-600'
+                                      >
+                                        Confirm
+                                      </button>
+                                      <button
+                                        onClick={() => setConfirmRemoveKey(null)}
+                                        className='text-[11px] font-semibold text-gray-400 hover:text-gray-600'
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setConfirmRemoveKey(row.key)}
+                                      className='flex md:hidden shrink-0 self-center text-gray-400 hover:text-red-500 px-0'
+                                      title='Delete this day'
+                                    >
+                                      <img src="/delete.png" alt="delete" className='w-4 h-4 shrink-0' />
+                                    </button>
+                                  )}
+                              </div>
+
+                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Time Start</p>
+                              <input
+                                aria-label='Time Start'
+                                type='time'
+                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'timeStart')}`}
+                                value={row.timeStart}
+                                onChange={(e) => updateMeetingRow(row.key, 'timeStart', e.target.value)}
+                              />
+
+                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Time End</p>
+                              <input
+                                aria-label='Time End'
+                                type='time'
+                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'timeEnd')}`}
+                                value={row.timeEnd}
+                                onChange={(e) => updateMeetingRow(row.key, 'timeEnd', e.target.value)}
+                              />
+
+                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Room</p>
+                              <input
+                                type='text'
+                                placeholder='Room'
+                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'room')}`}
+                                value={row.room}
+                                onChange={(e) => updateMeetingRow(row.key, 'room', e.target.value)}
+                              />
+
+                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Type</p>
+                              <select
+                                aria-label='Select Room Type'
+                                value={row.roomType}
+                                onChange={(e) => updateMeetingRow(row.key, 'roomType', e.target.value)}
+                                className={`border rounded-md border-gray-300 text-xs px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'roomType')}`}
+                              >
+                                <option value='' disabled>Type</option>
+                                {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
+                              </select>
+
+                              {confirmRemoveKey === row.key ? (
+                                <div className='hidden md:flex items-center gap-1 shrink-0 ml-1 pl-2 border-l border-gray-200'>
+                                  <button
+                                    onClick={() => removeMeetingRow(row.key)}
+                                    className='text-[11px] font-semibold text-red-500 hover:text-red-600 px-1'
+                                    title='Confirm delete — this cannot be undone'
+                                  >
+                                    Confirm
+                                  </button>
+                                  <button
+                                    onClick={() => setConfirmRemoveKey(null)}
+                                    className='text-[11px] font-semibold text-gray-400 hover:text-gray-600 px-1'
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setConfirmRemoveKey(row.key)}
+                                  className='hidden md:flex items-center justify-center shrink-0 w-7 h-7 ml-1 pl-2 border-l border-gray-200 text-gray-400 hover:text-red-500 transition-colors'
+                                  title='Delete this day'
+                                >
+                                  <img src="/delete.png" alt="delete" className='w-4 h-4 shrink-0' />
+                                </button>
+                              )}
+                              {errorMessages.length > 0 && (
+                              <div className='mt-1.5 pl-1 space-y-0.5'>
+                                {errorMessages.map((msg, i) => (
+                                  <p key={i} className='text-red-500 text-[11px] leading-tight'>
+                                    {msg}
+                                  </p>
+                                ))}
+                              </div>
+                            )}
+                        </div>
+
+
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    <button
+                      onClick={addMeetingRow}
+                      className='mt-4 w-full border border-dashed border-gray-300 rounded-lg py-2 text-xs font-semibold text-gray-500 hover:bg-gray-50 transition-colors'
+                    >
+                      + Add Another Day
+                    </button>
                   </div>
                 </div>
 
-                <div className='flex flex-row gap-2 w-full mt-4 lg:mt-2 xl:mt-4 '>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>TIME START</label>
-                    <input aria-label='Time Start' type='time' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('timeStart')}`}
-                      value={timeStart} onChange={(e) => setTimeStart(e.target.value)} />
-                  </div>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>TIME END</label>
-                    <input aria-label='Time End' type='time' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('timeEnd')}`}
-                      value={timeEnd} onChange={(e) => setTimeEnd(e.target.value)} />
-                  </div>
-                </div>
-
-                <div className='flex flex-row gap-2 w-full mt-4 lg:mt-2 xl:mt-4 '>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 uppercase text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl font-roboto mb-1 lg:mb-2'>Room Assigned</label>
-                    <input type='text' placeholder='Enter Room' className={`py-2 lg:py-1 pl-4 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl rounded-sm border border-primary-800 w-full ${errClass('roomAssigned')}`}
-                      value={roomAssigned} onChange={(e) => setRoomAssigned(e.target.value)} />
-                  </div>
-                  <div className='flex-1 flex flex-col'>
-                    <label className='text-primary-800 text-md lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl uppercase font-roboto mb-1 lg:mb-2'>Room Type</label>
-                    <select aria-label='Select Room Type' value={selectedRoomType} onChange={(e) => setSelectedRoomType(e.target.value)} className={`border rounded-sm lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl border-primary-800 py-2 lg:py-1 px-3 w-full ${errClass('selectedRoomType')}`}>
-                      <option value='' disabled>Select type</option>
-                      {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <div className='flex flex-col mt-4 lg:mt-2 xl:mt-4 '>
-                  <label className='uppercase lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl text-primary-800 font-roboto mb-1 lg:mb-2'>Teacher / Instructor</label>
-                  <input type='text' placeholder='Enter Teacher/Instructor Name' className={`rounded-sm border border-primary-800 lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl py-2 lg:py-1 pl-4 w-full ${errClass('instructor')}`}
-                    value={instructor} onChange={(e) => setInstructor(e.target.value)} />
-                </div>
-
-                  {(fieldErrors.timeEnd?.includes('already has') || fieldErrors.timeEnd?.includes('later')) && (
-                    <p className='text-yellow-300 text-sm text-center font-roboto mt-4'>{fieldErrors.timeEnd}</p>
-                  )}
-                  {Object.keys(fieldErrors).length > 0 && !fieldErrors.timeEnd?.includes('already has') && !fieldErrors.timeEnd?.includes('later') && (
-                    <p className='text-yellow-300 text-sm text-center font-roboto mt-4'>Please fill in all highlighted fields.</p>
-                  )}
-                <div className='flex flex-row justify-center items-center gap-6 mt-6 lg:mt-6 xl:mt-5 2xl:mt-4 3xl:mt-8'>
-                  <button onClick={() => { setIsAddSubOpen(false); resetForm() }}
-                    className='bg-white lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl text-primary-600 uppercase border border-primary-800 font-bold font-roboto px-8 rounded-full py-1'>
+                {/* Footer */}
+                <div className='flex items-center justify-between px-6 py-4 border-t border-gray-100'>
+                  <button
+                    onClick={() => { setIsAddSubOpen(false); resetForm() }}
+                    className='text-sm font-semibold text-gray-600 border border-gray-300 rounded-full px-6 py-2 hover:bg-gray-50'
+                  >
                     Cancel
                   </button>
-                  <button onClick={handleSave}
-                    className='bg-orange-500   lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl text-white uppercase font-bold font-roboto px-8 rounded-full py-1'>
-                    {editTargetId ? 'Update' : 'Save'}
-                  </button>
+                  <div className='flex items-center gap-3'>
+                    <button
+                      onClick={resetForm}
+                      className='text-sm font-semibold text-gray-600 px-4 py-2 hover:bg-gray-50 rounded-full'
+                    >
+                      Reset
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className='bg-gray-900 text-white text-sm font-semibold px-6 py-2 rounded-full hover:opacity-90'
+                    >
+                      Save Class
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -518,11 +787,13 @@ const DayCard = ({ day }: { day: string }) => {
             </div>
           )}
         </div>
-        <ScheduleFab
-          onClearAll={() => setShowClearModal(true)}
-          onAddSchedule={() => { resetForm(); setIsAddSubOpen(true) }}
-          disabled={schedules.length === 0}
-        />
+          {!isAddSubOpen && (
+            <ScheduleFab
+              onClearAll={() => setShowClearModal(true)}
+              onAddSchedule={() => { resetForm(); setIsAddSubOpen(true) }}
+              disabled={schedules.length === 0}
+            />
+          )}
 
         {/* Soft Delete Modal — rendered at root level, outside DayCard */}
         {pendingDelete && (

@@ -15,6 +15,7 @@ import { type User } from 'firebase/auth'
 
 export interface Schedule {
   id: string
+  classId: string
   day: string
   subject: string
   timeStart: string
@@ -24,6 +25,18 @@ export interface Schedule {
   instructor: string
   uid: string
   createdAt: number
+}
+
+// One row of the "Schedule Meetings" table in the Add/Edit Class modal.
+// `id` is present when the row already exists as a Firestore doc (editing);
+// absent when it's a brand-new meeting slot being added.
+export interface MeetingInput {
+  id?: string
+  day: string
+  timeStart: string
+  timeEnd: string
+  room: string
+  roomType: string
 }
 
 export function useClassSched(user: User | null) {
@@ -60,13 +73,15 @@ export function useClassSched(user: User | null) {
     return () => unsubscribe()
   }, [user])
 
+  // Legacy single-meeting create/update — still used internally by
+  // addClass/updateClass, kept exported in case other call sites need it.
   function addSchedule(
-    day: string, subject: string, timeStart: string, timeEnd: string,
+    classId: string, day: string, subject: string, timeStart: string, timeEnd: string,
     room: string, roomType: string, instructor: string
   ) {
     if (!user) return
-    addDoc(collection(db, 'users', user.uid, 'schedules'), {
-      day, subject: subject.trim(), timeStart, timeEnd,
+    return addDoc(collection(db, 'users', user.uid, 'schedules'), {
+      classId, day, subject: subject.trim(), timeStart, timeEnd,
       room: room.trim(), roomType, instructor: instructor.trim(),
       uid: user.uid, createdAt: Date.now(),
     })
@@ -78,7 +93,7 @@ export function useClassSched(user: User | null) {
   ) {
     if (!user) return
     const schedRef = doc(db, 'users', user.uid, 'schedules', scheduleId)
-    updateDoc(schedRef, fields)
+    return updateDoc(schedRef, fields)
   }
 
   // keep deleteSchedule with await — softDelete needs to complete
@@ -95,5 +110,48 @@ export function useClassSched(user: User | null) {
     })
   }
 
-  return { schedules, loading, addSchedule, updateSchedule, deleteSchedule }
+  // Creates a brand-new class: one Firestore doc per meeting slot,
+  // all sharing a fresh classId + the same subject/instructor.
+  async function addClass(subject: string, instructor: string, meetings: MeetingInput[]) {
+    if (!user) return
+    const classId = doc(collection(db, 'users', user.uid, 'schedules')).id
+    await Promise.all(
+      meetings.map((m) =>
+        addSchedule(classId, m.day, subject, m.timeStart, m.timeEnd, m.room, m.roomType, instructor)
+      )
+    )
+    return classId
+  }
+
+  // Updates an existing class: syncs subject/instructor across all its
+  // meeting docs, updates changed rows, adds new rows, and removes rows
+  // that were deleted in the modal (via soft delete, same as a manual delete).
+  async function updateClass(classId: string, subject: string, instructor: string, meetings: MeetingInput[]) {
+    if (!user) return
+
+    const existing = schedules.filter((s) => s.classId === classId)
+    const keepIds = new Set(meetings.filter((m) => m.id).map((m) => m.id))
+    const removed = existing.filter((s) => !keepIds.has(s.id))
+
+    await Promise.all(removed.map((s) => deleteSchedule(s.id)))
+
+    await Promise.all(
+      meetings.map((m) => {
+        if (m.id) {
+          return updateSchedule(m.id, {
+            day: m.day,
+            subject,
+            timeStart: m.timeStart,
+            timeEnd: m.timeEnd,
+            room: m.room.trim(),
+            roomType: m.roomType,
+            instructor,
+          })
+        }
+        return addSchedule(classId, m.day, subject, m.timeStart, m.timeEnd, m.room, m.roomType, instructor)
+      })
+    )
+  }
+
+  return { schedules, loading, addSchedule, updateSchedule, deleteSchedule, addClass, updateClass }
 }
