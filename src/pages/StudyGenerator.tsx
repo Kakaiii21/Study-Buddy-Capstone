@@ -37,6 +37,7 @@ const ENQUEUE_URL = import.meta.env.VITE_STUDY_GENERATOR_ENQUEUE_URL as string
 const CANCEL_URL = import.meta.env.VITE_STUDY_GENERATOR_CANCEL_URL as string
 const COOLDOWN_MS = 2 * 60 * 1000 // 2 minutes
 const COOLDOWN_KEY = 'studygen_cooldown_until'
+const TICKET_KEY = 'studygen_ticket_id' // persists the in-flight ticket id across navigation/unmount
 
 // Session storage keys
 export const SESSION_KEY_RESULT = 'studygen_result'
@@ -64,7 +65,7 @@ function CoursePicker({
   onError,
 }: {
   user: User | null
-  courses: { id: string; name: string; color?: string }[]
+  courses: { id: string; name: string; color?: string; fileCount?: number }[]
   onSelect: (file: UploadedFile) => void
   onClose: () => void
   onError: (msg: string) => void
@@ -123,11 +124,13 @@ function CoursePicker({
                       onClick={() => setSelectedCourseId(course.id)}
                       className='flex flex-col items-center gap-2 p-4 3xl:p-6 border-2 border-gray-100 rounded-xl hover:border-primary-600 hover:bg-primary-50 transition group'
                     >
-                      <img
-                        src={`/folder-${course.color || 'blue'}.png`}
-                        alt='folder'
-                        className='w-16 2xl:w-20 3xl:w-24 group-hover:opacity-80 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
-                      />
+                    <img
+                      src={`/${course.fileCount && course.fileCount > 0 ? 'storefolder' : 'folder'}-${course.color || 'blue'}.png`}
+                      alt='folder'
+                      className='w-16 2xl:w-20 3xl:w-24 group-hover:opacity-80 select-none'
+                      onContextMenu={(e) => e.preventDefault()}
+                      draggable={false}
+                    />
                       <p className='font-roboto font-bold text-primary-600 text-sm 3xl:text-lg text-center truncate w-full'>{course.name}</p>
                     </button>
                   ))}
@@ -204,8 +207,10 @@ function StudyGenerator() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
   const [showCoursePicker, setShowCoursePicker] = useState(false)
   const [fileError, setFileError] = useState('')
-  const [queueStatus, setQueueStatus] = useState<'idle' | 'queued' | 'processing' | 'done' | 'error'>('idle')
-  const [ticketId, setTicketId] = useState<string | null>(null)
+const [queueStatus, setQueueStatus] = useState<'idle' | 'queued' | 'processing' | 'done' | 'error'>(
+  () => (localStorage.getItem(TICKET_KEY) ? 'queued' : 'idle')
+)
+const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getItem(TICKET_KEY))
   const [ticketNumber, setTicketNumber] = useState<number | null>(null)
   const [queuePosition, setQueuePosition] = useState<number | null>(null)
   const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
@@ -244,7 +249,15 @@ function StudyGenerator() {
 
     const ref = doc(db, 'queueTickets', ticketId)
     const unsub = onSnapshot(ref, (snap) => {
-      if (!snap.exists()) return
+      if (!snap.exists()) {
+        // ticket no longer exists server-side (expired/purged) — don't leave a stale id around
+        localStorage.removeItem(TICKET_KEY)
+        setQueueStatus('idle')
+        setTicketId(null)
+        setTicketNumber(null)
+        setQueuePosition(null)
+        return
+      }
       const data = snap.data()
 
       if (data.status === 'waiting') {
@@ -253,6 +266,7 @@ function StudyGenerator() {
       } else if (data.status === 'processing') {
         setQueueStatus('processing')
       } else if (data.status === 'done') {
+        localStorage.removeItem(TICKET_KEY)
         setQueueStatus('done')
 
         const sessionData = {
@@ -267,18 +281,24 @@ function StudyGenerator() {
         startCooldownTimer(Math.ceil(COOLDOWN_MS / 1000))
 
         const path = data.mode === 'quiz' ? '/studyGenerator/Quiz' : '/studyGenerator/Flashcard'
-        navigate(path, { state: sessionData })
+
+        // brief delay so the "ready" banner is visible for a beat before navigating away
+        setTimeout(() => {
+          navigate(path, { state: sessionData })
+        }, 400)
 
         setTicketId(null)
         setTicketNumber(null)
         setQueuePosition(null)
       } else if (data.status === 'failed') {
+        localStorage.removeItem(TICKET_KEY)
         setQueueStatus('error')
         setFileError(data.error || 'Something went wrong. Please try again.')
         setTicketId(null)
         setTicketNumber(null)
         setQueuePosition(null)
       } else if (data.status === 'cancelled') {
+        localStorage.removeItem(TICKET_KEY)
         setQueueStatus('idle')
         setTicketId(null)
         setTicketNumber(null)
@@ -327,19 +347,22 @@ function StudyGenerator() {
     return () => { if (cooldownRef.current) clearInterval(cooldownRef.current) }
   }, [])
 
-  useEffect(() => {
-    const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        if (parsed.mode === 'quiz') {
-          navigate('/studyGenerator/Quiz', { state: parsed, replace: true })
-        } else if (parsed.mode === 'flashcard') {
-          navigate('/studyGenerator/Flashcard', { state: parsed, replace: true })
-        }
-      } catch {/**/}
-    }
-  }, [])
+  // ── Restore on mount: finished result takes priority, otherwise resume a live ticket ──
+// ── Restore a finished result on mount, if one exists (ticket restore now happens via lazy init above) ──
+useEffect(() => {
+  const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (parsed.mode === 'quiz') {
+        navigate('/studyGenerator/Quiz', { state: parsed, replace: true })
+      } else if (parsed.mode === 'flashcard') {
+        navigate('/studyGenerator/Flashcard', { state: parsed, replace: true })
+      }
+    } catch {/**/}
+  }
+}, [])
+
 
   // ── Local file handling ───────────────────────────────────────────────────
 
@@ -425,6 +448,7 @@ function StudyGenerator() {
       }
 
       setTicketId(data.ticketId)
+      localStorage.setItem(TICKET_KEY, data.ticketId) // survive navigation/unmount
       setQueuePosition(data.position)
       setQueueStatus('queued')
     } catch (err) {
@@ -447,6 +471,7 @@ function StudyGenerator() {
     } catch (err) {
       console.error(err)
     } finally {
+      localStorage.removeItem(TICKET_KEY)
       setQueueStatus('idle')
       setTicketId(null)
       setTicketNumber(null)
@@ -544,6 +569,11 @@ function StudyGenerator() {
               {queueStatus === 'processing' && (
                 <div className='mt-2 flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-green-50 border border-green-300 text-green-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
                   <span>⚙️ Generating your {activeTab === 'quiz' ? 'quiz' : 'flashcards'} now...</span>
+                </div>
+              )}
+              {queueStatus === 'done' && (
+                <div className='mt-2 flex items-center gap-3 lg:text-[9px] xl:text-xs 2xl:text-sm 3xl:text-lg bg-green-50 border border-green-300 text-green-700 font-roboto text-sm font-semibold px-5 py-3 3xl:px-7 3xl:py-4 rounded-xl'>
+                  <span>✅ Your {activeTab === 'quiz' ? 'quiz' : 'flashcards'} are ready! Redirecting...</span>
                 </div>
               )}
               {/* ─────────────────────── */}

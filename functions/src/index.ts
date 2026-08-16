@@ -376,7 +376,27 @@ export const sendPasswordReset = onRequest(
     try {
       const { Resend } = await import('resend')
       const { email } = req.body as { email: string }
-      if (!email) { res.status(400).json({ error: 'Email is required' }); return }
+      if (!email) {
+        res.status(400).json({ error: 'Email is required', code: 'auth/invalid-email' })
+        return
+      }
+
+      // ✅ Explicitly check the user exists BEFORE generating the link.
+      // generatePasswordResetLink can throw a generic 'auth/internal-error'
+      // instead of 'auth/user-not-found' when the email isn't registered,
+      // so we surface the real reason here instead.
+      try {
+        await admin.auth().getUserByEmail(email)
+      } catch (e: any) {
+        if (e.code === 'auth/user-not-found') {
+          res.status(404).json({ error: 'Email not found.', code: 'auth/user-not-found' })
+          return
+        }
+        // Any other lookup error (e.g. malformed email) — surface as invalid-email
+        res.status(400).json({ error: 'Invalid email format.', code: 'auth/invalid-email' })
+        return
+      }
+
       const resetLink = await admin.auth().generatePasswordResetLink(email, {
         url: 'https://studybuddyph.site/',
       })
@@ -397,8 +417,11 @@ export const sendPasswordReset = onRequest(
       res.status(200).json({ success: true })
     } catch (err: unknown) {
       console.error('sendPasswordReset error:', err)
-      const message = err instanceof Error ? err.message : 'Internal server error'
-      res.status(500).json({ error: message })
+      const error = err as { code?: string; message?: string }
+      res.status(500).json({
+        error: error.message || 'Internal server error',
+        code: error.code || 'auth/unknown',
+      })
     }
   }
 )

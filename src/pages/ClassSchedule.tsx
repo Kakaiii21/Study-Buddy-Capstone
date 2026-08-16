@@ -91,6 +91,35 @@ function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; on
       </div>
     </div>
   )
+} 
+function ResetFormModal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <div className='flex items-center gap-3 mb-3'>
+          <img src="/delete.png" alt="reset icon" className='w-6 h-6 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+          <h2 className='text-lg font-bold text-gray-800'>Clear Form?</h2>
+        </div>
+        <p className='text-sm text-gray-500 mb-6'>
+          This will erase everything you've entered in this form, including subject info and all schedule rows.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button
+            onClick={onCancel}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors'
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'
+          >
+            Clear Form
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 // ── Speed Dial FAB (mobile/md only) ───────────
 function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
@@ -188,7 +217,7 @@ const MIN_DURATION_MINUTES = 15
 function ClassSchedule() {
   const { user } = useAuth()
   const { schedules, loading, addClass, updateClass, deleteSchedule } = useClassSched(user)
-
+const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [isAddSubOpen, setIsAddSubOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
   const [instructor, setInstructor] = useState('')
@@ -552,7 +581,7 @@ const DayCard = ({ day }: { day: string }) => {
           {/* Add / Edit Class Modal */}
 {isAddSubOpen && (
   <div className='fixed inset-0 bg-black/50 flex items-end lg:items-center justify-center z-50 lg:p-4'>
-    <div className='bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl w-full lg:max-w-2xl h-[90vh] lg:h-auto lg:max-h-[90vh] flex flex-col'>
+    <div className='bg-white rounded-t-2xl lg:rounded-2xl shadow-2xl w-full lg:max-w-3xl h-[90vh] lg:h-auto lg:max-h-[90vh] flex flex-col'>
       {/* Header */}
       <div className='flex items-start justify-between px-6 pt-6 pb-4 border-b border-gray-100'>
         <div>
@@ -622,84 +651,102 @@ const DayCard = ({ day }: { day: string }) => {
 
                         return (
                           <div key={row.key} className='border-b border-gray-100 pb-3 last:border-b-0'>
-                            <div className='flex flex-col md:flex-row md:items-center gap-2 border rounded-md p-4'>
-                              <div className='flex items-center gap-2 md:w-32 shrink-0 pt-0'>
-                                <span className='w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0' aria-hidden='true' />
-                                <select
-                                  aria-label='Select Day'
-                                  value={row.day}
-                                  onChange={(e) => updateMeetingRow(row.key, 'day', e.target.value)}
-                                  className={`border rounded-md border-gray-300 text-xs px-1 py-1 w-full ${rowErrClass(row.key, 'day')}`}
-                                >
-                                  <option value='' disabled>Day</option>
-                                  {days.map((day) => <option key={day} value={day}>{day}</option>)}
-                                </select>
-                                  {confirmRemoveKey === row.key ? (
-                                    <div className='flex md:hidden items-center gap-2 shrink-0'>
+                            <div className='flex flex-col lg:flex-row lg:flex-wrap lg:items-start gap-2 border rounded-md p-4'>
+                              <div className='flex flex-col md:flex-col md:flex-nowrap md:items-start lg:flex-row lg:flex-nowrap lg:items-end gap-2 w-full'>
+
+                              {/* Day */}
+                              <div className='flex flex-col gap-1 md:w-full lg:w-32 shrink-0'>
+                                <p className='text-xs text-primary-800'>Day</p>
+                                <div className='flex items-center gap-2'>
+                                  <span className='w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0' aria-hidden='true' />
+                                  <select
+                                    aria-label='Select Day'
+                                    value={row.day}
+                                    onChange={(e) => updateMeetingRow(row.key, 'day', e.target.value)}
+                                    className={`border rounded-md border-gray-300 text-xs px-1 py-1 w-full ${rowErrClass(row.key, 'day')}`}
+                                  >
+                                    <option value='' disabled>Day</option>
+                                    {days.map((day) => <option key={day} value={day}>{day}</option>)}
+                                  </select>
+                                    {confirmRemoveKey === row.key ? (
+                                      <div className='flex md:hidden items-center gap-2 shrink-0'>
+                                        <button
+                                          onClick={() => removeMeetingRow(row.key)}
+                                          className='text-[11px] font-semibold text-red-500 hover:text-red-600'
+                                        >
+                                          Confirm
+                                        </button>
+                                        <button
+                                          onClick={() => setConfirmRemoveKey(null)}
+                                          className='text-[11px] font-semibold text-gray-400 hover:text-gray-600'
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    ) : (
                                       <button
-                                        onClick={() => removeMeetingRow(row.key)}
-                                        className='text-[11px] font-semibold text-red-500 hover:text-red-600'
+                                        onClick={() => setConfirmRemoveKey(row.key)}
+                                        className='flex lg:hidden shrink-0 self-center text-gray-400 hover:text-red-500 px-0'
+                                        title='Delete this day'
                                       >
-                                        Confirm
+                                        <img src="/delete.png" alt="delete" className='w-4 h-4 shrink-0' />
                                       </button>
-                                      <button
-                                        onClick={() => setConfirmRemoveKey(null)}
-                                        className='text-[11px] font-semibold text-gray-400 hover:text-gray-600'
-                                      >
-                                        Cancel
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <button
-                                      onClick={() => setConfirmRemoveKey(row.key)}
-                                      className='flex md:hidden shrink-0 self-center text-gray-400 hover:text-red-500 px-0'
-                                      title='Delete this day'
-                                    >
-                                      <img src="/delete.png" alt="delete" className='w-4 h-4 shrink-0' />
-                                    </button>
-                                  )}
+                                    )}
+                                </div>
                               </div>
 
-                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Time Start</p>
-                              <input
-                                aria-label='Time Start'
-                                type='time'
-                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'timeStart')}`}
-                                value={row.timeStart}
-                                onChange={(e) => updateMeetingRow(row.key, 'timeStart', e.target.value)}
-                              />
+                              {/* Time Start */}
+                              <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
+                                <p className='text-xs text-primary-800'>Time Start</p>
+                                <input
+                                  aria-label='Time Start'
+                                  type='time'
+                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeStart')}`}
+                                  value={row.timeStart}
+                                  onChange={(e) => updateMeetingRow(row.key, 'timeStart', e.target.value)}
+                                />
+                              </div>
 
-                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Time End</p>
-                              <input
-                                aria-label='Time End'
-                                type='time'
-                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'timeEnd')}`}
-                                value={row.timeEnd}
-                                onChange={(e) => updateMeetingRow(row.key, 'timeEnd', e.target.value)}
-                              />
+                              {/* Time End */}
+                              <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
+                                <p className='text-xs text-primary-800'>Time End</p>
+                                <input
+                                  aria-label='Time End'
+                                  type='time'
+                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeEnd')}`}
+                                  value={row.timeEnd}
+                                  onChange={(e) => updateMeetingRow(row.key, 'timeEnd', e.target.value)}
+                                />
+                              </div>
 
-                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Room</p>
-                              <input
-                                type='text'
-                                placeholder='Room'
-                                className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'room')}`}
-                                value={row.room}
-                                onChange={(e) => updateMeetingRow(row.key, 'room', e.target.value)}
-                              />
+                              {/* Room */}
+                              <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
+                                <p className='text-xs text-primary-800'>Room</p>
+                                <input
+                                  type='text'
+                                  placeholder='Room'
+                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'room')}`}
+                                  value={row.room}
+                                  onChange={(e) => updateMeetingRow(row.key, 'room', e.target.value)}
+                                />
+                              </div>
 
-                              <p className='flex lg:hidden text-xs text-primary-800 py-1 w-full md:w-28'>Type</p>
-                              <select
-                                aria-label='Select Room Type'
-                                value={row.roomType}
-                                onChange={(e) => updateMeetingRow(row.key, 'roomType', e.target.value)}
-                                className={`border rounded-md border-gray-300 text-xs px-2 py-1 w-full md:flex-1 md:min-w-0 ${rowErrClass(row.key, 'roomType')}`}
-                              >
-                                <option value='' disabled>Type</option>
-                                {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
-                              </select>
+                              {/* Type */}
+                              <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
+                                <p className='text-xs text-primary-800'>Type</p>
+                                <select
+                                  aria-label='Select Room Type'
+                                  value={row.roomType}
+                                  onChange={(e) => updateMeetingRow(row.key, 'roomType', e.target.value)}
+                                  className={`border rounded-md border-gray-300 text-xs px-2 py-1 w-full ${rowErrClass(row.key, 'roomType')}`}
+                                >
+                                  <option value='' disabled>Type</option>
+                                  {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
+                                </select>
+                              </div>
 
                               {confirmRemoveKey === row.key ? (
-                                <div className='hidden md:flex items-center gap-1 shrink-0 ml-1 pl-2 border-l border-gray-200'>
+                                <div className='hidden md:flex items-center gap-1 shrink-0 ml-1 pl-2 border-l border-gray-200 pb-1'>
                                   <button
                                     onClick={() => removeMeetingRow(row.key)}
                                     className='text-[11px] font-semibold text-red-500 hover:text-red-600 px-1'
@@ -717,14 +764,16 @@ const DayCard = ({ day }: { day: string }) => {
                               ) : (
                                 <button
                                   onClick={() => setConfirmRemoveKey(row.key)}
-                                  className='hidden md:flex items-center justify-center shrink-0 w-7 h-7 ml-1 pl-2 border-l border-gray-200 text-gray-400 hover:text-red-500 transition-colors'
+                                  className='hidden lg:flex items-center justify-center shrink-0 w-7 h-7 ml-1 pl-2 border-l border-gray-200 text-gray-400 hover:text-red-500 transition-colors mb-1'
                                   title='Delete this day'
                                 >
                                   <img src="/delete.png" alt="delete" className='w-4 h-4 shrink-0' />
                                 </button>
                               )}
+                              </div>
                               {errorMessages.length > 0 && (
-                              <div className='mt-1.5 pl-1 space-y-0.5'>
+                              <div className='md:w-full mt-1.5 pl-1 space-y-0.5'>
+                                
                                 {errorMessages.map((msg, i) => (
                                   <p key={i} className='text-red-500 text-[11px] leading-tight'>
                                     {msg}
@@ -758,12 +807,12 @@ const DayCard = ({ day }: { day: string }) => {
                     Cancel
                   </button>
                   <div className='flex items-center gap-3'>
-                    <button
-                      onClick={resetForm}
-                      className='text-sm font-semibold text-gray-600 px-4 py-2 hover:bg-gray-50 rounded-full'
-                    >
-                      Reset
-                    </button>
+                  <button
+                    onClick={() => setShowResetConfirm(true)}
+                    className='text-sm font-semibold text-gray-600 px-4 py-2 hover:bg-gray-50 rounded-full'
+                  >
+                    Clear
+                  </button>
                     <button
                       onClick={handleSave}
                       className='bg-gray-900 text-white text-sm font-semibold px-6 py-2 rounded-full hover:opacity-90'
@@ -774,6 +823,12 @@ const DayCard = ({ day }: { day: string }) => {
                 </div>
               </div>
             </div>
+          )}
+          {showResetConfirm && (
+            <ResetFormModal
+              onConfirm={() => { resetForm(); setShowResetConfirm(false) }}
+              onCancel={() => setShowResetConfirm(false)}
+            />
           )}
 
           {/* Day Cards */}
