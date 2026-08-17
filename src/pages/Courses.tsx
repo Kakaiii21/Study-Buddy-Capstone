@@ -302,7 +302,7 @@ const { startTour } = useTour(
                       <button
                         title={`Open ${course.name} Folder`}
                         disabled={!isOnline}
-                        onClick={() => navigate(`/courses/${course.id}`, { state: { folderName: course.name } })}
+                        onClick={() => navigate(`/myFiles/${course.id}`, { state: { folderName: course.name } })}
                       >
                       <img
                         src={`${course.fileCount && course.fileCount > 0 ? "storefolder" : "folder"}-${course.color || 'blue'}.png`}

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import BfcacheGuard from './components/BfcacheGuard'
 import './index.css'
 import App from './App'
 import ForgotPassword from './pages/ForgotPassword'
@@ -118,7 +119,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/courses',
+    path: '/myFiles',
     element:(
       <ProtectedRoute>
         <Courses />
@@ -126,7 +127,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/courses/:courseId',
+    path: '/myFiles/:courseId',
     element:(
       <ProtectedRoute>
         <CourseFolder />
@@ -210,9 +211,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TimerProvider>
+      <BfcacheGuard />
       <ExpiredAlert />
       <EmailChangeWatcher /> 
-       <PasswordChangeWatcher /> 
+      <PasswordChangeWatcher /> 
       <RouterProvider router={router} />
     </TimerProvider>
   </StrictMode>

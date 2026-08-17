@@ -92,7 +92,7 @@ async function deleteCourseFile(fileId: string) {
   await softDelete(user.uid, {
     name: file.fileName,
     type: 'Course',
-    originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+    originalCollection: `users/${user.uid}/myFiles/${courseId}/files`,
     originalDocId: fileId,
     cloudinaryPublicId: file.publicId,
     data: { ...file },

@@ -22,7 +22,7 @@ useEffect(() => {
 
     if (user.emailVerified) {
       clearInterval(interval)
-      navigate('/', { state: { showLogin: true } })
+      navigate('/', { state: { showLogin: true }, replace: true })
     }
     setChecking(false)
   }, 5000)
@@ -37,7 +37,7 @@ useEffect(() => {
   await reload(user)
 
   if (user.emailVerified) {
-    navigate('/dashboard')
+    navigate('/dashboard', { replace: true })
   } else {
     setError('Email not verified yet. Please check your inbox and click the link.')
   }
@@ -103,7 +103,7 @@ useEffect(() => {
           </button>
 
         <button
-          onClick={() => navigate('/', { state: { showLogin: true } })}
+          onClick={() => navigate('/', { state: { showLogin: true }, replace: true })}
           className="w-full border-2 border-primary-600 uppercase 
           rounded-xl backdrop-blur-xs text-sm lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl
           hover:-translate-y-1 hover:shadow-[0_2px_10px_rgba(0,0,0,0.5)]

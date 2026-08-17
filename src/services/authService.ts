@@ -151,6 +151,7 @@ export const login = async (email: string, password: string) => {
 // LOGOUT
 export const logout = async () => {
   await signOut(auth)
+  window.history.replaceState(null, '', '/')
 }
 
 // GET CURRENT LOGGED IN USER

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import type { User } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
-import { db } from '../services/firebase'
+import { auth, db } from '../services/firebase'
 import { onAuthChange } from '../services/authService'
 import EmailChangeWatcher from './EmailChangeWatcher'
 
@@ -17,10 +17,26 @@ function ProtectedRoute({ children }: Props) {
 
   useEffect(() => {
     const unsubscribe = onAuthChange(async (user) => {
-      setUser(user)
-      if (user) {
+      // No session at all — nothing to protect, skip straight to redirect.
+      // Avoids waiting on a network round-trip (reload/getDoc) for the
+      // common "you're logged out" case, so the redirect fires as fast
+      // as possible and the URL flicker on back-navigation is minimal.
+      if (!user) {
+        setUser(null)
+        setStatus(null)
+        setLoading(false)
+        return
+      }
+
+      // Pull fresh emailVerified/status from Firebase — the cached
+      // token can be stale right after a user completes verification
+      await user.reload()
+      const freshUser = auth.currentUser
+      setUser(freshUser)
+
+      if (freshUser) {
         try {
-          const snap = await getDoc(doc(db, 'users', user.uid))
+          const snap = await getDoc(doc(db, 'users', freshUser.uid))
           setStatus(snap.data()?.status ?? 'active')
         } catch {
           setStatus('active') // fail open, don't lock the user out on a read error
@@ -34,11 +50,19 @@ function ProtectedRoute({ children }: Props) {
   }, [])
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>
+    // Blank on purpose — this can flash briefly on back-navigation while
+    // auth state resolves, and shouldn't reveal any page shell or text.
+    return null
   }
 
   if (!user) {
     return <Navigate to="/" replace />
+  }
+
+  const isGoogleUser = user.providerData.some((p) => p.providerId === 'google.com')
+
+  if (!isGoogleUser && !user.emailVerified) {
+    return <Navigate to="/verify-email" replace />
   }
 
   if (status === 'deactivated') {

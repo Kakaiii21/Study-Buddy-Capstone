@@ -362,7 +362,7 @@
           <button
 id='goBackBtn-mobile'
                 title="Go Back to Courses"
-                onClick={() => navigate('/courses')}
+                onClick={() => navigate('/myFiles')}
                 className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
                 <div id='goBackBtn' className='lg:hidden flex flex-col justify-center items-center '>
@@ -399,7 +399,7 @@ id='goBackBtn-mobile'
                     <button
                       id='goBackBtn-desktop'
                       title="Go Back to Courses"
-                      onClick={() => navigate('/courses')}
+                      onClick={() => navigate('/myFiles')}
                       className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded hover:bg-gray-100 transition"
                     >
                       <div className='flex flex-col justify-center  items-center '>

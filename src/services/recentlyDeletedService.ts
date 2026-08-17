@@ -92,13 +92,13 @@ export async function fetchRecentlyDeleted(uid: string): Promise<DeletedItem[]> 
 
 // ─── Restore ─────────────────────────────────────────────────────────────────
 export async function restoreItem(uid: string, item: DeletedItem): Promise<void> {
-  const isCourseFile = item.originalCollection.includes('/courses/') &&
+  const isCourseFile = item.originalCollection.includes('/myFiles/') &&
     item.originalCollection.endsWith('/files')
 
   if (isCourseFile) {
     const parts = item.originalCollection.split('/')
     const courseId = parts[3]
-    const coursePath = `users/${uid}/courses/${courseId}`
+    const coursePath = `users/${uid}/myFiles/${courseId}`
     const courseSnap = await getDoc(doc(db, coursePath))
 
     if (!courseSnap.exists()) {

@@ -85,7 +85,7 @@ export function useCourses(user: User | null) {
         return softDelete(user.uid, {
           name: fileData.fileName,
           type: 'Course',
-          originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+          originalCollection: `users/${user.uid}/myFiles/${courseId}/files`,
           originalDocId: fileDoc.id,
           cloudinaryPublicId: fileData.publicId,
           data: { ...fileData, id: fileDoc.id },
