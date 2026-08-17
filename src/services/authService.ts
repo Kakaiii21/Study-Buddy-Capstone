@@ -77,6 +77,20 @@ export const sendVerificationEmail = async (email: string) => {
   }
 }
 
+// CHECK EMAIL STATUS
+export const checkEmailStatus = async (email: string) => {
+  const response = await fetch(`${FUNCTIONS_BASE}/checkEmailStatus`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  if (!response.ok) {
+    const data = await response.json()
+    throw { code: data.code || 'auth/unknown', message: data.error }
+  }
+  return response.json() as Promise<{ exists: boolean; verified: boolean }>
+}
+
 // PASSWORD RESET (Forgot Password + Change Password)
 export const resetPassword = async (email: string) => {
   const response = await fetch(SEND_PASSWORD_RESET_URL, {

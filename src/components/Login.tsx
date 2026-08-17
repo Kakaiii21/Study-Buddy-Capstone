@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { onAuthChange } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
-import { login } from '../services/authService'
+import { login, sendVerificationEmail } from '../services/authService'
 import { getAuth } from 'firebase/auth'
 import { googleLogin } from '../services/authService'
 
@@ -118,9 +118,22 @@ const [passwordUpdated] = useState<boolean>(() => {
 
     // in Login.tsx, handleLogin:
     if (!user.emailVerified) {
+      let resendMessage = "Please verify your email first. We've sent a new verification link to your inbox."
+      try {
+        await sendVerificationEmail(email)
+      } catch (resendErr: unknown) {
+        // Cooldown or send failure — still tell the user why login failed,
+        // just without claiming a new email went out.
+        const code = typeof resendErr === 'object' && resendErr !== null && 'code' in resendErr
+          ? (resendErr as { code: string }).code
+          : ''
+        resendMessage = code === 'auth/too-many-requests'
+          ? 'Please verify your email first. A verification link was already sent recently — please check your inbox.'
+          : 'Please verify your email first. Check your inbox for the verification link.'
+      }
       sessionStorage.setItem('intentionalLogout', 'true')
       await getAuth().signOut()
-      setFieldErrors(prev => ({ ...prev, email: 'Please verify your email first. Check your inbox.' }))
+      setFieldErrors(prev => ({ ...prev, email: resendMessage }))
       return
     }
 

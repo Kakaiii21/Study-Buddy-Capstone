@@ -1,8 +1,8 @@
-import { useEffect ,useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { onAuthChange } from '../services/authService'
 import { signup } from '../services/authService'
 import { googleLogin } from '../services/authService'
+import { checkEmailStatus } from '../services/authService'
 
 type FieldErrors = {
   firstName: string
@@ -49,20 +49,6 @@ function PasswordRequirements({ password }: { password: string }) {
 }
 function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     const navigate = useNavigate()
-
-    useEffect(() => {
-      const unsubscribe = onAuthChange((user) => {
-        if (user) {
-          if (user.emailVerified) {
-            navigate('/dashboard', { replace: true })
-          } else {
-            navigate('/verify-email', { replace: true })
-          }
-        }
-      })
-      return () => unsubscribe()
-    }, [])
-
 
   const [passwordFocused, setPasswordFocused] = useState(false)
 
@@ -211,7 +197,17 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
       setLoading(false)
       const firebaseError = err as { code: string }
       if (firebaseError.code === 'auth/email-already-in-use') {
-        setFieldErrors(prev => ({ ...prev, email: 'Email is already in use.' }))
+        try {
+          const { verified } = await checkEmailStatus(email)
+          setFieldErrors(prev => ({
+            ...prev,
+            email: verified
+              ? 'Email is already in use.'
+              : 'This email is already registered but not verified. Check your inbox, or log in to resend the verification email.'
+          }))
+        } catch {
+          setFieldErrors(prev => ({ ...prev, email: 'Email is already in use.' }))
+        }
       } else {
         setFieldErrors(prev => ({ ...prev, email: 'Something went wrong. Please try again.' }))
       }

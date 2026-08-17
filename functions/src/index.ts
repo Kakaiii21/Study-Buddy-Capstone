@@ -461,7 +461,30 @@ export const sendVerificationEmail = onRequest(
     }
   }
 )
+// ── CHECK EMAIL STATUS ───────────────────────────────────────────────────────
+export const checkEmailStatus = onRequest(
+  { timeoutSeconds: 30, memory: '256MiB' },
+  async (req, res) => {
+    setCors(res)
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+    try {
+      const { email } = req.body as { email?: string }
+      if (!email) { res.status(400).json({ error: 'Email is required' }); return }
 
+      try {
+        const userRecord = await admin.auth().getUserByEmail(email)
+        res.status(200).json({ exists: true, verified: userRecord.emailVerified })
+      } catch {
+        res.status(200).json({ exists: false, verified: false })
+      }
+    } catch (err: unknown) {
+      console.error('checkEmailStatus error:', err)
+      const message = err instanceof Error ? err.message : 'Internal server error'
+      res.status(500).json({ error: message })
+    }
+  }
+)
 // ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
 export const sendChangeEmail = onRequest(
   { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
