@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { getAuth, sendEmailVerification, reload } from 'firebase/auth'
+import { getAuth, reload } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { sendVerificationEmail } from '../services/authService'
+
 
 function VerifyEmail() {
   const auth = getAuth()
@@ -44,25 +46,33 @@ useEffect(() => {
   setChecking(false)
 }
 
-  const handleResend = async () => {
-    const user = auth.currentUser
-    if (!user) return
+const handleResend = async () => {
+  const user = auth.currentUser
+  if (!user || !user.email) return
 
-    try {
-      setLoading(true)
-      setError('')
-      await sendEmailVerification(user)
-      setMessage('Verification email resent! Check your inbox.')
-    } catch {
-      setError('Could not resend email. Please try again later.')
-    } finally {
-      setLoading(false)
+  try {
+    setLoading(true)
+    setError('')
+    setMessage('')
+    await sendVerificationEmail(user.email)
+    setMessage('Verification email resent! Check your inbox.')
+  } catch (err) {
+    let message = 'Could not resend email. Please try again later.'
+    if (err && typeof err === 'object') {
+      const e = err as { code?: string; message?: string }
+      if (e.code === 'auth/too-many-requests' || e.message?.includes('wait')) {
+        message = e.message ?? message
+      }
     }
+    setError(message)
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="bg-white p-8 lg:p-4 xl:p-5 2xl:p-6 3xl:p-10 rounded-xl  md:bg-pink-800 lg:bg-white
+      <div className="bg-white p-8 lg:p-4 xl:p-5 2xl:p-6 3xl:p-10 rounded-xl 
       shadow-[0_0px_40px_rgba(0,0,0,.30)]
        w-full lg:w-[350px] xl:w-[450px] 2xl:w-[550px] 3xl:w-[650px] text-center">
 

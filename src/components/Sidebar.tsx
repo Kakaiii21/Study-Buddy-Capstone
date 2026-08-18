@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { logout } from '../services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
-
+import { useHelpBuddy } from '../context/useHelpBuddy'
 type Props = {
   uploading?: boolean
   quizActive?: boolean
@@ -15,9 +15,23 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-
+const { openHelpModal } = useHelpBuddy()
   const isOpen = isOpenInternal || isOpenExternal   // ← merged state
+const catGifs = ['/CatLove.gif', '/CatCry.gif', '/CatLaugh.gif']
 
+const [currentGif, setCurrentGif] = useState(catGifs[0])
+
+useEffect(() => {
+  const pickRandom = () => {
+    setCurrentGif(prev => {
+      const options = catGifs.filter(g => g !== prev) // avoid repeating the same one back-to-back
+      return options[Math.floor(Math.random() * options.length)]
+    })
+  }
+
+  const interval = setInterval(pickRandom, 10 * 1000) // every 1 min
+  return () => clearInterval(interval)
+}, [])
   const close = () => {
     setIsOpenInternal(false)
     onExternalClose?.()
@@ -164,17 +178,36 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
                 <button
                   onClick={() => !isBlocked && setShowLogoutModal(true)}
                   className="
-                     w-full text-left py-2 lg:py-1 pl-1   mb-1
+                     w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
                     font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
-                    transition-colors duration-200 rounded-lg
-                    flex items-center gap-2 
+                    transition-colors duration-200  rounded-md
+                    flex items-center gap-2 justs 
                     text-white hover:bg-[#4A4A49]
                   "
                 >
-                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9  shrink-0 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
+                  <img src="/sideIcons/logoutR.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
                   Logout
                 </button>
               </div>
+
+<div className='mt-3 flex flex-col justify-center items-center mb-3'>
+<img
+  src={currentGif}
+  alt=""
+  className='w-52 relative lg:w-32 2xl:w-44 2xl:-mt-[45px] 3xl:w-56 3xl:-mt-10 z-10 lg:-mt-[40px] -mt-[70px] select-none pointer-events-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}
+/>
+  <button
+    onClick={openHelpModal}
+    className='uppercase bg-[#FEE248] py-2  hover:opacity-70
+    text-sm lg:text-[10px] 2xl:text-[14px] 2xl:py-2 2xl:px-3 2xl:-mt-12 3xl:text-lg 3xl:-mt-16 3xl:py-3 lg:-mt-9 lg:px-2 lg:py-1 px-4 rounded-md font-inter font-bold text-[#675C21] -mt-14'
+  >
+    Help your Buddy
+  </button>
+  <p className='font-inter font-normal text-white  text-[8px] lg:text-[5px] 2xl:text-[7px] 3xl:text-[9px] mt-1'>ANIMATION BY ABDUL LATIF</p>
+</div>
+{/* no HelpBuddyModal line here — it's auto-rendered by HelpBuddyProvider at the app root */}
         </nav>
       </aside>
 

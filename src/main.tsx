@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { HelpBuddyProvider } from './context/HelpBuddyContext'
 import BfcacheGuard from './components/BfcacheGuard'
 import './index.css'
 import App from './App'
@@ -211,11 +212,13 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TimerProvider>
-      <BfcacheGuard />
-      <ExpiredAlert />
-      <EmailChangeWatcher /> 
-      <PasswordChangeWatcher /> 
-      <RouterProvider router={router} />
+      <HelpBuddyProvider>
+        <BfcacheGuard />
+        <ExpiredAlert />
+        <EmailChangeWatcher /> 
+        <PasswordChangeWatcher /> 
+        <RouterProvider router={router} />
+      </HelpBuddyProvider>
     </TimerProvider>
   </StrictMode>
 )

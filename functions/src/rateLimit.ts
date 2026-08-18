@@ -10,7 +10,7 @@ type LockResult = { allowed: boolean; retryAfter?: number }
 export async function acquireCooldown(
   key: string,
   cooldownSeconds: number,
-  maxProcessingSeconds = 240 // safety: unstick a lock if a request crashed without releasing
+  maxProcessingSeconds = 240
 ): Promise<LockResult> {
   const ref = admin.firestore().doc(`rateLimits/${key}`)
   const now = Date.now()
@@ -26,7 +26,6 @@ export async function acquireCooldown(
         if (pendingElapsed < maxProcessingSeconds) {
           return { allowed: false, retryAfter: Math.ceil(maxProcessingSeconds - pendingElapsed) }
         }
-        // stale pending lock (previous request crashed) — fall through and reclaim it
       } else if (data.status === 'cooldown') {
         const elapsed = (now - data.lastRequest) / 1000
         if (elapsed < cooldownSeconds) {
@@ -40,18 +39,15 @@ export async function acquireCooldown(
   })
 }
 
-/** Call after the request finishes. success=true starts the real cooldown; success=false frees the lock immediately. */
 export async function releaseCooldown(key: string, success: boolean): Promise<void> {
   const ref = admin.firestore().doc(`rateLimits/${key}`)
   if (success) {
     await ref.set({ status: 'cooldown', lastRequest: Date.now() })
   } else {
-    await ref.delete().catch(() => {}) // free it up so the user can retry right away
+    await ref.delete().catch(() => {})
   }
 }
 
-// ── Simple Firestore-based semaphore so concurrent users queue instead of ──
-// ── slamming Groq's rate limit all at once. ────────────────────────────────
 export async function acquireGroqSlot(
   maxConcurrent = 3,
   pollMs = 1500,
@@ -64,20 +60,16 @@ export async function acquireGroqSlot(
     const acquired = await admin.firestore().runTransaction(async (tx) => {
       const doc = await tx.get(ref)
       const data = doc.exists ? doc.data()! : { active: 0, updatedAt: 0 }
-
-      // self-heal: if "active" hasn't moved in a while, something crashed without releasing
       const stale = Date.now() - (data.updatedAt ?? 0) > 60000
       const active = stale ? 0 : (data.active ?? 0)
-
       if (active >= maxConcurrent) return false
       tx.set(ref, { active: active + 1, updatedAt: Date.now() })
       return true
     })
-
     if (acquired) return true
     await new Promise((r) => setTimeout(r, pollMs))
   }
-  return false // gave up waiting — caller should return 503 "try again"
+  return false
 }
 
 export async function releaseGroqSlot(): Promise<void> {

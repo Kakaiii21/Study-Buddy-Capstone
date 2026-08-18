@@ -433,10 +433,22 @@ export const sendVerificationEmail = onRequest(
     setCors(res)
     if (req.method === 'OPTIONS') { res.status(204).send(''); return }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return }
+
+    const { email } = req.body as { email: string }
+    if (!email) { res.status(400).json({ error: 'Email is required' }); return }
+
+    let succeeded = false
     try {
+      const cooldown = await acquireCooldown(`sendVerificationEmail:${email}`, 60)
+      if (!cooldown.allowed) {
+        res.status(429).json({
+          error: `Please wait ${cooldown.retryAfter}s before requesting another verification email.`,
+          code: 'auth/too-many-requests',
+        })
+        return
+      }
+
       const { Resend } = await import('resend')
-      const { email } = req.body as { email: string }
-      if (!email) { res.status(400).json({ error: 'Email is required' }); return }
       const verifyLink = await admin.auth().generateEmailVerificationLink(email, {
         url: 'https://studybuddyph.site/',
       })
@@ -453,11 +465,14 @@ export const sendVerificationEmail = onRequest(
           ${actionButton(verifyLink, 'Verify Email')}
         `),
       })
+      succeeded = true
       res.status(200).json({ success: true })
     } catch (err: unknown) {
       console.error('sendVerificationEmail error:', err)
       const message = err instanceof Error ? err.message : 'Internal server error'
       res.status(500).json({ error: message })
+    } finally {
+      await releaseCooldown(`sendVerificationEmail:${email}`, succeeded)
     }
   }
 )

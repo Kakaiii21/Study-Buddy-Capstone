@@ -3,8 +3,9 @@
 
 import { precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
-import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
+import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 
 declare const self: ServiceWorkerGlobalScope & {
   _notifTimers: Record<string, ReturnType<typeof setTimeout>>
@@ -30,6 +31,18 @@ registerRoute(
     url.hostname.includes('fonts.googleapis.com') ||
     url.hostname.includes('fonts.gstatic.com'),
   new StaleWhileRevalidate({ cacheName: 'fonts-cache' })
+)
+
+// GIFs excluded from precache (too large) — cached at runtime on first view instead
+registerRoute(
+  ({ url }) => url.pathname.endsWith('.gif'),
+  new CacheFirst({
+    cacheName: 'gif-assets',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+      new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 30 * 24 * 60 * 60 }),
+    ],
+  })
 )
 
 // ── Lifecycle ─────────────────────────────────────────────────

@@ -607,7 +607,7 @@ useEffect(() => {
                       disabled={coursesLoading || isGenerating || !isOnline}
                       className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
                     >
-                      {coursesLoading ? 'Loading...' : 'Course Files'}
+                      {coursesLoading ? 'Loading...' : 'My Files'}
                     </button>
                   </div>
                 </div>
