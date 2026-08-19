@@ -697,7 +697,7 @@ const coursesDesktop: DriveStep[] = [
   {
     element: '#courseSearchBar',
     popover: {
-      title: '🔍 Search Course Folder',
+      title: '🔍 Search  Folder',
       description: 'Quickly find a folder by typing part of its name here.',
       side: 'left',
     },
@@ -705,7 +705,7 @@ const coursesDesktop: DriveStep[] = [
   {
     element: '#coursesGrid',
     popover: {
-      title: '📁 Your Course Folders',
+      title: '📁 Your Folders',
       description: 'All your files folders live here. Click one to open it and see the files inside.',
       side: 'right',
     },
@@ -713,7 +713,7 @@ const coursesDesktop: DriveStep[] = [
   {
     element: '#courseFolder',
     popover: {
-      title: '📁 Course Folder',
+      title: '📁 File Folder',
       description:
         'Open this folder to view, upload, and organize your academic files.',
       side: 'right',
@@ -734,7 +734,7 @@ const coursesTablet: DriveStep[] = [
   {
     element: '#courseSearchBar',
     popover: {
-      title: '🔍 Search Course Folder',
+      title: '🔍 Search Files Folder',
       description: 'Quickly find a folder by typing part of its name here.',
       side: 'bottom',
     },
@@ -750,7 +750,7 @@ const coursesTablet: DriveStep[] = [
   {
     element: '#coursesGrid',
     popover: {
-      title: '📁 Your Course Folders',
+      title: '📁 Your Folders',
       description: 'All your files folders live here. Tap one to open it and see the files inside.',
       side: 'bottom',
     },
@@ -758,7 +758,7 @@ const coursesTablet: DriveStep[] = [
   {
     element: '#courseFolder',
     popover: {
-      title: '📁 Course Folder',
+      title: '📁 File Folder',
       description:
         'Open this folder to view, upload, and organize your academic files.',
       side: 'right',
@@ -779,7 +779,7 @@ const coursesMobile: DriveStep[] = [
   {
     element: '#courseSearchBar',
     popover: {
-      title: '🔍 Search Course Folder',
+      title: '🔍 Search Folders',
       description: 'Quickly find a folder by typing part of its name here.',
       side: 'bottom',
     },
@@ -795,7 +795,7 @@ const coursesMobile: DriveStep[] = [
   {
     element: '#coursesGrid',
     popover: {
-      title: '📁 Your Course Folders',
+      title: '📁 Your Files Folders',
       description: 'All your files folders live here. Tap one to open it and see the files inside.',
       side: 'bottom',
     },
@@ -803,7 +803,7 @@ const coursesMobile: DriveStep[] = [
   {
     element: '#courseFolder',
     popover: {
-      title: '📁 Course Folder',
+      title: '📁 Files Folder',
       description:
         'Open this folder to view, upload, and organize your academic files.',
       side: 'bottom',
@@ -825,7 +825,7 @@ const coursefolderDesktop: DriveStep[] = [
     popover: {
       title: '⬅️ Go Back',
       description:
-        'Click here anytime to return to the Course Folder.',
+        'Click here anytime to return to the Files Folder.',
       side: 'right',
     },
   },
@@ -841,7 +841,7 @@ const coursefolderDesktop: DriveStep[] = [
     element: '#uploadFilesBtn',
     popover: {
       title: '⬆️ Upload Files',
-      description: 'Click here to upload a new file to this course folder. Max 10 MB per file.',
+      description: 'Click here to upload a new file to this folder. Max 10 MB per file.',
       side: 'left',
     },
   },
@@ -878,7 +878,7 @@ const coursefolderTablet: DriveStep[] = [
     popover: {
       title: '⬅️ Go Back',
       description:
-        'Click here anytime to return to the Course Folder.',
+        'Click here anytime to return to the Files Folder.',
       side: 'right',
     },
   },
@@ -931,7 +931,7 @@ const coursefolderMobile: DriveStep[] = [
     popover: {
       title: '⬅️ Go Back',
       description:
-        'Click here anytime to return to the Course Folder.',
+        'Click here anytime to return to the Files Folder.',
       side: 'right',
     },
   },
@@ -989,7 +989,7 @@ const studygeneratorDesktop: DriveStep[] = [
   {
     element: '#courseFilesBtn',
     popover: {
-      title: '📁 Use a Course File',
+      title: '📁 Use a File',
       description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
       side: 'bottom',
     },
@@ -1057,7 +1057,7 @@ const studygeneratorTablet: DriveStep[] = [
   {
     element: '#courseFilesBtn',
     popover: {
-      title: '📁 Use a Course File',
+      title: '📁 Use a File',
       description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
       side: 'bottom',
     },
@@ -1117,7 +1117,7 @@ const studygeneratorMobile: DriveStep[] = [
   {
     element: '#courseFilesBtn',
     popover: {
-      title: '📁 Use a Course File',
+      title: '📁 Use a File',
       description: 'Already uploaded a file to one of your course folders? Pick it here instead.',
       side: 'bottom',
     },
@@ -1324,7 +1324,7 @@ const recentlydeletedDesktop: DriveStep[] = [
     element: '#filterTypeSelect',
     popover: {
       title: '🔀 Filter by Type',
-      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      description: 'Switch between To Do, Notes, Class Schedule, My Files, Quiz, and Flashcard items.',
       side: 'left',
     },
   },
@@ -1368,7 +1368,7 @@ const recentlydeletedTablet: DriveStep[] = [
     element: '#filterTypeSelect',
     popover: {
       title: '🔀 Filter by Type',
-      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      description: 'Switch between To Do, Notes, Class Schedule, My Files, Quiz, and Flashcard items.',
       side: 'left',
     },
   },
@@ -1412,7 +1412,7 @@ const recentlydeletedMobile: DriveStep[] = [
     element: '#filterTypeSelect',
     popover: {
       title: '🔀 Filter by Type',
-      description: 'Switch between To Do, Notes, Class Schedule, Course, Quiz, and Flashcard items.',
+      description: 'Switch between To Do, Notes, Class Schedule, My Files, Quiz, and Flashcard items.',
       side: 'bottom',
     },
   },

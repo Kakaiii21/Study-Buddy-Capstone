@@ -565,7 +565,7 @@ function OrphanRestoreModal({
         </p>
         <div className='bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-5'>
           <p className='text-xs text-blue-700'>
-            This file will be restored to a <span className='font-bold'>Restored Files</span> folder in your Courses instead.
+            This file will be restored to a <span className='font-bold'>Restored Files</span> folder in your My Files instead.
           </p>
         </div>
         <div className='flex gap-3 justify-end'>

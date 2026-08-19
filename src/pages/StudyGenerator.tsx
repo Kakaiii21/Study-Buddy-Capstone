@@ -114,7 +114,7 @@ function CoursePicker({
             <>
               {courses.length === 0 ? (
                 <p className='text-gray-400 font-roboto text-center py-10 3xl:text-lg'>
-                  No courses found. Create one in the Courses page first.
+                  No courses found. Create one in the My Files page first.
                 </p>
               ) : (
                 <div className='grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-3 gap-4 3xl:gap-6'>

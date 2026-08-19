@@ -190,7 +190,7 @@ const { startTour } = useTour(
 
               {/* Top Bar — mobile only */}
         <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Courses</p>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -208,7 +208,7 @@ const { startTour } = useTour(
         <div className="min-h-screen  w-full flex flex-col">
             <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Courses</p>
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>My Files</p>
           {/* Header */}
         <div className="flex flex-col w-full lg:flex lg:flex-row md:flex-row 
           px-14 sm:px-12 justify-center items-center py-1
@@ -431,7 +431,7 @@ const { startTour } = useTour(
                   <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
                 <p className='ml-12 md:ml-20 text-2xl font-bold font-roboto text-white uppercase'>
-                  Edit Course
+                  Edit Folder
                 </p>
               </div>
                 <div className='flex flex-row w-full gap-2'>

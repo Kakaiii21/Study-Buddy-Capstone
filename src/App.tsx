@@ -293,9 +293,9 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           draggable={false}
           />
           <div className='text-primary-600 font-inter'>
-            <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>Course</p>
+            <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>My Files</p>
             <p className=' mr-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Organize your subjects and
-            materials by course. Keep
+            materials by folders. Keep
             everything related to each class
             neatly grouped and easy to find.</p>
           </div>

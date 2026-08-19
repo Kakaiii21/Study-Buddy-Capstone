@@ -361,7 +361,7 @@
         <div  className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
           <button
 id='goBackBtn-mobile'
-                title="Go Back to Courses"
+                title="Go Back to My Files"
                 onClick={() => navigate('/myFiles')}
                 className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
               >
@@ -374,7 +374,7 @@ id='goBackBtn-mobile'
               <p className="hidden text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
                 {folderName}
               </p>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Courses</p>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -392,13 +392,13 @@ id='goBackBtn-mobile'
               <div className="min-h-screen  w-full flex flex-col">
                   <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
                   font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
-                  mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Courses</p>
+                  mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>My Files</p>
                 {/* Header */}
                 <div className='flex mt-1   lg:mt-0 flex-col md:flex-row  md:justify-between md:items-center  lg:justify-between lg:items-center w-full gap-3 mb-6 lg:mb-0'>
                   <div className="hidden   lg:flex items-center   gap-4">
                     <button
                       id='goBackBtn-desktop'
-                      title="Go Back to Courses"
+                      title="Go Back to My Files"
                       onClick={() => navigate('/myFiles')}
                       className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded hover:bg-gray-100 transition"
                     >
