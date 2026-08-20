@@ -34,7 +34,6 @@ function Dashboard() {
   const idCardRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { user } = useAuth()
-  // Auth guard — redirect if not logged in or email not verified
     useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, (user) => {
         if (!user) {
@@ -42,15 +41,15 @@ function Dashboard() {
         } else if (!user.emailVerified) {
           navigate('/verify-email', { replace: true })
         }
-        setAuthChecked(true)  // ← add this
+        setAuthChecked(true)  
       })
       return () => unsubscribe()
     }, [])
   const { startTour } = useTour(
     'dashboard',
     false,
-    () => setShowSidebar(true), // onOpenSidebar
-    () => setShowSidebar(false), // onCloseSidebar
+    () => setShowSidebar(true), 
+    () => setShowSidebar(false), 
     user
   )
   const { elapsedSeconds } = useTimerContext() 
@@ -65,8 +64,7 @@ function Dashboard() {
     return total === 0 ? 0 : Math.round((done / total) * 100)
   }, [tasks])
 
-  // Cached task progress — read synchronously on first render (before `user`
-  // resolves) so the bar never flashes to 0 on remount.
+
   const [initialCachedPercent] = useState<number>(() => {
     const uid = user?.uid ?? sessionStorage.getItem('lastUid')
     if (!uid) return 0
@@ -74,23 +72,14 @@ function Dashboard() {
     return cached ? Number(cached) : 0
   })
 
-  // Derived, not stored — swaps from the cached snapshot to the live value
-  // the moment tasksLoading flips to false. No setState needed here.
-  // Also guard on `user` itself: right after remounting (e.g. navigating
-  // back from another module), `user` can briefly still be null while
-  // useTasks already reports loading:false with an empty list — without
-  // this check that empty-list 0% would flash in and stomp the cached
-  // value until the real tasks load back in.
   const completedPercent = (!user || tasksLoading) ? initialCachedPercent : computedPercent
 
-  // keep lastUid fresh so the next remount can find the cache key
-  // even before useAuth resolves
+  
   useEffect(() => {
     if (!user) return
     sessionStorage.setItem('lastUid', user.uid)
   }, [user])
 
-  // sync the fresh value out to sessionStorage (external system) — no setState here
   useEffect(() => {
     if (!user || tasksLoading) return
     sessionStorage.setItem(`taskProgress_${user.uid}`, String(computedPercent))
@@ -106,7 +95,7 @@ function Dashboard() {
 
   const [showCustomize, setShowCustomize] = useState(false)
   const [cardColor, setCardColor] = useState('#D9CBF5')
-  const [formCardColor, setFormCardColor] = useState('#D9CBF5') // draft color while modal is open; only committed to cardColor on Save
+  const [formCardColor, setFormCardColor] = useState('#D9CBF5') 
 
   const [formFirstName, setFormFirstName] = useState('')
   const [formLastName, setFormLastName] = useState('')
@@ -119,7 +108,7 @@ function Dashboard() {
     setFormLastName(lastName ?? '')
     setFormAge(age !== null ? String(age) : '')
     setFormYearLevel(yearLevel ?? '')
-    setFormCardColor(cardColor) // reset draft to current saved color
+    setFormCardColor(cardColor) 
     setShowCustomize(true)
   }
 
@@ -193,8 +182,7 @@ function Dashboard() {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
   }
 
-  // Display-safe fallbacks — catches null AND empty string ('') so a saved-but-blank
-  // field never collapses the card layout; always renders a placeholder instead.
+
   const displayFirstName = firstName || '—'
   const displayLastName = lastName || '—'
   const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
@@ -247,7 +235,7 @@ const handleSaveCustomizeAll = async () => {
     if (numericAge !== null && numericAge !== age) await handleSaveCardField('age', numericAge)
     if (formYearLevel && formYearLevel !== yearLevel) await handleSaveCardField('yearLevel', formYearLevel)
     await handleSaveCardField('cardColor', formCardColor)
-    setCardColor(formCardColor) // commit draft color to the real dashboard card only on Save
+    setCardColor(formCardColor) 
 
     if (!hasCustomizedCard && user) {
       await updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true })
@@ -300,7 +288,6 @@ const handleSaveCustomizeAll = async () => {
         <p className='hidden md:flex w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto 
         font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
         mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
-        {/* Wrapper aligns ID card + stats row with the sections below (same max-w container) */}
         <div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
         <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
             
@@ -311,7 +298,7 @@ const handleSaveCustomizeAll = async () => {
           h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
           shadow-[0_5px_4px_-2px_rgba(0,0,0,0.25)]  group cursor-pointer'>
 
-          {/* Header strip — color now driven by cardColor */}
+          {/* Header strip*/}
           <div
             className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 relative'
             style={{ backgroundColor: cardColor }}
@@ -440,7 +427,7 @@ const handleSaveCustomizeAll = async () => {
     </div>
   </div>
 </div>
-{/* TASK PROGRESS heading with percent aligned right */}
+{/* TASK PROGRESS */}
 <div id='progressC' >
   <div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] lg:pr-3 mx-auto lg:mt-1 2xl:mt-5 3xl:mt-6 mt-6 sm:mt-5 md:mt-5'>
   <p className='font-inter font-semibold text-sm md:text-md 
@@ -502,7 +489,7 @@ className='relative flex flex-col justify-between text-left p-2
   </div>
 </div>
 </main>
- {/* Timer Panel — static column, lg+ only. Below lg the timer opens as its own page (/timer) */}
+ {/* Timer Panel  */}
  <div
    id='timer-panel'
    className='hidden lg:flex lg:flex-shrink-0 lg:h-full lg:w-[30%] xl:w-[30%] 2xl:w-[28%] 3xl:w-[26%]'
@@ -597,20 +584,20 @@ className='relative flex flex-col justify-between text-left p-2
                   <div className='flex gap-4'>
                     <div className='flex-1'>
                       <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Age</label>
-<input
-  type='number'
-  min={1}
-  max={99}
-  value={formAge}
-  onChange={(e) => {
-    const val = e.target.value
-    if (val === '' || (Number(val) >= 1 && Number(val) <= 99)) {
-      setFormAge(val)
-    }
-  }}
-  placeholder='Optional'
-  className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
-/>
+                        <input
+                          type='number'
+                          min={1}
+                          max={99}
+                          value={formAge}
+                          onChange={(e) => {
+                            const val = e.target.value
+                            if (val === '' || (Number(val) >= 1 && Number(val) <= 99)) {
+                              setFormAge(val)
+                            }
+                          }}
+                          placeholder='Optional'
+                          className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+                        />
                     </div>
                     <div className='flex-1'>
                       <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Year Level</label>
@@ -633,7 +620,6 @@ className='relative flex flex-col justify-between text-left p-2
                 </div>
               </div>
 
-              {/* Actions + color picker — reordered on mobile: color first, buttons last */}
               <div className='w-full md:w-56 flex flex-col gap-3'>
 
                 <p className='order-1 md:order-4 text-center font-inter text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
