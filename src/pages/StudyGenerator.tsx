@@ -10,7 +10,6 @@ import type { User } from 'firebase/auth'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useTour } from '../hooks/useTour'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadedFile {
   name: string
@@ -29,17 +28,15 @@ interface CourseFile {
   fileSize: string
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 const ACCEPTED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt']
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.txt'
 const ENQUEUE_URL = import.meta.env.VITE_STUDY_GENERATOR_ENQUEUE_URL as string
 const CANCEL_URL = import.meta.env.VITE_STUDY_GENERATOR_CANCEL_URL as string
-const COOLDOWN_MS = 2 * 60 * 1000 // 2 minutes
+const COOLDOWN_MS = 2 * 60 * 1000 
 const COOLDOWN_KEY = 'studygen_cooldown_until'
-const TICKET_KEY = 'studygen_ticket_id' // persists the in-flight ticket id across navigation/unmount
+const TICKET_KEY = 'studygen_ticket_id' 
 
-// Session storage keys
 export const SESSION_KEY_RESULT = 'studygen_result'
 
 function formatBytes(bytes: number): string {
@@ -53,7 +50,6 @@ function formatCountdown(seconds: number): string {
   const s = seconds % 60
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── Course Picker Modal ──────────────────────────────────────────────────────
 
@@ -114,7 +110,7 @@ function CoursePicker({
             <>
               {courses.length === 0 ? (
                 <p className='text-gray-400 font-roboto text-center py-10 3xl:text-lg'>
-                  No courses found. Create one in the My Files page first.
+                  No folders found. Create one in the My Files page first.
                 </p>
               ) : (
                 <div className='grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-3 gap-4 3xl:gap-6'>
@@ -145,7 +141,7 @@ function CoursePicker({
                 onClick={() => setSelectedCourseId(null)}
                 className='flex items-center gap-1 text-primary-600 font-roboto font-semibold text-sm 3xl:text-lg mb-4 hover:underline'
               >
-                ← Back to courses
+                ← Back to Folders
               </button>
 
               {loading ? (
@@ -215,7 +211,7 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
   const [queuePosition, setQueuePosition] = useState<number | null>(null)
   const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
   const [cooldownSeconds, setCooldownSeconds] = useState(0)
-  const [isSubmitting, setIsSubmitting] = useState(false) // guards against double-click before the server responds
+  const [isSubmitting, setIsSubmitting] = useState(false) 
 
   const [tourPreview, setTourPreview] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -223,7 +219,6 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
   const items = [10, 20, 30, 40, 50]
   const isOnline = useNetworkStatus()
 
-  //scroll sa div ng options
   const generateSectionRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (uploadedFile && generateSectionRef.current) {
@@ -234,7 +229,6 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
     }
   }, [uploadedFile])
 
-  // initialize cooldown from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(COOLDOWN_KEY)
     if (stored) {
@@ -243,14 +237,12 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
     }
   }, [])
 
-  // ── Listen to my ticket's status ─────────────────────────────────────────
   useEffect(() => {
     if (!ticketId) return
 
     const ref = doc(db, 'queueTickets', ticketId)
     const unsub = onSnapshot(ref, (snap) => {
       if (!snap.exists()) {
-        // ticket no longer exists server-side (expired/purged) — don't leave a stale id around
         localStorage.removeItem(TICKET_KEY)
         setQueueStatus('idle')
         setTicketId(null)
@@ -282,7 +274,6 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
 
         const path = data.mode === 'quiz' ? '/studyGenerator/Quiz' : '/studyGenerator/Flashcard'
 
-        // brief delay so the "ready" banner is visible for a beat before navigating away
         setTimeout(() => {
           navigate(path, { state: sessionData })
         }, 400)
@@ -309,7 +300,6 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
     return () => unsub()
   }, [ticketId])
 
-  // ── Live position + estimated wait ───────────────────────────────────────
   useEffect(() => {
     if (!ticketNumber || queueStatus !== 'queued') return
 
@@ -325,7 +315,6 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
     return () => unsub()
   }, [ticketNumber, queueStatus])
 
-  // ── countdown ticker ────────────────────────────────────────────────
   function startCooldownTimer(seconds: number) {
     setCooldownSeconds(seconds)
     if (cooldownRef.current) clearInterval(cooldownRef.current)
@@ -342,13 +331,11 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
     }, 1000)
   }
 
-  // clear interval on unmount
   useEffect(() => {
     return () => { if (cooldownRef.current) clearInterval(cooldownRef.current) }
   }, [])
 
-  // ── Restore on mount: finished result takes priority, otherwise resume a live ticket ──
-// ── Restore a finished result on mount, if one exists (ticket restore now happens via lazy init above) ──
+
 useEffect(() => {
   const saved = sessionStorage.getItem(SESSION_KEY_RESULT)
   if (saved) {
@@ -364,7 +351,6 @@ useEffect(() => {
 }, [])
 
 
-  // ── Local file handling ───────────────────────────────────────────────────
 
   const handleLocalFile = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return
@@ -399,9 +385,9 @@ useEffect(() => {
     if (!selectItems) { setFileError('Please select the number of items.'); return }
     if (!isOnline) { setFileError('You are offline. Please reconnect to generate.'); return }
     if (cooldownSeconds > 0) return
-    if (isSubmitting) return // extra guard in case of rapid double-clicks
+    if (isSubmitting) return 
 
-    setIsSubmitting(true) // disable immediately, before any await
+    setIsSubmitting(true)
     setFileError('')
     setSuggestedMax(null)
     sessionStorage.removeItem(SESSION_KEY_RESULT)
@@ -448,14 +434,14 @@ useEffect(() => {
       }
 
       setTicketId(data.ticketId)
-      localStorage.setItem(TICKET_KEY, data.ticketId) // survive navigation/unmount
+      localStorage.setItem(TICKET_KEY, data.ticketId) 
       setQueuePosition(data.position)
       setQueueStatus('queued')
     } catch (err) {
       console.error(err)
       setFileError('Network error. Please check your connection and try again.')
     } finally {
-      setIsSubmitting(false) // always release the lock, success or failure
+      setIsSubmitting(false) 
     }
   }
 
@@ -708,7 +694,6 @@ useEffect(() => {
                       {items.map((item) => (
                         <option key={item} value={item}>{item}</option>
                       ))}
-                      {/* Add suggested max as an option if it's not already in the list */}
                       {suggestedMax && !items.includes(suggestedMax) && (
                         <option key={`suggested-${suggestedMax}`} value={suggestedMax}>
                           {suggestedMax}
