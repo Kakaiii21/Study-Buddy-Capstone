@@ -23,7 +23,6 @@ const COLUMNS: { id: Status; label: string }[] = [
   { id: 'done',        label: 'DONE' },
 ]
 
-// ── Date/time helpers ─────────────────────────
 
 function getNowISO(): string {
   const now = new Date()
@@ -32,7 +31,6 @@ function getNowISO(): string {
 }
 
 
-/** "YYYY-MM-DDTHH:MM"  →  "MM/DD/YYYY H:MM AM/PM" */
 function toDisplayFormat(storage: string): string {
   if (!storage) return ''
   const [datePart, timePart] = storage.split('T')
@@ -45,7 +43,6 @@ function toDisplayFormat(storage: string): string {
   return `${mm}/${dd}/${yyyy} ${h}:${mStr} ${ampm}`
 }
 
-/** "MM/DD/YYYY" → "YYYY-MM-DD" */
 function toStorageDateOnly(display: string): string {
   const parts = display.split('/')
   if (parts.length !== 3 || parts[2].length !== 4) return ''
@@ -72,7 +69,6 @@ function isValidDate(display: string): boolean {
   return date.getFullYear() === yyyy && date.getMonth() === mm - 1 && date.getDate() === dd
 }
 
-/** "MM/DD/YYYY" + "HH:MM" → "YYYY-MM-DDTHH:MM" */
 function buildStorageValue(dateDisplay: string, time: string): string {
   const datePart = toStorageDateOnly(dateDisplay)
   if (!datePart) return ''
@@ -283,18 +279,18 @@ function TaskModal({
             />
           </div>
 
-<input
-  aria-label="time"
-  type="time"
-  value={taskTime}
-  onChange={(e) => handleTimeChange(e.target.value)}
-  className={`border-2 rounded-md py-3 px-3 w-full font-mono 
-  lg:text-sm lg:py-1 lg:rounded-sm
-  xl:text-[15px] xl:py-2
-  2xl:text-[16px]
-  3xl:text-lg
-    ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
-/>
+          <input
+            aria-label="time"
+            type="time"
+            value={taskTime}
+            onChange={(e) => handleTimeChange(e.target.value)}
+            className={`border-2 rounded-md py-3 px-3 w-full font-mono 
+            lg:text-sm lg:py-1 lg:rounded-sm
+            xl:text-[15px] xl:py-2
+            2xl:text-[16px]
+            3xl:text-lg
+              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+          />
         </div>
 
         {dateError && <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>}
@@ -579,7 +575,7 @@ function TaskCard({
   )
 }
 
-// ── Drag Overlay Card (rendered above everything) ──
+// ── Drag Overlay Card 
 
 function DragCard({ task }: { task: Task }) {
   const nowISO = getNowISO()
@@ -650,7 +646,6 @@ function Column({
         </button>
       </div>
 
-      {/* Smooth collapse using grid-rows trick — no overflow-hidden on outer so dragged cards aren't clipped */}
       <div
 
         style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
@@ -750,14 +745,14 @@ function ToDoList() {
   }
 
   async function handleAddSave(name: string, deadline: string) {
-    setIsAddModalOpen(false)  // close immediately
-    addTask(name, deadline)   // fire and forget
+    setIsAddModalOpen(false) 
+    addTask(name, deadline)   
   }
 
   async function handleEditSave(name: string, deadline: string) {
     if (!editingTask) return
-    setEditingTask(null)      // close immediately
-    updateTask(editingTask.id, { name, deadline })  // fire and forget
+    setEditingTask(null)    
+    updateTask(editingTask.id, { name, deadline })  
   }
 
   function handleDeleteClick(id: string, name: string) {
@@ -959,7 +954,6 @@ function ToDoList() {
                 ))}
               </div>
 
-              {/* Renders the dragged card in a portal above everything */}
               <DragOverlay dropAnimation={null}>
                 {activeTask ? (
                   <DragCard task={activeTask} />
