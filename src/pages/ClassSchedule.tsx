@@ -181,9 +181,7 @@ function ScheduleFab({ onClearAll, onAddSchedule, disabled }: {
   )
 }
 
-// One row inside the "Schedule Meetings" section of the Add/Edit Class modal.
-// `id` carries the underlying Firestore doc id when editing an existing meeting;
-// `key` is a stable React key that survives even for brand-new (unsaved) rows.
+
 interface MeetingRow {
   key: string
   id?: string
@@ -203,15 +201,10 @@ const newMeetingRow = (): MeetingRow => ({
   roomType: '',
 })
 
-// Minimum required gap (in minutes) between any two class meetings on the
-// same day. 0 means back-to-back scheduling is allowed (a class ending at
-// 8:00 AM and another starting at 8:00 AM is NOT a conflict) — only true
-// time-range overlaps are blocked. Raise this if you want a mandatory
-// passing-time buffer between classes instead.
+
 const MIN_GAP_MINUTES = 0
 
-// Minimum allowed duration (in minutes) for a single meeting slot. Guards
-// against accidental tiny/garbage entries like a 1-minute "class".
+
 const MIN_DURATION_MINUTES = 15
 
 function ClassSchedule() {
@@ -261,10 +254,7 @@ const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   const addMeetingRow = () => setMeetings((prev) => [...prev, newMeetingRow()])
 
-  // Any row can now be removed — including the last remaining one — since
-  // deletion is the only way to drop a slot now that there's no separate
-  // enable/disable toggle. If the user empties the list, "Add Another Day"
-  // is still available to start over.
+
 const [confirmRemoveKey, setConfirmRemoveKey] = useState<string | null>(null)
 
 const removeMeetingRow = (key: string) => {
@@ -301,22 +291,15 @@ const removeMeetingRow = (key: string) => {
         row.timeStart && row.timeEnd &&
         toMinutes(row.timeEnd) - toMinutes(row.timeStart) < MIN_DURATION_MINUTES
       ) {
-        // Catches accidental/garbage entries like a 1-minute class.
         errs.timeEnd = `Class must be at least ${MIN_DURATION_MINUTES} minutes long`
       }
       if (Object.keys(errs).length > 0) newRowErrors[row.key] = errs
     })
 
-    // Conflict check: each active row against other classes' schedules,
-    // and against the other rows being saved in this same class.
-    // A required gap (MIN_GAP_MINUTES) is applied on both sides of every
-    // comparison range so that back-to-back slots with zero gap between
-    // them (e.g. 12:21–12:22 followed immediately by 12:22–12:50) are also
-    // flagged, not just true overlaps.
+   
     activeRows.forEach((row, i) => {
       if (!row.day || !row.timeStart || !row.timeEnd) return
-      // Skip conflict check if this row already failed basic validation
-      // (e.g. end <= start), since the times aren't meaningful yet.
+     
       if (newRowErrors[row.key]?.timeEnd || newRowErrors[row.key]?.timeStart) return
 
       const rowStart = toMinutes(row.timeStart)
@@ -384,8 +367,7 @@ const removeMeetingRow = (key: string) => {
     setShowClearModal(false)
   }
 
-  // Opens the modal pre-filled with every meeting that belongs to this class,
-  // so all of a subject's day/time/room slots are edited together.
+
   const handleEditOpen = (classId: string) => {
     const rows = schedules.filter((s) => s.classId === classId)
     if (rows.length === 0) return
@@ -576,7 +558,6 @@ const DayCard = ({ day }: { day: string }) => {
 
               </div>
           </div>
-          {/* <hr className='hidden md:block sm:block w-full border-t mt-3 border-primary-600 mb-6' /> */}
 
           {/* Add / Edit Class Modal */}
 {isAddSubOpen && (
@@ -643,8 +624,7 @@ const DayCard = ({ day }: { day: string }) => {
                     <div className='space-y-3'>
                       {meetings.map((row) => {
                         const rowErrs = rowErrors[row.key]
-                        // De-duplicate, since timeStart/timeEnd conflict messages
-                        // are often set together but shouldn't repeat visually.
+      
                         const errorMessages = rowErrs
                           ? Array.from(new Set(Object.values(rowErrs)))
                           : []
@@ -850,7 +830,7 @@ const DayCard = ({ day }: { day: string }) => {
             />
           )}
 
-        {/* Soft Delete Modal — rendered at root level, outside DayCard */}
+        {/* Soft Delete Modal */}
         {pendingDelete && (
           <SoftDeleteModal
             itemName={pendingDelete.name}
