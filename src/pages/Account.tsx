@@ -53,7 +53,7 @@ const { startTour } = useTour(
 
         <div className='flex flex-1 overflow-hidden flex-col lg:flex-row'>
 
-          {/* Left — nav menu, HIDDEN on mobile/tablet */}
+          {/* Left */}
 <div className='hidden lg:flex lg:flex-1 flex-col overflow-auto pt-0 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.15)] relative z-10'>
           <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-2
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
@@ -125,7 +125,7 @@ const { startTour } = useTour(
         </div>
       </div>
 
-{/* Bottom nav — ONLY on mobile/tablet */}
+{/* Bottom nav  */}
 <div className='lg:hidden fixed bottom-0 left-0 right-0 bg-primary-800 border-t border-gray-200 shadow-[0_-8px_16px_-4px_rgba(0,0,0,0.08)] z-20'>
     <div className='flex items-stretch justify-around px-1 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]'>
 
