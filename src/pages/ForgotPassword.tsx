@@ -20,7 +20,7 @@ function ForgotPassword() {
 
     try {
       setLoading(true)
-      await resetPassword(email) // ← changed
+      await resetPassword(email) 
       setSuccess('Password reset link sent! Check your inbox.')
       setEmail('')
     } catch (err) {
