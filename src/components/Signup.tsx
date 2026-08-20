@@ -58,7 +58,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  // ✅ Terms agreement state
+  //  Terms agreement state
   const [agreed, setAgreed] = useState(false)
   const [agreedTouched, setAgreedTouched] = useState(false)
 
@@ -136,7 +136,6 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
   const handleChange = (field: keyof FieldErrors, value: string) => {
     const newValues = { ...currentValues, [field]: value }
 
-    // Update the state value
     const setters = {
       firstName: setFirstName,
       lastName: setLastName,
@@ -146,12 +145,10 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     }
     setters[field](value)
 
-    // Mark as touched and validate immediately
     setTouched(prev => ({ ...prev, [field]: true }))
     const error = validateField(field, newValues)
     setFieldErrors(prev => ({ ...prev, [field]: error }))
 
-    // Also re-validate confirmPassword live when password changes
     if (field === 'password') {
       const confirmError = validateField('confirmPassword', newValues)
       setFieldErrors(prev => ({ ...prev, confirmPassword: touched.confirmPassword ? confirmError : prev.confirmPassword }))
@@ -219,7 +216,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
-{/* MOBILE HEADER - visible only on mobile */}
+{/* MOBILE HEADER */}
 <div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
   <h1 className="text-white font-inter font-extrabold text-3xl">
     Welcome To Study Buddy!
@@ -387,11 +384,9 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             placeholder="Enter Your Password"
           />
 
-          {/* Show checklist ONLY while focused */}
           {passwordFocused && (
             <PasswordRequirements password={password} />
           )}
-          {/* Show single error ONLY when blurred and invalid */}
           {!passwordFocused && touched.password && fieldErrors.password && (
             <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs  mb-2 px-1">⚠ {fieldErrors.password}</p>
           )}
@@ -416,7 +411,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
             <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mb-4 px-1">⚠ {fieldErrors.confirmPassword}</p>
           )}
 
-          {/* ✅ TERMS & PRIVACY CHECKBOX */}
+          {/* TERMS & PRIVACY CHECKBOX */}
           <div className="mb-4 mt-2">
             <label className="flex font-inter items-start gap-2 cursor-pointer">
               <input
@@ -446,7 +441,6 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
                 .
               </span>
             </label>
-            {/* ✅ Show error if they try to sign up without checking */}
             {agreedTouched && !agreed && (
               <p className="text-red-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[13px] text-xs mt-1 px-1">⚠ You must agree to the Terms of Service and Privacy Policy.</p>
             )}
