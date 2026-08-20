@@ -386,7 +386,7 @@ useEffect(() => {
                       onClick={() => setIsDropdownOpen((prev) => !prev)}
                       className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm'
                     >
-                      <span className='truncate'>{selectedSubject === 'All Categories' ? 'All Subjects' : selectedSubject}</span>
+                      <span className='truncate'>{selectedSubject === 'All Categories' ? 'All Categories' : selectedSubject}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                       </svg>
@@ -542,7 +542,7 @@ useEffect(() => {
 
               <div className='flex flex-col gap-y-5 mt-5'>
                 <div className='flex items-center gap-2 lg:gap-4 md:gap-4'>
-                  {/* + Subject Button */}
+                  {/* + Category Button */}
                   <button
                     id='addSubjectBtn'
                     aria-label='add Sub'
@@ -558,7 +558,7 @@ useEffect(() => {
                   </button>
                 </div>
 
-                {/* Subject Buttons */}
+                {/* Category Buttons */}
                 <div id='subjectDropdown' className='flex flex-col gap-2'>
                   <button
                     onClick={() => setSelectedSubject('All Categories')}
@@ -645,7 +645,7 @@ useEffect(() => {
             </div>
           )}
 
-          {/* ── Add Subject Modal ── */}
+          {/* ── Add Category Modal ── */}
           {isSubjectModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
@@ -656,12 +656,12 @@ useEffect(() => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <p className='text-2xl font-bold uppercase text-primary-600 text-center mb-6'>
-                  Add A Subject Name
+                  Add A Category Name
                 </p>
                 <input
                   className='w-full border-2 border-primary-600 rounded-md px-3 py-3 mb-4'
                   type='text'
-                  placeholder='Enter Subject Name'
+                  placeholder='Enter Category Name'
                   value={subjectName}
                   onChange={(e) => setSubjectName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
@@ -686,7 +686,7 @@ useEffect(() => {
             </div>
           )}
 
-          {/* ── Delete Subject Confirmation Modal ── */}
+          {/* ── Delete Category Confirmation Modal ── */}
           {deleteSubjectConfirm && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
@@ -697,7 +697,7 @@ useEffect(() => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <p className='text-xl font-bold text-primary-600 uppercase text-center'>
-                  Remove Subject?
+                  Remove Category?
                 </p>
                 <p className='text-sm text-gray-500 text-center'>
                   <span
@@ -706,7 +706,7 @@ useEffect(() => {
                   >
                     "{deleteSubjectConfirm}"
                   </span>
-                  will be removed. Notes tagged with this subject will be moved to <span className='font-semibold'>All Categories</span>.
+                  will be removed. Notes tagged with this category will be moved to <span className='font-semibold'>All Categories</span>.
                 </p>
                 <div className='flex gap-4 w-full mt-2'>
                   <button
@@ -753,7 +753,7 @@ useEffect(() => {
                       <p className='text-sm text-right text-primary-600 font-semibold pt-2 shrink-0 max-w-[120px] truncate'>{displaySubject}</p>
                     ) : (
                       <select
-                        aria-label='Select subject'
+                        aria-label='Select category'
                         value={displaySubject}
                         onChange={(e) => setNoteSubject(e.target.value)}
                         className='shrink-0 max-w-[100px] border-2
@@ -848,7 +848,7 @@ useEffect(() => {
                       <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
                     ) : (
                       <select
-                        aria-label='Select subject'
+                        aria-label='Select category'
                         value={displaySubject}
                         onChange={(e) => setNoteSubject(e.target.value)}
                         className='max-w-52 border-2 mr-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'

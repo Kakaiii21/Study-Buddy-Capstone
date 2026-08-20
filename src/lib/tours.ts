@@ -416,16 +416,16 @@ const notesDesktop: DriveStep[] = [
   {
     element: '#addSubjectBtn',
     popover: {
-      title: '➕ Add a Subject',
-      description: 'Create a new subject to organize your notes by class or topic.',
+      title: '➕ Add a Category',
+      description: 'Create a new category to organize your notes by class or topic.',
       side: 'left',
     },
   },
   {
     element: '#subjectDropdownDesktop',
     popover: {
-      title: '🗂️ Filter by Subject',
-      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
+      title: '🗂️ Filter by Category',
+      description: 'Use this dropdown to view notes from a specific category, or see all of them at once.',
       side: 'left',
     },
   },
@@ -458,25 +458,8 @@ const notesDesktop: DriveStep[] = [
 
 // ─── Notes Tablet (md, 768px–1023px) ────────────────────────────────────────
 const notesTablet: DriveStep[] = [
-
   {
-    element: '#addSubjectBtnMobile',
-    popover: {
-      title: '➕ Add a Subject',
-      description: 'Create a new subject to organize your notes by class or topic.',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#subjectDropdown',
-    popover: {
-      title: '🗂️ Filter by Subject',
-      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
-      side: 'bottom',
-    },
-  },
-  {
-    element: '#notesSearchBar',
+    element: '#notesSearchBarMobile',
     popover: {
       title: '🔍 Search Notes',
       description: 'Quickly find a note by typing part of its title here.',
@@ -484,7 +467,24 @@ const notesTablet: DriveStep[] = [
     },
   },
   {
-    element: '#newNoteBtnDesktop',
+    element: '#addSubjectBtnMobile',
+    popover: {
+      title: '➕ Add a Category',
+      description: 'Create a new category to organize your notes by class or topic.',
+      side: 'bottom',
+    },
+  },
+  {
+    element: '#subjectDropdown',
+    popover: {
+      title: '🗂️ Filter by Category',
+      description: 'Use this dropdown to view notes from a specific category, or see all of them at once.',
+      side: 'bottom',
+    },
+  },
+
+  {
+    element: '#newNoteBtnMobile',
     popover: {
       title: '📝 Create a Note',
       description: 'Tap here to write a new note.',
@@ -496,7 +496,7 @@ const notesTablet: DriveStep[] = [
     popover: {
       title: '📚 Your Notes',
       description: 'Tap any note card to view it in full.',
-      side: 'bottom',
+      side: 'left',
     },
   },
   {
@@ -522,16 +522,16 @@ const notesMobile: DriveStep[] = [
   {
     element: '#addSubjectBtnMobile',
     popover: {
-      title: '➕ Add a Subject',
-      description: 'Create a new subject to organize your notes by class or topic.',
+      title: '➕ Add a Category',
+      description: 'Create a new category to organize your notes by class or topic.',
       side: 'bottom',
     },
   },
   {
     element: '#subjectDropdown',
     popover: {
-      title: '🗂️ Filter by Subject',
-      description: 'Use this dropdown to view notes from a specific subject, or see all of them at once.',
+      title: '🗂️ Filter by Category',
+      description: 'Use this dropdown to view notes from a specific category, or see all of them at once.',
       side: 'bottom',
     },
   },
