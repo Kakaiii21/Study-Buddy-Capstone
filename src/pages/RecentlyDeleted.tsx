@@ -289,8 +289,7 @@ const filtered = useMemo(() => {
   const handleRestoreFolderWithFiles = async () => {
     if (!folderRestoreItem) return
     const childFiles = getChildDeletedFiles(folderRestoreItem)
-    // Restore the folder first so it exists again before its files are restored,
-    // otherwise the files would fall back to the orphan "Restored Files" folder.
+
     await handleRestore(folderRestoreItem)
     for (const file of childFiles) {
       await handleRestore(file)
@@ -376,7 +375,7 @@ const filtered = useMemo(() => {
             </div>
           )}
 
-          {/* Filters — matched to GeneratedHistory spacing */}
+          {/* Filters */}
           <div className='flex flex-row lg:flex-row sm:items-center sm:justify-end gap-3 mb-6'>
             <select
               id='filterTypeSelect'
@@ -396,6 +395,7 @@ const filtered = useMemo(() => {
 
             <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
               <input
+              id='deletedSearchBar'
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -421,7 +421,7 @@ const filtered = useMemo(() => {
             </div>
           </div>
 
-          {/* Recent label — matched to GeneratedHistory */}
+          {/* Recent label */}
           <div className='flex items-center gap-3 mb-4 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
             <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
             <hr className='flex-1 border-t border-primary-100' />
