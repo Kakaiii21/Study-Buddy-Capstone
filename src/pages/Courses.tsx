@@ -108,11 +108,7 @@ const { startTour } = useTour(
 
     setIsSaving(true)
 
-    // Close the modal right away — validation already passed, so we don't
-    // need to wait on the network write to know this will succeed. This
-    // also avoids the race with the Firestore onSnapshot listener updating
-    // `courses` (and rendering the new folder) before this promise resolves,
-    // which was causing the folder to appear behind the still-open modal.
+
     setShowModal(false)
     const nameToAdd = folderName.trim()
     const colorToAdd = selectedColor
@@ -214,27 +210,27 @@ const { startTour } = useTour(
           px-14 sm:px-12 justify-center items-center py-1
           lg:justify-end lg:items-start lg:pr-10 2xl:pr-16 lg:px-0 lg:gap-3
           md:justify-between md:items-start sm:items-center gap-1 p-0">
-<button
-  id='addCourseBtn'
-  onClick={() => setShowModal(true)}
-  disabled={!isOnline}
-  title={!isOnline ? 'You are offline' : undefined}
-  className="order-2 lg:order-1 bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-  py-2 lg:py-1 px-4 rounded-sm 
-  flex items-center justify-center gap-2
-  font-inter font-black
-  text-[10px] lg:text-[10px] md:ml-10
-  xl:text-[13px] 2xl:text-[15px]
-  3xl:text-[19px]
-  hover:opacity-90
-  w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]
-  backdrop-blur-xs
-  hover:-translate-y-1 
-  hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-  transition-all duration-300 disabled:bg-[#B0A030]
-  disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
-  disabled:hover:translate-y-0 disabled:hover:shadow-none"            
->
+        <button
+          id='addCourseBtn'
+          onClick={() => setShowModal(true)}
+          disabled={!isOnline}
+          title={!isOnline ? 'You are offline' : undefined}
+          className="order-2 lg:order-1 bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+          py-2 lg:py-1 px-4 rounded-sm 
+          flex items-center justify-center gap-2
+          font-inter font-black
+          text-[10px] lg:text-[10px] md:ml-10
+          xl:text-[13px] 2xl:text-[15px]
+          3xl:text-[19px]
+          hover:opacity-90
+          w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]
+          backdrop-blur-xs
+          hover:-translate-y-1 
+          hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+          transition-all duration-300 disabled:bg-[#B0A030]
+          disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
+          disabled:hover:translate-y-0 disabled:hover:shadow-none"            
+        >
             <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3 2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             New Folder
             </button>
@@ -270,7 +266,6 @@ const { startTour } = useTour(
           </div>
             <hr className=' sm:block w-full border-t mt-3 border-[#E9E9E9] mb-2' />
 
-            {/* Background save error (add-course write failed after modal already closed) */}
             {addCourseError && (
               <div className='w-full flex justify-center mb-2'>
                 <p className='text-red-500 text-xs font-roboto font-semibold bg-red-50 border border-red-200 rounded-md px-3 py-1'>
@@ -282,7 +277,7 @@ const { startTour } = useTour(
           {/* Folder Area */}
           {loading ? (
             <div className='flex-1  flex items-center justify-center text-primary-400 text-xl'>
-              Loading courses...
+              Loading Folders...
             </div>
           ) : (
 <div id='coursesGrid'
@@ -370,7 +365,7 @@ const { startTour } = useTour(
                   <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
                 <p className='ml-12 md:ml-24 text-2xl text-center lg:ml-[80px] lg:text-lg xl:ml-[80px] xl:text-xl font-bold font-roboto text-white uppercase'>
-                  Add a course
+                  Add a Folder
                 </p>
               </div>
               <div className='flex flex-row w-full gap-2 lg:h-8 xl:h-10'>
@@ -414,7 +409,6 @@ const { startTour } = useTour(
                 ))}
               </div>
 
-              {/* ← Add this below the input row */}
               {folderError && (
                 <p className='text-red-300 text-sm font-semibold lg:text-[10px] -mt-3'>{folderError}</p>
               )}
@@ -452,7 +446,6 @@ const { startTour } = useTour(
                 </div>
 
                 <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
-                {/* Folder color picker */}
                 <div className='flex flex-wrap gap-3 mb-2 justify-center'>
                   {(['grey', 'yellow', 'blue', 'green', 'pink', 'purple', 'orange'] as const).map((color) => (
                     <button
@@ -475,7 +468,6 @@ const { startTour } = useTour(
                   ))}
                 </div>
 
-                {/* ← Add this below the input row */}
                 {editError && (
                   <p className='text-red-300 text-sm font-semibold -mt-3'>{editError}</p>
                 )}
@@ -505,7 +497,7 @@ const { startTour } = useTour(
             itemName={pendingDelete.name}
             onConfirm={handleDelete}
             onCancel={() => setPendingDelete(null)}
-            isFolder={true}   // ← add this
+            isFolder={true}   
           />
         )}
     </div>
