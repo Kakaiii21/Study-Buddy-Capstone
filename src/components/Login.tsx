@@ -19,7 +19,7 @@ function Login({ onSwitchToSignup} : {onSwitchToSignup?: () => void}) {
   const navigate = useNavigate()
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
-      if (user && user.emailVerified) {   //  only redirect verified users
+      if (user && user.emailVerified) {  
         navigate('/dashboard', { replace: true })
       }
     })
@@ -116,14 +116,12 @@ const [passwordUpdated] = useState<boolean>(() => {
       setLoading(true)
       const user = await login(email, password)
 
-    // in Login.tsx, handleLogin:
     if (!user.emailVerified) {
       let resendMessage = "Please verify your email first. We've sent a new verification link to your inbox."
       try {
         await sendVerificationEmail(email)
       } catch (resendErr: unknown) {
-        // Cooldown or send failure — still tell the user why login failed,
-        // just without claiming a new email went out.
+       
         const code = typeof resendErr === 'object' && resendErr !== null && 'code' in resendErr
           ? (resendErr as { code: string }).code
           : ''
@@ -256,7 +254,6 @@ const [passwordUpdated] = useState<boolean>(() => {
             </div>
           )}
 
-          {/* ✅ ADD THESE */}
           {cancelResult === 'success' && (
             <div className="bg-green-600 text-white px-4 py-3 rounded-md text-sm font-roboto text-center mb-4">
               Email change cancelled. Your account email remains unchanged.
