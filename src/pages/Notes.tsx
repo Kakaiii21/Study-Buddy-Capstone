@@ -92,7 +92,6 @@ function Notes() {
   const { schedules } = useClassSched(user)
   const schedSubjects = useMemo(() => schedules.map((s) => s.subject), [schedules])
 
-  // ── Subject & filter state ──
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
   const [subjects, setSubjects] = useState<string[]>([])
@@ -101,7 +100,6 @@ function Notes() {
   const [selectedSubject, setSelectedSubject] = useState('All Categories')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // ── Note modal state ──
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'view' | 'edit'>('create')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
@@ -110,7 +108,6 @@ function Notes() {
   const [noteContent, setNoteContent] = useState('')
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
-  // ── 3-dot menu state ──
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
 useEffect(() => {
@@ -143,7 +140,6 @@ useEffect(() => {
     return `Untitled (${untitledNotes.length})`
   }
 
-  // ── Subject handlers ──
   function handleSubjectSave() {
     if (subjectName.trim() === '') return
     setSubjects((prev) => [...prev, subjectName.trim()])
@@ -152,7 +148,6 @@ useEffect(() => {
     setIsDropdownOpen(true)
   }
 
-  // ── Modal open helpers ──
   function openNoteModal() {
     setSelectedNote(null)
     setModalMode('create')
@@ -195,7 +190,6 @@ useEffect(() => {
     setSelectedNote(null)
   }
 
-  // ── Note CRUD handlers ──
   async function handleNoteSave() {
     if (noteContent.trim() === '') return
     const title = noteTitle.trim() || getUntitledTitle()
@@ -217,7 +211,6 @@ useEffect(() => {
     })
   }
 
-  // ── Download as .txt ──
   function downloadNote(note: Note) {
     const text = [
       `Title: ${note.title}`,
@@ -240,13 +233,11 @@ useEffect(() => {
     URL.revokeObjectURL(url)
   }
 
-  // ── Filtered notes ──
   const filteredNotes = notes
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .filter((n) => selectedSubject === 'All Categories' || n.subject === selectedSubject)
     .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  // ── Derived modal display values ──
   const displayTitle   = modalMode === 'view' ? (selectedNote?.title   ?? '') : noteTitle
   const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'All Categories') : noteSubject
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
@@ -291,7 +282,6 @@ useEffect(() => {
   </button>
 </div>
 
-{/* Spacer so fixed bar doesn't cover content underneath */}
 <div className='lg:hidden h-[72px]'  />
 
       <main  className="flex-1  mt-24 lg:mt-2  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1">
@@ -301,7 +291,6 @@ useEffect(() => {
             {/* ── Notes Area ── */}
             <div className='flex-1 min-w-0  '>
 
-              {/* ── Desktop search (lg and up) ── */}
               <div className='hidden lg:flex flex-col items-end w-full pl-3 pr-2
                 mt-2 md:mt-4 lg:-mt-1 xl:mt-0 2xl:mt-0 gap-2'>
                 <p className='self-start font-inter  font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
@@ -345,7 +334,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* ── Mobile / md search + subject dropdown (below lg) ── */}
               <div className='flex lg:hidden flex-col gap-3 px-2  mt-3'>
                 {/* Search bar */}
                 <div 
@@ -379,7 +367,6 @@ useEffect(() => {
                   )}
                 </div>
 
-                {/* + button and subject dropdown */}
                 <div className='flex items-center gap-3'>
                   <button
                     id='addSubjectBtnMobile'
@@ -452,7 +439,6 @@ useEffect(() => {
                 </div>
               ) : (
                 <div className='grid grid-cols-2 lg:flex mb-5 lg:flex-row lg:flex-wrap lg:justify-start mt-3 lg:items-start gap-4 lg:py-2 px-2'>
-                  {/* Mobile new note button */}
                   <button
                     id='newNoteBtnMobile'
                     onClick={openNoteModal}
@@ -468,7 +454,6 @@ useEffect(() => {
                     </svg> 
                   </button>
 
-                  {/* Desktop new note button */}
                   <button
                     id='newNoteBtnDesktop'
                     onClick={openNoteModal}
@@ -550,7 +535,6 @@ useEffect(() => {
 
             </div>
 
-            {/* ── Right column: subject button list — desktop (lg) only ── */}
             <div className='hidden lg:flex flex-col lg:w-56 xl:w-80 shrink-0 rounded-xl pr-2 mt-5'>
               <p className='self-start font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
                 NOTE CATEGORIES
