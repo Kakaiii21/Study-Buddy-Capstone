@@ -237,11 +237,10 @@ function Dashboard() {
       setSavingField(null)
     }
   }
-
-  const handleSaveCustomizeAll = async () => {
+const handleSaveCustomizeAll = async () => {
     const trimmedFirst = formFirstName.trim()
     const trimmedLast = formLastName.trim()
-    const numericAge = formAge ? Number(formAge) : null
+    const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
 
     if (trimmedFirst && trimmedFirst !== firstName) await handleSaveCardField('firstName', trimmedFirst)
     if (trimmedLast && trimmedLast !== lastName) await handleSaveCardField('lastName', trimmedLast)
@@ -598,15 +597,20 @@ className='relative flex flex-col justify-between text-left p-2
                   <div className='flex gap-4'>
                     <div className='flex-1'>
                       <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Age</label>
-                      <input
-                        type='number'
-                        min={1}
-                        max={120}
-                        value={formAge}
-                        onChange={(e) => setFormAge(e.target.value)}
-                        placeholder='Optional'
-                        className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
-                      />
+<input
+  type='number'
+  min={1}
+  max={99}
+  value={formAge}
+  onChange={(e) => {
+    const val = e.target.value
+    if (val === '' || (Number(val) >= 1 && Number(val) <= 99)) {
+      setFormAge(val)
+    }
+  }}
+  placeholder='Optional'
+  className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
+/>
                     </div>
                     <div className='flex-1'>
                       <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Year Level</label>

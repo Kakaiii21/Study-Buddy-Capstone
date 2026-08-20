@@ -13,7 +13,14 @@ const PAGE_TYPES: DeletedItemType[] = [
   'Quiz',
   'Flashcard',
 ]
-
+const PAGE_TYPE_LABELS: Record<DeletedItemType, string> = {
+  'To Do': 'To Do',
+  'Notes': 'Notes',
+  'Class Schedule': 'Class Schedule',
+  'Course': 'My Files',
+  'Quiz': 'Quiz',
+  'Flashcard': 'Flashcard',
+}
 
 
 function DaysBadge({ days }: { days: number }) {
@@ -376,15 +383,15 @@ const filtered = useMemo(() => {
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
               className='w-40 border border-primary-800 rounded-md
-              px-3 py-1 lg:py-auto lg:rounded-sm
+              px-3 py-1 lg:py-1.5 xl:py-2 lg:rounded-sm 3xl:w-52
               text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
               font-roboto text-primary-600
               focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
               aria-label='Filter by page type'
             >
-              {PAGE_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
+{PAGE_TYPES.map((t) => (
+  <option key={t} value={t}>{PAGE_TYPE_LABELS[t]}</option>
+))}
             </select>
 
             <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
@@ -431,9 +438,9 @@ const filtered = useMemo(() => {
               </div>
 
               {filtered.length === 0 ? (
-                <p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>
-                  No deleted {selectedType} items
-                </p>
+<p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>
+  No deleted {PAGE_TYPE_LABELS[selectedType]} items
+</p>
               ) : (
                 filtered.map((item) => {
                   const days = daysRemaining(item.deletedAt)
