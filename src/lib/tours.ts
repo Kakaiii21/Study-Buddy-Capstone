@@ -1238,7 +1238,7 @@ const generatedhistoryTablet: DriveStep[] = [
     popover: {
       title: '📋 Your Generated Materials',
       description: 'View, retake, or delete any previously generated quiz or flashcard set from here.',
-      side: 'left',
+      side: 'bottom',
     },
   },
   {

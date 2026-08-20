@@ -16,7 +16,6 @@ function formatDate(date: Date): string {
   })
 }
 
-// ── Shuffle helpers for "Retake" (mirrors Quiz.tsx's shuffleQuestions logic) ──
 interface QuizItem {
   question: string
   options: string[]
@@ -39,18 +38,17 @@ const shuffleQuizItems = (items: QuizItem[]): QuizItem[] =>
     }
   })
 
-// This component is copy-pasted in Notes, ToDoList, ClassSchedule, GeneratedHistory
-// Fix it in ALL of them the same way
+
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
   onConfirm: () => void
   onCancel: () => void 
 }) {
-  const [confirming, setConfirming] = useState(false)  // ← add this
+  const [confirming, setConfirming] = useState(false)  
 
   const handleConfirm = () => {
-    if (confirming) return          // ← block double click
+    if (confirming) return          
     setConfirming(true)
     onConfirm()
   }
@@ -124,7 +122,6 @@ function GeneratedHistory() {
     setPendingDelete(null)
   }
 
-  // ── Navigate to QuizView with all saved data ──
   const handleViewQuiz = (item: (typeof quizHistory)[number]) => {
     navigate('/quizView', {
       state: {
@@ -138,7 +135,6 @@ function GeneratedHistory() {
     })
   }
 
-  // ── Navigate to Quiz as a fresh retake (shuffled) ──
   const handleRetakeQuiz = (item: (typeof quizHistory)[number]) => {
     navigate('/studyGenerator/Quiz', {
       state: {
@@ -149,7 +145,6 @@ function GeneratedHistory() {
     })
   }
 
-  // ── Navigate to FlashcardView ──
   const handleViewFlashcard = (item: (typeof flashcardHistory)[number]) => {
     navigate('/flashcardView', {
       state: {
@@ -220,6 +215,7 @@ function GeneratedHistory() {
 
            <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
               <input
+              id='genSearchBar'
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -354,6 +350,8 @@ function GeneratedHistory() {
                           <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
                           <div className='flex justify-center'>
                             <img
+                            id='viewBtn'
+                            
                               src='/View.png'
                               alt='View'
                               className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
@@ -362,6 +360,7 @@ function GeneratedHistory() {
                           </div>
                           <div className='flex justify-center'>
                               <img
+                              id='deleteBtn'
                                 src='/delete.png'
                                 alt='Delete'
                                 className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
