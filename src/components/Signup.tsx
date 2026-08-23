@@ -449,7 +449,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           <button
             onClick={handleSignup}
             disabled={loading}
-            className="w-full bg-pink-700
+            className="w-full bg-primary-800
               hover:opacity-90   
                backdrop-blur-xs
                hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]

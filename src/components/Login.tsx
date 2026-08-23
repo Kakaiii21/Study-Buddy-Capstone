@@ -159,7 +159,7 @@ const [passwordUpdated] = useState<boolean>(() => {
     `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
-    <div className="min-h-screen md:h-auto flex flex-col md:px-32 lg:flex-row bg-primary-600 2xl:px-[150px]">
+    <div className="min-h-screen md:h-auto flex flex-col md:px-32 lg:flex-row bg-primary-600 2xl:px-[30px]">
 {/* MOBILE HEADER */}
 <div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
   <h1 className="text-white font-inter font-extrabold text-3xl">

@@ -168,7 +168,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           backdrop-blur-xs
           hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
           transition-all duration-300'>
-            Download
+            Add to Home
             <img src="./downA.png" alt="Download" className='w-2 h-3 md:w-4 md:h-6 lg:w-4 lg:h-6 xl:w-4 xl:h-6 2xl:w-4 2xl:h-6' />
           </button>
 

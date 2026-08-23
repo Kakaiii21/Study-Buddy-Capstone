@@ -259,23 +259,26 @@ function FlashcardView() {
                   </div>
                 ) : (
                   /* ── Flip Card ── */
-                  <div
-                    onClick={() => toggleCard(index)}
-                    className={`relative w-full h-56 lg:h-44 2xl:h-52 cursor-pointer duration-500 transform-style preserve-3d
-                      ${flipped[index] ? 'rotate-y-180' : ''}`}
-                  >
-                    <div className='absolute w-full h-full backface-hidden flex items-center justify-center
-                      bg-primary-600 border-2 border-primary-600 rounded-xl px-5'>
-                      <div className='flex flex-col text-center'>
-                        <p className='text-white font-inter text-xl lg:text-lg font-bold uppercase'>{card.term}</p>
-                        <p className='text-white font-inter text-sm lg:text-xs mt-1'>Click to view definition</p>
-                      </div>
-                    </div>
-                    <div className='absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center
-                      bg-white border-2 border-primary-600 rounded-xl px-5'>
-                      <p className='text-primary-600 text-center font-medium'>{card.definition}</p>
-                    </div>
-                  </div>
+<div
+  onClick={() => toggleCard(index)}
+  className={`relative w-full h-56 lg:h-44 2xl:h-52 cursor-pointer duration-500 transform-style preserve-3d
+    ${flipped[index] ? 'rotate-y-180' : ''}`}
+>
+  {/* FRONT — now shows the definition */}
+  <div className='absolute w-full h-full backface-hidden flex items-center justify-center
+    bg-primary-600 border-2 border-primary-600 rounded-xl px-5'>
+    <div className='flex flex-col text-center'>
+      <p className='text-white font-inter text-xl lg:text-lg font-bold'>{card.definition}</p>
+      <p className='text-white font-inter text-sm lg:text-xs mt-1'>Click to view term</p>
+    </div>
+  </div>
+
+  {/* BACK — now shows the term */}
+  <div className='absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center
+    bg-white border-2 border-primary-600 rounded-xl px-5'>
+    <p className='text-primary-600 text-center font-medium uppercase'>{card.term}</p>
+  </div>
+</div>
                 )}
               </div>
             </div>
