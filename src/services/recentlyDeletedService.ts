@@ -6,6 +6,8 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
+  increment,
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './firebase'
@@ -92,49 +94,55 @@ export async function fetchRecentlyDeleted(uid: string): Promise<DeletedItem[]> 
 
 // ─── Restore ─────────────────────────────────────────────────────────────────
 export async function restoreItem(uid: string, item: DeletedItem): Promise<void> {
-  const isCourseFile = item.originalCollection.includes('/myFiles/') &&
+  const isCourseFile = item.originalCollection.includes('/courses/') &&
     item.originalCollection.endsWith('/files')
 
   if (isCourseFile) {
     const parts = item.originalCollection.split('/')
     const courseId = parts[3]
-    const coursePath = `users/${uid}/myFiles/${courseId}`
+    const coursePath = `users/${uid}/courses/${courseId}`
     const courseSnap = await getDoc(doc(db, coursePath))
 
     if (!courseSnap.exists()) {
       const coursesRef = collection(db, 'users', uid, 'courses')
       const coursesSnap = await getDocs(coursesRef)
-      let restoredFolderId: string | null = null
 
-      coursesSnap.forEach(d => {
-        if (d.data().name === 'Restored Files') restoredFolderId = d.id
-      })
+      const existing = coursesSnap.docs.find(d => d.data().name === 'Restored Files')
 
-      if (!restoredFolderId) {
+      let restoredFolderId: string
+      if (existing) {
+        restoredFolderId = existing.id
+      } else {
         const newFolder = await addDoc(coursesRef, {
           name: 'Restored Files',
           uid,
           createdAt: Date.now(),
+          fileCount: 0,
+          color: 'grey',
         })
         restoredFolderId = newFolder.id
       }
 
       const newFileRef = doc(collection(db, 'users', uid, 'courses', restoredFolderId, 'files'))
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id: _id, ...cleanData } = item.data as Record<string, unknown>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _id, ...cleanData } = item.data as Record<string, unknown>
       await setDoc(newFileRef, cleanData)
+      await updateDoc(doc(db, 'users', uid, 'courses', restoredFolderId), {
+        fileCount: increment(1),
+      })
       await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
       return
     }
   }
 
   const originalRef = doc(db, item.originalCollection, item.originalDocId)
-  await setDoc(originalRef, item.data)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _id, ...cleanData } = item.data as Record<string, unknown>
+  await setDoc(originalRef, cleanData)
   await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
   // ✅ Same — no storageUsed change on restore
 }
 
-// ─── Permanent Delete ─────────────────────────────────────────────────────────
 // ─── Permanent Delete ─────────────────────────────────────────────────────────
 export async function permanentDelete(
   uid: string,
