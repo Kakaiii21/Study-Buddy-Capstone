@@ -195,7 +195,7 @@ function Flashcard() {
         </div>
 
         <p className='text-center text-gray-400 font-roboto text-sm lg:text-xs 2xl:text-lg lg:mb-2 mb-6'>
-          Click a card to flip it and reveal the definition.
+          Click a card to flip it and reveal the term.
         </p>
 
         <div className='flex flex-col lg:mx-20 gap-8 lg:gap-2 2xl:gap-4 md:mx-10'>

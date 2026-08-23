@@ -177,7 +177,7 @@ function FlashcardView() {
         )}
 
         <p className='text-center text-gray-400 font-roboto text-sm lg:text-xs 2xl:text-lg lg:mb-2 mb-6'>
-          Click a card to flip it and reveal the definition.
+          Click a card to flip it and reveal the term.
         </p>
 
         {/* Cards */}
