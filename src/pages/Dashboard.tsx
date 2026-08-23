@@ -394,7 +394,7 @@ function Dashboard() {
     { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
     { label: 'Notes',          path: '/notes',          color: '#7FC4FF' },
     { label: 'Class Schedule', path: '/schedule',       color: '#B5E8A0' },
-    { label: 'My Files',        path: '/courses',        color: '#C9A9F0' },
+    { label: 'My Files',        path: '/myFiles',        color: '#C9A9F0' },
     { label: 'Study Generator',path: '/studyGenerator', color: '#FFB8D9' },
     { label: 'Generated History', path: '/history', color: '#FFB870' },
   ]
