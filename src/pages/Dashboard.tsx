@@ -94,8 +94,8 @@ function Dashboard() {
   const [hasCustomizedCard, setHasCustomizedCard] = useState<boolean | null>(null)
 
   const [showCustomize, setShowCustomize] = useState(false)
-  const [cardColor, setCardColor] = useState('#D9CBF5')
-  const [formCardColor, setFormCardColor] = useState('#D9CBF5') 
+  const [cardColor, setCardColor] = useState('#C9C9C9')
+  const [formCardColor, setFormCardColor] = useState('#C9C9C9') 
 
   const [formFirstName, setFormFirstName] = useState('')
   const [formLastName, setFormLastName] = useState('')
@@ -124,7 +124,7 @@ function Dashboard() {
         setLastName(data.lastName || '')
         setAge(data.age ?? null)
         setYearLevel(data.yearLevel || '')
-        setCardColor(data.cardColor || '#D9CBF5')
+        setCardColor(data.cardColor || '#C9C9C9')
         setHasCustomizedCard(data.hasCustomizedCard ?? false)
         if (data.hasCustomizedCard === false) {
           setFormFirstName(data.firstName || '')
