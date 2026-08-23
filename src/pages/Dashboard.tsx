@@ -11,6 +11,7 @@ import { useTasks } from '../hooks/useTasks'
 import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
+import { uploadToCloudinary } from '../services/cloudinary'
 
 function Dashboard() {
   const [showSidebar, setShowSidebar] = useState(false)
@@ -103,12 +104,26 @@ function Dashboard() {
   const [formYearLevel, setFormYearLevel] = useState('')
   const [savingField, setSavingField] = useState<string | null>(null)
 
+  // Pending profile-picture changes, staged in the modal until Save is clicked.
+  const [pendingProfileFile, setPendingProfileFile] = useState<File | null>(null)
+  const [pendingProfilePreview, setPendingProfilePreview] = useState<string | null>(null)
+  const [pendingRemove, setPendingRemove] = useState(false)
+
+  const [toast, setToast] = useState<string | null>(null)
+  const showToast = (message: string) => {
+    setToast(message)
+    setTimeout(() => setToast(null), 3000)
+  }
+
   const openCustomize = () => {
     setFormFirstName(firstName ?? '')
     setFormLastName(lastName ?? '')
     setFormAge(age !== null ? String(age) : '')
     setFormYearLevel(yearLevel ?? '')
     setFormCardColor(cardColor) 
+    setPendingProfileFile(null)
+    setPendingProfilePreview(null)
+    setPendingRemove(false)
     setShowCustomize(true)
   }
 
@@ -188,23 +203,54 @@ function Dashboard() {
   const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
   const displayYearLevel = yearLevel || '—'
 
+  const customizeFileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingPic, setUploadingPic] = useState(false)
 
+  // Live preview shown inside the customize modal only — reflects a
+  // pending file pick / pending remove, not the saved profilePic yet.
+  const modalPreviewSrc = pendingRemove
+    ? '/profile.png'
+    : (pendingProfilePreview || profilePic)
 
-  const activities = [
-    { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
-    { label: 'Notes',          path: '/notes',          color: '#7FC4FF' },
-    { label: 'Class Schedule', path: '/schedule',       color: '#B5E8A0' },
-    { label: 'My Files',        path: '/courses',        color: '#C9A9F0' },
-    { label: 'Study Generator',path: '/studyGenerator', color: '#FFB8D9' },
-    { label: 'Generated History', path: '/history', color: '#FFB870' },
-  ]
+  // Waits for an image URL to actually finish loading before we swap it in.
+  // Prevents a flash of the old cached picture / broken image if the CDN
+  // or a service worker hasn't caught up with the new asset yet.
+  const preloadImage = (src: string): Promise<void> =>
+    new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve()
+      img.onerror = () => reject(new Error(`Failed to preload ${src}`))
+      img.src = src
+    })
 
-  const YEAR_LEVEL_GROUPS = [
-    { label: 'Elementary', options: ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'] },
-    { label: 'Junior High', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'] },
-    { label: 'Senior High', options: ['Grade 11', 'Grade 12'] },
-    { label: 'College', options: ['1st Year', '2nd Year', '3rd Year', '4th Year'] },
-  ]
+  // Stage a newly picked file as a local preview only. Nothing is
+  // uploaded or deleted until Save is clicked.
+  const handleProfilePicSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
+    setPendingProfileFile(file)
+    setPendingProfilePreview(URL.createObjectURL(file))
+    setPendingRemove(false)
+    if (customizeFileInputRef.current) customizeFileInputRef.current.value = ''
+  }
+
+  // Stage a removal. Nothing is deleted from Cloudinary/Firestore until Save.
+  const handleRemoveProfilePicClick = () => {
+    if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
+    setPendingProfileFile(null)
+    setPendingProfilePreview(null)
+    setPendingRemove(true)
+  }
+
+  // Discard any staged picture change and close the modal without saving.
+  const handleCancelCustomize = () => {
+    if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
+    setPendingProfileFile(null)
+    setPendingProfilePreview(null)
+    setPendingRemove(false)
+    setShowCustomize(false)
+  }
 
   const handleSaveCardField = async (
     field: 'firstName' | 'lastName' | 'age' | 'yearLevel' | 'cardColor',
@@ -225,10 +271,96 @@ function Dashboard() {
       setSavingField(null)
     }
   }
-const handleSaveCustomizeAll = async () => {
+
+  const handleSaveCustomizeAll = async () => {
     const trimmedFirst = formFirstName.trim()
     const trimmedLast = formLastName.trim()
     const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
+    const pictureWasChanged = Boolean(pendingProfileFile) || pendingRemove
+
+    // Commit a staged new profile picture (upload to Cloudinary, delete old asset).
+    if (pendingProfileFile && user) {
+      setUploadingPic(true)
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid))
+        const oldPublicId = userSnap.data()?.photoPublicId ?? null
+
+        const result = await uploadToCloudinary(pendingProfileFile, undefined, user.uid)
+        const bustedUrl = `${result.url}?v=${Date.now()}`
+
+        await updateDoc(doc(db, 'users', user.uid), {
+          photoURL: bustedUrl,
+          photoPublicId: result.publicId
+        })
+
+        try {
+          await preloadImage(bustedUrl)
+        } catch (preloadErr) {
+          console.warn('Profile pic preload failed, setting src anyway:', preloadErr)
+        }
+
+        setProfilePic(bustedUrl)
+        sessionStorage.setItem('profilePic', bustedUrl)
+        window.dispatchEvent(new Event('profilePicUpdated'))
+
+        const cacheKey = `user_${user.uid}`
+        const cached = sessionStorage.getItem(cacheKey)
+        if (cached) {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: bustedUrl, photoPublicId: result.publicId }))
+        }
+
+        if (oldPublicId) {
+          await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
+          }).catch((err) => console.warn('Old profile pic delete failed:', err))
+        }
+
+        showToast('Profile picture updated successfully!')
+      } catch (err) {
+        console.error('Profile picture upload failed:', err)
+        showToast('Failed to upload picture. Please try again.')
+      } finally {
+        setUploadingPic(false)
+      }
+    } else if (pendingRemove && user) {
+      // Commit a staged removal.
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid))
+        const oldPublicId = userSnap.data()?.photoPublicId ?? null
+
+        await updateDoc(doc(db, 'users', user.uid), { photoURL: null, photoPublicId: null })
+
+        setProfilePic('/profile.png')
+        sessionStorage.setItem('profilePic', '/profile.png')
+        window.dispatchEvent(new Event('profilePicUpdated'))
+
+        const cacheKey = `user_${user.uid}`
+        const cached = sessionStorage.getItem(cacheKey)
+        if (cached) {
+          sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: null, photoPublicId: null }))
+        }
+
+        if (oldPublicId) {
+          await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
+          }).catch((err) => console.warn('Old profile pic delete failed:', err))
+        }
+
+        showToast('Profile picture removed.')
+      } catch (err) {
+        console.error('Failed to remove profile picture:', err)
+        showToast('Failed to remove picture. Please try again.')
+      }
+    }
+
+    if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
+    setPendingProfileFile(null)
+    setPendingProfilePreview(null)
+    setPendingRemove(false)
 
     if (trimmedFirst && trimmedFirst !== firstName) await handleSaveCardField('firstName', trimmedFirst)
     if (trimmedLast && trimmedLast !== lastName) await handleSaveCardField('lastName', trimmedLast)
@@ -252,10 +384,62 @@ const handleSaveCustomizeAll = async () => {
     setAge(numericAge)
     setYearLevel(formYearLevel)
     setShowCustomize(false)
+
+    if (pictureWasChanged) {
+      window.location.reload()
+    }
   }
+
+  const activities = [
+    { label: 'To Do List',     path: '/todolist',       color: '#FFD84D' },
+    { label: 'Notes',          path: '/notes',          color: '#7FC4FF' },
+    { label: 'Class Schedule', path: '/schedule',       color: '#B5E8A0' },
+    { label: 'My Files',        path: '/courses',        color: '#C9A9F0' },
+    { label: 'Study Generator',path: '/studyGenerator', color: '#FFB8D9' },
+    { label: 'Generated History', path: '/history', color: '#FFB870' },
+  ]
+
+  const YEAR_LEVEL_GROUPS = [
+    { label: 'Elementary', options: ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'] },
+    { label: 'Junior High', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'] },
+    { label: 'Senior High', options: ['Grade 11', 'Grade 12'] },
+    { label: 'College', options: ['1st Year', '2nd Year', '3rd Year', '4th Year'] },
+  ]
 
   if (!authChecked) return null  
   return (
+    <>
+      <style>{`
+        .upload-loader {
+          width: fit-content;
+          font-size: 40px;
+          font-family: system-ui, sans-serif;
+          font-weight: bold;
+          text-transform: uppercase;
+          color: #0000;
+          -webkit-text-stroke: 1px #fff;
+          background:
+            radial-gradient(0.71em at 50% 1em, #fff 99%, #0000 101%) calc(50% - 1em) 1em/2em 200% repeat-x text,
+            radial-gradient(0.71em at 50% -0.5em, #0000 99%, #fff 101%) 50% 1.5em/2em 200% repeat-x text;
+          animation: l10-0 .8s linear infinite alternate, l10-1 4s linear infinite;
+        }
+        .upload-loader:before { content: "Loading"; }
+        @keyframes l10-0 { to { background-position-x: 50%, calc(50% + 1em); } }
+        @keyframes l10-1 { to { background-position-y: -.5em, 0; } }
+      `}</style>
+
+      {uploadingPic && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
+          <div className="upload-loader" />
+        </div>
+      )}
+
+      {toast && (
+        <div className='fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-primary-600 text-white px-6 py-3 rounded-xl shadow-lg font-inter text-sm transition-all'>
+          {toast}
+        </div>
+      )}
+
     <div className='h-screen w-full  overflow-hidden bg-white'>
       <div className='flex h-full'>
         {/* Sidebar */}
@@ -311,6 +495,7 @@ const handleSaveCustomizeAll = async () => {
 
             <div className='flex flex-col h-auto '>
               <img
+                key={profilePic}
                 src={profilePic}
                 alt="Profile"
                 crossOrigin="anonymous"
@@ -519,8 +704,43 @@ className='relative flex flex-col justify-between text-left p-2
                     <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-24 h-3 border-2 border-primary-800 rounded-full' />
                   </div>
                   <div className='flex flex-row items-start gap-3 px-2 md:px-4 pt-2 pb-3'>
-                    <div className='flex flex-col'>
-                      <img src={profilePic} alt="Profile" className='w-[75px] h-[100px] object-cover border-2 border-primary-800' />
+                    <div className='flex flex-col items-center gap-1'>
+                      <div className='relative w-[75px] h-[100px] group/pic'>
+                        <button
+                          type='button'
+                          aria-label='change profile picture'
+                          disabled={uploadingPic}
+                          onClick={() => customizeFileInputRef.current?.click()}
+                          className='relative w-full h-full block disabled:opacity-40'
+                        >
+                          <img
+                            key={modalPreviewSrc}
+                            src={modalPreviewSrc}
+                            alt="Profile"
+                            className={`w-full h-full object-cover border-2 border-primary-800 ${uploadingPic ? 'opacity-40' : 'opacity-100'}`}
+                          />
+                          {/* Hover overlay */}
+                          <div className='absolute inset-0 bg-black/50 opacity-0 group-hover/pic:opacity-100 transition-opacity duration-200 flex items-center justify-center'>
+                            <span className='text-white text-[9px] font-inter font-medium uppercase text-center px-1'>
+                              {uploadingPic ? 'Uploading...' : 'Change'}
+                            </span>
+                          </div>
+                        </button>
+                        <input
+                          ref={customizeFileInputRef}
+                          type="file"
+                          accept="image/png, image/jpg, image/jpeg"
+                          className="hidden"
+                          onChange={handleProfilePicSelect}
+                        />
+                      </div>
+                      <button
+                        type='button'
+                        onClick={handleRemoveProfilePicClick}
+                        className='text-red-500 text-[9px] font-inter hover:underline'
+                      >
+                        Remove
+                      </button>
                       <div
                         className='w-full h-3 mt-2'
                         style={{
@@ -644,7 +864,7 @@ className='relative flex flex-col justify-between text-left p-2
                 </button>
 
                 <button
-                  onClick={() => setShowCustomize(false)}
+                  onClick={handleCancelCustomize}
                   className='order-5 md:order-3 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
                 >
                   Cancel
@@ -655,6 +875,7 @@ className='relative flex flex-col justify-between text-left p-2
         </div>
       )}
     </div>
+    </>
   )
 }
 export default Dashboard
