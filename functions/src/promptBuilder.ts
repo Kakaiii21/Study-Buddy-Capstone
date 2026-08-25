@@ -54,21 +54,25 @@ TEXT:
 ${textSample}`
   }
 
-  return `You are a flashcard generator. Use ONLY the text below to create ${numItems} flashcards.
+return `You are a flashcard generator. Use ONLY the text below to create ${numItems} flashcards.
 
 RULES:
 - Each card must cover a unique concept — no repeats
-- Front: short term or question (max 10 words)
-- Back: clear concise definition or answer (1-2 sentences)
+- Front: the term, name, or concept itself ONLY — a word or short noun phrase (max 6 words). NEVER phrase it as a question. NEVER start with "What", "Who", "Why", "How", "Define", etc.
+- Back: clear concise definition or explanation of that term (1-2 sentences)
 - ${sourceLang} only, keep format keywords in English
 - Do NOT add any intro, outro, or explanations
 
-FORMAT — follow exactly:
-Card 1 Front: [term or question]
-Card 1 Back: [definition or answer]
+EXAMPLE (follow this pattern exactly):
+Card 1 Front: System Integrator
+Card 1 Back: A specialist who connects disparate applications, systems, cloud solutions, and data storage into a unified solution.
 
-Card 2 Front: [term or question]
-Card 2 Back: [definition or answer]
+FORMAT — follow exactly:
+Card 1 Front: [term]
+Card 1 Back: [definition]
+
+Card 2 Front: [term]
+Card 2 Back: [definition]
 
 TEXT:
 ${textSample}`
