@@ -80,6 +80,10 @@ export function useCourses(user: User | null) {
     const filesRef = collection(db, 'users', user.uid, 'courses', courseId, 'files')
     const snapshot = await getDocs(filesRef)
     await Promise.all(
+
+
+      
+      
       snapshot.docs.map((fileDoc) => {
         const fileData = fileDoc.data()
         return softDelete(user.uid, {

@@ -238,46 +238,41 @@ function TaskModal({
         </label>
 
         <div className="flex flex-col sm:flex-row gap-3 3xl:gap-8 my-3">
-          <div className="relative flex items-center flex-1">
-            <input
-              className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono 
-              lg:text-sm lg:py-1 lg:rounded-sm
-              xl:text-[15px] xl:py-2
-              2xl:text-[16px]
-              3xl:text-lg
-                ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
-              value={taskDeadline}
-              onChange={(e) => handleDeadlineChange(e.target.value)}
-              type="text"
-              placeholder="MM/DD/YYYY"
-              maxLength={10}
-            />
-            <button
-              type="button"
-              onClick={() => calendarRef.current?.showPicker()}
-              className="absolute right-3
-              text-primary-600 hover:text-primary-800 transition-colors"
-              tabIndex={-1}
-              title="Pick a date"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-            </button>
-            <input
-              aria-label="cal"
-              ref={calendarRef}
-              type="date"
-              min={todayDate}
-              value={calendarValue}
-              onChange={(e) => handleCalendarChange(e.target.value)}
-              className="absolute right-0 bottom-0 opacity-0 w-0 h-0 pointer-events-none"
-              tabIndex={-1}
-            />
-          </div>
+<div className="relative flex items-center flex-1">
+  <input
+    className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono 
+    lg:text-sm lg:py-1 lg:rounded-sm
+    xl:text-[15px] xl:py-2
+    2xl:text-[16px]
+    3xl:text-lg
+      ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+    value={taskDeadline}
+    onChange={(e) => handleDeadlineChange(e.target.value)}
+    type="text"
+    placeholder="MM/DD/YYYY"
+    maxLength={10}
+  />
+  {/* Real date input sits directly over the icon area — tapping it opens the native picker with no JS trigger needed, works on every iOS version */}
+  <input
+    aria-label="Pick a date"
+    ref={calendarRef}
+    type="date"
+    min={todayDate}
+    value={calendarValue}
+    onChange={(e) => handleCalendarChange(e.target.value)}
+    className="absolute right-0 top-0 w-10 h-full opacity-0 cursor-pointer"
+    tabIndex={-1}
+  />
+  {/* Decorative icon only — sits underneath, pointer-events-none so taps pass through to the real input above it */}
+  <div className="absolute right-3 text-primary-600 pointer-events-none">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  </div>
+</div>
 
           <input
             aria-label="time"

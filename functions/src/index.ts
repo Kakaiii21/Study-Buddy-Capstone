@@ -680,7 +680,7 @@ export const confirmEmailChange = onRequest(
       }
 
       // ✅ Redirect to login with success message
-      res.redirect('https://studybuddyph.site/login?emailUpdated=true')
+      res.redirect('https://studybuddyph.site/?emailUpdated=true')
     } catch (err) {
       console.error('confirmEmailChange error:', err)
       res.status(500).send('Something went wrong. Please try again.')
@@ -704,7 +704,7 @@ export const cancelEmailChange = onRequest(
       const cancelDoc = await admin.firestore().doc(`emailCancelTokens/${token}`).get()
 
       if (!cancelDoc.exists) {
-        res.redirect('https://studybuddyph.site/login?cancelResult=already-used')
+        res.redirect('https://studybuddyph.site/?cancelResult=already-used')
         return
       }
 
@@ -712,7 +712,7 @@ export const cancelEmailChange = onRequest(
 
       if (Date.now() > expiresAt) {
         await cancelDoc.ref.delete()
-        res.redirect('https://studybuddyph.site/login?cancelResult=expired')
+        res.redirect('https://studybuddyph.site/?cancelResult=expired')
         return
       }
 
@@ -742,7 +742,7 @@ export const cancelEmailChange = onRequest(
       // ✅ Delete the cancel token — it's been used
       await cancelDoc.ref.delete()
 
-      res.redirect('https://studybuddyph.site/login?cancelResult=success')
+      res.redirect('https://studybuddyph.site/?cancelResult=success')
     } catch (err) {
       console.error('cancelEmailChange error:', err)
       res.status(500).send('Something went wrong. Please try again.')
@@ -810,7 +810,11 @@ export const reactivateAccount = onRequest(
         res.status(410).json({ error: 'Reactivation window has expired.' })
         return
       }
-      await userRef.update({ status: 'active', deactivatedAt: admin.firestore.FieldValue.delete() })
+      await userRef.update({
+        status: 'active',
+        deactivatedAt: admin.firestore.FieldValue.delete(),
+        deletionWarningsSent: admin.firestore.FieldValue.delete(),
+      })
       res.status(200).json({ success: true })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Internal server error'

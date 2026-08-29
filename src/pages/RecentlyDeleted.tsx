@@ -358,9 +358,9 @@ const filtered = useMemo(() => {
         </div>
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
-            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4  
-            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>Recently Deleted</p>
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:ml-0 3xl:ml-0
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-4 '>Recently Deleted</p>
 
           {/* Restore Error Toast */}
           {restoreError && (
@@ -382,7 +382,7 @@ const filtered = useMemo(() => {
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value as DeletedItemType)}
               className='w-40 border border-primary-800 rounded-md
-              px-3 py-1 lg:py-1.5 xl:py-2 lg:rounded-sm 3xl:w-52
+              px-3 py-2 lg:py-1.5 xl:py-2 lg:rounded-sm 3xl:w-52 md:py-2
               text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
               font-roboto text-primary-600
               focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'

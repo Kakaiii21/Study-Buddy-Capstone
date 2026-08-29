@@ -55,9 +55,9 @@ const { startTour } = useTour(
 
           {/* Left */}
 <div className='hidden lg:flex lg:flex-1 flex-col overflow-auto pt-0 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.15)] relative z-10'>
-          <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-2
+          <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:ml-0 3xl:ml-0
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-4 xl:mt-4 2xl:mt-4 '>Account</p>
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-4 '>Account</p>
   <p className='text-xs lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] lg:mt-4 xl:mt-5 2xl:mt-6 3xl:mt-7  font-inter font-medium text-primary-600 pl-9 lg:pl-5  2xl:pl-11 tracking-widest mb-4 xl:mb-5 2xl:mb-6'>
     Account Settings
   </p>

@@ -509,12 +509,12 @@ useEffect(() => {
         </div>
         <main className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 3xl:px-14 3xl:pt-0 pt-1">
           <div className="min-h-screen  w-full flex flex-col">
-            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:p-4 3xl:p-6  
-            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 3xl:mt-4 '>Study Generator</p>
+            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:-ml-8 3xl:-ml-12
+            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-4 '>Study Generator</p>
             {/* Header */}
             <div className="flex flex-col w-full lg:flex lg:flex-row md:flex-row 
-          px-14 sm:px-12 justify-center items-center py-1
+          px-14 sm:px-12 justify-center items-center py-1 
           lg:justify-end lg:items-start lg:pr-10 2xl:pr-16 3xl:pr-20 lg:px-0 lg:gap-3
           md:justify-between md:items-start sm:items-center gap-1 p-0">
             </div>
@@ -617,7 +617,7 @@ useEffect(() => {
                       <div className='min-w-0 max-w-[180px] lg:max-w-[200px] 2xl:max-w-[180px] 3xl:max-w-[260px]'>
                         <p className='font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
                         <p className='font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
-                          {uploadedFile.size} · from {uploadedFile.source === 'local' ? 'Local' : 'Courses'}
+                          {uploadedFile.size} · from {uploadedFile.source === 'local' ? 'Local' : 'My Files'}
                         </p>
                       </div>
                     </div>
