@@ -21,6 +21,7 @@ function EmailChangeWatcher() {
       const data = snap.data()
       // If pendingEmail was just cleared and email changed, sign out
       if (!data?.pendingEmail && data?.email && data.email !== user.email) {
+        sessionStorage.removeItem(`user_${user.uid}`)
         await signOut(auth)
         window.location.href = '/?emailUpdated=true'
       }

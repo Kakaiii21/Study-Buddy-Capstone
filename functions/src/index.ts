@@ -381,7 +381,7 @@ export const sendPasswordReset = onRequest(
         return
       }
 
-      // ✅ Explicitly check the user exists BEFORE generating the link.
+      // / Explicitly check the user exists BEFORE generating the link.
       // generatePasswordResetLink can throw a generic 'auth/internal-error'
       // instead of 'auth/user-not-found' when the email isn't registered,
       // so we surface the real reason here instead.
@@ -573,7 +573,7 @@ export const sendChangeEmail = onRequest(
         `),
       })
 
-      // ✅ To old email — cancel link (1 hour window before confirm)
+      // / To old email — cancel link (1 hour window before confirm)
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
         to: userRecord.email,
@@ -633,16 +633,16 @@ export const confirmEmailChange = onRequest(
         return
       }
 
-      // ✅ NOW we update the email — only after user clicked the link
+      //  NOW we update the email — only after user clicked the link
       await admin.auth().updateUser(uid, { email: newEmail, emailVerified: true })
 
-      // ✅ Update Firestore user doc
+      //  Update Firestore user doc
       await admin.firestore().doc(`users/${uid}`).update({
         email: newEmail,
         pendingEmail: admin.firestore.FieldValue.delete(),
       })
 
-      // ✅ Extend cancel token to 7 days as a recovery token (don't delete it yet)
+      //  Extend cancel token to 7 days as a recovery token (don't delete it yet)
       if (cancelToken) {
         await admin.firestore().doc(`emailCancelTokens/${cancelToken}`).update({
           expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
@@ -650,10 +650,10 @@ export const confirmEmailChange = onRequest(
         })
       }
 
-      // ✅ Delete the used verify token
+      //  Delete the used verify token
       await tokenDoc.ref.delete()
 
-      // ✅ Notify old email that the change is now live, with a 7-day undo link
+      //  Notify old email that the change is now live, with a 7-day undo link
       if (oldEmail && cancelToken) {
         const { Resend } = await import('resend')
         const resend = new Resend(process.env.RESEND_API_KEY!)
@@ -679,7 +679,7 @@ export const confirmEmailChange = onRequest(
         })
       }
 
-      // ✅ Redirect to login with success message
+      // / Redirect to login with success message
       res.redirect('https://studybuddyph.site/?emailUpdated=true')
     } catch (err) {
       console.error('confirmEmailChange error:', err)
@@ -717,7 +717,7 @@ export const cancelEmailChange = onRequest(
       }
 
       if (confirmed) {
-        // ✅ Change already went through — fully revert auth email back to oldEmail
+        // / Change already went through — fully revert auth email back to oldEmail
         await admin.auth().updateUser(uid, {
           email: oldEmail,
           emailVerified: true,
@@ -728,18 +728,18 @@ export const cancelEmailChange = onRequest(
           pendingEmail: admin.firestore.FieldValue.delete(),
         })
       } else {
-        // ✅ Change not yet confirmed — just clear pendingEmail
+        // / Change not yet confirmed — just clear pendingEmail
         await admin.firestore().doc(`users/${uid}`).update({
           pendingEmail: admin.firestore.FieldValue.delete(),
         })
 
-        // ✅ Delete the verify token so the new email link no longer works
+        // / Delete the verify token so the new email link no longer works
         if (verifyToken) {
           await admin.firestore().doc(`emailChangeTokens/${verifyToken}`).delete()
         }
       }
 
-      // ✅ Delete the cancel token — it's been used
+      // / Delete the cancel token — it's been used
       await cancelDoc.ref.delete()
 
       res.redirect('https://studybuddyph.site/?cancelResult=success')

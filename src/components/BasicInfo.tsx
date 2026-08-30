@@ -50,24 +50,32 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
     return `${local[0]}${'•'.repeat(Math.max(local.length - 1, 3))}@${domain}`
   }
 
+  // ── FIX: fetchUser now only trusts the sessionStorage cache when it has
+  // no pendingEmail. If a pendingEmail is present (or there's no cache at
+  // all), it always reloads auth + refetches Firestore and reconciles,
+  // so a confirmed email change can never be masked by a stale cache. ──
   useEffect(() => {
     if (!user) return
     const fetchUser = async () => {
       const cacheKey = `user_${user.uid}`
       const cached = sessionStorage.getItem(cacheKey)
+      const cachedData = cached ? JSON.parse(cached) : null
 
-      if (cached) {
-        const data = JSON.parse(cached)
-        setFirstName(data.firstName || '')
-        setLastName(data.lastName || '')
-        setOriginalFirstName(data.firstName || '')
-        setOriginalLastName(data.lastName || '')
-        setProfilePic(data.photoURL || '/profile.png')
-        setEmail(data.email || user.email || '')
+      // Fast path: cache exists and has nothing pending — safe to trust.
+      if (cachedData && !cachedData.pendingEmail) {
+        setFirstName(cachedData.firstName || '')
+        setLastName(cachedData.lastName || '')
+        setOriginalFirstName(cachedData.firstName || '')
+        setOriginalLastName(cachedData.lastName || '')
+        setProfilePic(cachedData.photoURL || '/profile.png')
+        setEmail(cachedData.email || user.email || '')
         return
       }
 
+      // Slow path: no cache, or cache has a pendingEmail that needs
+      // reconciling against the current auth/Firestore state.
       await user.reload()
+      const authEmail = auth.currentUser?.email
       const docSnap = await getDoc(doc(db, 'users', user.uid))
       if (docSnap.exists()) {
         const data = docSnap.data()
@@ -76,7 +84,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
         setOriginalFirstName(data.firstName || '')
         setOriginalLastName(data.lastName || '')
         setProfilePic(data.photoURL || '/profile.png')
-        const authEmail = auth.currentUser?.email
+
         if (data.pendingEmail && authEmail === data.pendingEmail) {
           await updateDoc(doc(db, 'users', user.uid), {
             email: data.pendingEmail,
