@@ -216,7 +216,7 @@ const { startTour } = useTour(
           disabled={!isOnline}
           title={!isOnline ? 'You are offline' : undefined}
           className="order-2 lg:order-1 bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-          py-2 lg:py-1 px-4 rounded-sm 
+          py-2 lg:py-1.5 3xl:py-0.5 px-4 rounded-sm 
           flex items-center justify-center gap-2
           font-inter font-black
           text-[10px] lg:text-[10px] md:ml-10

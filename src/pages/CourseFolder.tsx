@@ -375,6 +375,8 @@ id='goBackBtn-mobile'
                 {folderName}
               </p>
           <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
+            
+            {!previewFile && (
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -387,6 +389,7 @@ id='goBackBtn-mobile'
               </div>
               <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
             </button>
+      )}
         </div>
             <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
               <div className="min-h-screen  w-full flex flex-col">
@@ -418,7 +421,7 @@ id='goBackBtn-mobile'
                   </div>
                   <div className="flex flex-col lg:flex-row w-full 
                     px-4 sm:px-6 justify-center items-center py-1 md:justify-end md:items-center 
-                    lg:justify-end lg:items-center lg:pr-10 2xl:pr-16 lg:px-0 lg:gap-3
+                    lg:justify-end lg:items-center lg:pr-0 2xl:pr-0 lg:px-0 lg:gap-3 3xl:pr-0
                     gap-2 p-0">
                   <div className='flex items-center gap-2 w-full lg:w-40 mx-2'>
                     <select
@@ -428,7 +431,7 @@ id='goBackBtn-mobile'
                       onChange={(e) => setFilter(e.target.value)}
                       className='w-full lg:w-40 border border-primary-800 rounded-md
                       px-3 py-2 lg:py-1 lg:rounded-sm
-                      text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
+                      text-[10px] lg:text-[10px] xl:text-[11px] 2xl:text-[12px] 3xl:text-[16px] 
                       font-roboto text-primary-600
                       focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
                     >
@@ -462,8 +465,8 @@ id='goBackBtn-mobile'
                       font-inter font-black
                       disabled:bg-[#B0A030]
                       disabled:hover:flex-none
-                      text-[10px] lg:text-[8px]
-                      xl:text-[10px] 2xl:text-[12px]
+                      text-[10px] lg:text-[10px]
+                      xl:text-[11px] 2xl:text-[12px] 3xl:text-[16px] 
                       flex items-center justify-center gap-1.5
                       w-full lg:w-auto
                       hover:opacity-90
@@ -479,7 +482,7 @@ id='goBackBtn-mobile'
 
                 <hr className='w-full border-t border-primary-600 lg:mb-0' />
                 {uploading && (
-                  <div className='w-full bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm font-roboto px-4 py-2 rounded-md mb-3 flex items-center gap-2'>
+                  <div className='w-full lg:mt-3 bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm font-roboto px-4 py-2 rounded-md mb-3 flex items-center gap-2'>
                     ⚠ Please wait — navigating away will cancel the upload.
                   </div>
                 )}
@@ -527,7 +530,7 @@ id='goBackBtn-mobile'
                 )}
 
                 {error && (
-                  <p className='text-red-500 text-sm font-roboto mb-4 lg:text-[9px] border  text-center'>{error}</p>
+                  <p className='text-red-500 text-sm font-roboto mb-4 lg:text-[9px]  3xl:text-sm text-center'>{error}</p>
                 )}
 
                 {/* Files Area */}
@@ -672,21 +675,21 @@ id='goBackBtn-mobile'
                     {previewFile.fileType === 'pdf' ? (
                       <a href={previewFile.fileUrl} target="_blank" rel="noopener noreferrer" className="text-white text-xs md:text-md lg:text-[16px] xl:text-[16px] 2xl:text-[16px] font-roboto hover:opacity-70" title="Open PDF in new tab">
                         <div className="flex flex-row gap-3 items-center">
-                          <img className="w-5 h-5  select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/ViewIcon.png" alt="view icon" />
+                          <img className="w-5 h-5 ml-3 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/ViewIcon.png" alt="view icon" />
                           View in New Tab
                         </div>
                       </a>
-                    ) : (
-                      <a href={previewFile.fileUrl} download className="text-white text-md font-roboto hover:opacity-70" title="Download file">
-                        <div className="flex flex-row gap-3 items-center">
-                          <img className="w-5 h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/downloadIcon.png" alt="download icon" />
-                          Download
-                        </div>
-                      </a>
-                    )}
+                      ) : (
+                        <button onClick={() => handleDownload(previewFile)} className="text-white text-md font-roboto hover:opacity-70" title="Download file">
+                          <div className="flex flex-row gap-3 ml-3 items-center">
+                            <img className="w-5 h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/downloadIcon.png" alt="download icon" />
+                            Download
+                          </div>
+                        </button>
+                      )}
                     <button
                       onClick={() => { setPreviewFile(null); setPageNumber(1); setNumPages(0) }}
-                      className='text-white font-bold text-xl hover:opacity-70'
+                      className='text-white font-bold text-xl pl-5 hover:opacity-70'
                     >
                       ✕
                     </button>
@@ -792,6 +795,7 @@ id='goBackBtn-mobile'
                 </div>
               </div>
             )}
+            {!previewFile && (
                 <button
                   id='tour-btn'
                   onClick={() => startTour(                             )}
@@ -807,7 +811,10 @@ id='goBackBtn-mobile'
                   <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
                     font-inter font-semibold'>Need Help?</p>         
                 </button>
+             )}
+
           </div>
+          
         )
       }
 
