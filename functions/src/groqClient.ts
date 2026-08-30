@@ -26,7 +26,8 @@ async function postToGroq(prompt: string, apiKey: string) {
         { role: 'user', content: prompt },
       ],
       temperature: 0.3,
-      max_tokens: 4000,
+      max_tokens: 6000,          // ← was 4000
+      reasoning_effort: 'low',   // ← new: was defaulting to 'medium'
     },
     {
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -36,7 +37,6 @@ async function postToGroq(prompt: string, apiKey: string) {
 }
 
 export async function callGroq(prompt: string, apiKey: string): Promise<GroqResult> {
-  // Queue: don't let more than N users hit Groq at the exact same moment.
   const gotSlot = await acquireGroqSlot(3, 1500, 45000)
   if (!gotSlot) {
     throw new Error('Servers are busy right now. Please try again in a moment.')
@@ -56,15 +56,21 @@ export async function callGroq(prompt: string, apiKey: string): Promise<GroqResu
           await new Promise((r) => setTimeout(r, retryAfter * 1000))
           continue
         }
-        if (status === 429) {
-          throw new Error('Rate limit reached. Please try again shortly.')
-        }
+        if (status === 429) throw new Error('Rate limit reached. Please try again shortly.')
         throw err
       }
     }
 
-    const content = response!.data?.choices?.[0]?.message?.content
-    if (!content) throw new Error('Empty response from Groq API')
+    const choice = response!.data?.choices?.[0]
+    const content = choice?.message?.content
+    const finishReason = choice?.finish_reason
+
+    if (!content) {
+      if (finishReason === 'length') {
+        throw new Error('GROQ_TRUNCATED: Response was cut off before any output was generated. Try fewer items.')
+      }
+      throw new Error('GROQ_EMPTY: Empty response from Groq API')
+    }
 
     const usage: GroqUsage = {
       prompt_tokens: response!.data?.usage?.prompt_tokens ?? 0,

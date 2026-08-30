@@ -53,6 +53,7 @@ function Flashcard() {
   const [enabled, setEnabled] = useState(false)
   const [flipped, setFlipped] = useState<Record<number, boolean>>({})
   const [showModal, setShowModal] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
@@ -117,7 +118,7 @@ function Flashcard() {
     navigate('/studyGenerator')
   }
 
-  const handleSubmit = async () => {
+  const proceedDone = async () => {
     if (enabled) {
       const user = auth.currentUser
       if (user && result) {
@@ -140,6 +141,21 @@ function Flashcard() {
     }
 
     setShowModal(true)
+  }
+
+  const handleDone = async () => {
+    // "Save Generated" is off — confirm before finishing without saving
+    if (!enabled) {
+      setShowSaveConfirm(true)
+      return
+    }
+
+    await proceedDone()
+  }
+
+  const handleConfirmDoneWithoutSaving = () => {
+    setShowSaveConfirm(false)
+    proceedDone()
   }
 
   if (!result?.items || result.items.length === 0) {
@@ -320,9 +336,9 @@ function Flashcard() {
             </button>
             <button
               className='hover:opacity-50 lg:text-xs 2xl:text-lg bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'
-              onClick={handleSubmit}
+              onClick={handleDone}
             >
-              Save
+              Done
             </button>
           </div>
         </div>
@@ -388,6 +404,34 @@ function Flashcard() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ── Save Confirmation Modal ─────────────────────────────────────────── */}
+      {showSaveConfirm && (
+        <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/50'>
+          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
+            <p className='text-xl font-bold text-primary-600 uppercase text-center font-roboto'>
+              Finish Without Saving?
+            </p>
+            <p className='text-sm text-gray-500 text-center'>
+              "Save Generated" is off. This flashcard set won't appear in your Generated History. Continue anyway?
+            </p>
+            <div className='flex gap-4 w-full'>
+              <button
+                onClick={() => setShowSaveConfirm(false)}
+                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50 font-roboto uppercase'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDoneWithoutSaving}
+                className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:opacity-80 font-roboto uppercase'
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -53,10 +53,12 @@ function clearQuizSession() {
 
 function Quiz() {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([])
+  const mainRef = useRef<HTMLElement | null>(null)
   const location = useLocation()
   const navigate = useNavigate()
 
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
 
   // useRef so result never goes null on re-renders
   const [result] = useState<ResultState | null>(() => loadResult(location.state))
@@ -147,20 +149,7 @@ function Quiz() {
     return 'border-primary-600'
   }
 
-  const handleSubmit = async () => {
-    if (!allAnswered) {
-      setAttempted(true)
-      sessionStorage.setItem('quiz_attempted', 'true')
-      const firstUnanswered = questions.findIndex((_, i) => selected[i] === undefined)
-      if (firstUnanswered !== -1) {
-        questionRefs.current[firstUnanswered]?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        })
-      }
-      return
-    }
-
+  const proceedSubmit = async () => {
     const score = getScore()
     setFinalScore(score)
     setSubmitted(true)
@@ -208,6 +197,34 @@ function Quiz() {
     }
   }
 
+  const handleSubmit = async () => {
+    if (!allAnswered) {
+      setAttempted(true)
+      sessionStorage.setItem('quiz_attempted', 'true')
+      const firstUnanswered = questions.findIndex((_, i) => selected[i] === undefined)
+      if (firstUnanswered !== -1) {
+        questionRefs.current[firstUnanswered]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }
+      return
+    }
+
+    // All questions answered, but "Save Generated" is off — confirm before submitting
+    if (!enabled) {
+      setShowSaveConfirm(true)
+      return
+    }
+
+    await proceedSubmit()
+  }
+
+  const handleConfirmSubmitWithoutSaving = () => {
+    setShowSaveConfirm(false)
+    proceedSubmit()
+  }
+
   const handleDiscard = () => {
     sessionStorage.removeItem(SESSION_KEY_RESULT)
     clearQuizSession()
@@ -238,13 +255,12 @@ function Quiz() {
     setSaveSuccess(false)
     setQuestions(shuffleQuestions(questions))
     clearQuizSession()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    mainRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleOk = () => {
-    sessionStorage.removeItem(SESSION_KEY_RESULT)
-    clearQuizSession()
-    navigate('/studyGenerator')
+    setShowModal(false)
+    mainRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleDeleteRequest = (qIndex: number) => {
@@ -303,7 +319,7 @@ function Quiz() {
 
      <Sidebar quizActive={!submitted} />
      </div>
-      <main className='flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1'>
+      <main ref={mainRef} className='flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1'>
 
         <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
           <p className=' text-center font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz</p>
@@ -490,16 +506,18 @@ function Quiz() {
             </div>
           ))}
 
-          <div className='flex flex-row justify-start items-center gap-3'>
-            <button
-              aria-label={enabled ? 'Disable save generated' : 'Enable save generated'}
-              onClick={() => setEnabled(!enabled)}
-              className={`w-14 h-8 flex items-center rounded-full p-1 transition ${enabled ? 'bg-green-500' : 'bg-gray-400'}`}
-            >
-              <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
-            </button>
-            <p className='text-xs md:text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-semibold text-primary-600'>SAVE GENERATED</p>
-          </div>
+          {!submitted && (
+            <div className='flex flex-row justify-start items-center gap-3'>
+              <button
+                aria-label={enabled ? 'Disable save generated' : 'Enable save generated'}
+                onClick={() => setEnabled(!enabled)}
+                className={`w-14 h-8 flex items-center rounded-full p-1 transition ${enabled ? 'bg-green-500' : 'bg-gray-400'}`}
+              >
+                <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+              <p className='text-xs md:text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-semibold text-primary-600'>SAVE GENERATED</p>
+            </div>
+          )}
 
           <div className='flex flex-row ml-auto gap-4 mb-10 items-center'>
             {attempted && !submitted && !allAnswered && (
@@ -514,11 +532,10 @@ function Quiz() {
               Discard
             </button>
             <button
-              className='hover:opacity-50 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl lg:py-1 xl:py-1.5 2xl:py-2 3xl:py-2.5 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase disabled:opacity-40'
-              onClick={handleSubmit}
-              disabled={submitted}
+              className='hover:opacity-50 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl lg:py-1 xl:py-1.5 2xl:py-2 3xl:py-2.5 bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm rounded-md md:text-xl uppercase'
+              onClick={submitted ? handleRetake : handleSubmit}
             >
-              Submit
+              {submitted ? 'Retake' : 'Submit'}
             </button>
           </div>
         </div>
@@ -644,6 +661,33 @@ function Quiz() {
                 className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600 font-roboto uppercase'
               >
                 Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSaveConfirm && (
+        <div className='fixed inset-0 z-[70] flex items-center justify-center bg-black/50'>
+          <div className='bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 p-8 flex flex-col items-center gap-6'>
+            <p className='text-xl font-bold text-primary-600 uppercase text-center font-roboto'>
+              Submit Without Saving?
+            </p>
+            <p className='text-sm text-gray-500 text-center'>
+              "Save Generated" is off. This attempt won't appear in your Generated History. Submit anyway?
+            </p>
+            <div className='flex gap-4 w-full'>
+              <button
+                onClick={() => setShowSaveConfirm(false)}
+                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50 font-roboto uppercase'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSubmitWithoutSaving}
+                className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:opacity-80 font-roboto uppercase'
+              >
+                Submit Anyway
               </button>
             </div>
           </div>
