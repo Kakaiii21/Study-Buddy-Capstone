@@ -328,7 +328,7 @@ function GeneratedHistory() {
               {/* ── Flashcard Table ── */}
               {selectedGen === 'Flashcard' && (
                 <>
-                  <div  className='grid lg:pb-2 grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 border-b text-gray-500 text-xs font-medium'>
+                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                     <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
@@ -339,7 +339,7 @@ function GeneratedHistory() {
                     <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
                   ) : (
                     filteredFlashcard.map((item) => (
-                      <div key={item.id} className=' py-2 lg:py-1 2xl:py-2 3xl:py-3'>
+                      <div key={item.id} className=' py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                         <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
                           <div className='min-w-0'>
                             <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>

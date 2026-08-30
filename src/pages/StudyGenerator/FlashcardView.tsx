@@ -153,20 +153,20 @@ function FlashcardView() {
           )}
         </div>
 
-        <div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6  mt-4 lg:mt-0'>
-          <p className=' hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
-            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>
+<div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6  mt-4 lg:mt-0'>
+  <div className='hidden lg:flex lg:items-center justify-between w-full lg:pl-0
+    mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3'>
+    <p className='font-inter font-semibold text-sm md:text-md lg:text-[10px]  xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
             Flashcard
           </p>
           {fileName && (
-            <span className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
-            font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>
+      <span className='font-inter font-semibold text-sm md:text-md lg:text-[10px] lg:mr-1 xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
+
               from: {fileName}
             </span>
           )}
         </div>
+      </div>
 
         {saving && (
           <p className='text-xs text-gray-400 font-roboto text-center mb-4'>Saving changes...</p>
