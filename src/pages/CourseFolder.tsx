@@ -671,21 +671,40 @@ id='goBackBtn-mobile'
       {/* File Preview Modal */}
       {previewFile && (
         <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex flex-col' onClick={(e) => e.stopPropagation()}>
-          <div className='flex justify-between items-center px-4 py-3 bg-primary-600'>
-            <p className='text-white font-roboto font-semibold truncate'>{previewFile.fileName}</p>
-            <div className='flex items-center gap-5'>
+          {/* ── Modal header: stacks on mobile (filename+close on top, actions below), single row from sm: up ── */}
+          <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-primary-600'>
+            <div className='flex items-center justify-between gap-3 min-w-0'>
+              <p className='text-white font-roboto font-semibold truncate min-w-0 text-sm sm:text-base'>
+                {previewFile.fileName}
+              </p>
+              <button
+                onClick={() => { setPreviewFile(null); setPageNumber(1); setNumPages(0) }}
+                className='sm:hidden text-white font-bold text-xl leading-none shrink-0 px-1'
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className='flex items-center justify-end gap-4 sm:gap-5 shrink-0'>
               {previewFile.fileType === 'pdf' ? (
-                <a href={previewFile.fileUrl} target="_blank" rel="noopener noreferrer" className="text-white text-xs md:text-md lg:text-[16px] xl:text-[16px] 2xl:text-[16px] font-roboto hover:opacity-70" title="Open PDF in new tab">
-                  <div className="flex flex-row gap-3 items-center">
-                    <img className="w-5 h-5 ml-3 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/ViewIcon.png" alt="view icon" />
-                    View in New Tab
+                <a
+                  href={previewFile.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white text-xs sm:text-sm lg:text-[16px] font-roboto hover:opacity-70"
+                  title="Open PDF in new tab"
+                >
+                  <div className="flex flex-row gap-2 items-center whitespace-nowrap">
+                    <img className="w-5 h-5 select-none shrink-0" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/ViewIcon.png" alt="view icon" />
+                    <span className='hidden sm:inline'>View in New Tab</span>
+                    <span className='sm:hidden'>View</span>
                   </div>
                 </a>
                 ) : (
-                  <button onClick={() => handleDownload(previewFile)} className="text-white text-md font-roboto hover:opacity-70" title="Download file">
-                    <div className="flex flex-row gap-3 ml-3 items-center">
-                      <img className="w-5 h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/downloadIcon.png" alt="download icon" />
-                      Download
+                  <button onClick={() => handleDownload(previewFile)} className="text-white text-xs sm:text-sm lg:text-[16px] font-roboto hover:opacity-70" title="Download file">
+                    <div className="flex flex-row gap-2 items-center whitespace-nowrap">
+                      <img className="w-5 h-5 select-none shrink-0" onContextMenu={(e) => e.preventDefault()} draggable={false} src="/downloadIcon.png" alt="download icon" />
+                      <span>Download</span>
                     </div>
                   </button>
                 )}
@@ -697,17 +716,16 @@ id='goBackBtn-mobile'
                       '_blank'
                     )
                   }
-                  className="text-white text-md font-roboto hover:opacity-70"
+                  className="text-white text-xs sm:text-sm lg:text-[16px] font-roboto hover:opacity-70 whitespace-nowrap"
                   title="Open in new tab to start slideshow"
                 >
-                  <div className="flex flex-row gap-3 ml-3 items-center">
-                    Present in New Tab
-                  </div>
+                  <span className='hidden sm:inline'>Present in New Tab</span>
+                  <span className='sm:hidden'>Present</span>
                 </button>
               )}
               <button
                 onClick={() => { setPreviewFile(null); setPageNumber(1); setNumPages(0) }}
-                className='text-white font-bold text-xl pl-5 hover:opacity-70'
+                className='hidden sm:block text-white font-bold text-xl pl-2 hover:opacity-70'
               >
                 ✕
               </button>
@@ -721,7 +739,7 @@ id='goBackBtn-mobile'
 
             {previewFile.fileType === 'pdf' && (
               <div className='flex flex-col w-full h-full'>
-                <div className='flex-1 overflow-y-auto flex justify-center py-4'>
+                <div className='flex-1 overflow-y-auto flex justify-center py-2 sm:py-4 px-2'>
                   <Document
                     file={pdfFile}
                     onLoadSuccess={({ numPages }) => { setNumPages(numPages); setPageNumber(1) }}
@@ -731,18 +749,18 @@ id='goBackBtn-mobile'
                   >
                     <Page
                       pageNumber={pageNumber}
-                      width={Math.min(window.innerWidth - 32, 800)}
+                      width={Math.min(window.innerWidth - 24, 800)}
                       renderTextLayer={true}
                       renderAnnotationLayer={true}
                     />
                   </Document>
                 </div>
                 {numPages > 0 && (
-                  <div className='flex-shrink-0 flex items-center justify-center gap-4 py-4 bg-gray-900'>
-                    <div className='flex items-center gap-4 bg-gray-800 px-6 py-3 rounded-full'>
-                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.max(p - 1, 1)) }} disabled={pageNumber <= 1} className='text-white font-bold text-lg disabled:opacity-30 px-2'>‹</button>
-                      <p className='text-white font-roboto text-sm'>Page {pageNumber} of {numPages}</p>
-                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.min(p + 1, numPages)) }} disabled={pageNumber >= numPages} className='text-white font-bold text-lg disabled:opacity-30 px-2'>›</button>
+                  <div className='flex-shrink-0 flex items-center justify-center gap-4 py-3 sm:py-4 bg-gray-900'>
+                    <div className='flex items-center gap-3 sm:gap-4 bg-gray-800 px-4 sm:px-6 py-2 sm:py-3 rounded-full'>
+                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.max(p - 1, 1)) }} disabled={pageNumber <= 1} className='text-white font-bold text-base sm:text-lg disabled:opacity-30 px-2'>‹</button>
+                      <p className='text-white font-roboto text-xs sm:text-sm whitespace-nowrap'>Page {pageNumber} of {numPages}</p>
+                      <button onClick={(e) => { e.stopPropagation(); setPageNumber((p) => Math.min(p + 1, numPages)) }} disabled={pageNumber >= numPages} className='text-white font-bold text-base sm:text-lg disabled:opacity-30 px-2'>›</button>
                     </div>
                   </div>
                 )}
@@ -763,16 +781,16 @@ id='goBackBtn-mobile'
                   className='w-full h-full'
                   title={previewFile.fileName}
                 />
-                <div className='flex-shrink-0 flex items-center justify-center gap-4 py-2 bg-gray-900'>
+                <div className='flex-shrink-0 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 py-2 bg-gray-900 px-2 text-center'>
                   <button
                     onClick={() => setDocViewer(docViewer === 'office' ? 'google' : 'office')}
-                    className='text-xs text-gray-300 underline hover:text-white'
+                    className='text-[11px] sm:text-xs text-gray-300 underline hover:text-white'
                   >
                     Not loading? Try another viewer
                   </button>
                   <button
                     onClick={() => handleDownload(previewFile)}
-                    className='text-xs text-gray-300 underline hover:text-white'
+                    className='text-[11px] sm:text-xs text-gray-300 underline hover:text-white'
                   >
                     Download instead
                   </button>
