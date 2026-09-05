@@ -701,7 +701,7 @@ id='goBackBtn-mobile'
                   title="Open in new tab to start slideshow"
                 >
                   <div className="flex flex-row gap-3 ml-3 items-center">
-                    Slideshow
+                    Present in New Tab
                   </div>
                 </button>
               )}
