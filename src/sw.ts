@@ -79,7 +79,7 @@ self.addEventListener('push', (event) => {
   const title = notification.title ?? 'Study Buddy'
   const options: NotificationOptions = {
     body: notification.body ?? '',
-    icon: '/icon-192.png',
+    icon: '/web-app-manifest-192x192.png',
     tag: data.taskId ? `task-deadline-${data.taskId}` : undefined,
     data,
     requireInteraction: true,
@@ -166,8 +166,8 @@ function scheduleTimer(taskId: string, taskName: string, deadline: string) {
 
     self.registration.showNotification('⏰ Task Due Soon!', {
       body: `"${taskName}" is due in 1 hour.`,
-      icon: '/icon-192.png',
-      //`badge: '/icon-192.png',
+      icon: '/web-app-manifest-192x192.png',
+      //`badge: '/web-app-manifest-192x192.png',
       tag: `task-deadline-${taskId}`,
       data: { taskId, deadline },
       requireInteraction: true,
