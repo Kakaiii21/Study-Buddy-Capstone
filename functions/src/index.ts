@@ -825,3 +825,4 @@ export const reactivateAccount = onRequest(
 
 export { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
 export { cleanupDeactivatedAccounts } from './cleanup'
+export { checkTaskDeadlines } from './checkTaskDeadlines'

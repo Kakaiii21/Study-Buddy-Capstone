@@ -58,7 +58,41 @@ self.addEventListener('activate', (e) => {
   )
 })
 
+// ── Push notifications (FCM) ───────────────────────────────────
+// Handles pushes sent server-side via Firebase Cloud Messaging. This is
+// what lets a notification arrive even if the app is fully closed on
+// this device — independent of whichever device actually created or
+// edited the task.
+
+self.addEventListener('push', (event) => {
+  let payload: { notification?: { title?: string; body?: string }; data?: Record<string, string> } = {}
+  try {
+    payload = event.data ? event.data.json() : {}
+  } catch (err) {
+    console.error('Failed to parse push payload:', err)
+    return
+  }
+
+  const notification = payload.notification ?? {}
+  const data = payload.data ?? {}
+
+  const title = notification.title ?? 'Study Buddy'
+  const options: NotificationOptions = {
+    body: notification.body ?? '',
+    icon: '/icon-192.png',
+    tag: data.taskId ? `task-deadline-${data.taskId}` : undefined,
+    data,
+    requireInteraction: true,
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
 // ── IndexedDB helpers ─────────────────────────────────────────
+// NOTE: this section (through the message handler below) is the old
+// client-side, single-device scheduling system. Kept in place for now
+// as a fallback while the FCM path above is being tested — remove once
+// the Cloud Function is confirmed working end-to-end on all devices.
 
 const DB_NAME = 'notif-store'
 const STORE = 'deadlines'

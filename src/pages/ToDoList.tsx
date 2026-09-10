@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTour } from '../hooks/useTour'
+import { useFcmRegistration } from '../hooks/useFcmRegistration'
 import {
   DndContext,
   useDroppable,
@@ -681,6 +682,7 @@ function ToDoList() {
   const [clearingAll, setClearingAll] = useState(false)
 
   useTaskNotifications(tasks)
+  useFcmRegistration(user)
 
   const [collapsedCols, setCollapsedCols] = useState<Record<Status, boolean>>({
     'todo': false,

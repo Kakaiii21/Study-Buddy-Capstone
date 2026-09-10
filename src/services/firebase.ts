@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
+import { getMessaging, type Messaging } from 'firebase/messaging'
+import { getApp } from 'firebase/app' 
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,3 +20,16 @@ export const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager()
   })
 })
+
+let messaging: Messaging | null = null
+export function getMessagingInstance(): Messaging | null {
+  if (typeof window === 'undefined') return null
+  if (!messaging) {
+    try {
+      messaging = getMessaging(getApp())
+    } catch {
+      return null
+    }
+  }
+  return messaging
+}
