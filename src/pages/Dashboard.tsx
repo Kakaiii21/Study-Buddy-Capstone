@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom'
 import StudyTimer from '../components/StudyTimer'
 import { useAuth } from '../hooks/useAuth'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { useTimerContext } from '../context/TimerContext' 
 import { useQuizHistory } from '../hooks/useQuizHistory'
@@ -86,23 +86,71 @@ function Dashboard() {
     sessionStorage.setItem(`taskProgress_${user.uid}`, String(computedPercent))
   }, [computedPercent, tasksLoading, user])
 
-  const [firstName, setFirstName] = useState<string | null>(null)
-  const [profilePic, setProfilePic] = useState('/profile.png')
+  // Shape of the fields we read off the cached/live users/{uid} doc.
+  // Matches the subset of Firestore fields this component actually uses.
+  interface CachedUserDoc {
+    firstName?: string
+    lastName?: string
+    photoURL?: string | null
+    age?: number | null
+    yearLevel?: string
+    cardColor?: string
+    hasCustomizedCard?: boolean
+  }
 
-  const [lastName, setLastName] = useState<string | null>(null)
-  const [age, setAge] = useState<number | null>(null)
-  const [yearLevel, setYearLevel] = useState<string | null>(null)
-  const [hasCustomizedCard, setHasCustomizedCard] = useState<boolean | null>(null)
+  // One-time synchronous read of this device's cached copy of the user
+  // doc, used only to seed initial state so the dashboard paints
+  // instantly. This runs during render (lazy useState initializer), not
+  // inside an effect — every subsequent update comes from the onSnapshot
+  // listener's callback instead.
+  const [initialUserCache] = useState<CachedUserDoc | null>(() => {
+    const uid = user?.uid ?? sessionStorage.getItem('lastUid')
+    if (!uid) return null
+    const cached = sessionStorage.getItem(`user_${uid}`)
+    if (!cached) return null
+    try {
+      return JSON.parse(cached) as CachedUserDoc
+    } catch {
+      return null
+    }
+  })
 
-  const [showCustomize, setShowCustomize] = useState(false)
-  const [cardColor, setCardColor] = useState('#C9C9C9')
-  const [formCardColor, setFormCardColor] = useState('#C9C9C9') 
+  const [firstName, setFirstName] = useState<string | null>(
+    initialUserCache ? (initialUserCache.firstName || 'Student') : null
+  )
+  const [profilePic, setProfilePic] = useState(initialUserCache?.photoURL || '/profile.png')
 
-  const [formFirstName, setFormFirstName] = useState('')
-  const [formLastName, setFormLastName] = useState('')
-  const [formAge, setFormAge] = useState('')
-  const [formYearLevel, setFormYearLevel] = useState('')
-  const [savingField, setSavingField] = useState<string | null>(null)
+  const [lastName, setLastName] = useState<string | null>(
+    initialUserCache ? (initialUserCache.lastName || '') : null
+  )
+  const [age, setAge] = useState<number | null>(initialUserCache?.age ?? null)
+  const [yearLevel, setYearLevel] = useState<string | null>(
+    initialUserCache ? (initialUserCache.yearLevel || '') : null
+  )
+  const [hasCustomizedCard, setHasCustomizedCard] = useState<boolean | null>(
+    initialUserCache ? (initialUserCache.hasCustomizedCard ?? false) : null
+  )
+
+  const [showCustomize, setShowCustomize] = useState(initialUserCache?.hasCustomizedCard === false)
+  const [cardColor, setCardColor] = useState(initialUserCache?.cardColor || '#C9C9C9')
+  const [formCardColor, setFormCardColor] = useState(initialUserCache?.cardColor || '#C9C9C9')
+
+  const [formFirstName, setFormFirstName] = useState(
+    initialUserCache?.hasCustomizedCard === false ? (initialUserCache?.firstName || '') : ''
+  )
+  const [formLastName, setFormLastName] = useState(
+    initialUserCache?.hasCustomizedCard === false ? (initialUserCache?.lastName || '') : ''
+  )
+  const [formAge, setFormAge] = useState(
+    initialUserCache?.hasCustomizedCard === false &&
+    initialUserCache?.age !== undefined &&
+    initialUserCache?.age !== null
+      ? String(initialUserCache.age)
+      : ''
+  )
+  const [formYearLevel, setFormYearLevel] = useState(
+    initialUserCache?.hasCustomizedCard === false ? (initialUserCache?.yearLevel || '') : ''
+  )
 
   // Pending profile-picture changes, staged in the modal until Save is clicked.
   const [pendingProfileFile, setPendingProfileFile] = useState<File | null>(null)
@@ -129,11 +177,19 @@ function Dashboard() {
 
   useEffect(() => {
     if (!user) return
-    const loadUser = async () => {
-      const cacheKey = `user_${user.uid}`
-      const cached = sessionStorage.getItem(cacheKey)
-      if (cached) {
-        const data = JSON.parse(cached)
+    const cacheKey = `user_${user.uid}`
+
+    // Live listener instead of a one-time getDoc: this is what makes
+    // changes made on one device (e.g. laptop) show up on another (e.g.
+    // phone) without a manual refresh — including the moment a write that
+    // was queued while offline actually reaches Firestore. Every setState
+    // call below happens inside this subscription callback, not directly
+    // in the effect body.
+    const unsubscribe = onSnapshot(
+      doc(db, 'users', user.uid),
+      (snap) => {
+        if (!snap.exists()) return
+        const data = snap.data()
         setFirstName(data.firstName || 'Student')
         setProfilePic(data.photoURL || '/profile.png')
         setLastName(data.lastName || '')
@@ -148,46 +204,26 @@ function Dashboard() {
           setFormYearLevel(data.yearLevel || '')
           setShowCustomize(true)
         }
-        return
+        sessionStorage.setItem(cacheKey, JSON.stringify(data))
+      },
+      (err) => {
+        console.error('Failed to listen to user doc:', err)
       }
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid))
-        if (snap.exists()) {
-          const data = snap.data()
-          setFirstName(data.firstName || 'Student')
-          setProfilePic(data.photoURL || '/profile.png')
-          setLastName(data.lastName || '')
-          setAge(data.age ?? null)
-          setYearLevel(data.yearLevel || '')
-          setCardColor(data.cardColor || '#D9CBF5')
-          setHasCustomizedCard(data.hasCustomizedCard ?? false)
-          if (data.hasCustomizedCard === false) {
-            setFormFirstName(data.firstName || '')
-            setFormLastName(data.lastName || '')
-            setFormAge(data.age !== undefined && data.age !== null ? String(data.age) : '')
-            setFormYearLevel(data.yearLevel || '')
-            setShowCustomize(true)
-          }
-          sessionStorage.setItem(cacheKey, JSON.stringify(data))
-        }
-      } catch {
-        setFirstName('Student')
-        setProfilePic('/profile.png')
-      }
-    }
-    loadUser()
+    )
 
     const handleUpdate = () => {
-      const cacheKey = `user_${user.uid}`
-      const cached = sessionStorage.getItem(cacheKey)
-      if (cached) {
-        const data = JSON.parse(cached)
+      const cachedNow = sessionStorage.getItem(cacheKey)
+      if (cachedNow) {
+        const data = JSON.parse(cachedNow)
         setProfilePic(data.photoURL || '/profile.png')
         setFirstName(data.firstName || 'Student')
       }
     }
     window.addEventListener('profilePicUpdated', handleUpdate)
-    return () => window.removeEventListener('profilePicUpdated', handleUpdate)
+    return () => {
+      unsubscribe()
+      window.removeEventListener('profilePicUpdated', handleUpdate)
+    }
   }, [user])
 
   const formatElapsed = (total: number): string => {
@@ -205,6 +241,23 @@ function Dashboard() {
 
   const customizeFileInputRef = useRef<HTMLInputElement>(null)
   const [uploadingPic, setUploadingPic] = useState(false)
+
+  // Tracks browser connectivity so picture upload/removal (which needs a
+  // real network round-trip to Cloudinary/Cloud Functions) can be disabled
+  // offline, while text fields + card color still save fine via Firestore's
+  // built-in offline queueing.
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   // Live preview shown inside the customize modal only — reflects a
   // pending file pick / pending remove, not the saved profilePic yet.
@@ -252,34 +305,44 @@ function Dashboard() {
     setShowCustomize(false)
   }
 
-  const handleSaveCardField = async (
+  const handleSaveCardField = (
     field: 'firstName' | 'lastName' | 'age' | 'yearLevel' | 'cardColor',
     value: string | number
   ) => {
     if (!user) return
-    setSavingField(field)
-    try {
-      await updateDoc(doc(db, 'users', user.uid), { [field]: value })
-      const cacheKey = `user_${user.uid}`
-      const cached = sessionStorage.getItem(cacheKey)
-      if (cached) {
-        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
-      }
-    } catch (err) {
-      console.error(`Failed to save ${field}:`, err)
-    } finally {
-      setSavingField(null)
+    // Update the local cache immediately so the UI reflects the change
+    // right away regardless of connectivity. We deliberately don't await
+    // updateDoc(): its Promise only resolves once the server acknowledges
+    // the write, which never happens while offline — awaiting it would
+    // hang forever. Firestore queues the write locally on its own and
+    // syncs it automatically once the connection is back.
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
     }
+    updateDoc(doc(db, 'users', user.uid), { [field]: value }).catch((err) => {
+      console.error(`Failed to sync ${field} to server:`, err)
+    })
   }
 
   const handleSaveCustomizeAll = async () => {
     const trimmedFirst = formFirstName.trim()
     const trimmedLast = formLastName.trim()
     const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
-    const pictureWasChanged = Boolean(pendingProfileFile) || pendingRemove
+
+    // Only count the picture as "changed" for this save if we can actually
+    // reach Cloudinary/Cloud Functions right now. The Firestore field writes
+    // below are fine offline (queued locally and synced automatically) —
+    // the picture upload/removal is a real network call with no offline path.
+    const pictureWasChanged = (Boolean(pendingProfileFile) || pendingRemove) && isOnline
+
+    if (!isOnline && (pendingProfileFile || pendingRemove)) {
+      showToast("You're offline — your photo change will save once you're back online.")
+    }
 
     // Commit a staged new profile picture (upload to Cloudinary, delete old asset).
-    if (pendingProfileFile && user) {
+    if (pendingProfileFile && user && isOnline) {
       setUploadingPic(true)
       try {
         const userSnap = await getDoc(doc(db, 'users', user.uid))
@@ -324,7 +387,7 @@ function Dashboard() {
       } finally {
         setUploadingPic(false)
       }
-    } else if (pendingRemove && user) {
+    } else if (pendingRemove && user && isOnline) {
       // Commit a staged removal.
       try {
         const userSnap = await getDoc(doc(db, 'users', user.uid))
@@ -357,25 +420,32 @@ function Dashboard() {
       }
     }
 
-    if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
-    setPendingProfileFile(null)
-    setPendingProfilePreview(null)
-    setPendingRemove(false)
+    // Only clear the staged picture state once it's actually been committed
+    // (or there was nothing pending). If we're offline, leave it staged so
+    // it survives to the next Save attempt once connectivity returns.
+    if (isOnline) {
+      if (pendingProfilePreview) URL.revokeObjectURL(pendingProfilePreview)
+      setPendingProfileFile(null)
+      setPendingProfilePreview(null)
+      setPendingRemove(false)
+    }
 
-    if (trimmedFirst && trimmedFirst !== firstName) await handleSaveCardField('firstName', trimmedFirst)
-    if (trimmedLast && trimmedLast !== lastName) await handleSaveCardField('lastName', trimmedLast)
-    if (numericAge !== null && numericAge !== age) await handleSaveCardField('age', numericAge)
-    if (formYearLevel && formYearLevel !== yearLevel) await handleSaveCardField('yearLevel', formYearLevel)
-    await handleSaveCardField('cardColor', formCardColor)
+    if (trimmedFirst && trimmedFirst !== firstName) handleSaveCardField('firstName', trimmedFirst)
+    if (trimmedLast && trimmedLast !== lastName) handleSaveCardField('lastName', trimmedLast)
+    if (numericAge !== null && numericAge !== age) handleSaveCardField('age', numericAge)
+    if (formYearLevel && formYearLevel !== yearLevel) handleSaveCardField('yearLevel', formYearLevel)
+    handleSaveCardField('cardColor', formCardColor)
     setCardColor(formCardColor) 
 
     if (!hasCustomizedCard && user) {
-      await updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true })
       const cacheKey = `user_${user.uid}`
       const cached = sessionStorage.getItem(cacheKey)
       if (cached) {
         sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), hasCustomizedCard: true }))
       }
+      updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true }).catch((err) => {
+        console.error('Failed to sync hasCustomizedCard to server:', err)
+      })
       setHasCustomizedCard(true)
     }
 
@@ -709,7 +779,7 @@ className='relative flex flex-col justify-between text-left p-2
                         <button
                           type='button'
                           aria-label='change profile picture'
-                          disabled={uploadingPic}
+                          disabled={uploadingPic || !isOnline}
                           onClick={() => customizeFileInputRef.current?.click()}
                           className='relative w-full h-full block disabled:opacity-40'
                         >
@@ -722,7 +792,7 @@ className='relative flex flex-col justify-between text-left p-2
                           {/* Hover overlay */}
                           <div className='absolute inset-0 bg-black/50 opacity-0 group-hover/pic:opacity-100 transition-opacity duration-200 flex items-center justify-center'>
                             <span className='text-white text-[9px] font-inter font-medium uppercase text-center px-1'>
-                              {uploadingPic ? 'Uploading...' : 'Change'}
+                              {uploadingPic ? 'Uploading...' : !isOnline ? 'Offline' : 'Change'}
                             </span>
                           </div>
                         </button>
@@ -737,10 +807,16 @@ className='relative flex flex-col justify-between text-left p-2
                       <button
                         type='button'
                         onClick={handleRemoveProfilePicClick}
-                        className='text-red-500 text-[9px] font-inter hover:underline'
+                        disabled={!isOnline}
+                        className='text-red-500 text-[9px] font-inter hover:underline disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed'
                       >
                         Remove
                       </button>
+                      {!isOnline && (
+                        <p className='text-[7px] text-gray-400 font-inter text-center leading-tight'>
+                          Connect to change photo
+                        </p>
+                      )}
                       <div
                         className='w-full h-3 mt-2'
                         style={{
@@ -857,10 +933,10 @@ className='relative flex flex-col justify-between text-left p-2
 
                 <button
                   onClick={handleSaveCustomizeAll}
-                  disabled={savingField !== null}
+                  disabled={uploadingPic}
                   className='order-3 md:order-1 mt-1 md:mt-0 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
                 >
-                  {savingField ? 'Saving...' : 'Save'}
+                  {uploadingPic ? 'Saving...' : 'Save'}
                 </button>
 
                 <button
