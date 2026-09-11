@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
 import { useTour } from '../hooks/useTour'
+import { useCategories, type Category } from '../hooks/useCategories'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
@@ -54,11 +55,15 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
 }
 
 function Notes() {
-  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
+  const { categories, addCategory, deleteCategory } = useCategories(user)
+  const { schedules } = useClassSched(user)
+  const schedSubjects = useMemo(() => schedules.map((s) => s.subject), [schedules])
+
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
-  const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<string | null>(null)
+  const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<Category | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
   const { startTour } = useTour(
@@ -69,11 +74,11 @@ function Notes() {
     user
   )
 
-  function handleSubjectDelete(subject: string) {
-    const affectedNotes = notes.filter((n) => n.subject === subject)
+  function handleSubjectDelete(category: Category) {
+    const affectedNotes = notes.filter((n) => n.subject === category.name)
     affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Categories' }))
-    setSubjects((prev) => prev.filter((s) => s !== subject))
-    if (selectedSubject === subject) setSelectedSubject('All Categories')
+    deleteCategory(category.id)
+    if (selectedSubject === category.name) setSelectedSubject('All Categories')
     setDeleteSubjectConfirm(null)
   }
 
@@ -89,12 +94,8 @@ function Notes() {
     }
   }
 
-  const { schedules } = useClassSched(user)
-  const schedSubjects = useMemo(() => schedules.map((s) => s.subject), [schedules])
-
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
-  const [subjects, setSubjects] = useState<string[]>([])
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [selectedSubject, setSelectedSubject] = useState('All Categories')
@@ -109,14 +110,6 @@ function Notes() {
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
-
-useEffect(() => {
-    if (notes.length === 0) return
-    const fromNotes = notes
-      .map((n) => n.subject)
-      .filter((s) => s !== 'All Categories' && !schedSubjects.includes(s))
-    setSubjects((prev) => Array.from(new Set([...prev, ...fromNotes])))
- }, [notes, schedSubjects])
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
@@ -142,7 +135,7 @@ useEffect(() => {
 
   function handleSubjectSave() {
     if (subjectName.trim() === '') return
-    setSubjects((prev) => [...prev, subjectName.trim()])
+    addCategory(subjectName.trim())
     setSubjectName('')
     setIsSubjectModalOpen(false)
     setIsDropdownOpen(true)
@@ -245,8 +238,7 @@ useEffect(() => {
 
   const allSubjects = Array.from(
     new Set([
-      ...subjects.map((s) => s.trim()),
-      ...notes.map((n) => n.subject).filter((s) => s !== 'All Categories').map((s) => s.trim()),
+      ...categories.map((c) => c.name.trim()),
       ...schedules.map((s) => s.subject.trim()),
     ])
   )
@@ -416,7 +408,11 @@ useEffect(() => {
                             </button>
                              {!schedSubjects.includes(subject) && (
                               <button
-                                onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  const category = categories.find((c) => c.name === subject)
+                                  if (category) setDeleteSubjectConfirm(category)
+                                }}
                                 className='ml-2 text-primary-600 hover:text-red-500 font-bold text-xs flex-shrink-0'
                                 aria-label={`Delete ${subject}`}
                               >
@@ -588,7 +584,11 @@ useEffect(() => {
                       </button>
                        {!schedSubjects.includes(subject) && (
                         <button
-                          onClick={(e) => { e.stopPropagation(); setDeleteSubjectConfirm(subject) }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const category = categories.find((c) => c.name === subject)
+                            if (category) setDeleteSubjectConfirm(category)
+                          }}
                           className={`ml-2 font-bold text-xs flex-shrink-0
                             ${selectedSubject === subject ? 'text-white hover:text-red-200' : 'text-primary-600 hover:text-red-500'}`}
                           aria-label={`Delete ${subject}`}
@@ -702,9 +702,9 @@ useEffect(() => {
                 <p className='text-sm text-gray-500 text-center'>
                   <span
                     className='block max-w-[260px] mx-auto truncate font-semibold text-primary-600'
-                    title={deleteSubjectConfirm}
+                    title={deleteSubjectConfirm.name}
                   >
-                    "{deleteSubjectConfirm}"
+                    "{deleteSubjectConfirm.name}"
                   </span>
                   will be removed. Notes tagged with this category will be moved to <span className='font-semibold'>All Categories</span>.
                 </p>
