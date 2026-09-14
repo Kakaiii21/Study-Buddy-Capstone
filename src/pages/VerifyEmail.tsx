@@ -31,7 +31,7 @@ useEffect(() => {
 
   return () => clearInterval(interval)
 }, [])
-  const handleContinue = async () => {
+const handleContinue = async () => {
   const user = auth.currentUser
   if (!user) return
 
@@ -39,7 +39,7 @@ useEffect(() => {
   await reload(user)
 
   if (user.emailVerified) {
-    navigate('/dashboard', { replace: true })
+    navigate('/', { state: { showLogin: true }, replace: true })
   } else {
     setError('Email not verified yet. Please check your inbox and click the link.')
   }
