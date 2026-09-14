@@ -309,19 +309,14 @@ function Dashboard() {
     field: 'firstName' | 'lastName' | 'age' | 'yearLevel' | 'cardColor',
     value: string | number
   ) => {
-    if (!user) return
-    // Update the local cache immediately so the UI reflects the change
-    // right away regardless of connectivity. We deliberately don't await
-    // updateDoc(): its Promise only resolves once the server acknowledges
-    // the write, which never happens while offline — awaiting it would
-    // hang forever. Firestore queues the write locally on its own and
-    // syncs it automatically once the connection is back.
+    if (!user) return Promise.resolve()
     const cacheKey = `user_${user.uid}`
     const cached = sessionStorage.getItem(cacheKey)
     if (cached) {
       sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), [field]: value }))
     }
-    updateDoc(doc(db, 'users', user.uid), { [field]: value }).catch((err) => {
+    // return the promise instead of firing-and-forgetting
+    return updateDoc(doc(db, 'users', user.uid), { [field]: value }).catch((err) => {
       console.error(`Failed to sync ${field} to server:`, err)
     })
   }
@@ -430,12 +425,14 @@ function Dashboard() {
       setPendingRemove(false)
     }
 
-    if (trimmedFirst && trimmedFirst !== firstName) handleSaveCardField('firstName', trimmedFirst)
-    if (trimmedLast && trimmedLast !== lastName) handleSaveCardField('lastName', trimmedLast)
-    if (numericAge !== null && numericAge !== age) handleSaveCardField('age', numericAge)
-    if (formYearLevel && formYearLevel !== yearLevel) handleSaveCardField('yearLevel', formYearLevel)
-    handleSaveCardField('cardColor', formCardColor)
-    setCardColor(formCardColor) 
+    const pendingWrites: Promise<unknown>[] = []
+
+    if (trimmedFirst && trimmedFirst !== firstName) pendingWrites.push(handleSaveCardField('firstName', trimmedFirst))
+    if (trimmedLast && trimmedLast !== lastName) pendingWrites.push(handleSaveCardField('lastName', trimmedLast))
+    if (numericAge !== null && numericAge !== age) pendingWrites.push(handleSaveCardField('age', numericAge))
+    if (formYearLevel && formYearLevel !== yearLevel) pendingWrites.push(handleSaveCardField('yearLevel', formYearLevel))
+    pendingWrites.push(handleSaveCardField('cardColor', formCardColor))
+    setCardColor(formCardColor)
 
     if (!hasCustomizedCard && user) {
       const cacheKey = `user_${user.uid}`
@@ -443,9 +440,11 @@ function Dashboard() {
       if (cached) {
         sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), hasCustomizedCard: true }))
       }
-      updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true }).catch((err) => {
-        console.error('Failed to sync hasCustomizedCard to server:', err)
-      })
+      pendingWrites.push(
+        updateDoc(doc(db, 'users', user.uid), { hasCustomizedCard: true }).catch((err) => {
+          console.error('Failed to sync hasCustomizedCard to server:', err)
+        })
+      )
       setHasCustomizedCard(true)
     }
 
@@ -454,6 +453,14 @@ function Dashboard() {
     setAge(numericAge)
     setYearLevel(formYearLevel)
     setShowCustomize(false)
+
+    // Wait for every Firestore write to actually reach the server before
+    // reloading — otherwise reload() cancels the in-flight requests and
+    // hasCustomizedCard never gets persisted, causing the modal to keep
+    // reappearing.
+    if (pendingWrites.length > 0) {
+      await Promise.allSettled(pendingWrites)
+    }
 
     if (pictureWasChanged) {
       window.location.reload()
