@@ -477,6 +477,15 @@ const DayCard = ({ day }: { day: string }) => {
     )
   }
 
+  const isFormEmpty =
+  !subjectName.trim() &&
+  !instructor.trim() &&
+  meetings.length === 1 &&
+  !meetings[0].day &&
+  !meetings[0].timeStart &&
+  !meetings[0].timeEnd &&
+  !meetings[0].room.trim() &&
+  !meetings[0].roomType
   return (
       <div className='flex h-screen'>
         {/* Sidebar */}
@@ -514,26 +523,27 @@ const DayCard = ({ day }: { day: string }) => {
                 pl-1 
                 lg:justify-end  lg:items-start lg:pr-6 2xl:pr-20 lg:px-2 lg:gap-3 
                 md:justify-between md:items-start sm:items-center gap-1 p-2">
-                <button
-                  id='clearScheduleBtn'
-                  onClick={() => setShowClearModal(true)}
-                  className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
-                  py-1 px-4 rounded-sm 
-                  flex items-center gap-1.5
-                  font-inter font-black
-
-                  text-[10px] lg:text-[9px]
-                  xl:text-[12px] 2xl:text-[14px]
-                  3xl:text-[18px]
-                  hover:opacity-90 w-auto
-                  backdrop-blur-xs
-                  hover:-translate-y-1 
-                  hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
-                  transition-all duration-300 uppercase"
-                >
-                  <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
-                    CLEAR ALL schedules
-                </button>
+                  <button
+                    id='clearScheduleBtn'
+                    onClick={() => setShowClearModal(true)}
+                    disabled={schedules.length === 0}
+                    className="bg-[#E2E2E2] drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
+                    py-1 px-4 rounded-sm 
+                    flex items-center gap-1.5
+                    font-inter font-black
+                    text-[10px] lg:text-[9px]
+                    xl:text-[12px] 2xl:text-[14px]
+                    3xl:text-[18px]
+                    hover:opacity-90 w-auto
+                    backdrop-blur-xs
+                    hover:-translate-y-1 
+                    hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+                    transition-all duration-300 uppercase
+                    disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                  >
+                    <img src="./crossB.png" alt="" className='w-2.5 h-2.5 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
+                      CLEAR ALL schedules
+                  </button>
                 <button
                   id='addScheduleBtn'
                   onClick={() => { resetForm(); setIsAddSubOpen(true) }}
@@ -789,7 +799,8 @@ const DayCard = ({ day }: { day: string }) => {
                   <div className='flex items-center gap-3'>
                   <button
                     onClick={() => setShowResetConfirm(true)}
-                    className='text-sm font-semibold text-gray-600 px-4 py-2 hover:bg-gray-50 rounded-full'
+                    disabled={isFormEmpty}
+                    className='text-sm font-semibold text-gray-600 px-4 py-2 hover:bg-gray-50 rounded-full disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
                   >
                     Clear
                   </button>

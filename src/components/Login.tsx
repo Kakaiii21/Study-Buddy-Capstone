@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { onAuthChange } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
 import { login, sendVerificationEmail } from '../services/authService'
@@ -50,7 +50,8 @@ const [passwordUpdated] = useState<boolean>(() => {
 
   const [loading, setLoading] = useState(false)
 
-
+const emailRef = useRef<HTMLInputElement>(null)
+const passwordRef = useRef<HTMLInputElement>(null)
 
   const validateField = (field: keyof FieldErrors, values: { email: string; password: string }): string => {
     switch (field) {
@@ -99,6 +100,30 @@ const [passwordUpdated] = useState<boolean>(() => {
     setFieldErrors(prev => ({ ...prev, [field]: error }))
   }
 
+  const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElement | null>; value: string }[] = [
+  { key: 'email', ref: emailRef, value: email },
+  { key: 'password', ref: passwordRef, value: password },
+]
+
+const focusNextEmpty = (
+  e: React.KeyboardEvent<HTMLInputElement>,
+  currentKey: keyof FieldErrors
+) => {
+  if (e.key !== 'Enter') return
+  e.preventDefault()
+
+  const currentIndex = fieldOrder.findIndex((f) => f.key === currentKey)
+
+  for (let i = 1; i <= fieldOrder.length; i++) {
+    const field = fieldOrder[(currentIndex + i) % fieldOrder.length]
+    if (!field.value.trim()) {
+      field.ref.current?.focus()
+      return
+    }
+  }
+
+  handleLogin()
+}
   const validateAll = (): boolean => {
     const errors: FieldErrors = {
       email: validateField('email', { email, password }),
@@ -279,10 +304,12 @@ const [passwordUpdated] = useState<boolean>(() => {
           3xl:text-[19px]
           ">EMAIL</p>
           <input
+            ref = {emailRef}
             type="email"
             value={email}
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
+            onKeyDown={(e) => focusNextEmpty(e, 'email')}
             className={inputClass('email')}
             placeholder="Enter Your Email"
           />
@@ -299,11 +326,13 @@ const [passwordUpdated] = useState<boolean>(() => {
           3xl:text-[19px]
           ">PASSWORD</p>
           <input
+            ref = {passwordRef}
             type="password"
             value={password}
             onChange={(e) => handleChange('password', e.target.value)}
             onBlur={() => handleBlur('password')}
             className={inputClass('password')}
+            onKeyDown={(e) => focusNextEmpty(e, 'password')}
             placeholder="Enter Your password"
           />
           {touched.password && fieldErrors.password && (

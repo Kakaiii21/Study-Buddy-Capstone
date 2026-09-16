@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signup } from '../services/authService'
 import { googleLogin } from '../services/authService'
@@ -80,6 +80,13 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
 
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Refs for Enter-to-advance behavior below.
+  const firstNameRef = useRef<HTMLInputElement>(null)
+  const lastNameRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordRef = useRef<HTMLInputElement>(null)
 
   const handleGoogleSignup = async () => {
     try {
@@ -211,6 +218,36 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     }
   }
 
+const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElement | null>; value: string }[] = [
+  { key: 'firstName', ref: firstNameRef, value: firstName },
+  { key: 'lastName', ref: lastNameRef, value: lastName },
+  { key: 'email', ref: emailRef, value: email },
+  { key: 'password', ref: passwordRef, value: password },
+  { key: 'confirmPassword', ref: confirmPasswordRef, value: confirmPassword },
+]
+
+  // On Enter, jumps to the next empty field (wrapping around), or submits
+  // if every field is already filled.
+  const focusNextEmpty = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    currentKey: keyof FieldErrors
+  ) => {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+
+    const currentIndex = fieldOrder.findIndex((f) => f.key === currentKey)
+
+    for (let i = 1; i <= fieldOrder.length; i++) {
+      const field = fieldOrder[(currentIndex + i) % fieldOrder.length]
+      if (!field.value.trim()) {
+        field.ref.current?.focus()
+        return
+      }
+    }
+
+    handleSignup()
+  }
+
   const inputClass = (field: keyof FieldErrors) =>
     `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
@@ -312,10 +349,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           3xl:text-[19px]
           ">FIRST NAME</p>
           <input
+            ref={firstNameRef}
             type="text"
             value={firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
+            onKeyDown={(e) => focusNextEmpty(e, 'firstName')}
             className={inputClass('firstName')}
             placeholder="Enter Your First Name"
           />
@@ -332,10 +371,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           3xl:text-[19px]
           ">LAST NAME</p>
           <input
+            ref={lastNameRef}
             type="text"
             value={lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
+            onKeyDown={(e) => focusNextEmpty(e, 'lastName')}
             className={inputClass('lastName')}
             placeholder="Enter Your Last Name"
           />
@@ -352,10 +393,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           3xl:text-[19px]
           ">EMAIL</p>
           <input
+            ref={emailRef}
             type="email"
             value={email}
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
+            onKeyDown={(e) => focusNextEmpty(e, 'email')}
             className={inputClass('email')}
             placeholder="Enter Your Email Address"
           />
@@ -372,6 +415,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           3xl:text-[19px]
           ">PASSWORD</p>
           <input
+            ref={passwordRef}
             type="password"
             value={password}
             onChange={(e) => handleChange('password', e.target.value)}
@@ -380,6 +424,7 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
               setPasswordFocused(false)
               handleBlur('password')
             }}            
+            onKeyDown={(e) => focusNextEmpty(e, 'password')}
             className={inputClass('password')}
             placeholder="Enter Your Password"
           />
@@ -400,10 +445,12 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
           3xl:text-[19px]
           ">CONFIRM PASSWORD</p>
           <input
+            ref={confirmPasswordRef}
             type="password"
             value={confirmPassword}
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
+            onKeyDown={(e) => focusNextEmpty(e, 'confirmPassword')}
             className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
