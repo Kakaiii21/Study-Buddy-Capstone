@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 /// <reference types="vite-plugin-pwa/vanillajs" />
 
-import { precacheAndRoute } from 'workbox-precaching'
-import { registerRoute } from 'workbox-routing'
+import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching'
+import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
@@ -12,6 +12,15 @@ declare const self: ServiceWorkerGlobalScope & {
 }
 
 precacheAndRoute(self.__WB_MANIFEST)
+
+// ── SPA navigation fallback ─────────────────────────────────────
+// Any browser navigation (page load, PWA launch, route change like
+// /dashboard, /todolist, etc.) that isn't an exact precached asset
+// falls back to index.html, so React Router can take over client-side
+// even with zero network. Without this, launching the installed app
+// offline on any route but "/" just fails silently — blank screen.
+const navigationHandler = createHandlerBoundToURL('/index.html')
+registerRoute(new NavigationRoute(navigationHandler))
 
 // ── Runtime caching ───────────────────────────────────────────
 
@@ -167,7 +176,6 @@ function scheduleTimer(taskId: string, taskName: string, deadline: string) {
     self.registration.showNotification('⏰ Task Due Soon!', {
       body: `"${taskName}" is due in 1 hour.`,
       icon: '/web-app-manifest-192x192.png',
-      //`badge: '/web-app-manifest-192x192.png',
       tag: `task-deadline-${taskId}`,
       data: { taskId, deadline },
       requireInteraction: true,
