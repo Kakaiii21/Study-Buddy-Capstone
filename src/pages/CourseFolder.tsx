@@ -565,7 +565,7 @@ id='goBackBtn-mobile'
                   <span className='text-primary-600 font-bold'>click to browse</span>
                 </p>
                 <p className='text-gray-300 font-roboto text-xs mt-2'>
-                  Accepted: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, PNG, JPG, TXT, XL
+                  Accepted: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, PNG, JPG, TXT
                 </p>
               </div>
             )

@@ -111,7 +111,9 @@ const { startTour } = useTour(
   const [addCourseError, setAddCourseError] = useState('')
 
   const navigate = useNavigate()
-
+const filteredCourses = courses.filter((c) =>
+  c.name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+)
   const handleSave = async () => {
     if (isSaving) return
 
@@ -306,14 +308,14 @@ const { startTour } = useTour(
   className='grid grid-cols-2 justify-items-center place-content-center
   lg:pl-4 lg:justify-items-stretch
   lg:grid-cols-5 3xl:grid-cols-6 md:grid-cols-3 md:gap-x-5 gap-y-5 w-full md:mt-10 mt-5 lg:mt-1'>
-              {courses.length === 0 ? (
-              <div className='col-span-2 md:col-span-3  lg:col-span-5 flex items-center justify-center py-20 w-full'>
-                <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
-                  No folders yet. Click <span className='text-primary-600 font-bold'>+ New Folder</span> to create one.
-                </p>
-              </div>
-              ) : (
-                courses.map((course) => (
+{filteredCourses.length === 0 ? (
+  <div className='col-span-2 md:col-span-3  lg:col-span-5 flex items-center justify-center py-20 w-full'>
+    <p className='text-gray-400 font-roboto text-center text-sm md:text-lg'>
+      No folders yet. Click <span className='text-primary-600 font-bold'>+ New Folder</span> to create one.
+    </p>
+  </div>
+) : (
+  filteredCourses.map((course) => (
                   <div id='courseFolder' key={course.id} className='max-w-32 md:max-w-52   lg:max-w-[130px]  xl:max-w-[150px] 2xl:max-w-[180px]'>
                     <div className="relative">
                       <button
