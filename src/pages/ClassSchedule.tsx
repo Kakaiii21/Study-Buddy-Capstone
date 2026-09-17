@@ -51,7 +51,7 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
             disabled={confirming}
             className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
           >
-            {confirming ? 'Deleting...' : 'Move to Trash'}
+            {confirming ? 'Moving...' : 'Move to Trash'}
           </button>
         </div>
       </div>
@@ -469,12 +469,12 @@ const DayCard = ({ day }: { day: string }) => {
                     {menuOpenIndex === s.id && (
                       <>
                         <div className='fixed inset-0 z-0' onClick={() => setMenuOpenIndex(null)} />
-                        <div className='absolute right-2 top-0 mt-1 bg-white border border-primary-800 rounded-sm shadow-lg z-10 w-24 py-0'>
+                       <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
                           <button
                             onClick={() => handleEditOpen(s.classId)}
-                            className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] xl:text-[13px] 2xl:text-[14px] text-primary-600 hover:bg-primary-50 font-semibold'
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  src="edit.png" alt="edit icon" />Edit
+                            <img className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  src="edit.png" alt="edit icon" />Edit
                           </button>
                           <hr className='my-1 mx-1 border-primary-800 ' />
                           <button
@@ -482,9 +482,9 @@ const DayCard = ({ day }: { day: string }) => {
                               setMenuOpenIndex(null)
                               setPendingDelete({ id: s.id, name: s.subject })
                             }}
-                            className='flex items-center gap-2 w-full text-left px-4 py-1 text-sm lg:text-[12px] text-primary-600 hover:bg-red-50 font-semibold'
+                            className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-3.5 h-3.5 lg:w-3  lg:h-3 xl:w-4 xl:h-4 2xl:w-4 2xl:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />Delete
+                            <img src="delete.png" alt="delete icon"  className='w-5 h-5 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />Delete
                           </button>
                         </div>
                       </>

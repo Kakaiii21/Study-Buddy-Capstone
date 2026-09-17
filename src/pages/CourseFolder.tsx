@@ -565,7 +565,7 @@ id='goBackBtn-mobile'
                   <span className='text-primary-600 font-bold'>click to browse</span>
                 </p>
                 <p className='text-gray-300 font-roboto text-xs mt-2'>
-                  Accepted: PDF, DOC, DOCX, PPT, PPTX, PNG, JPG, TXT
+                  Accepted: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, PNG, JPG, TXT, XL
                 </p>
               </div>
             )
@@ -609,33 +609,33 @@ id='goBackBtn-mobile'
                       <span className='w-1 h-1 bg-gray-500 rounded-full'></span>
                     </button>
 
-                    {activeFileMenu === file.id && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className='absolute top-7 left-10 bg-white border border-primary-800 rounded-sm shadow-lg z-20 w-32 lg:w-[100px] overflow-hidden'
-                      >
-                        <button
-                          onClick={() => handleEdit(file.id)}
-                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                        >
-                          <img src='/edit.png' alt='edit icon' className='w-5 h-5 lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Rename
-                        </button>
-                        <hr className='my-1 border-primary-800' />
-                        <button
-                          onClick={() => handleDownload(file)}
-                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
-                        >
-                          <img src='/download.png' alt='download icon' className='w-5 h-5  lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Download
-                        </button>
-                        <hr className='my-1 border-primary-800' />
-                        <button
-                          onClick={() => { setPendingDelete({ id: file.id, name: file.fileName }); setActiveFileMenu(null) }}
-                          className='flex items-center gap-2 w-full text-left lg:text-[10px] px-4 py-2 lg:px-2 lg:py-1 text-sm text-primary-600 hover:bg-red-50 font-semibold'
-                        >
-                          <img src='/delete.png' alt='delete icon' className='w-5 h-5  lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
-                        </button>
-                      </div>
-                    )}
+{activeFileMenu === file.id && (
+  <div
+    onClick={(e) => e.stopPropagation()}
+    className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 lg:w-32 py-1'
+  >
+    <button
+      onClick={() => handleEdit(file.id)}
+      className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+    >
+      <img src='/edit.png' alt='edit icon' className='w-5 h-5 lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Rename
+    </button>
+    <hr className='my-1 border-gray-100' />
+    <button
+      onClick={() => handleDownload(file)}
+      className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+    >
+      <img src='/download.png' alt='download icon' className='w-5 h-5 lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Download
+    </button>
+    <hr className='my-1 border-gray-100' />
+    <button
+      onClick={() => { setPendingDelete({ id: file.id, name: file.fileName }); setActiveFileMenu(null) }}
+      className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+    >
+      <img src='/delete.png' alt='delete icon' className='w-5 h-5 lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
+    </button>
+  </div>
+)}
                   </div>
 
                   <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm lg:text-[10px] xl:text-[11px]  2xl:text-md mt-1 lg:mt-0 w-full truncate px-1'>

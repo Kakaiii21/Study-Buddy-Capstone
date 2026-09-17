@@ -357,7 +357,7 @@ function SoftDeleteModal({ taskName, onConfirm, onCancel }: {
           </button>
           <button onClick={handleConfirm} disabled={confirming}
             className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'>
-            {confirming ? 'Deleting...' : 'Move to Trash'}
+            {confirming ? 'Moving...' : 'Move to Trash'}
           </button>
         </div>
       </div>

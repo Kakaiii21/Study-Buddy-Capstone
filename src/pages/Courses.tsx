@@ -5,15 +5,26 @@ import { useAuth } from '../hooks/useAuth'
 import { useCourses, type CourseColor } from '../hooks/useCourses'
 import { useTour } from '../hooks/useTour'
 
-function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: { 
+function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
   itemName: string
-  onConfirm: () => void
+  onConfirm: () => Promise<void>
   onCancel: () => void
   isFolder?: boolean
-}) 
+}) {
+  const [confirming, setConfirming] = useState(false)
 
+  const handleConfirm = async () => {
+    if (confirming) return
+    setConfirming(true)
+    try {
+      await onConfirm()
+      // no need to setConfirming(false) on success — parent unmounts this modal
+    } catch (err) {
+      console.error('Delete failed:', err)
+      setConfirming(false) // let them retry instead of being stuck on "Deleting..."
+    }
+  }
 
-{
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
       <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-4 max-w-sm lg:max-w-[300px] xl:max-w-[350px] w-full mx-4'>
@@ -22,7 +33,10 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
           <h2 className='text-lg lg:text-xs xl:text-sm font-bold text-gray-800'>Move to Recently Deleted?</h2>
         </div>
         <p className='text-sm lg:text-[10px] xl:text-[11px] mb-1'>
-          <span className='font-semibold text-gray-700'>"{itemName}"</span> will be moved to{' '}
+          <span className='block max-w-full truncate font-semibold text-gray-700' title={itemName}>
+            "{itemName}"
+          </span>{' '}
+          will be moved to{' '}
           <span className='font-semibold text-primary-600'>Recently Deleted</span>.
         </p>
 
@@ -38,11 +52,19 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
           You can restore it anytime within <span className='font-semibold text-red-400'>30 days</span>, after which it will be permanently deleted.
         </p>
         <div className='flex gap-3 lg:gap-1.5 justify-end'>
-          <button onClick={onCancel} className='px-4 py-2 lg:px-2 lg:py-1 rounded-lg lg:rounded-sm text-sm lg:text-[10px] xl:text-[11px] font-medium text-gray-600 hover:bg-gray-100 transition-colors'>
+          <button
+            onClick={onCancel}
+            disabled={confirming}
+            className='px-4 py-2 lg:px-2 lg:py-1 rounded-lg lg:rounded-sm text-sm lg:text-[10px] xl:text-[11px] font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'
+          >
             Cancel
           </button>
-          <button onClick={onConfirm} className='px-4 py-2 lg:px-2 lg:py-1 rounded-lg lg:rounded-sm text-sm lg:text-[10px] xl:text-[11px] font-medium bg-red-500 text-white hover:bg-red-600 transition-colors'>
-            Move to Trash
+          <button
+            onClick={handleConfirm}
+            disabled={confirming}
+            className='px-4 py-2 lg:px-2 lg:py-1 rounded-lg lg:rounded-sm text-sm lg:text-[10px] xl:text-[11px] font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
+          >
+            {confirming ? 'Moving...' : 'Move to Trash'}
           </button>
         </div>
       </div>
@@ -327,20 +349,20 @@ const { startTour } = useTour(
                       {activeMenu === course.id && (
                         <div
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute  lg:top-[70px] left-12 top-16 md:top-[130px] lg:left-32 xl:left-[140px] xl:top-[95px] 2xl:left-[165px] 2xl:top-[115px] bg-pink-50 border border-primary-800 rounded-sm shadow-lg z-20 w-[110px] overflow-hidden"
+                          className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1  lg:top-[70px] left-12  md:top-[130px] lg:left-32 xl:left-[140px] xl:top-[95px] 2xl:left-[165px] 2xl:top-[115px]  overflow-hidden"
                         >
                           <button
                             onClick={() => handleEditOpen(course.id, course.name, course.color)}
-                            className='flex items-center lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[15px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
+                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img className='w-5 h-5 lg:w-3 lg:h-3 xl:w-3 xl:h-3 2xl:w-5 2xl:h-5 3xl:w-5 3xl:h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="edit.png" alt="edit icon" /> Edit
+                            <img className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} src="edit.png" alt="edit icon" /> Edit
                           </button>
                           <hr className='my-0 border-primary-800 mx-2' />
                           <button
                             onClick={() => { setPendingDelete({ id: course.id, name: course.name }); setActiveMenu(null) }}
-                            className='flex items-center lg:text-[12px] xl:text-[13px] 2xl:text-[15px] 3xl:text-[15px] gap-2 w-full text-left px-4 py-1 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+                             className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
                           >
-                            <img src="delete.png" alt="delete icon" className='w-5 h-5 lg:w-3 lg:h-3 xl:w-3 xl:h-3 2xl:w-5 2xl:h-5 3xl:w-5 3xl:h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
+                            <img src="delete.png" alt="delete icon" className='w-5 h-5 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
                           </button>
                         </div>
                       )}
