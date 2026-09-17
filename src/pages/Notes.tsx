@@ -96,6 +96,7 @@ function Notes() {
 
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
+  const [subjectError, setSubjectError] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [selectedSubject, setSelectedSubject] = useState('All Categories')
@@ -133,10 +134,40 @@ function Notes() {
     return `Untitled (${untitledNotes.length})`
   }
 
-  function handleSubjectSave() {
-    if (subjectName.trim() === '') return
-    addCategory(subjectName.trim())
+  function openSubjectModal() {
     setSubjectName('')
+    setSubjectError('')
+    setIsSubjectModalOpen(true)
+  }
+
+  function closeSubjectModal() {
+    setIsSubjectModalOpen(false)
+    setSubjectError('')
+  }
+
+  function handleSubjectNameChange(value: string) {
+    setSubjectName(value)
+    if (subjectError) setSubjectError('')
+  }
+
+  function handleSubjectSave() {
+    const trimmed = subjectName.trim()
+    if (trimmed === '') return
+
+    // Duplicate check against every subject already visible in Notes —
+    // manually-added categories AND live class-schedule subjects — so you
+    // can't create "Math" here while a class named "Math" already exists.
+    const isDuplicate = allSubjects.some(
+      (s) => s.toLowerCase() === trimmed.toLowerCase()
+    )
+    if (isDuplicate) {
+      setSubjectError('This category already exists.')
+      return
+    }
+
+    addCategory(trimmed)
+    setSubjectName('')
+    setSubjectError('')
     setIsSubjectModalOpen(false)
     setIsDropdownOpen(true)
   }
@@ -363,7 +394,7 @@ function Notes() {
                   <button
                     id='addSubjectBtnMobile'
                     aria-label='add Sub'
-                    onClick={() => setIsSubjectModalOpen(true)}
+                    onClick={openSubjectModal}
                     className='flex-shrink-0 h-12 w-12 flex items-center justify-center bg-[#FEE248] text-primary-800 font-bold rounded-md'
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -542,7 +573,7 @@ function Notes() {
                   <button
                     id='addSubjectBtn'
                     aria-label='add Sub'
-                    onClick={() => setIsSubjectModalOpen(true)}
+                    onClick={openSubjectModal}
                     className='flex-shrink-0 w-full flex items-center shadow-[0_3px_5px_rgba(0,0,0,.5)]
  text-xs justify-center h-10 bg-[#FEE248] text-primary-800 font-bold  rounded-md'
                   >
@@ -649,7 +680,7 @@ function Notes() {
           {isSubjectModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
-              onClick={() => setIsSubjectModalOpen(false)}
+              onClick={closeSubjectModal}
             >
               <div
                 className='bg-white rounded-2xl p-10 w-full max-w-md mx-6'
@@ -659,17 +690,27 @@ function Notes() {
                   Add A Category Name
                 </p>
                 <input
-                  className='w-full border-2 border-primary-600 rounded-md px-3 py-3 mb-4'
+                  className={`w-full border-2 rounded-md px-3 py-3 transition-colors
+                    ${subjectError ? 'border-red-400 bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300' : 'border-primary-600'}`}
                   type='text'
                   placeholder='Enter Category Name'
                   value={subjectName}
-                  onChange={(e) => setSubjectName(e.target.value)}
+                  onChange={(e) => handleSubjectNameChange(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
+                  aria-invalid={!!subjectError}
+                  aria-describedby={subjectError ? 'subjectNameError' : undefined}
                   autoFocus
                 />
+                {subjectError ? (
+                  <p id='subjectNameError' className='text-red-500 text-xs font-semibold mt-2 mb-2'>
+                    {subjectError}
+                  </p>
+                ) : (
+                  <div className='mb-4' />
+                )}
                 <div className='flex gap-4 mt-4'>
                   <button
-                    onClick={() => setIsSubjectModalOpen(false)}
+                    onClick={closeSubjectModal}
                     className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
                   >
                     CANCEL

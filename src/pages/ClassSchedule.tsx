@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useClassSched, type MeetingInput } from '../hooks/useClassSched'
+import { useCategories } from '../hooks/useCategories'
 import { useTour } from '../hooks/useTour'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
@@ -210,6 +211,7 @@ const MIN_DURATION_MINUTES = 15
 function ClassSchedule() {
   const { user } = useAuth()
   const { schedules, loading, addClass, updateClass, deleteSchedule } = useClassSched(user)
+  const { categories, addCategory } = useCategories(user)
 const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [isAddSubOpen, setIsAddSubOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
@@ -267,6 +269,19 @@ const removeMeetingRow = (key: string) => {
   const toMinutes = (t: string) => {
     const [h, m] = t.split(':').map(Number)
     return h * 60 + m
+  }
+
+  // If a subject is no longer referenced by any schedule row (optionally
+  // excluding rows we're about to delete/replace), turn it into a real,
+  // standalone category doc — same as one added manually in Notes — so it
+  // survives in Notes as a deletable category instead of silently
+  // disappearing along with the schedule that used to reference it.
+  const preserveOrphanedSubject = (subject: string, excludeIds: string[] = []) => {
+    const stillUsed = schedules.some((s) => s.subject === subject && !excludeIds.includes(s.id))
+    const alreadyCategory = categories.some((c) => c.name === subject)
+    if (!stillUsed && !alreadyCategory) {
+      addCategory(subject)
+    }
   }
 
   const handleSave = () => {
@@ -359,11 +374,18 @@ const removeMeetingRow = (key: string) => {
   async function handleDelete() {
     if (!pendingDelete) return
     await deleteSchedule(pendingDelete.id)
+    preserveOrphanedSubject(pendingDelete.name, [pendingDelete.id])
     setPendingDelete(null)
   }
 
   async function handleClearAll() {
+    const uniqueSubjects = Array.from(new Set(schedules.map((s) => s.subject)))
     await Promise.all(schedules.map((s) => deleteSchedule(s.id)))
+    uniqueSubjects.forEach((subject) => {
+      if (!categories.some((c) => c.name === subject)) {
+        addCategory(subject)
+      }
+    })
     setShowClearModal(false)
   }
 

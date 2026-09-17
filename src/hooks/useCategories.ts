@@ -53,10 +53,19 @@ export function useCategories(user: User | null) {
     return () => unsubscribe()
   }, [user])
 
+  // Guards against duplicate category docs (same name, case/whitespace
+  // insensitive) — both the manual "Add Category" flow and the
+  // orphaned-subject preservation flow in ClassSchedule call this,
+  // so the check lives here once instead of at every call site.
   function addCategory(name: string) {
     if (!user || !name.trim()) return
+    const trimmed = name.trim()
+    const exists = categories.some(
+      (c) => c.name.trim().toLowerCase() === trimmed.toLowerCase()
+    )
+    if (exists) return
     addDoc(collection(db, 'users', user.uid, 'categories'), {
-      name: name.trim(),
+      name: trimmed,
       uid: user.uid,
       createdAt: Date.now(),
     })
