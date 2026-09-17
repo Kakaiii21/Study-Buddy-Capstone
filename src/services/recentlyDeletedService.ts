@@ -135,12 +135,28 @@ export async function restoreItem(uid: string, item: DeletedItem): Promise<void>
     }
   }
 
-  const originalRef = doc(db, item.originalCollection, item.originalDocId)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _id, ...cleanData } = item.data as Record<string, unknown>
-  await setDoc(originalRef, cleanData)
-  await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
-  // ✅ Same — no storageUsed change on restore
+const originalRef = doc(db, item.originalCollection, item.originalDocId)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { id: _id, ...cleanData } = item.data as Record<string, unknown>
+await setDoc(originalRef, cleanData)
+
+if (isCourseFile) {
+  // restoring a single file into a course that still exists —
+  // bump the parent's count instead of leaving it stale
+  const parts = item.originalCollection.split('/')
+  const courseId = parts[3]
+  await updateDoc(doc(db, 'users', uid, 'courses', courseId), {
+    fileCount: increment(1),
+  })
+} else if (item.originalCollection === `users/${uid}/courses`) {
+  // restoring a whole course folder — recompute from the actual
+  // files subcollection rather than trusting the snapshot's fileCount
+  const filesRef = collection(db, item.originalCollection, item.originalDocId, 'files')
+  const filesSnap = await getDocs(filesRef)
+  await updateDoc(originalRef, { fileCount: filesSnap.size })
+}
+
+await deleteDoc(doc(db, 'users', uid, 'recentlyDeleted', item.id))
 }
 
 // ─── Permanent Delete ─────────────────────────────────────────────────────────

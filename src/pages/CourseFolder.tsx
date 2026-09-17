@@ -362,10 +362,10 @@ const handleFiles = async (incoming: FileList | null) => {
         {/* Top Bar — mobile only */}
   <div  className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
     <button
-id='goBackBtn-mobile'
+          id='goBackBtn-mobile'
           title="Go Back to My Files"
-          onClick={() => navigate('/myFiles')}
-          className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded hover:bg-gray-100 transition"
+          onClick={() => !uploading && navigate('/myFiles')}
+  className="flex flex-col items-center md:pl-0 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 rounded  transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <div id='goBackBtn' className='lg:hidden flex flex-col justify-center items-center '>
           <span className="text-5xl leading-none">←</span>
@@ -404,8 +404,8 @@ id='goBackBtn-mobile'
               <button
                 id='goBackBtn-desktop'
                 title="Go Back to My Files"
-                onClick={() => navigate('/myFiles')}
-                className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded hover:bg-gray-100 transition"
+                onClick={() => !uploading && navigate('/myFiles')}
+  className="flex flex-col items-center md:pl-16 lg:pl-0 xl:pl-0 2xl:pl-0 px-3 py-1 lg:py-0 rounded transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <div className='flex flex-col justify-center  items-center '>
                 <span className="text-5xl lg:text-2xl leading-none">←</span>
@@ -578,7 +578,7 @@ id='goBackBtn-mobile'
               {filteredFiles.map((file) => (
                 <div
                   key={file.id}
-                  className='flex  flex-col items-center bg-white border-gray-200 rounded-xl p-0 hover:shadow-md transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
+                  className='flex  flex-col items-center bg-white border-gray-200 rounded-xl p-0 transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
                 >
                   <div className='relative w-full flex justify-center items-end'>
                     <button  onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
@@ -788,12 +788,12 @@ id='goBackBtn-mobile'
                   >
                     Not loading? Try another viewer
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => handleDownload(previewFile)}
                     className='text-[11px] sm:text-xs text-gray-300 underline hover:text-white'
                   >
                     Download instead
-                  </button>
+                  </button> */}
                 </div>
               </div>
             )}
