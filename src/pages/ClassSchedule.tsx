@@ -286,7 +286,22 @@ const removeMeetingRow = (key: string) => {
 
   const handleSave = () => {
     const topErrors: Record<string, string> = {}
-    if (!subjectName.trim()) topErrors.subjectName = 'Required'
+    const trimmedSubject = subjectName.trim()
+    if (!trimmedSubject) {
+      topErrors.subjectName = 'Required'
+    } else {
+      // Block saving a subject name that already belongs to a different
+      // class. Excludes the class currently being edited so re-saving it
+      // with its own unchanged name doesn't trip the check.
+      const isDuplicateSubject = schedules.some(
+        (s) =>
+          s.subject.trim().toLowerCase() === trimmedSubject.toLowerCase() &&
+          s.classId !== editTargetClassId
+      )
+      if (isDuplicateSubject) {
+        topErrors.subjectName = 'A class with this subject name already exists'
+      }
+    }
     if (!instructor.trim()) topErrors.instructor = 'Required'
 
     const activeRows = meetings
@@ -626,8 +641,24 @@ const DayCard = ({ day }: { day: string }) => {
                           placeholder='Enter Subject'
                           className={`py-2 px-3 rounded-lg border border-gray-300 text-sm w-full ${errClass('subjectName')}`}
                           value={subjectName}
-                          onChange={(e) => setSubjectName(e.target.value)}
+                          onChange={(e) => {
+                            setSubjectName(e.target.value)
+                            if (fieldErrors.subjectName) {
+                              setFieldErrors((prev) => {
+                                const next = { ...prev }
+                                delete next.subjectName
+                                return next
+                              })
+                            }
+                          }}
+                          aria-invalid={!!fieldErrors.subjectName}
+                          aria-describedby={fieldErrors.subjectName ? 'subjectNameError' : undefined}
                         />
+                        {fieldErrors.subjectName && (
+                          <p id='subjectNameError' className='text-red-500 text-xs mt-1'>
+                            {fieldErrors.subjectName}
+                          </p>
+                        )}
                       </div>
                       <div className='flex-1 flex flex-col'>
                         <label className='text-xs font-semibold text-gray-500 mb-1'>Teacher / Instructor</label>
