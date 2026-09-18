@@ -16,36 +16,32 @@ function ProtectedRoute({ children }: Props) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthChange(async (user) => {
-      // No session at all — nothing to protect, skip straight to redirect.
-      // Avoids waiting on a network round-trip (reload/getDoc) for the
-      // common "you're logged out" case, so the redirect fires as fast
-      // as possible and the URL flicker on back-navigation is minimal.
-      if (!user) {
-        setUser(null)
-        setStatus(null)
-        setLoading(false)
-        return
-      }
+ const unsubscribe = onAuthChange(async (user) => {
+  if (!user) {
+    setUser(null)
+    setStatus(null)
+    setLoading(false)
+    return
+  }
 
-      // Pull fresh emailVerified/status from Firebase — the cached
-      // token can be stale right after a user completes verification
-      await user.reload()
-      const freshUser = auth.currentUser
-      setUser(freshUser)
+  let freshUser = user
+  try {
+    await user.reload()
+    freshUser = auth.currentUser ?? user
+  } catch {
+    // Offline or network error — fall back to the cached user object
+    // instead of hanging forever with loading=true.
+  }
+  setUser(freshUser)
 
-      if (freshUser) {
-        try {
-          const snap = await getDoc(doc(db, 'users', freshUser.uid))
-          setStatus(snap.data()?.status ?? 'active')
-        } catch {
-          setStatus('active') // fail open, don't lock the user out on a read error
-        }
-      } else {
-        setStatus(null)
-      }
-      setLoading(false)
-    })
+  try {
+    const snap = await getDoc(doc(db, 'users', freshUser.uid))
+    setStatus(snap.data()?.status ?? 'active')
+  } catch {
+    setStatus('active')
+  }
+  setLoading(false)
+})
     return () => unsubscribe()
   }, [])
 

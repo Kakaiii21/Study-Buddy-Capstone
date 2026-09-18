@@ -41,7 +41,28 @@ window.addEventListener('beforeinstallprompt', (e) => {
   setInstallPrompt(e)
 })
 registerSW({ immediate: true })
-
+// Prevent stale-cache blank screens: when a new service worker takes
+// control mid-session, the in-memory page may reference old build
+// assets that no longer exist in the new precache. Force one clean
+// reload to resync — guarded so it can only fire once per page load.
+let refreshing = false
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (refreshing) return
+  refreshing = true
+  window.location.reload()
+})
+window.addEventListener('error', (e) => {
+  const el = document.createElement('div')
+  el.style.cssText = 'position:fixed;inset:0;background:#fff;color:#c00;padding:16px;font-size:12px;z-index:99999;overflow:auto;white-space:pre-wrap;font-family:monospace;'
+  el.textContent = `ERROR: ${e.message}\n${e.filename}:${e.lineno}\n${e.error?.stack ?? ''}`
+  document.body.appendChild(el)
+})
+window.addEventListener('unhandledrejection', (e) => {
+  const el = document.createElement('div')
+  el.style.cssText = 'position:fixed;inset:0;background:#fff;color:#c00;padding:16px;font-size:12px;z-index:99999;overflow:auto;white-space:pre-wrap;font-family:monospace;'
+  el.textContent = `UNHANDLED REJECTION: ${e.reason?.message ?? e.reason}\n${e.reason?.stack ?? ''}`
+  document.body.appendChild(el)
+})
 const router = createBrowserRouter([
   {
     path: '/',
