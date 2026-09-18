@@ -42,10 +42,15 @@ function ReactivatePage() {
     }
     }
 
-  const handleLogout = async () => {
+const handleLogout = async () => {
+  try {
     await logout()
+  } catch (err) {
+    console.error('Logout error:', err)
+  } finally {
     navigate('/')
   }
+}
 
   if (checkingAuth) {
     return <div className="text-center mt-10">Loading...</div>

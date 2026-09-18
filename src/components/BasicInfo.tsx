@@ -346,7 +346,11 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           <input
             type="text"
             value={firstName}
-            onChange={(e) => { setFirstName(e.target.value); setFirstNameError(false) }}
+            onChange={(e) => {
+              const value = e.target.value
+              setFirstName(value)
+              setFirstNameError(!value.trim())
+            }}
             placeholder='First name'
             className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
@@ -360,8 +364,11 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
           <input
             type="text"
             value={lastName}
-            onChange={(e) => { setLastName(e.target.value); setLastNameError(false) }}
-            placeholder='Last name'
+            onChange={(e) => {
+              const value = e.target.value
+              setLastName(value)
+              setLastNameError(!value.trim())
+            }}            placeholder='Last name'
             className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
           {lastNameError && (

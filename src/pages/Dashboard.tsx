@@ -238,7 +238,7 @@ function Dashboard() {
   const displayLastName = lastName || '—'
   const displayAge = age !== null && age !== undefined && String(age) !== '' ? age : '—'
   const displayYearLevel = yearLevel || '—'
-
+const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; lastName?: string }>({})
   const customizeFileInputRef = useRef<HTMLInputElement>(null)
   const [uploadingPic, setUploadingPic] = useState(false)
 
@@ -321,15 +321,21 @@ function Dashboard() {
     })
   }
 
-  const handleSaveCustomizeAll = async () => {
-    const trimmedFirst = formFirstName.trim()
-    const trimmedLast = formLastName.trim()
-    const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
+ const handleSaveCustomizeAll = async () => {
+  const trimmedFirst = formFirstName.trim()
+  const trimmedLast = formLastName.trim()
 
-    // Only count the picture as "changed" for this save if we can actually
-    // reach Cloudinary/Cloud Functions right now. The Firestore field writes
-    // below are fine offline (queued locally and synced automatically) —
-    // the picture upload/removal is a real network call with no offline path.
+  // NEW — block save if first/last name are empty
+  const errors: { firstName?: string; lastName?: string } = {}
+  if (!trimmedFirst) errors.firstName = 'First name is required.'
+  if (!trimmedLast) errors.lastName = 'Last name is required.'
+  if (errors.firstName || errors.lastName) {
+    setCustomizeErrors(errors)
+    return
+  }
+  setCustomizeErrors({})
+
+  const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
     const pictureWasChanged = (Boolean(pendingProfileFile) || pendingRemove) && isOnline
 
     if (!isOnline && (pendingProfileFile || pendingRemove)) {
@@ -866,23 +872,35 @@ className='relative flex flex-col justify-between text-left p-2
                 <div className='flex flex-col gap-2'>
                   <div>
                     <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name</label>
-                    <input
-                      type='text'
-                      value={formFirstName}
-                      onChange={(e) => setFormFirstName(e.target.value)}
-                      placeholder='Optional'
-                      className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
-                    />
+<input
+  type='text'
+  value={formFirstName}
+  onChange={(e) => {
+    setFormFirstName(e.target.value)
+    if (customizeErrors.firstName) setCustomizeErrors((prev) => ({ ...prev, firstName: undefined }))
+  }}
+  placeholder='Required'
+  className={`w-full bg-gray-100 border rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs ${customizeErrors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+/>
+{customizeErrors.firstName && (
+  <p className='text-red-500 text-[10px] font-inter mt-1'>{customizeErrors.firstName}</p>
+)}
                   </div>
                   <div>
                     <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name</label>
-                    <input
-                      type='text'
-                      value={formLastName}
-                      onChange={(e) => setFormLastName(e.target.value)}
-                      placeholder='Optional'
-                      className='w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs'
-                    />
+<input
+  type='text'
+  value={formLastName}
+  onChange={(e) => {
+    setFormLastName(e.target.value)
+    if (customizeErrors.lastName) setCustomizeErrors((prev) => ({ ...prev, lastName: undefined }))
+  }}
+  placeholder='Required'
+  className={`w-full bg-gray-100 border rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs ${customizeErrors.lastName ? 'border-red-500' : 'border-gray-300'}`}
+/>
+{customizeErrors.lastName && (
+  <p className='text-red-500 text-[10px] font-inter mt-1'>{customizeErrors.lastName}</p>
+)}
                   </div>
                   <div className='flex gap-4'>
                     <div className='flex-1'>
