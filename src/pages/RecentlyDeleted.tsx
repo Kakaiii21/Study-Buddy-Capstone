@@ -1,4 +1,4 @@
-import  { useState, useMemo } from 'react'
+import  { useState, useMemo , useEffect} from 'react'
 import Sidebar from '../components/Sidebar'
 import { useRecentlyDeleted } from '../hooks/useRecentlyDeleted'
 import { daysRemaining } from '../services/recentlyDeletedService'
@@ -208,6 +208,19 @@ function RecentlyDeleted() {
   const [orphanRestoreItem, setOrphanRestoreItem] = useState<DeletedItem | null>(null)
   const [restoreConfirmItem, setRestoreConfirmItem] = useState<DeletedItem | null>(null)
   const [folderRestoreItem, setFolderRestoreItem] = useState<DeletedItem | null>(null)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
   const { startTour } = useTour(
     'recentlydeleted',
     false,
@@ -420,6 +433,11 @@ const filtered = useMemo(() => {
               </svg>
             </div>
           </div>
+{!isOnline && (
+  <div className='bg-yellow-50 border border-yellow-200 text-yellow-700 text-xs rounded-xl px-4 py-2 mb-4'>
+    You're offline — restore and permanent delete are disabled until you reconnect.
+  </div>
+)}
 
           {/* Recent label */}
           <div className='flex items-center gap-3 mb-4 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
@@ -470,39 +488,50 @@ const filtered = useMemo(() => {
                           <DaysBadge days={days} />
                         </div>
 
-                        <div className='flex justify-center'>
-                          <button
-                            id='restoreBtn'
-                            aria-label={`Restore ${item.name}`}
-                            onClick={() => handleRestoreClick(item)}
-                            disabled={isActing}
-                          >
-                            {isActing ? (
-                              <span className='w-5 h-5 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
-                            ) : (
-                              <img
-                                src='/Restore.png'
-                                alt='Restore'
-                                className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
-                              />
-                            )}
-                          </button>
-                        </div>
+<div className='flex justify-center'>
+  <button
+    id='restoreBtn'
+    aria-label={`Restore ${item.name}`}
+    onClick={() => handleRestoreClick(item)}
+    disabled={isActing || !isOnline}
+    title={!isOnline ? 'Connect to restore items' : undefined}
+  >
+    {isActing ? (
+      <span className='w-5 h-5 flex items-center justify-center text-primary-600 text-xs'>⏳</span>
+    ) : (
+      <img
+        src='/Restore.png'
+        alt='Restore'
+        className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 select-none ${
+          isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'
+        }`}
+        onContextMenu={(e) => e.preventDefault()}
+        draggable={false}
+      />
+    )}
+  </button>
+</div>
 
-                        <div className='flex justify-center'>
-                          <button
-                            id='permaDeleteBtn'
-                            aria-label={`Delete ${item.name}`}
-                            onClick={() => handleDeleteClick(item.id, item.name)}
-                            disabled={isActing}
-                          >
-                            <img
-                              src='/delete.png'
-                              alt='Delete'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
-                            />
-                          </button>
-                        </div>
+<div className='flex justify-center'>
+  <button
+    id='permaDeleteBtn'
+    aria-label={`Delete ${item.name}`}
+    onClick={() => handleDeleteClick(item.id, item.name)}
+    disabled={isActing || !isOnline}
+    title={!isOnline ? 'Connect to permanently delete' : undefined}
+  >
+    <img
+      src='/delete.png'
+      alt='Delete'
+      className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 select-none ${
+        isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'
+      }`}
+      onContextMenu={(e) => e.preventDefault()}
+      draggable={false}
+    />
+  </button>
+</div>
+
                       </div>
                     </div>
                   )
