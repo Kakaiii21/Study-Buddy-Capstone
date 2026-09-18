@@ -36,6 +36,7 @@ const CANCEL_URL = import.meta.env.VITE_STUDY_GENERATOR_CANCEL_URL as string
 const COOLDOWN_MS = 2 * 60 * 1000 
 const COOLDOWN_KEY = 'studygen_cooldown_until'
 const TICKET_KEY = 'studygen_ticket_id' 
+const FILE_NAME_KEY = 'studygen_ticket_filename'  
 
 export const SESSION_KEY_RESULT = 'studygen_result'
 
@@ -212,7 +213,9 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
   const [suggestedMax, setSuggestedMax] = useState<number | null>(null)
   const [cooldownSeconds, setCooldownSeconds] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false) 
-
+const [pendingFileName, setPendingFileName] = useState<string | null>(
+  () => localStorage.getItem(FILE_NAME_KEY)
+)
   const [tourPreview, setTourPreview] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -260,11 +263,10 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
       } else if (data.status === 'done') {
         localStorage.removeItem(TICKET_KEY)
         setQueueStatus('done')
-
         const sessionData = {
           items: data.result?.items ?? [],
           mode: data.mode,
-          fileName: uploadedFile?.name ?? data.fileName ?? '',
+          fileName: uploadedFile?.name ?? pendingFileName ?? data.fileName ?? '',
         }
         sessionStorage.setItem(SESSION_KEY_RESULT, JSON.stringify(sessionData))
 
@@ -283,6 +285,8 @@ const [ticketId, setTicketId] = useState<string | null>(() => localStorage.getIt
         setQueuePosition(null)
       } else if (data.status === 'failed') {
         localStorage.removeItem(TICKET_KEY)
+        localStorage.removeItem(FILE_NAME_KEY)   // ← add
+        setPendingFileName(null)  
         setQueueStatus('error')
         setFileError(data.error || 'Something went wrong. Please try again.')
         setTicketId(null)
@@ -402,6 +406,7 @@ useEffect(() => {
       if (uploadedFile.source === 'local' && uploadedFile.file) {
         const formData = new FormData()
         formData.append('file', uploadedFile.file)
+        formData.append('fileName', uploadedFile.name) 
         formData.append('mode', activeTab)
         formData.append('numItems', String(selectItems))
         body = formData
@@ -410,6 +415,7 @@ useEffect(() => {
         body = JSON.stringify({
           fileUrl: uploadedFile.fileUrl,
           fileType: uploadedFile.type,
+          fileName: uploadedFile.name,
           mode: activeTab,
           numItems: selectItems,
         })
@@ -432,9 +438,10 @@ useEffect(() => {
         }
         return
       }
-
       setTicketId(data.ticketId)
-      localStorage.setItem(TICKET_KEY, data.ticketId) 
+      localStorage.setItem(TICKET_KEY, data.ticketId)
+      localStorage.setItem(FILE_NAME_KEY, uploadedFile.name)
+      setPendingFileName(uploadedFile.name)   // keep state in sync immediately
       setQueuePosition(data.position)
       setQueueStatus('queued')
     } catch (err) {
