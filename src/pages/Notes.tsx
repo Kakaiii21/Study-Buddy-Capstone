@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useNotes, type Note } from '../hooks/useNotes'
 import { useClassSched } from '../hooks/useClassSched'
 import { useTour } from '../hooks/useTour'
+import NoteEditor from '../components/NoteEditor'
 import { useCategories, type Category } from '../hooks/useCategories'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
@@ -812,13 +813,11 @@ function Notes() {
 
                   <p className='text-sm text-gray-400 mb-4'>{modalTime.date} — {modalTime.time}</p>
 
-                  <textarea
-                    className='w-full flex-1 min-h-[300px] px-3 py-2 mb-4 pb-16 resize-none read-only:cursor-default'
-                    placeholder='Write your notes here...'
-                    value={displayContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    readOnly={isReadOnly}
-                  />
+<NoteEditor
+  content={displayContent}
+  onChange={setNoteContent}
+  readOnly={isReadOnly}
+/>
 
                   <div className='flex gap-4 mt-auto'>
                     {modalMode === 'view' && (
@@ -874,12 +873,13 @@ function Notes() {
                 </div>
 
                 {/* ── DESKTOP layout ── */}
-                <div className='hidden lg:flex flex-col flex-1 py-10 lg:py-3 px-5 relative'>
-                  <div className='flex justify-between items-center gap-1 mb-0'>
+                <div className='hidden lg:flex flex-col flex-1 min-h-0 py-10 lg:py-3 px-5 relative'>
+                    <div className='flex justify-between items-center gap-1 mb-0'>
                     <input
                       className='min-w-20 py-2 text-primary-600 text-2xl font-bold placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
                       type='text'
                       placeholder='Untitled'
+                      maxLength={24}
                       value={displayTitle}
                       onChange={(e) => setNoteTitle(e.target.value)}
                       readOnly={isReadOnly}
@@ -905,13 +905,11 @@ function Notes() {
                   <p className='text-sm text-primary-600 mb-2'>{modalTime.date} — {modalTime.time}</p>
                   <hr className='w-full border-t border-primary-600 mb-2' />
 
-                  <textarea
-                    className='w-full flex-1 min-h-[400px]  rounded-md px-1 py-1 pb-16 mb-4 resize-none read-only:cursor-default'
-                    placeholder='Write your notes here...'
-                    value={displayContent}
-                    onChange={(e) => setNoteContent(e.target.value)}
-                    readOnly={isReadOnly}
-                  />
+<NoteEditor
+  content={displayContent}
+  onChange={setNoteContent}
+  readOnly={isReadOnly}
+/>
 
                   <div className='flex gap-4 mt-auto'>
                     {modalMode === 'view' && (
