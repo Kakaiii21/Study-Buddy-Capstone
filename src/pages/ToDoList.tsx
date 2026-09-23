@@ -87,9 +87,15 @@ function getCardStyle(task: Task, nowISO: string): string {
     }
   }
 
+
   return 'bg-white border border-2 border-black lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 }
-
+  function sortByDeadline(a: Task, b: Task): number {
+  if (!a.deadline && !b.deadline) return 0
+  if (!a.deadline) return 1  
+  if (!b.deadline) return -1
+  return a.deadline.localeCompare(b.deadline) 
+}
 // ── Task Modal ────────────────────────────────
 
 function TaskModal({
@@ -942,7 +948,7 @@ function ToDoList() {
                     key={col.id}
                     id={col.id}
                     label={col.label}
-                    tasks={tasks.filter((t) => t.status === col.id)}
+                    tasks={tasks.filter((t) => t.status === col.id).sort(sortByDeadline)}
                     onDelete={handleDeleteClick}
                     onEdit={setEditingTask}
                     collapsed={collapsedCols[col.id]}
