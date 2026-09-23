@@ -151,27 +151,39 @@ function handleSubjectDelete(category: Category) {
     if (subjectError) setSubjectError('')
   }
 
-  function handleSubjectSave() {
-    const trimmed = subjectName.trim()
-    if (trimmed === '') return
+function handleSubjectSave() {
+  const trimmed = subjectName.trim()
+  if (trimmed === '') return
 
-    // Duplicate check against every subject already visible in Notes —
-    // manually-added categories AND live class-schedule subjects — so you
-    // can't create "Math" here while a class named "Math" already exists.
-    const isDuplicate = allSubjects.some(
-      (s) => s.toLowerCase() === trimmed.toLowerCase()
-    )
-    if (isDuplicate) {
-      setSubjectError('This category already exists.')
-      return
-    }
-
-    addCategory(trimmed)
-    setSubjectName('')
-    setSubjectError('')
-    setIsSubjectModalOpen(false)
-    setIsDropdownOpen(true)
+  // Duplicate check against every subject already visible in Notes —
+  // manually-added categories AND live class-schedule subjects — so you
+  // can't create "Math" here while a class named "Math" already exists.
+  const isDuplicate = allSubjects.some(
+    (s) => s.toLowerCase() === trimmed.toLowerCase()
+  )
+  if (isDuplicate) {
+    setSubjectError('This category already exists.')
+    return
   }
+
+  addCategory(trimmed)
+  setSubjectName('')
+  setSubjectError('')
+  setIsSubjectModalOpen(false)
+  setIsDropdownOpen(true)
+}
+
+function getSuggestedCategories() {
+  // Suggest base names derived from your existing categories/class subjects,
+  // e.g. "Elective 2" and "Elective 3" both suggest "Elective".
+  const baseNames = Array.from(
+    new Set(
+      allSubjects.map((s) => s.replace(/\s+\d+$/, '').trim())
+    )
+  )
+
+  return baseNames.filter((name) => name !== '')
+}
 
 function openNoteModal() {
   setSelectedNote(null)
@@ -696,57 +708,74 @@ const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'Uncateg
             </div>
           )}
 
-          {/* ── Add Category Modal ── */}
-          {isSubjectModalOpen && (
-            <div
-              className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
-              onClick={closeSubjectModal}
+{/* ── Add Category Modal ── */}
+{isSubjectModalOpen && (
+  <div
+    className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50'
+    onClick={closeSubjectModal}
+  >
+    <div
+      className='bg-white rounded-2xl p-10 w-full max-w-md mx-6'
+      onClick={(e) => e.stopPropagation()}
+    >
+      <p className='text-2xl font-bold uppercase text-primary-600 text-center mb-6'>
+        Add A Category Name
+      </p>
+      <input
+        className={`w-full border-2 rounded-md px-3 py-3 transition-colors
+          ${subjectError ? 'border-red-400 bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300' : 'border-primary-600'}`}
+        type='text'
+        placeholder='Enter Category Name'
+        maxLength={18}
+        value={subjectName}
+        onChange={(e) => handleSubjectNameChange(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
+        aria-invalid={!!subjectError}
+        aria-describedby={subjectError ? 'subjectNameError' : undefined}
+        autoFocus
+      />
+      {subjectError ? (
+        <p id='subjectNameError' className='text-red-500 text-xs font-semibold mt-2 mb-2'>
+          {subjectError}
+        </p>
+      ) : (
+        <div className='mb-4' />
+      )}
+
+      <div className='flex flex-col gap-1 mb-4'>
+        <label className='text-primary-800 font-semibold text-sm'>Suggested Categories:</label>
+        <div className='flex flex-wrap gap-2'>
+          {getSuggestedCategories().map((s) => (
+            <button
+              key={s}
+              type='button'
+              onClick={() => handleSubjectNameChange(s)}
+              className='text-sm px-3 py-1 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors'
             >
-              <div
-                className='bg-white rounded-2xl p-10 w-full max-w-md mx-6'
-                onClick={(e) => e.stopPropagation()}
-              >
-                <p className='text-2xl font-bold uppercase text-primary-600 text-center mb-6'>
-                  Add A Category Name
-                </p>
-                <input
-                  className={`w-full border-2 rounded-md px-3 py-3 transition-colors
-                    ${subjectError ? 'border-red-400 bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300' : 'border-primary-600'}`}
-                  type='text'
-                  placeholder='Enter Category Name'
-                  maxLength={18}
-                  value={subjectName}
-                  onChange={(e) => handleSubjectNameChange(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
-                  aria-invalid={!!subjectError}
-                  aria-describedby={subjectError ? 'subjectNameError' : undefined}
-                  autoFocus
-                />
-                {subjectError ? (
-                  <p id='subjectNameError' className='text-red-500 text-xs font-semibold mt-2 mb-2'>
-                    {subjectError}
-                  </p>
-                ) : (
-                  <div className='mb-4' />
-                )}
-                <div className='flex gap-4 mt-4'>
-                  <button
-                    onClick={closeSubjectModal}
-                    className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-                  >
-                    CANCEL
-                  </button>
-                  <button
-                    onClick={handleSubjectSave}
-                    disabled={subjectName.trim() === ''}
-                    className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
-                  >
-                    SAVE
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className='flex gap-4 mt-4'>
+        <button
+          onClick={closeSubjectModal}
+          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
+        >
+          CANCEL
+        </button>
+        <button
+          onClick={handleSubjectSave}
+          disabled={subjectName.trim() === ''}
+          className='flex-1 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
+        >
+          SAVE
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
           {/* ── Delete Category Confirmation Modal ── */}
           {deleteSubjectConfirm && (
