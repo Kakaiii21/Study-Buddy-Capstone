@@ -75,13 +75,13 @@ function Notes() {
     user
   )
 
-  function handleSubjectDelete(category: Category) {
-    const affectedNotes = notes.filter((n) => n.subject === category.name)
-    affectedNotes.forEach((n) => updateNote(n.id, { subject: 'All Categories' }))
-    deleteCategory(category.id)
-    if (selectedSubject === category.name) setSelectedSubject('All Categories')
-    setDeleteSubjectConfirm(null)
-  }
+function handleSubjectDelete(category: Category) {
+  const affectedNotes = notes.filter((n) => n.subject === category.name)
+  affectedNotes.forEach((n) => updateNote(n.id, { subject: 'Uncategorized' }))
+  deleteCategory(category.id)
+  if (selectedSubject === category.name) setSelectedSubject('All Categories')
+  setDeleteSubjectConfirm(null)
+}
 
   function handleCloseAttempt() {
     const hasUnsavedContent =
@@ -107,7 +107,7 @@ function Notes() {
   const [modalMode, setModalMode] = useState<'create' | 'view' | 'edit'>('create')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [noteTitle, setNoteTitle] = useState('')
-  const [noteSubject, setNoteSubject] = useState('All Categories')
+  const [noteSubject, setNoteSubject] = useState('Uncategorized')
   const [noteContent, setNoteContent] = useState('')
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
@@ -173,19 +173,19 @@ function Notes() {
     setIsDropdownOpen(true)
   }
 
-  function openNoteModal() {
-    setSelectedNote(null)
-    setModalMode('create')
-    const now = new Date()
-    setModalTime({
-      date: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    })
-    setNoteTitle('')
-    setNoteSubject(selectedSubject !== 'All Categories' ? selectedSubject : 'All Categories')
-    setNoteContent('')
-    setIsNoteModalOpen(true)
-  }
+function openNoteModal() {
+  setSelectedNote(null)
+  setModalMode('create')
+  const now = new Date()
+  setModalTime({
+    date: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+  })
+  setNoteTitle('')
+  setNoteSubject(selectedSubject !== 'All Categories' ? selectedSubject : 'Uncategorized')
+  setNoteContent('')
+  setIsNoteModalOpen(true)
+}
 
   function openViewModal(note: Note) {
     setSelectedNote(note)
@@ -215,15 +215,15 @@ function Notes() {
     setSelectedNote(null)
   }
 
-  async function handleNoteSave() {
-    if (noteContent.trim() === '') return
-    const title = noteTitle.trim() || getUntitledTitle()
-    setNoteTitle('')
-    setNoteSubject('All Categories')
-    setNoteContent('')
-    setIsNoteModalOpen(false)
-    addNote(title, noteSubject, noteContent)
-  }
+async function handleNoteSave() {
+  if (noteContent.trim() === '') return
+  const title = noteTitle.trim() || getUntitledTitle()
+  setNoteTitle('')
+  setNoteSubject('Uncategorized')
+  setNoteContent('')
+  setIsNoteModalOpen(false)
+  addNote(title, noteSubject, noteContent)
+}
 
   async function handleNoteUpdate() {
     if (!selectedNote) return
@@ -264,7 +264,7 @@ function Notes() {
     .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const displayTitle   = modalMode === 'view' ? (selectedNote?.title   ?? '') : noteTitle
-  const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'All Categories') : noteSubject
+const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'Uncategorized') : noteSubject
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
   const isReadOnly     = modalMode === 'view'
 
@@ -280,6 +280,7 @@ function Notes() {
     await deleteNote(pendingDelete.id)
     setPendingDelete(null)
   }
+
 
   return (
     <div className='flex h-screen'>
@@ -418,14 +419,22 @@ function Notes() {
 
                     {isDropdownOpen && (
                       <div  className='absolute  top-full left-0 mt-2 w-full bg-white border rounded-md shadow-md z-50 max-h-64 overflow-y-auto'>
-                        <button
-                          className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
-                            ${selectedSubject === 'All Categories' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
-                          onClick={() => { setSelectedSubject('All Categories'); setIsDropdownOpen(false) }}
-                        >
-                          All Categories
-                        </button>
-                        {allSubjects.map((subject, index) => (
+<button
+  className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
+    ${selectedSubject === 'All Categories' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
+  onClick={() => { setSelectedSubject('All Categories'); setIsDropdownOpen(false) }}
+>
+  All Categories
+</button>
+<button
+  className={`block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm font-semibold
+    ${selectedSubject === 'Uncategorized' ? 'bg-primary-50 text-primary-600' : 'text-primary-600'}`}
+  onClick={() => { setSelectedSubject('Uncategorized'); setIsDropdownOpen(false) }}
+>
+  Uncategorized
+</button>
+{allSubjects.map((subject, index) => (
+
                           <div
                           id='subjectDropdown'
                             key={index}
@@ -588,17 +597,27 @@ function Notes() {
 
                 {/* Category Buttons */}
                 <div id='subjectDropdown' className='flex flex-col gap-2'>
-                  <button
-                    onClick={() => setSelectedSubject('All Categories')}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
-                      ${selectedSubject === 'All Categories'
-                        ? 'bg-primary-600 text-white border-primary-600'
-                        : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
-                  >
-                    All Categories
-                  </button>
+<button
+  onClick={() => setSelectedSubject('All Categories')}
+  className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
+    ${selectedSubject === 'All Categories'
+      ? 'bg-primary-600 text-white border-primary-600'
+      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
+>
+  All Categories
+</button>
 
-                  {allSubjects.map((subject, index) => (
+<button
+  onClick={() => setSelectedSubject('Uncategorized')}
+  className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
+    ${selectedSubject === 'Uncategorized'
+      ? 'bg-primary-600 text-white border-primary-600'
+      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
+>
+  Uncategorized
+</button>
+
+{allSubjects.map((subject, index) => (
                     <div
                     id='subjectDropdownDesktop'
                       key={index}
@@ -695,6 +714,7 @@ function Notes() {
                     ${subjectError ? 'border-red-400 bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300' : 'border-primary-600'}`}
                   type='text'
                   placeholder='Enter Category Name'
+                  maxLength={18}
                   value={subjectName}
                   onChange={(e) => handleSubjectNameChange(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubjectSave()}
@@ -741,15 +761,15 @@ function Notes() {
                 <p className='text-xl font-bold text-primary-600 uppercase text-center'>
                   Remove Category?
                 </p>
-                <p className='text-sm text-gray-500 text-center'>
-                  <span
-                    className='block max-w-[260px] mx-auto truncate font-semibold text-primary-600'
-                    title={deleteSubjectConfirm.name}
-                  >
-                    "{deleteSubjectConfirm.name}"
-                  </span>
-                  will be removed. Notes tagged with this category will be moved to <span className='font-semibold'>All Categories</span>.
-                </p>
+<p className='text-sm text-gray-500 text-center'>
+  <span
+    className='block max-w-[260px] mx-auto truncate font-semibold text-primary-600'
+    title={deleteSubjectConfirm.name}
+  >
+    "{deleteSubjectConfirm.name}"
+  </span>
+will be removed. Notes tagged with this category will be moved to <span className='font-semibold'>Uncategorized</span>.
+</p>
                 <div className='flex gap-4 w-full mt-2'>
                   <button
                     onClick={() => setDeleteSubjectConfirm(null)}
@@ -803,11 +823,11 @@ function Notes() {
                         
                         border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
                       >
-                        <option value='All Categories'>All Categories</option>
-                        {allSubjects.map((subject, index) => (
-                          <option key={index} value={subject}>{subject}</option>
-                        ))}
-                      </select>
+  <option value='All Categories'>Uncategorized</option>
+  {allSubjects.map((subject, index) => (
+    <option key={index} value={subject}>{subject}</option>
+  ))}
+</select>
                     )}
                   </div>
 
@@ -888,17 +908,17 @@ function Notes() {
                     {isReadOnly ? (
                       <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
                     ) : (
-                      <select
-                        aria-label='Select category'
-                        value={displaySubject}
-                        onChange={(e) => setNoteSubject(e.target.value)}
-                        className='max-w-52 border-2 mr-2 border-primary-600 rounded-md px-6 py-2 text-primary-600 font-semibold'
-                      >
-                        <option value='All Categories'>All Categories</option>
-                        {allSubjects.map((subject, index) => (
-                          <option key={index} value={subject}>{subject}</option>
-                        ))}
-                      </select>
+<select
+  aria-label='Select category'
+  value={displaySubject}
+  onChange={(e) => setNoteSubject(e.target.value)}
+  className='shrink-0 max-w-[130px] border-2 border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-xs'
+>
+  <option value='Uncategorized'>Uncategorized</option>
+  {allSubjects.map((subject, index) => (
+    <option key={index} value={subject}>{subject}</option>
+  ))}
+</select>
                     )}
                   </div>
 
