@@ -58,15 +58,18 @@ useEffect(() => {
 }, [user])
 
 
-   function addNote(title: string, subject: string, content: string) {
-    if (!user || !title.trim()) return
-     addDoc(collection(db, 'users', user.uid, 'notes'), {
+  // Returns the new note's Firestore doc id (or undefined if it couldn't be
+  // created), so callers — e.g. autosave — can start updating it right away.
+  async function addNote(title: string, subject: string, content: string): Promise<string | undefined> {
+    if (!user || !title.trim()) return undefined
+    const docRef = await addDoc(collection(db, 'users', user.uid, 'notes'), {
       title: title.trim(),
       subject,
       content: content.trim(),
       uid: user.uid,
       createdAt: Date.now(),
     })
+    return docRef.id
   }
 
   // Notes example
@@ -94,4 +97,3 @@ async function deleteNote(noteId: string) {
 
   return { notes, loading, addNote, updateNote, deleteNote }
 }
-

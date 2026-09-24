@@ -6,6 +6,7 @@ import { useClassSched } from '../hooks/useClassSched'
 import { useTour } from '../hooks/useTour'
 import NoteEditor from '../components/NoteEditor'
 import { useCategories, type Category } from '../hooks/useCategories'
+import { useAutosaveNote } from '../hooks/useAutosaveNote'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
@@ -63,7 +64,6 @@ function Notes() {
   const schedSubjects = useMemo(() => schedules.map((s) => s.subject), [schedules])
 
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
-  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<Category | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
 
@@ -75,24 +75,18 @@ function Notes() {
     user
   )
 
-function handleSubjectDelete(category: Category) {
-  const affectedNotes = notes.filter((n) => n.subject === category.name)
-  affectedNotes.forEach((n) => updateNote(n.id, { subject: 'Uncategorized' }))
-  deleteCategory(category.id)
-  if (selectedSubject === category.name) setSelectedSubject('All Categories')
-  setDeleteSubjectConfirm(null)
-}
+  function handleSubjectDelete(category: Category) {
+    const affectedNotes = notes.filter((n) => n.subject === category.name)
+    affectedNotes.forEach((n) => updateNote(n.id, { subject: 'Uncategorized' }))
+    deleteCategory(category.id)
+    if (selectedSubject === category.name) setSelectedSubject('All Categories')
+    setDeleteSubjectConfirm(null)
+  }
 
+  // Notes autosave silently — closing is just "close", nothing to discard.
   function handleCloseAttempt() {
-    const hasUnsavedContent =
-      modalMode === 'edit' ||
-      (modalMode === 'create' && (noteTitle.trim() !== '' || noteContent.trim() !== ''))
-
-    if (hasUnsavedContent) {
-      setShowDiscardConfirm(true)
-    } else {
-      closeNoteModal()
-    }
+    autosave.flush()
+    closeNoteModal()
   }
 
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
@@ -104,7 +98,7 @@ function handleSubjectDelete(category: Category) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false)
-  const [modalMode, setModalMode] = useState<'create' | 'view' | 'edit'>('create')
+  const [modalMode, setModalMode] = useState<'view' | 'edit'>('edit')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [noteTitle, setNoteTitle] = useState('')
   const [noteSubject, setNoteSubject] = useState('Uncategorized')
@@ -112,6 +106,8 @@ function handleSubjectDelete(category: Category) {
   const [modalTime, setModalTime] = useState({ date: '', time: '' })
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+
+  const autosave = useAutosaveNote(user, addNote, updateNote)
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
@@ -129,12 +125,6 @@ function handleSubjectDelete(category: Category) {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
 
-  function getUntitledTitle() {
-    const untitledNotes = notes.filter((n) => n.title === 'Untitled' || n.title.match(/^Untitled \(\d+\)$/))
-    if (untitledNotes.length === 0) return 'Untitled'
-    return `Untitled (${untitledNotes.length})`
-  }
-
   function openSubjectModal() {
     setSubjectName('')
     setSubjectError('')
@@ -151,53 +141,57 @@ function handleSubjectDelete(category: Category) {
     if (subjectError) setSubjectError('')
   }
 
-function handleSubjectSave() {
-  const trimmed = subjectName.trim()
-  if (trimmed === '') return
+  function handleSubjectSave() {
+    const trimmed = subjectName.trim()
+    if (trimmed === '') return
 
-  // Duplicate check against every subject already visible in Notes —
-  // manually-added categories AND live class-schedule subjects — so you
-  // can't create "Math" here while a class named "Math" already exists.
-  const isDuplicate = allSubjects.some(
-    (s) => s.toLowerCase() === trimmed.toLowerCase()
-  )
-  if (isDuplicate) {
-    setSubjectError('This category already exists.')
-    return
+    // Duplicate check against every subject already visible in Notes —
+    // manually-added categories AND live class-schedule subjects — so you
+    // can't create "Math" here while a class named "Math" already exists.
+    const isDuplicate = allSubjects.some(
+      (s) => s.toLowerCase() === trimmed.toLowerCase()
+    )
+    if (isDuplicate) {
+      setSubjectError('This category already exists.')
+      return
+    }
+
+    addCategory(trimmed)
+    setSubjectName('')
+    setSubjectError('')
+    setIsSubjectModalOpen(false)
+    setIsDropdownOpen(true)
   }
 
-  addCategory(trimmed)
-  setSubjectName('')
-  setSubjectError('')
-  setIsSubjectModalOpen(false)
-  setIsDropdownOpen(true)
-}
-
-function getSuggestedCategories() {
-  // Suggest base names derived from your existing categories/class subjects,
-  // e.g. "Elective 2" and "Elective 3" both suggest "Elective".
-  const baseNames = Array.from(
-    new Set(
-      allSubjects.map((s) => s.replace(/\s+\d+$/, '').trim())
+  function getSuggestedCategories() {
+    // Suggest base names derived from your existing categories/class subjects,
+    // e.g. "Elective 2" and "Elective 3" both suggest "Elective".
+    const baseNames = Array.from(
+      new Set(
+        allSubjects.map((s) => s.replace(/\s+\d+$/, '').trim())
+      )
     )
-  )
 
-  return baseNames.filter((name) => name !== '')
-}
+    return baseNames.filter((name) => name !== '')
+  }
 
-function openNoteModal() {
-  setSelectedNote(null)
-  setModalMode('create')
-  const now = new Date()
-  setModalTime({
-    date: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-  })
-  setNoteTitle('')
-  setNoteSubject(selectedSubject !== 'All Categories' ? selectedSubject : 'Uncategorized')
-  setNoteContent('')
-  setIsNoteModalOpen(true)
-}
+  function openNoteModal() {
+    // Opens a blank, immediately-editable note. Nothing is created in
+    // Firestore yet — autosave silently creates the doc on first keystroke.
+    setSelectedNote(null)
+    setModalMode('edit')
+    const now = new Date()
+    setModalTime({
+      date: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+      time: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    })
+    const initialSubject = selectedSubject !== 'All Categories' ? selectedSubject : 'Uncategorized'
+    setNoteTitle('')
+    setNoteSubject(initialSubject)
+    setNoteContent('')
+    autosave.startNew(initialSubject)
+    setIsNoteModalOpen(true)
+  }
 
   function openViewModal(note: Note) {
     setSelectedNote(note)
@@ -219,6 +213,7 @@ function openNoteModal() {
     setNoteTitle(note.title)
     setNoteSubject(note.subject)
     setNoteContent(note.content)
+    autosave.startExisting(note.id, { title: note.title, subject: note.subject, content: note.content })
     setIsNoteModalOpen(true)
   }
 
@@ -227,25 +222,18 @@ function openNoteModal() {
     setSelectedNote(null)
   }
 
-async function handleNoteSave() {
-  if (noteContent.trim() === '') return
-  const title = noteTitle.trim() || getUntitledTitle()
-  setNoteTitle('')
-  setNoteSubject('Uncategorized')
-  setNoteContent('')
-  setIsNoteModalOpen(false)
-  addNote(title, noteSubject, noteContent)
-}
-
-  async function handleNoteUpdate() {
-    if (!selectedNote) return
-    const title = noteTitle.trim() || getUntitledTitle()
-    closeNoteModal()
-    updateNote(selectedNote.id, {
-      title,
-      subject: noteSubject,
-      content: noteContent.trim(),
-    })
+  // Every title/subject/content edit flows through here — updates local
+  // state for the UI and hands the merged draft to autosave in one call.
+  function handleFieldChange(next: Partial<{ title: string; subject: string; content: string }>) {
+    const merged = {
+      title: next.title ?? noteTitle,
+      subject: next.subject ?? noteSubject,
+      content: next.content ?? noteContent,
+    }
+    if (next.title !== undefined) setNoteTitle(next.title)
+    if (next.subject !== undefined) setNoteSubject(next.subject)
+    if (next.content !== undefined) setNoteContent(next.content)
+    autosave.onFieldChange(merged)
   }
 
   function downloadNote(note: Note) {
@@ -276,7 +264,7 @@ async function handleNoteSave() {
     .filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const displayTitle   = modalMode === 'view' ? (selectedNote?.title   ?? '') : noteTitle
-const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'Uncategorized') : noteSubject
+  const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'Uncategorized') : noteSubject
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
   const isReadOnly     = modalMode === 'view'
 
@@ -817,7 +805,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
             </div>
           )}
 
-          {/* ── Note Modal (create / view / edit) ── */}
+          {/* ── Note Modal (view / edit — edit autosaves, nothing to discard) ── */}
           {isNoteModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
@@ -836,7 +824,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       type='text'
                       placeholder='Untitled'
                       value={displayTitle}
-                      onChange={(e) => setNoteTitle(e.target.value)}
+                      onChange={(e) => handleFieldChange({ title: e.target.value })}
                       readOnly={isReadOnly}
                       autoFocus={!isReadOnly}
                     />
@@ -846,13 +834,13 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       <select
                         aria-label='Select category'
                         value={displaySubject}
-                        onChange={(e) => setNoteSubject(e.target.value)}
+                        onChange={(e) => handleFieldChange({ subject: e.target.value })}
                         className='shrink-0 max-w-[100px] border-2
                         
                         
                         border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
                       >
-  <option value='All Categories'>Uncategorized</option>
+  <option value='Uncategorized'>Uncategorized</option>
   {allSubjects.map((subject, index) => (
     <option key={index} value={subject}>{subject}</option>
   ))}
@@ -864,12 +852,12 @@ will be removed. Notes tagged with this category will be moved to <span classNam
 
 <NoteEditor
   content={displayContent}
-  onChange={setNoteContent}
+  onChange={(html) => handleFieldChange({ content: html })}
   readOnly={isReadOnly}
 />
 
                   <div className='flex gap-4 mt-auto'>
-                    {modalMode === 'view' && (
+                    {modalMode === 'view' ? (
                       <>
                         <button
                           onClick={handleCloseAttempt}
@@ -884,39 +872,13 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                           EDIT
                         </button>
                       </>
-                    )}
-                    {modalMode === 'edit' && (
-                      <>
-                        <button
-                          onClick={handleCloseAttempt}
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-                        >
-                          CANCEL
-                        </button>
-                        <button
-                          onClick={handleNoteUpdate}
-                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
-                        >
-                          SAVE
-                        </button>
-                      </>
-                    )}
-                    {modalMode === 'create' && (
-                      <>
-                        <button
-                          onClick={handleCloseAttempt}
-                          className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-                        >
-                          CANCEL
-                        </button>
-                        <button
-                          onClick={handleNoteSave}
-                          disabled={noteContent.trim() === ''}
-                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
-                        >
-                          SAVE
-                        </button>
-                      </>
+                    ) : (
+                      <button
+                        onClick={handleCloseAttempt}
+                        className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
+                      >
+                        DONE
+                      </button>
                     )}
                   </div>
                 </div>
@@ -930,7 +892,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       placeholder='Untitled'
                       maxLength={24}
                       value={displayTitle}
-                      onChange={(e) => setNoteTitle(e.target.value)}
+                      onChange={(e) => handleFieldChange({ title: e.target.value })}
                       readOnly={isReadOnly}
                       autoFocus={!isReadOnly}
                     />
@@ -940,7 +902,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
 <select
   aria-label='Select category'
   value={displaySubject}
-  onChange={(e) => setNoteSubject(e.target.value)}
+  onChange={(e) => handleFieldChange({ subject: e.target.value })}
   className='shrink-0 max-w-[130px] border-2 border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-xs'
 >
   <option value='Uncategorized'>Uncategorized</option>
@@ -956,12 +918,12 @@ will be removed. Notes tagged with this category will be moved to <span classNam
 
 <NoteEditor
   content={displayContent}
-  onChange={setNoteContent}
+  onChange={(html) => handleFieldChange({ content: html })}
   readOnly={isReadOnly}
 />
 
                   <div className='flex gap-4 mt-auto'>
-                    {modalMode === 'view' && (
+                    {modalMode === 'view' ? (
                       <div className='flex gap-2 ml-auto'>
                         <button
                           onClick={closeNoteModal}
@@ -976,37 +938,13 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                           EDIT
                         </button>
                       </div>
-                    )}
-                    {modalMode === 'edit' && (
+                    ) : (
                       <div className='flex gap-2 ml-auto'>
                         <button
                           onClick={handleCloseAttempt}
-                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
-                        >
-                          CANCEL
-                        </button>
-                        <button
-                          onClick={handleNoteUpdate}
                           className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
                         >
-                          SAVE
-                        </button>
-                      </div>
-                    )}
-                    {modalMode === 'create' && (
-                      <div className='flex gap-2 ml-auto'>
-                        <button
-                          onClick={closeNoteModal}
-                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
-                        >
-                          CANCEL
-                        </button>
-                        <button
-                          onClick={handleNoteSave}
-                          disabled={noteContent.trim() === ''}
-                          className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed'
-                        >
-                          SAVE
+                          DONE
                         </button>
                       </div>
                     )}
@@ -1033,40 +971,6 @@ will be removed. Notes tagged with this category will be moved to <span classNam
            </button>
         </div>
       </main>
-
-      {/* ── Discard Changes Confirmation Modal ── */}
-      {showDiscardConfirm && (
-        <div
-          className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60]'
-          onClick={() => setShowDiscardConfirm(false)}
-        >
-          <div
-            className='bg-white rounded-2xl p-8 w-full max-w-sm mx-6 flex flex-col items-center gap-4'
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className='text-xl font-bold text-primary-600 uppercase text-center'>
-              Discard Changes?
-            </p>
-            <p className='text-sm text-gray-500 text-center'>
-              You have unsaved changes. Are you sure you want to discard them?
-            </p>
-            <div className='flex gap-4 w-full mt-2'>
-              <button
-                onClick={() => setShowDiscardConfirm(false)}
-                className='flex-1 border-2 border-primary-600 text-primary-600 font-bold py-2 rounded-md hover:bg-primary-50'
-              >
-                KEEP EDITING
-              </button>
-              <button
-                onClick={() => { setShowDiscardConfirm(false); closeNoteModal() }}
-                className='flex-1 bg-red-500 text-white font-bold py-2 rounded-md hover:bg-red-600'
-              >
-                DISCARD
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
