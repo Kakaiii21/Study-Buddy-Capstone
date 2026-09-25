@@ -1,6 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { resetPassword } from '../services/authService'
+
+const RESEND_COOLDOWN = 60 // seconds
+
+const formatCooldown = (seconds: number) => {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}:${s.toString().padStart(2, '0')}` : `${s}s`
+}
 
 function ForgotPassword() {
   const navigate = useNavigate()
@@ -8,8 +16,25 @@ function ForgotPassword() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [hasSent, setHasSent] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const handleSendLink = async () => {
+  // ── Tick the cooldown down every second ──
+  useEffect(() => {
+    if (cooldown <= 0) {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      return
+    }
+    intervalRef.current = setInterval(() => {
+      setCooldown((prev) => (prev <= 1 ? 0 : prev - 1))
+    }, 1000)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [cooldown])
+
+  const sendResetLink = async () => {
     setError('')
     setSuccess('')
 
@@ -20,9 +45,10 @@ function ForgotPassword() {
 
     try {
       setLoading(true)
-      await resetPassword(email) 
+      await resetPassword(email)
       setSuccess('Password reset link sent! Check your inbox.')
-      setEmail('')
+      setHasSent(true)
+      setCooldown(RESEND_COOLDOWN)
     } catch (err) {
       const e = err as { code: string }
       if (e.code === 'auth/user-not-found') {
@@ -36,6 +62,8 @@ function ForgotPassword() {
       setLoading(false)
     }
   }
+
+  const canSend = !loading && cooldown === 0
 
   return (
     <div className='h-screen w-full'>
@@ -71,20 +99,36 @@ function ForgotPassword() {
               type="email"
               value={email}
               onChange={(e) => { setEmail(e.target.value); setError('') }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendLink()}
+              onKeyDown={(e) => e.key === 'Enter' && canSend && sendResetLink()}
               placeholder='Enter your email'
               className='w-full px-3 py-2 border text-md lg:text-xs 2xl:text-xl 3xl:text-2xl border-primary-600 rounded-md focus:outline-none'
             />
           </div>
         </div>
 
-        <button
-          onClick={handleSendLink}
-          disabled={loading}
-          className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 lg:text-xs xl:text-lg 2xl:text-xl mt-10 lg:mt-5 xl:mt-5 2xl:mt-10 rounded-md uppercase disabled:opacity-50'
-        >
-          {loading ? 'Sending...' : 'Send Link'}
-        </button>
+        <div className='flex flex-row gap-4 mt-10 lg:mt-5 xl:mt-5 2xl:mt-10'>
+          {!hasSent ? (
+            <button
+              onClick={sendResetLink}
+              disabled={!canSend}
+              className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 lg:text-xs xl:text-lg 2xl:text-xl rounded-md uppercase disabled:opacity-50'
+            >
+              {loading ? 'Sending...' : 'Send Link'}
+            </button>
+          ) : (
+            <button
+              onClick={sendResetLink}
+              disabled={!canSend}
+              className='font-roboto font-bold bg-primary-600 text-white text-md px-16 py-2 lg:text-xs xl:text-lg 2xl:text-xl rounded-md uppercase disabled:opacity-50'
+            >
+              {loading
+                ? 'Sending...'
+                : cooldown > 0
+                ? `Resend in ${formatCooldown(cooldown)}`
+                : 'Resend Link'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
