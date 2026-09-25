@@ -34,6 +34,10 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   // ────────────────────────────────────────────────────────────────────────
 
+  // ── NEW: remove profile pic state ───────────────────────────────────
+const [showRemovePicModal, setShowRemovePicModal] = useState(false)
+const [removingPic, setRemovingPic] = useState(false)
+// ────────────────────────────────────────────────────────────────────────
   // ── NEW: deactivate state ─────────────────────────────────────────
   const [showDeactivateModal, setShowDeactivateModal] = useState(false)
   const [deactivating, setDeactivating] = useState(false)
@@ -191,41 +195,45 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
     }
   }
 
-  const handleRemoveProfilePic = async () => {
-    if (!user) return
-    try {
-      const userSnap = await getDoc(doc(db, 'users', user.uid))
-      const oldPublicId = userSnap.data()?.photoPublicId ?? null
+const handleRemoveProfilePic = async () => {
+  if (!user) return
+  setRemovingPic(true)
+  try {
+    const userSnap = await getDoc(doc(db, 'users', user.uid))
+    const oldPublicId = userSnap.data()?.photoPublicId ?? null
 
-      await updateDoc(doc(db, 'users', user.uid), {
-        photoURL: null,
-        photoPublicId: null
-      })
+    await updateDoc(doc(db, 'users', user.uid), {
+      photoURL: null,
+      photoPublicId: null
+    })
 
-      setProfilePic('/profile.png')
-      sessionStorage.setItem('profilePic', '/profile.png')
-      window.dispatchEvent(new Event('profilePicUpdated'))
+    setProfilePic('/profile.png')
+    sessionStorage.setItem('profilePic', '/profile.png')
+    window.dispatchEvent(new Event('profilePicUpdated'))
 
-      const cacheKey = `user_${user.uid}`
-      const cached = sessionStorage.getItem(cacheKey)
-      if (cached) {
-        sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: null, photoPublicId: null }))
-      }
-
-      if (oldPublicId) {
-        await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
-        }).catch((err) => console.warn('Old profile pic delete failed:', err))
-      }
-
-      showToast('Profile picture removed.')
-    } catch (err) {
-      console.error('Failed to remove profile picture:', err)
-      showToast('Failed to remove picture. Please try again.')
+    const cacheKey = `user_${user.uid}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      sessionStorage.setItem(cacheKey, JSON.stringify({ ...JSON.parse(cached), photoURL: null, photoPublicId: null }))
     }
+
+    if (oldPublicId) {
+      await fetch('https://us-central1-study-buddy-cbaa8.cloudfunctions.net/deleteCloudinaryAsset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId: oldPublicId, resourceType: 'image' }),
+      }).catch((err) => console.warn('Old profile pic delete failed:', err))
+    }
+
+    showToast('Profile picture removed.')
+  } catch (err) {
+    console.error('Failed to remove profile picture:', err)
+    showToast('Failed to remove picture. Please try again.')
+  } finally {
+    setRemovingPic(false)
+    setShowRemovePicModal(false)
   }
+}
 
   // ── logout handler ──────────────────────────────────────────────────
   const handleLogout = async () => {
@@ -330,19 +338,20 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
             >
               Upload a new photo.
             </button>
-            <button
-              onClick={handleRemoveProfilePic}
-              className='text-red-500 text-xs md:text-sm  lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px] font-inter hover:underline'
-            >
-              Remove
-            </button>
+<button
+  onClick={() => setShowRemovePicModal(true)}
+  disabled={profilePic === '/profile.png'}
+  className='text-red-500 text-xs md:text-sm  lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px] font-inter hover:underline disabled:opacity-40 disabled:hover:no-underline disabled:cursor-not-allowed'
+>
+  Remove
+</button>
           </div>
         </div>
 
         <hr className='border-t border-gray-300 mb-4 md:mb-6 lg:mb-0 2xl:mb-4' />
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
-          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name</label>
+          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name *</label>
           <input
             type="text"
             value={firstName}
@@ -360,7 +369,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
         </div>
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1 2xl:mt-3 '>
-          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name</label>
+          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name *</label>
           <input
             type="text"
             value={lastName}
@@ -490,6 +499,34 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
             </div>
           </div>
         )}
+        {/* ── NEW: Remove profile picture confirmation modal ── */}
+{showRemovePicModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => !removingPic && setShowRemovePicModal(false)} />
+    <div className="relative bg-white rounded-xl shadow-xl p-8 w-80 text-center">
+      <h2 className="text-xl font-bold text-red-500 font-roboto mb-2">Remove Profile Picture</h2>
+      <p className="text-gray-600 mb-6 text-sm">
+        Are you sure you want to remove your profile picture? This can't be undone.
+      </p>
+      <div className="flex gap-4">
+        <button
+          onClick={() => setShowRemovePicModal(false)}
+          disabled={removingPic}
+          className="flex-1 text-primary-800 border border-primary-800 font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleRemoveProfilePic}
+          disabled={removingPic}
+          className="flex-1 bg-red-500 text-white font-roboto font-bold py-3 rounded-lg hover:opacity-90 transition-opacity duration-200 disabled:opacity-50"
+        >
+          {removingPic ? 'Removing...' : 'Remove'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </>
   )

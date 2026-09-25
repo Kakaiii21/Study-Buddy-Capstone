@@ -94,7 +94,7 @@ function ForgotPassword() {
           {success && <p className='text-green-500 text-sm lg:text-xs 2xl:text-lg 3xl:text-2xl  font-semibold text-center'>{success}</p>}
 
           <div className='w-full max-auto lg:px-6 xl:px-6 2xl:px-16 3xl:px-20'>
-            <p className='font-roboto font-bold text-primary-600 text-md lg:text-xs 2xl:text-xl 3xl:text-2xl  mb-1'>Email</p>
+            <p className='font-roboto font-bold text-primary-600 text-md lg:text-xs 2xl:text-xl 3xl:text-2xl  mb-1'>Email *</p>
             <input
               type="email"
               value={email}

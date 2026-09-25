@@ -24,13 +24,14 @@ export async function uploadToCloudinary(
     const ext = file.name.split('.').pop()?.toLowerCase() || ''
     const isImage = ['png', 'jpg', 'jpeg'].includes(ext)
     const resourceType = isImage ? 'image' : 'raw'
-const formData = new FormData()
-formData.append('file', file)
-formData.append('upload_preset', UPLOAD_PRESET)
 
-if (!userId) {
-  formData.append('folder', 'courses')
-}
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', UPLOAD_PRESET)
+
+    if (!userId) {
+      formData.append('folder', 'courses')
+    }
 
     const xhr = new XMLHttpRequest()
 
@@ -52,7 +53,9 @@ if (!userId) {
           fileSize: formatSize(file.size),
         })
       } else {
-        reject(new Error('Upload failed'))
+        const errorData = JSON.parse(xhr.responseText)
+        console.error('Cloudinary error:', errorData)
+        reject(new Error(`Upload failed: ${errorData.error?.message || xhr.responseText}`))
       }
     })
 
@@ -60,21 +63,5 @@ if (!userId) {
 
     xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`)
     xhr.send(formData)
-    xhr.addEventListener('load', () => {
-  if (xhr.status === 200) {
-    const data = JSON.parse(xhr.responseText)
-    resolve({
-      url: data.secure_url,
-      publicId: data.public_id,
-      fileName: file.name,
-      fileType: ext,
-      fileSize: formatSize(file.size),
-    })
-  } else {
-    const errorData = JSON.parse(xhr.responseText)  // ← add this
-    console.error('Cloudinary error:', errorData)    // ← add this
-    reject(new Error(`Upload failed: ${errorData.error?.message || xhr.responseText}`))
-  }
-})
   })
 }

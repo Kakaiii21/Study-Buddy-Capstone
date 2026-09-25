@@ -191,7 +191,7 @@ function TaskModal({
 
         <label className="flex font-semibold text-primary-600 text-xl 
        lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl
-         py-2">Task</label>
+         py-2">Task *</label>
         <input
           className="flex border-2 rounded-md border-primary-600 min-w-full my-2 
           lg:text-sm lg:py-1 lg:rounded-sm lg:my-0

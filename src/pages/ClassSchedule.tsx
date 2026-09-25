@@ -635,7 +635,7 @@ const DayCard = ({ day }: { day: string }) => {
                     <p className='text-sm font-bold text-gray-800 mb-3'>Class Information</p>
                     <div className='flex flex-col sm:flex-row gap-4'>
                       <div className='flex-1 flex flex-col'>
-                        <label className='text-xs font-semibold text-gray-500 mb-1'>Subject Name</label>
+                        <label className='text-xs font-semibold text-gray-500 mb-1'>Subject Name *</label>
                         <input
                           type='text'
                           placeholder='Enter Subject'
@@ -661,7 +661,7 @@ const DayCard = ({ day }: { day: string }) => {
                         )}
                       </div>
                       <div className='flex-1 flex flex-col'>
-                        <label className='text-xs font-semibold text-gray-500 mb-1'>Teacher / Instructor</label>
+                        <label className='text-xs font-semibold text-gray-500 mb-1'>Teacher / Instructor *</label>
                         <input
                           type='text'
                           placeholder='Enter Teacher/Instructor Name'
@@ -699,7 +699,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                               {/* Day */}
                               <div className='flex flex-col gap-1 md:w-full lg:w-32 shrink-0'>
-                                <p className='text-xs text-primary-800'>Day</p>
+                                <p className='text-xs text-primary-800'>Day *</p>
                                 <div className='flex items-center gap-2'>
                                   <span className='w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0' aria-hidden='true' />
                                   <select
@@ -740,7 +740,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                               {/* Time Start */}
                               <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
-                                <p className='text-xs text-primary-800'>Time Start</p>
+                                <p className='text-xs text-primary-800'>Time Start *</p>
                                 <input
                                   aria-label='Time Start'
                                   type='time'
@@ -752,7 +752,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                               {/* Time End */}
                               <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
-                                <p className='text-xs text-primary-800'>Time End</p>
+                                <p className='text-xs text-primary-800'>Time End *</p>
                                 <input
                                   aria-label='Time End'
                                   type='time'
@@ -764,7 +764,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                               {/* Room */}
                               <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
-                                <p className='text-xs text-primary-800'>Room</p>
+                                <p className='text-xs text-primary-800'>Room *</p>
                                 <input
                                   type='text'
                                   placeholder='Room'
@@ -776,7 +776,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                               {/* Type */}
                               <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
-                                <p className='text-xs text-primary-800'>Type</p>
+                                <p className='text-xs text-primary-800'>Type *</p>
                                 <select
                                   aria-label='Select Room Type'
                                   value={row.roomType}

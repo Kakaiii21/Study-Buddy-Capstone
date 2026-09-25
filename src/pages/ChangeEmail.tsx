@@ -158,7 +158,7 @@ return (
           <div className='w-full my-8 mt-1'>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Current Password</p>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Current Password *</p>
               <input
                 type="password"
                 value={password}
@@ -170,7 +170,7 @@ return (
             </div>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>New Email</p>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>New Email *</p>
               <input
                 type="email"
                 value={newEmail}
@@ -181,7 +181,7 @@ return (
             </div>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Confirm New Email</p>
+              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Confirm New Email *</p>
               <input
                 type="email"
                 value={confirmEmail}

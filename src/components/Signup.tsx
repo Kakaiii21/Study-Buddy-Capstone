@@ -253,24 +253,24 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
-{/* MOBILE HEADER */}
-<div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
-  <h1 className="text-white font-inter font-extrabold text-3xl">
-    Welcome To Study Buddy!
-  </h1>
-  <p className="text-white font-fustat text-sm mt-3">
-    Create your account and start learning smarter.
-  </p>
-  <p className="text-white font-fustat text-sm mt-2">
-    Already have an account?{' '}
-    <button
-      onClick={() => onSwitchToLogin ? onSwitchToLogin() : navigate('/login')}
-      className="font-bold underline bg-white text-primary-800 px-2 rounded-lg"
-    >
-      Log In
-    </button>
-  </p>
-</div>
+      {/* MOBILE HEADER */}
+      <div className="flex lg:hidden flex-col items-center pt-8 pb-4 px-6 text-center">
+        <h1 className="text-white font-inter font-extrabold text-3xl">
+          Welcome To Study Buddy!
+        </h1>
+        <p className="text-white font-fustat text-sm mt-3">
+          Create your account and start learning smarter.
+        </p>
+        <p className="text-white font-fustat text-sm mt-2">
+          Already have an account?{' '}
+          <button
+            onClick={() => onSwitchToLogin ? onSwitchToLogin() : navigate('/login')}
+            className="font-bold underline bg-white text-primary-800 px-2 rounded-lg"
+          >
+            Log In
+          </button>
+        </p>
+      </div>
 
 
 {/* LEFT PANEL */}
@@ -347,7 +347,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
           xl:text-[13px]
           2xl:text-[16px]
           3xl:text-[19px]
-          ">FIRST NAME</p>
+          ">FIRST NAME *</p>
           <input
             ref={firstNameRef}
             type="text"
@@ -369,7 +369,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
           xl:text-[13px]
           2xl:text-[16px]
           3xl:text-[19px]
-          ">LAST NAME</p>
+          ">LAST NAME *</p>
           <input
             ref={lastNameRef}
             type="text"
@@ -391,7 +391,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
           xl:text-[13px]
           2xl:text-[16px]
           3xl:text-[19px]
-          ">EMAIL</p>
+          ">EMAIL *</p>
           <input
             ref={emailRef}
             type="email"
@@ -413,7 +413,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
           xl:text-[13px]
           2xl:text-[16px]
           3xl:text-[19px]
-          ">PASSWORD</p>
+          ">PASSWORD *</p>
           <input
             ref={passwordRef}
             type="password"
@@ -443,7 +443,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
           xl:text-[13px]
           2xl:text-[16px]
           3xl:text-[19px]
-          ">CONFIRM PASSWORD</p>
+          ">CONFIRM PASSWORD *</p>
           <input
             ref={confirmPasswordRef}
             type="password"

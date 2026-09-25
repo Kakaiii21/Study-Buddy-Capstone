@@ -871,7 +871,7 @@ className='relative flex flex-col justify-between text-left p-2
                 {/* Form */}
                 <div className='flex flex-col gap-2'>
                   <div>
-                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name</label>
+                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name *</label>
 <input
   type='text'
   value={formFirstName}
@@ -887,7 +887,7 @@ className='relative flex flex-col justify-between text-left p-2
 )}
                   </div>
                   <div>
-                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name</label>
+                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name *</label>
 <input
   type='text'
   value={formLastName}
