@@ -56,6 +56,46 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   )
 }
 
+function DiscardNoteModal({ onConfirm, onCancel }: {
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  const [confirming, setConfirming] = useState(false)
+
+  const handleConfirm = () => {
+    if (confirming) return
+    setConfirming(true)
+    onConfirm()
+  }
+
+  return (
+    <div className='fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+      <div className='bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4'>
+        <h2 className='text-lg font-bold text-gray-800 mb-2'>Discard this note?</h2>
+        <p className='text-sm text-gray-500 mb-6'>
+          This note hasn't been kept — it will be deleted and this can't be undone.
+        </p>
+        <div className='flex gap-3 justify-end'>
+          <button
+            onClick={onCancel}
+            disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40'
+          >
+            Keep Editing
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={confirming}
+            className='px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-60'
+          >
+            {confirming ? 'Discarding...' : 'Discard'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Notes() {
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
@@ -66,6 +106,7 @@ function Notes() {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<Category | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
+  const [cancelConfirm, setCancelConfirm] = useState(false)
 
   const { startTour } = useTour(
     'notes',
@@ -220,6 +261,18 @@ function Notes() {
   function closeNoteModal() {
     setIsNoteModalOpen(false)
     setSelectedNote(null)
+    setCancelConfirm(false)
+  }
+
+  // Only reachable for a brand-new note (selectedNote === null) — deletes
+  // the doc autosave already created in Firestore and closes without saving.
+  async function handleCancelNewNote() {
+    const idToDelete = autosave.noteId // ← adjust if your hook exposes the id differently
+    if (idToDelete) {
+      await deleteNote(idToDelete)
+    }
+    setCancelConfirm(false)
+    closeNoteModal()
   }
 
   // Every title/subject/content edit flows through here — updates local
@@ -662,6 +715,13 @@ function Notes() {
             />
           )}
 
+          {cancelConfirm && (
+            <DiscardNoteModal
+              onConfirm={handleCancelNewNote}
+              onCancel={() => setCancelConfirm(false)}
+            />
+          )}
+
           {/* ── Download Confirmation Modal ── */}
           {confirmDownload && (
             <div
@@ -805,7 +865,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
             </div>
           )}
 
-          {/* ── Note Modal (view / edit — edit autosaves, nothing to discard) ── */}
+          {/* ── Note Modal (view / edit — edit autosaves; only a brand-new note can be discarded) ── */}
           {isNoteModalOpen && (
             <div
               className='fixed inset-0 bg-black bg-opacity-50 flex justify-end lg:justify-center items-end lg:items-center z-50'
@@ -872,6 +932,21 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                           EDIT
                         </button>
                       </>
+                    ) : selectedNote === null ? (
+                      <>
+                        <button
+                          onClick={() => setCancelConfirm(true)}
+                          className='flex-1 border-2 border-red-400 text-red-500 font-bold py-2 rounded-md hover:bg-red-50'
+                        >
+                          CANCEL
+                        </button>
+                        <button
+                          onClick={handleCloseAttempt}
+                          className='flex-1 border-2 border-primary-600 bg-primary-600 text-white font-bold py-2 rounded-md hover:bg-primary-700'
+                        >
+                          DONE
+                        </button>
+                      </>
                     ) : (
                       <button
                         onClick={handleCloseAttempt}
@@ -936,6 +1011,21 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                           className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
                         >
                           EDIT
+                        </button>
+                      </div>
+                    ) : selectedNote === null ? (
+                      <div className='flex gap-2 ml-auto'>
+                        <button
+                          onClick={() => setCancelConfirm(true)}
+                          className='uppercase border border-red-400 text-red-500 text-xs font-bold py-1 px-10 rounded-md hover:bg-red-50'
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleCloseAttempt}
+                          className='uppercase bg-primary-600 border border-primary-600 text-white text-xs font-bold py-1 px-10 rounded-md hover:bg-primary-700'
+                        >
+                          DONE
                         </button>
                       </div>
                     ) : (
