@@ -17,6 +17,28 @@ interface ResultState {
   fileName: string
 }
 
+const optionLetters = ['A', 'B', 'C', 'D']
+
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
+const shuffleQuestions = (qs: QuizQuestion[]): QuizQuestion[] =>
+  shuffleArray(qs).map((q) => {
+    const shuffledOptions = shuffleArray(q.options)
+    const newAnswerIndex = shuffledOptions.indexOf(q.options[optionLetters.indexOf(q.answer)])
+    return {
+      ...q,
+      options: shuffledOptions,
+      answer: optionLetters[newAnswerIndex],
+    }
+  })
+
 function loadResult(locationState: unknown): ResultState | null {
   const state = locationState as ResultState | null
   if (state?.items && state.mode === 'quiz') return state
@@ -69,9 +91,10 @@ function Quiz() {
   const [attempted, setAttempted] = useState<boolean>(
     () => loadPersistedQuizState().savedAttempted
   )
-  const [questions, setQuestions] = useState<QuizQuestion[]>(
-    () => loadPersistedQuizState().savedQuestions ?? result?.items ?? []
-  )
+// ✅ Only runs once, on mount (this is the lazy-init form you already had)
+const [questions, setQuestions] = useState<QuizQuestion[]>(
+  () => loadPersistedQuizState().savedQuestions ?? result?.items ?? []
+)
 
   const [enabled, setEnabled] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -120,7 +143,6 @@ function Quiz() {
       }
 
 
-  const optionLetters = ['A', 'B', 'C', 'D']
   const allAnswered = questions.every((_, i) => selected[i] !== undefined)
 
   const saveQuestions = (updated: QuizQuestion[]) => {
@@ -231,20 +253,6 @@ function Quiz() {
     navigate('/studyGenerator')
   }
 
-  const shuffleArray = <T,>(arr: T[]): T[] =>
-    [...arr].sort(() => Math.random() - 0.5)
-
-  const shuffleQuestions = (qs: QuizQuestion[]): QuizQuestion[] =>
-    shuffleArray(qs).map(q => {
-      const shuffledOptions = shuffleArray(q.options)
-      const newAnswerIndex = shuffledOptions.indexOf(q.options[optionLetters.indexOf(q.answer)])
-      return {
-        ...q,
-        options: shuffledOptions,
-        answer: optionLetters[newAnswerIndex],
-      }
-    })
-
   const handleRetake = () => {
     setShowModal(false)
     setSubmitted(false)
@@ -253,7 +261,7 @@ function Quiz() {
     setFinalScore(0)
     setSaveError(null)
     setSaveSuccess(false)
-    setQuestions(shuffleQuestions(questions))
+    setQuestions(shuffleQuestions(questions))   // ← shuffles both question order AND each question's options
     clearQuizSession()
     mainRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   }

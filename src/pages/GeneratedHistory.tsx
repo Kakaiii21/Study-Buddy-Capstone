@@ -24,9 +24,14 @@ interface QuizItem {
 
 const optionLetters = ['A', 'B', 'C', 'D']
 
-const shuffleArray = <T,>(arr: T[]): T[] =>
-  [...arr].sort(() => Math.random() - 0.5)
-
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
 const shuffleQuizItems = (items: QuizItem[]): QuizItem[] =>
   shuffleArray(items).map((q) => {
     const shuffledOptions = shuffleArray(q.options)
@@ -37,6 +42,8 @@ const shuffleQuizItems = (items: QuizItem[]): QuizItem[] =>
       answer: optionLetters[newAnswerIndex],
     }
   })
+
+
 
 
 
@@ -154,6 +161,16 @@ function GeneratedHistory() {
       },
     })
   }
+
+  const handleShuffleFlashcard = (item: (typeof flashcardHistory)[number]) => {
+  navigate('/flashcardView', {
+    state: {
+      items: shuffleArray(item.items),
+      fileName: item.fileName,
+      id: item.id,
+    },
+  })
+}
 
   useEffect(() => {
   const quizView = sessionStorage.getItem('quizView_state')
@@ -329,50 +346,59 @@ function GeneratedHistory() {
               {/* ── Flashcard Table ── */}
               {selectedGen === 'Flashcard' && (
                 <>
-                  <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
-                    <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
-                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
-                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
-                    <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
-                  </div>
+<div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
+  <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
+  <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
+  <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
+  <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Shuffle</p>
+  <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Delete</p>
+</div>
 
                   {filteredFlashcard.length === 0 ? (
                     <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
                   ) : (
                     filteredFlashcard.map((item) => (
                       <div key={item.id} className=' py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
-                        <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
-                          <div className='min-w-0'>
-                            <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
-                              {item.fileName}
-                            </p>
-                            <p className='text-xs  md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateSaved)}</p>
-                          </div>
-                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
-                          <div className='flex justify-center'>
-                            <img
-                            id='viewBtn'
-                            
-                              src='/View.png'
-                              alt='View'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
-                              onClick={() => handleViewFlashcard(item)}
-                            />
-                          </div>
-                          <div className='flex justify-center'>
-                              <img
-                              id='deleteBtn'
-                                src='/delete.png'
-                                alt='Delete'
-                                className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
-                                  ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}  onContextMenu={(e) => e.preventDefault()} draggable={false}
-                                onClick={() => isOnline
-                                  ? setPendingDelete({ id: item.id, name: item.fileName })
-                                  : undefined
-                                }
-                              />
-                          </div>
-                        </div>
+<div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
+  <div className='min-w-0'>
+    <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px] font-semibold text-primary-600 break-all leading-tight'>
+      {item.fileName}
+    </p>
+    <p className='text-xs md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateSaved)}</p>
+  </div>
+  <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
+  <div className='flex justify-center'>
+    <img
+      id='viewBtn'
+      src='/View.png'
+      alt='View'
+      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none'
+      onContextMenu={(e) => e.preventDefault()} draggable={false}
+      onClick={() => handleViewFlashcard(item)}
+    />
+  </div>
+  <div className='flex justify-center'>
+    <img
+      id='shuffleBtn'
+      src='/Retake.png'
+      alt='Shuffle'
+      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none'
+      onContextMenu={(e) => e.preventDefault()} draggable={false}
+      onClick={() => handleShuffleFlashcard(item)}
+    />
+  </div>
+  <div className='flex justify-center'>
+    <img
+      id='deleteBtn'
+      src='/delete.png'
+      alt='Delete'
+      className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 transition select-none
+        ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
+      onContextMenu={(e) => e.preventDefault()} draggable={false}
+      onClick={() => isOnline ? setPendingDelete({ id: item.id, name: item.fileName }) : undefined}
+    />
+  </div>
+</div>
                       </div>
                     ))
                   )}

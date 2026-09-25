@@ -19,6 +19,15 @@ interface FlashcardViewState {
 // ← Outside the component so it's stable
 const FLASHCARD_VIEW_KEY = 'flashcard_view_state'
 
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
 function FlashcardView() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -37,6 +46,7 @@ function FlashcardView() {
 
   // ── All hooks BEFORE any early return ──
   const [cards, setCards] = useState<FlashcardItem[]>(state?.items ?? [])
+  const [originalCards, setOriginalCards] = useState<FlashcardItem[]>(state?.items ?? [])
   const [flipped, setFlipped] = useState<Record<number, boolean>>({})
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null)
   const [editIndex, setEditIndex] = useState<number | null>(null)
@@ -78,27 +88,28 @@ function FlashcardView() {
     setFlipped((prev) => ({ ...prev, [index]: !prev[index] }))
   }
 
-  const persistCards = async (updated: FlashcardItem[]) => {
-    const user = auth.currentUser
-    if (!user || !id) {
-      console.warn('Missing user or id', { uid: user?.uid, id })
-      return
-    }
-    setSaving(true)
-    setSaveError(null)
-    try {
-      await updateDoc(doc(db, 'users', user.uid, 'flashcardHistory', id), {
-        items: updated,
-        total: updated.length,
-      })
-      setShowSuccessModal(true)
-    } catch (err) {
-      console.error('Update failed:', err)
-      setSaveError('Failed to save changes.')
-    } finally {
-      setSaving(false)
-    }
+const persistCards = async (updated: FlashcardItem[]) => {
+  const user = auth.currentUser
+  if (!user || !id) {
+    console.warn('Missing user or id', { uid: user?.uid, id })
+    return
   }
+  setSaving(true)
+  setSaveError(null)
+  try {
+    await updateDoc(doc(db, 'users', user.uid, 'flashcardHistory', id), {
+      items: updated,
+      total: updated.length,
+    })
+    setOriginalCards(updated)
+    setShowSuccessModal(true)
+  } catch (err) {
+    console.error('Update failed:', err)
+    setSaveError('Failed to save changes.')
+  } finally {
+    setSaving(false)
+  }
+}
 
   const handleEditOpen = (index: number) => {
     setEditIndex(index)
@@ -133,6 +144,12 @@ function FlashcardView() {
       return next
     })
     setDeleteConfirmIndex(null)
+    setOpenMenuIndex(null)
+  }
+const isDirty = JSON.stringify(cards) !== JSON.stringify(originalCards)
+  const handleShuffle = () => {
+    setCards((prev) => shuffleArray(prev))
+    setFlipped({})
     setOpenMenuIndex(null)
   }
 
@@ -295,13 +312,20 @@ function FlashcardView() {
             >
               Back
             </button>
-              <button
-                className={`hover:opacity-50 lg:text-xs 2xl:text-lg  bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase transition
-                  ${!isOnline ? 'opacity-40 cursor-not-allowed' : ''}`}
-                onClick={() => isOnline ? persistCards(cards) : undefined}
-              >
-                Save
-              </button>
+            <button
+              className='hover:opacity-50 lg:text-xs 2xl:text-lg bg-primary-800 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase'
+              onClick={handleShuffle}
+            >
+              Shuffle
+            </button>
+            <button
+              className={`hover:opacity-50 lg:text-xs 2xl:text-lg  bg-primary-600 text-white py-2 font-roboto md:px-14 px-8 text-sm md:text-xl rounded-md uppercase transition
+                ${(!isOnline || !isDirty) ? 'opacity-40 cursor-not-allowed' : ''}`}
+              disabled={!isOnline || !isDirty}
+              onClick={() => (isOnline && isDirty) ? persistCards(cards) : undefined}
+            >
+              Save
+            </button>
           </div>
         </div>
 
