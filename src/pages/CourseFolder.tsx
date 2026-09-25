@@ -169,7 +169,7 @@ const handleFiles = async (incoming: FileList | null) => {
     const rejected: string[] = []
     const duplicates: string[] = []
     const toUpload: File[] = []
-    const MAX_FILE_SIZE = 10 * 1024 * 1024
+    const MAX_FILE_SIZE = 25 * 1024 * 1024
 
     Array.from(incoming).forEach((file) => {
       const ext = file.name.split('.').pop()?.toLowerCase() || ''
@@ -179,8 +179,8 @@ const handleFiles = async (incoming: FileList | null) => {
       if (!trimmedName) { rejected.push(file.name); return }
 
       if (file.size > MAX_FILE_SIZE) {
-        messages.push(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Max is 10 MB.`)
-        return
+        messages.push(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Max is 10 MB.`)       
+         return
       }
 
       const alreadyExists = files.some(
@@ -658,8 +658,7 @@ const handleFiles = async (incoming: FileList | null) => {
                   <p className='text-gray-400 font-roboto text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[12px] text-center'>
                     + Drop more files or <span className='text-primary-600 font-bold'>click to browse</span>
                     <br />
-                    <span className='text-xs text-gray-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px]'>Max 10 MB per file</span>
-                  </p>
+<span className='text-xs text-gray-500 lg:text-[10px] xl:text-[11px] 2xl:text-[12px]'>Max 25 MB per file</span>                  </p>
                 </div>
               )}
             </div>
