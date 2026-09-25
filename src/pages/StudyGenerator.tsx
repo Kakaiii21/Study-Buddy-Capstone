@@ -221,7 +221,9 @@ const [pendingFileName, setPendingFileName] = useState<string | null>(
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const items = [10, 20, 30, 40, 50]
   const isOnline = useNetworkStatus()
-
+const visibleItems = suggestedMax
+  ? Array.from(new Set([...items.filter((n) => n <= suggestedMax), suggestedMax])).sort((a, b) => a - b)
+  : items
   const generateSectionRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (uploadedFile && generateSectionRef.current) {
@@ -433,6 +435,7 @@ useEffect(() => {
         } else if (data.suggested_max) {
           setFileError(data.error)
           setSuggestedMax(data.suggested_max)
+          setSelectItems((prev) => (typeof prev === 'number' && prev > data.suggested_max ? '' : prev))
         } else {
           setFileError(data.error || 'Something went wrong. Please try again.')
         }
@@ -685,28 +688,23 @@ useEffect(() => {
                   </div>
 
                   <div className='mt-2 2xl:mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
-                    <select
-                      id='itemsSelect'
-                      className='w-52 3xl:w-64 border border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
-                      aria-label='Select Number of Items'
-                      value={selectItems}
-                      onChange={(e) => {
-                        setSelectItems(e.target.value === '' ? '' : Number(e.target.value))
-                        setSuggestedMax(null)
-                        setFileError('')
-                      }}
-                      disabled={isGenerating}
-                    >
-                      <option value='' disabled>Select number of items</option>
-                      {items.map((item) => (
-                        <option key={item} value={item}>{item}</option>
-                      ))}
-                      {suggestedMax && !items.includes(suggestedMax) && (
-                        <option key={`suggested-${suggestedMax}`} value={suggestedMax}>
-                          {suggestedMax}
-                        </option>
-                      )}
-                    </select>
+<select
+  id='itemsSelect'
+  className='w-52 3xl:w-64 border border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
+  aria-label='Select Number of Items'
+  value={selectItems}
+  onChange={(e) => {
+    setSelectItems(e.target.value === '' ? '' : Number(e.target.value))
+    setSuggestedMax(null)
+    setFileError('')
+  }}
+  disabled={isGenerating}
+>
+  <option value='' disabled>Select number of items</option>
+  {visibleItems.map((item) => (
+    <option key={item} value={item}>{item}</option>
+  ))}
+</select>
 
                     <button
                       id='randomItemsBtn'
