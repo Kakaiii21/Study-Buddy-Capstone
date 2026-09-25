@@ -87,6 +87,14 @@ export function useAutosaveNote(
     })
   }
 
+    function cancelDraft(): string | null {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    const id = noteIdRef.current
+    clearLocal(draftKeyRef.current)
+    noteIdRef.current = null
+    return id
+  }
+
   /** Call on every title/subject/content change. */
   function onFieldChange(fields: DraftFields) {
     latestRef.current = fields
@@ -127,5 +135,5 @@ export function useAutosaveNote(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { startNew, startExisting, onFieldChange, flush, recoverDraft }
+  return { startNew, startExisting, onFieldChange, flush, recoverDraft, cancelDraft }
 }

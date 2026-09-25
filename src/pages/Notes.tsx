@@ -267,7 +267,7 @@ function Notes() {
   // Only reachable for a brand-new note (selectedNote === null) — deletes
   // the doc autosave already created in Firestore and closes without saving.
   async function handleCancelNewNote() {
-    const idToDelete = autosave.noteId // ← adjust if your hook exposes the id differently
+    const idToDelete = autosave.cancelDraft()
     if (idToDelete) {
       await deleteNote(idToDelete)
     }
