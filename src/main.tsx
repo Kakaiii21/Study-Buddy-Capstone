@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { HelpBuddyProvider } from './context/HelpBuddyContext'
+import { ThemeProvider } from './context/ThemeContext'
 import BfcacheGuard from './components/BfcacheGuard'
 import ModerationNotificationWatcher from './components/ModerationNotificationWatcher'
 import './index.css'
@@ -233,15 +234,17 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <TimerProvider>
-      <HelpBuddyProvider>
-        <BfcacheGuard />
-        <ExpiredAlert />
-        <EmailChangeWatcher /> 
-        <PasswordChangeWatcher /> 
-        <ModerationNotificationWatcher />
-        <RouterProvider router={router} />
-      </HelpBuddyProvider>
-    </TimerProvider>
+    <ThemeProvider>
+      <TimerProvider>
+        <HelpBuddyProvider>
+          <BfcacheGuard />
+          <ExpiredAlert />
+          <EmailChangeWatcher /> 
+          <PasswordChangeWatcher /> 
+          <ModerationNotificationWatcher />
+          <RouterProvider router={router} />
+        </HelpBuddyProvider>
+      </TimerProvider>
+    </ThemeProvider>
   </StrictMode>
 )

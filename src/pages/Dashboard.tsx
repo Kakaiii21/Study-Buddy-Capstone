@@ -12,8 +12,11 @@ import { useTour } from '../hooks/useTour'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
+import { useTheme } from '../context/ThemeContext'
 
 function Dashboard() {
+    const { theme } = useTheme()
+
   const [showSidebar, setShowSidebar] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)  
   
@@ -53,6 +56,16 @@ function Dashboard() {
     () => setShowSidebar(false), 
     user
   )
+  const needHelpIcon = {
+  light: '/needhelp.png',
+  dark: '/needhelp.png',
+  warm: '/needhelp-warm.png',
+}
+const timerIcon = {
+  light: '/timer.png',
+  dark: '/timer-dark.png',
+  warm: '/timer-warm.png',
+}
   const { elapsedSeconds } = useTimerContext() 
   const { quizHistory } = useQuizHistory(user)
   const latestQuiz = quizHistory[0] ?? null
@@ -551,7 +564,7 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
         </div>
       )}
 
-    <div className='h-screen w-full  overflow-hidden bg-white'>
+    <div className='h-screen w-full  overflow-hidden bg-white dark:bg-[#0A0F15] FBF1E8 warm:bg-[#FBF1E8]'>
       <div className='flex h-full'>
         {/* Sidebar */}
         <div className='md:p-3 '>
@@ -564,25 +577,33 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
         {/* Right of sidebar */}
         <div className='flex-1  flex flex-col overflow-hidden'>
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white fixed top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter font-semibold text-md text-[#B3B3B3] uppercase'>Dashboard</p>
+        <div className='lg:hidden dark:bg-[#010409] warm:bg-[#FBF1E8] flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter font-semibold text-md text-[#B3B3B3]uppercase dark:text-white'>Dashboard</p>
           <div className='w-10' />
           <button
             id='timer-btn'                      
             onClick={() => navigate('/timer')}
             className='flex flex-col items-center gap-1 px-2 mt-3 md:mt-0 py-1'
           >
-            <img src='/timer.png' alt='timer' className='w-10 h-10 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-            <span className='text-xs text-primary-600 font-bold'>Timer</span>
+  <img
+    src={timerIcon[theme]}
+    alt='timer'
+    className='w-10 h-10 select-none'
+    onContextMenu={(e) => e.preventDefault()}
+    draggable={false}
+  />
+              <span className='text-xs dark:text-white warm:text-[#623627] text-primary-600 font-bold'>Timer</span>
           </button>
         </div>
           {/* Body: main content + timer side by side */}
         <div className='flex w-full  flex-1 overflow-hidden mt-0 lg:mt-0'>
             {/* Scrollable Main Content */}
-        <main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white px-3 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
+        <main ref={mainRef} onScroll={handleScroll}     className={`flex-1 min-w-0 w-full overflow-y-auto bg-white dark:bg-[#0A0F15] warm:bg-[#FBF1E8] px-3 lg:px-5 xl:px-6 2xl:px-7 3xl:px-8 custom-scroll ${isScrolling ? 'is-scrolling' : ''}`}>
         <p className='hidden md:flex w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto 
         font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase
-        mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 '>Dashboard</p>
+        mt-6 sm:mt-5 md:mt-4 lg:mt-3 xl:mt-4 2xl:mt-5 3xl:mt-6 
+        dark:text-white warm:text-[#623627]
+        '>Dashboard</p>
         <div className='w-full   max-w-[520px] sm:max-w-[600px] md:max-w-[650px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto mt-2 '>
         <div className='flex  flex-col sm:flex-row sm:flex-nowrap w-full gap-4 sm:gap-5 md:gap-6 lg:gap-6 xl:gap-7 2xl:gap-7 3xl:gap-10 mt-0 justify-center items-center'>
             
@@ -590,7 +611,7 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
         <div id='idCard' ref={idCardRef} onClick={openCustomize} className='w-full flex-1 min-w-[100px] max-w-[350px] md:min-w-[340px] md:max-w-[420px]
           lg:min-w-[280px] lg:max-w-[clamp(260px,34vw,290px)] xl:min-w-[310px] xl:max-w-[340px] 
           2xl:min-w-[400px] 2xl:max-w-[430px] 3xl:min-w-[520px] 3xl:max-w-[550px]
-          h-auto pb-3 bg-white border-2 border-primary-800 rounded-lg overflow-hidden relative
+          h-auto pb-3 bg-white  border-2 border-primary-800 dark:border-white warm:border-[#623627] rounded-lg overflow-hidden relative
           shadow-[0_5px_4px_-2px_rgba(0,0,0,0.25)]  group cursor-pointer'>
 
           {/* Header strip*/}
@@ -598,7 +619,7 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
             className='w-full h-8 md:h-9 lg:h-8 xl:h-10 2xl:h-12 3xl:h-14 relative'
             style={{ backgroundColor: cardColor }}
           >
-            <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
+            <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white dark:bg-[#0A0F15] warm:bg-[#FBF1E8] w-20 md:w-22 lg:w-24 xl:w-28 2xl:w-32 3xl:w-36 h-3 md:h-3 lg:h-3 xl:h-4 2xl:h-5 3xl:h-6 border-2 border-primary-800 rounded-full'></div>
           </div>
 
           {/* Main content: photo + text + logo */}
@@ -693,7 +714,10 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
       {/* Current Time Spent */}
       <div id='currentTime'           
         className='w-full h-auto px-1 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 3xl:min-px-2 py-3
-          border-2 border-primary-600 rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-1 3xl:gap-x-2
+          border-2 border-primary-600 
+          dark:bg-[#BFC7D4] dark:border-white
+          warm:bg-[#F9D5C6] warm:border-[#623627]
+           rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-1 3xl:gap-x-2
           md:min-h-[70px] 3xl:min-h-[85px]
         '>
         <img src="/currentTime.png" alt="Timer" onContextMenu={(e) => e.preventDefault()} draggable={false}
@@ -708,7 +732,9 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
       {/* Current Score */}
       <div id='currentScore' 
         className='w-full h-auto px-2 md:px-4 lg:px-3 xl:min-px-8 2xl:min-px-2 3xl:min-px-2 py-3 
-          border-2 border-primary-600 rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-10 3xl:gap-x-12
+          border-2 border-primary-600
+          dark:bg-[#BFC7D4] dark:border-white
+          warm:bg-[#FBD79A] warm:border-[#623627] rounded-xl flex items-center justify-start gap-x-4 md:gap-x-3 lg:gap-x-2 xl:gap-x-3 2xl:gap-x-10 3xl:gap-x-12
           md:min-h-[70px] 3xl:min-h-[85px]
         '>
         <img src="/currentScore.png" alt="Score" onContextMenu={(e) => e.preventDefault()} draggable={false}         
@@ -727,15 +753,17 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
 <div id='progressC' >
   <div className='flex items-center justify-between w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] lg:pr-3 mx-auto lg:mt-1 2xl:mt-5 3xl:mt-6 mt-6 sm:mt-5 md:mt-5'>
   <p className='font-inter font-semibold text-sm md:text-md 
-  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
+  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]
+dark:text-white warm:text-[#623627]
+ text-[#B3B3B3] uppercase'>TASK PROGRESS IN TO DO LIST</p>
   <span className='font-inter font-semibold text-sm md:text-md 
-  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-primary-600'>{completedPercent}%</span>
+  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] dark:text-white warm:text-[#623627] text-primary-600'>{completedPercent}%</span>
 </div>
 {/* HORIZONTAL PROGRESS BAR */}
 <div  className='w-full max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto px-2 mt-3 xl:mt-3 2xl:mt-3 3xl:mt-4 mb-2'>
-  <div className='w-full h-3 lg:h-3 xl:h-3 3xl:h-4 bg-gray-200 rounded-full overflow-hidden'>
+  <div className='w-full h-3 lg:h-3 xl:h-3 3xl:h-4 bg-gray-200 warm:bg-[#E0CABE] rounded-full overflow-hidden'>
     <div
-      className='h-full bg-[#9CCF7E] rounded-full  transition-all  duration-500 ease-out'
+      className='h-full bg-[#9CCF7E] dark:bg-[#4E5669]  warm:bg-[#623627] rounded-full  transition-all  duration-500 ease-out'
       style={{ width: `${completedPercent}%` }}
     />
   </div>
@@ -743,7 +771,7 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
 </div>
 <div className='flex  flex-row w-full mt-5 sm:mt-4 md:mt-4 lg:mt-1 lg:pr-3  2xl:mt-3 3xl:mt-4 max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto justify-between'>
   <p className='font-inter  mt-5 2xl:mt-8 3xl:mt-9 font-semibold text-sm md:text-md 
-  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] text-[#B3B3B3] uppercase'>Activities</p>
+  lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] dark:text-white warm:text-[#623627] text-[#B3B3B3] uppercase'>Activities</p>
   <button
     id='tour-btn'
     onClick={() => startTour()}
@@ -751,9 +779,14 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
     className='flex flex-col items-center justify-center'
   >
     <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-      <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}          />
-    </div>
-    <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+    <img
+      src={needHelpIcon[theme]}
+      alt="?"
+      className='w-10 block mx-auto mt-1 select-none '
+      onContextMenu={(e) => e.preventDefault()}
+      draggable={false}
+    />    </div>
+    <p className='text-[8px] md:text-[8px] dark:text-white warm:text-[#623627] warm:font-bold text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
     font-inter font-semibold'>Need Help?</p>
   </button>
   </div>
@@ -764,10 +797,11 @@ if (!isOnline && (pendingProfileFile || pendingRemove)) {
       <button
         key={activity.label}
         onClick={() => navigate(activity.path)}
-        style={{ backgroundColor: activity.color }}
-className='relative flex flex-col justify-between text-left p-2
+        style={{ backgroundColor: activity.color  }}
+className='relative flex flex-col justify-between text-left p-2  s
   min-w-[100px] h-[100px]  md:w-[190px] md:h-[120px] lg:w-full lg:max-w-[170px] xl:max-w-[170px] 2xl:max-w-[300px] 3xl:max-w-[340px] lg:h-[100px] xl:w-[170px] xl:h-[120px] 2xl:w-[230px] 2xl:h-[145px] 3xl:w-[270px] 3xl:h-[165px]
-  border-2 border-black rounded-2xl lg:rounded-lg
+  border-2 border-black rounded-2xl lg:rounded-lg 
+  warm:border-[#623627] warm:border-2
   hover:scale-[1.02] active:scale-[0.98] transition-transform'
       >
         <span className='font-inter font-black text-base sm:text-base md:text-lg lg:text-[14px] xl:text-[20px] 2xl:text-[26px] 3xl:text-[30px] text-black uppercase leading-tight  pr-8'>
@@ -788,7 +822,7 @@ className='relative flex flex-col justify-between text-left p-2
  {/* Timer Panel  */}
  <div
    id='timer-panel'
-   className='hidden lg:flex lg:flex-shrink-0 lg:h-full lg:w-[30%] xl:w-[30%] 2xl:w-[28%] 3xl:w-[26%]'
+   className='hidden warm:bg-[#623627] lg:flex lg:flex-shrink-0 lg:h-full lg:w-[30%] xl:w-[30%] 2xl:w-[28%] 3xl:w-[26%]'
  >
    <div className='h-full w-full overflow-y-auto'>
      <StudyTimer />

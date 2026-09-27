@@ -57,6 +57,7 @@ useEffect(() => {
   return (
     <div  onScroll={handleScroll}
   className={`flex flex-col h-full w-full bg-white
+    dark:bg-[#0A0F15] warm:bg-[#FBF1E8]
     px-3 xs:px-4 sm:px-5 md:px-6
     lg:px-0 lg:pr-5
     xl:px-0 xl:pr-5
@@ -75,10 +76,10 @@ useEffect(() => {
 >
 
       <div id='timer' className='w-full flex flex-col gap-4 md:gap-5 lg:gap-3 xl:gap-4 2xl:gap-y-10 
-      rounded-2xl lg:rounded-xl pb-10 lg:pb-0 
+      rounded-2xl lg:rounded-xl pb-10 lg:pb-0  dark:bg-[#0A0F15] warm:bg-[#623627] dark:border-white dark:border
        justify-center items-center  bg-primary-800'>
         <p className='font-bold text-center font-inter text-white tracking-widest 
-        mt-10 md:mt-10 lg:mt-5 xl:mt-6 2xl:mt-7 text-xl md:text-xl lg:text-lg xl:text-xl 2xl:text-2xl uppercase px-2'>
+        mt-10 md:mt-10 lg:mt-5 xl:mt-6  2xl:mt-7 text-xl md:text-xl lg:text-lg xl:text-xl 2xl:text-2xl uppercase px-2'>
           Study Timer
         </p>
 
@@ -112,6 +113,7 @@ useEffect(() => {
             tabIndex={isActive ? 0 : -1}
             className='px-5 sm:px-6 md:px-7 lg:px-5 xl:px-6 2xl:px-7 py-2 md:py-3 lg:py-0 xl:py-1 2xl:py-2 
             rounded-md lg:rounded-sm xl:rounded-md
+            dark:bg-[#657084] warm:bg-[#FBF1E8] warm:text-[#623627]
             bg-[#4A4A49] text-white font-inter font-extrabold uppercase  hover:text-primary-800
             text-xs sm:text-sm md:text-base lg:text-[8px] xl:text-[10px] 2xl:text-[12px] hover:bg-red-50'>
             Stop
@@ -130,21 +132,25 @@ useEffect(() => {
 
       <div className='flex w-full '>
         <p className='font-inter font-semibold uppercase text-left 
-        text-sm  md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3]'>set your study time</p>
+        text-sm 
+        dark:text-white warm:text-[#623627] warm:font-bold
+        md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] text-[#B3B3B3]'>set your study time</p>
       </div>
 
       {/* SET-TIMER PANEL */}
-      <div id='setTime' className='w-full bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800 '>
+      <div id='setTime' className='w-full
+      dark:bg-[#657084] warm:bg-[#623627] warm:border-[#FBF1E8]
+      bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-0 lg:py-2 lg:px-2 xl:p-6 xl:py-2 2xl:p-8 2xl:py-2 flex flex-col  gap-0 border-2 border-primary-800 '>
       <p className={`text-red-500  text-xs  sm:text-sm md:text-sm lg:text-[9px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[13px] text-center font-inter mb-0 h-4 sm:h-5 md:h-5 lg:h-4 transition-opacity ${
         errorMsg ? 'opacity-100' : 'opacity-0'
       }`}>
         {errorMsg || '\u00A0'}
       </p>
 
-        <div className='flex flex-col items-center gap-2 mt-4 md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 text-primary-600 uppercase font-roboto  mb-5 lg:mb-3 2xl:mb-6'>
+        <div className='flex flex-col  items-center gap-2 mt-4 md:mt-6 lg:mt-1 xl:mt-2 2xl:mt-3 text-primary-600 uppercase font-roboto  mb-5 lg:mb-3 2xl:mb-6'>
 
           {/* Label row */}
-          <div className='flex justify-center gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-x-2 xl:gap-x-2 2xl:gap-x-3'>
+          <div className='flex dark:text-white  justify-center gap-x-5 xs:gap-x-0 sm:gap-x-2 md:gap-x-3 lg:gap-x-2 xl:gap-x-2 2xl:gap-x-3'>
             {[
               { label: 'Hours',   id: 'hours'   },
               { label: 'Minutes', id: 'minutes' },
@@ -154,7 +160,9 @@ useEffect(() => {
                 key={field.id}
                 htmlFor={field.id}
                 className='w-16 xs:w-14 sm:w-16 md:w-20 lg:w-14 xl:w-16 2xl:w-16 text-center
-                text-sm md:text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[16px] text-primary-600'
+                text-sm
+                dark:text-white warm:text-white
+                md:text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[16px] text-primary-600'
               >
                 {field.label}
               </label>
@@ -180,11 +188,13 @@ useEffect(() => {
                     field.set(clean === '' ? '0' : clean)
                   }}
                   onFocus={(e) => e.target.select()}
-                  className='w-16 xs:w-14 sm:w-16 md:w-20 lg:w-14 xl:w-16 2xl:w-16 text-center border-2 border-primary-800 rounded
+                  className='w-16 xs:w-14 sm:w-16 md:w-20
+                  dark:bg-white warm:border-[#FBF1E8]
+                  lg:w-14 xl:w-16 2xl:w-16 text-center border-2 border-primary-800 rounded
                   text-lg xs:text-xl sm:text-xl md:text-2xl lg:text-sm xl:text-lg 2xl:text-xl text-primary-600'
                 />
                 {i < 2 && (
-                  <span className='text-lg md:text-lg lg:text-xs xl:text-sm 2xl:text-base font-bold text-primary-600 mx-1 leading-none'>
+                  <span className='text-lg md:text-lg lg:text-xs xl:text-sm 2xl:text-base font-bold warm:text-white text-primary-600 mx-1 leading-none'>
                     :
                   </span>
                 )}
@@ -201,12 +211,15 @@ useEffect(() => {
           shadow-[0_2px_3px_rgba(107,114,128,0.8)]
           hover:opacity-80
           transition-shadow
+          dark:bg-[#0A0F15] warm:bg-[#FBF1E8] warm:text-[#623627]
           hover:shadow-[0_2px_4px_rgba(107,114,128,1)]  '
         >
           Set Timer
         </button>
 
-        <p className='text-primary-800 mb-3 sm:mb-4 md:mb-4 lg:mb-2 xl:mb-3 2xl:mb-4 font-inter font-normal text-xs sm:text-sm md:text-base lg:text-[10px] xl:text-[12px] 2xl:text-[14px] uppercase text-center'>Quick Presets</p>
+        <p className='text-primary-800 
+        dark:text-white warm:text-white
+        mb-3 sm:mb-4 md:mb-4 lg:mb-2 xl:mb-3 2xl:mb-4 font-inter font-normal text-xs sm:text-sm md:text-base lg:text-[10px] xl:text-[12px] 2xl:text-[14px] uppercase text-center'>Quick Presets</p>
 
         <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 md:gap-y-4 md:gap-x-8 gap-y-3 gap-x-8 px-2 sm:px-5 md:px-6 
         lg:gap-x-5   lg:gap-y-2 lg:px-3 
@@ -221,7 +234,10 @@ useEffect(() => {
               }}
               className='px-1 w-full py-2 md:py-3 lg:py-[1px] xl:py-[2px] 2xl:py-[5px] 
               text-xs sm:text-sm md:text-base lg:text-[9px] xl:text-[11px] 2xl:text-[15px]
-              uppercase bg-[#4A4A49] rounded-md text-white font-inter font-bold
+              uppercase bg-[#4A4A49]
+              dark:bg-[#BFC7D4] dark:border-white dark:border
+              warm:bg-[#FBF1E8] warm:text-[#623627]
+              rounded-md text-white font-inter font-bold
               shadow-[0_2px_3px_rgba(107,114,128,0.8)]
               hover:opacity-80
               transition-shadow

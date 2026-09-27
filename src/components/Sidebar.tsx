@@ -2,11 +2,19 @@ import { useState, useRef, useEffect } from 'react'
 import { logout } from '../services/authService'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useHelpBuddy } from '../context/useHelpBuddy'
+import { useTheme } from '../context/ThemeContext'
 type Props = {
   uploading?: boolean
   quizActive?: boolean
   isOpenExternal?: boolean
   onExternalClose?: () => void
+}
+
+type ThemedIcon = {
+  light: string
+  dark: string
+  warm: string
+  warmActive?: string // shown when this item is active AND theme is 'warm'
 }
 
 function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false, onExternalClose }: Props) {
@@ -15,23 +23,28 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
-const { openHelpModal } = useHelpBuddy()
+  const { openHelpModal } = useHelpBuddy()
+  const { theme, setTheme } = useTheme()
   const isOpen = isOpenInternal || isOpenExternal   // ← merged state
-const catGifs = ['/CatLove.gif', '/CatCry.gif', '/CatLaugh.gif']
+  const catGifs = ['/CatLove.gif', '/CatCry.gif', '/CatLaugh.gif']
 
-const [currentGif, setCurrentGif] = useState(catGifs[0])
-
-useEffect(() => {
-  const pickRandom = () => {
-    setCurrentGif(prev => {
-      const options = catGifs.filter(g => g !== prev) // avoid repeating the same one back-to-back
-      return options[Math.floor(Math.random() * options.length)]
-    })
+  const [currentGif, setCurrentGif] = useState(catGifs[0])
+  const getIconSrc = (icon: ThemedIcon, isActive: boolean) => {
+    if (theme === 'warm' && isActive && icon.warmActive) {
+      return icon.warmActive
+    }
+    return icon[theme]
   }
-
-  const interval = setInterval(pickRandom, 10 * 1000) // every 1 min
-  return () => clearInterval(interval)
-}, [])
+  useEffect(() => {
+    const pickRandom = () => {
+      setCurrentGif(prev => {
+        const options = catGifs.filter(g => g !== prev) // avoid repeating the same one back-to-back
+        return options[Math.floor(Math.random() * options.length)]
+      })
+    }
+    const interval = setInterval(pickRandom, 10 * 1000) // every 1 min
+    return () => clearInterval(interval)
+  }, [])
   const close = () => {
     setIsOpenInternal(false)
     onExternalClose?.()
@@ -67,28 +80,113 @@ useEffect(() => {
     }
   }, [])
 
-  const navSections = [
-    {
-      heading: 'Home',
-      items: [{ label: 'Dashboard', path: '/dashboard', icon: '/sideIcons/dashboard.png' }]
-    },
-    {
-      heading: 'Activities',
-      items: [
-        { label: 'To Do List', path: '/todolist' , icon: '/sideIcons/todo.png' },
-        { label: 'Notes', path: '/notes' , icon: '/sideIcons/notes.png' },
-        { label: 'Class Schedule', path: '/schedule' , icon: '/sideIcons/classSched.png' },
-        { label: 'My Files', path: '/myFiles' , icon: '/sideIcons/courses.png' },
-        { label: 'Study Generator', path: '/studyGenerator' , icon: '/sideIcons/studyGen.png' },
-        { label: 'Generated History', path: '/history' , icon: '/sideIcons/genHis.png' },
-        { label: 'Recently Deleted', path: '/delete' , icon: '/sideIcons/RecentD.png' },
-      ]
-    },
-    {
-      heading: 'More',
-      items: [{ label: 'Account', path: '/account', icon: '/sideIcons/account.png' }]
-    },
-  ]
+const navSections = [
+  {
+    heading: 'Home',
+    items: [
+      {
+        label: 'Dashboard',
+        path: '/dashboard',
+        icon: {
+          light: '/sideIcons/dashboard.png',
+          dark: '/sideIcons/dashboard.png',
+          warm: '/sideIcons/dashboard.png',
+          warmActive: '/sideIcons/warm/dashboard.png',
+        },
+      },
+    ],
+  },
+  {
+    heading: 'Activities',
+    items: [
+      {
+        label: 'To Do List',
+        path: '/todolist',
+        icon: {
+          light: '/sideIcons/todo.png',
+          dark: '/sideIcons/todo.png',
+          warm: '/sideIcons/todo.png',
+          warmActive: '/sideIcons/warm/todo.png',
+        },
+      },
+      {
+        label: 'Notes',
+        path: '/notes',
+        icon: {
+          light: '/sideIcons/notes.png',
+          dark: '/sideIcons/notes.png',
+          warm: '/sideIcons/notes.png',
+          warmActive: '/sideIcons/warm/notes.png',
+        },
+      },
+      {
+        label: 'Class Schedule',
+        path: '/schedule',
+        icon: {
+          light: '/sideIcons/classSched.png',
+          dark: '/sideIcons/classSched.png',
+          warm: '/sideIcons/classSched.png',
+          warmActive: '/sideIcons/warm/classSched.png',
+        },
+      },
+      {
+        label: 'My Files',
+        path: '/myFiles',
+        icon: {
+          light: '/sideIcons/courses.png',
+          dark: '/sideIcons/courses.png',
+          warm: '/sideIcons/courses.png',
+          warmActive: '/sideIcons/warm/courses.png',
+        },
+      },
+      {
+        label: 'Study Generator',
+        path: '/studyGenerator',
+        icon: {
+          light: '/sideIcons/studyGen.png',
+          dark: '/sideIcons/studyGen.png',
+          warm: '/sideIcons/studyGen.png',
+          warmActive: '/sideIcons/warm/studyGen.png',
+        },
+      },
+      {
+        label: 'Generated History',
+        path: '/history',
+        icon: {
+          light: '/sideIcons/genHis.png',
+          dark: '/sideIcons/genHis.png',
+          warm: '/sideIcons/genHis.png',
+          warmActive: '/sideIcons/warm/genHis.png',
+        },
+      },
+      {
+        label: 'Recently Deleted',
+        path: '/delete',
+        icon: {
+          light: '/sideIcons/RecentD.png',
+          dark: '/sideIcons/RecentD.png',
+          warm: '/sideIcons/RecentD.png',
+          warmActive: '/sideIcons/warm/RecentD.png',
+        },
+      },
+    ],
+  },
+  {
+    heading: 'More',
+    items: [
+      {
+        label: 'Account',
+        path: '/account',
+        icon: {
+          light: '/sideIcons/account.png',
+          dark: '/sideIcons/account.png',
+          warm: '/sideIcons/account.png',
+          warmActive: '/sideIcons/warm/account.png',
+        },
+      },
+    ],
+  },
+]
 
   return (
     <>
@@ -121,7 +219,7 @@ useEffect(() => {
         className={`
           md:rounded-none lg:rounded-lg
           fixed top-0 left-0 h-full  w-60 lg:w-[165px] xl:w-[200px] 2xl:w-[235px] 3xl:w-[280px] bg-primary-800 z-40
-          flex flex-col shadow-lg 
+          flex flex-col shadow-lg  dark:bg-[#222631] warm:bg-[#623627]
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:flex
@@ -147,31 +245,75 @@ useEffect(() => {
               </div>
             <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5  ml-2 xl:px-3  '>
 
-              {section.items.map((item) => (
-              <button
-                  key={item.path}
-                  onClick={() => handleNavigate(item.path)}
-                  className={`
-                    w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
-                    font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
-                    transition-colors duration-200  rounded-md
-                    flex items-center gap-2 justs 
-                    ${location.pathname === item.path ||
-                      location.pathname.startsWith(item.path + '/') ||
-                      (item.path === '/history' && ['/quizView', '/flashcardView'].includes(location.pathname)) ||
-                      (item.path === '/account' && location.pathname === '/changeEmail')
-                      ? 'bg-[#4A4A49] text-white font-medium'
-                      : 'text-white hover:bg-[#4A4A49] '
-                    }
-                  `}
-                >
-                  <img src={item.icon} alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
-                  {item.label}
-                </button>
-              ))}
+{section.items.map((item) => {
+  const isActive =
+    location.pathname === item.path ||
+    location.pathname.startsWith(item.path + '/') ||
+    (item.path === '/history' && ['/quizView', '/flashcardView'].includes(location.pathname)) ||
+    (item.path === '/account' && location.pathname === '/changeEmail')
+
+  return (
+    <button
+      key={item.path}
+      onClick={() => handleNavigate(item.path)}
+      className={`
+        w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
+        font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
+        transition-colors duration-200  rounded-md
+        flex items-center gap-2 justs 
+        ${isActive
+          ? 'bg-[#4A4A49] dark:bg-[#2F3542] warm:bg-[#FBF1E8] warm:text-[#623627] text-white font-medium'
+          : 'text-white hover:bg-[#4A4A49] dark:hover:bg-[#2F3542] warm:hover:bg-[#FBF1E8] warm:text-white'
+        }
+      `}
+    >
+      <img
+        src={getIconSrc(item.icon, isActive)}
+        alt=""
+        className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none"
+        onContextMenu={(e) => e.preventDefault()}
+        draggable={false}
+      />
+      {item.label}
+    </button>
+  )
+})}
             </div>
             </div>
           ))}
+
+          {/* THEME TOGGLE */}
+          <div className="px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0 ml-2 xl:px-3 mb-2">
+            <div className="flex items-center justify-between bg-[#3A3A39] rounded-md p-1">
+              <button
+                onClick={() => setTheme('light')}
+                aria-label="Light mode"
+                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
+                  theme === 'light' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                ☀️
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                aria-label="Dark mode"
+                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
+                  theme === 'dark' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                🌙
+              </button>
+              <button
+                onClick={() => setTheme('warm')}
+                aria-label="Warm mode"
+                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
+                  theme === 'warm' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                🔥
+              </button>
+            </div>
+          </div>
 
           {/* LOGOUT */}
               <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0  ml-2 xl:px-3'>

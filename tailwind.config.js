@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ['selector', '[data-theme="dark"]'],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -17,6 +18,15 @@ export default {
           700: '#D9D9D9',
           800: '#201E1E'
         },
+        warm: {
+          50: '#FBF3E8',
+          100: '#F0DFC2',
+          300: '#DCB77E',
+          500: '#B5793C',
+          600: '#3D2F1F',
+          700: '#5A4630',
+          800: '#2E2418',
+        },
       },
       fontFamily:{
         roboto: ['Roboto', 'sans-serif'],
@@ -30,5 +40,9 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss/plugin')(({ addVariant }) => {
+      addVariant('warm', '[data-theme="warm"] &')
+    }),
+  ],
 }
