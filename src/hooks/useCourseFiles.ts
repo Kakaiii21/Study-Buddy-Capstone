@@ -21,6 +21,8 @@ export interface CourseFile {
   publicId: string
   fileType: string
   fileSize: string
+  fileSizeBytes: number
+  moderationStatus: 'pending' | 'approved' | 'rejected'
   uid: string
   createdAt: number
 }
@@ -59,7 +61,7 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     publicId: string,
     fileType: string,
     fileSize: string,
-
+    fileSizeBytes: number,
   ) {
     if (!user || !courseId) return
 
@@ -71,6 +73,8 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
       publicId,
       fileType,
       fileSize,
+      fileSizeBytes,
+      moderationStatus: 'pending',
       uid: user.uid,
       createdAt: Date.now(),
     })
@@ -84,24 +88,25 @@ export function useCourseFiles(user: User | null, courseId: string | undefined) 
     await updateDoc(fileRef, { fileName: newFileName.trim() })
   }
 
-async function deleteCourseFile(fileId: string) {
-  if (!user || !courseId) return
-  const file = files.find((f) => f.id === fileId)
-  if (!file) return
+  async function deleteCourseFile(fileId: string) {
+    if (!user || !courseId) return
+    const file = files.find((f) => f.id === fileId)
+    if (!file) return
 
-  await softDelete(user.uid, {
-    name: file.fileName,
-    type: 'Course',
-    originalCollection: `users/${user.uid}/courses/${courseId}/files`,
-    originalDocId: fileId,
-    cloudinaryPublicId: file.publicId,
-    data: { ...file },
-  })
+    await softDelete(user.uid, {
+      name: file.fileName,
+      type: 'Course',
+      originalCollection: `users/${user.uid}/courses/${courseId}/files`,
+      originalDocId: fileId,
+      cloudinaryPublicId: file.publicId,
+      data: { ...file },
+    })
 
-  const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
-  await updateDoc(courseRef, { fileCount: increment(-1) })
+    const courseRef = doc(db, 'users', user.uid, 'courses', courseId)
+    await updateDoc(courseRef, { fileCount: increment(-1) })
 
-  await deleteDoc(doc(db, 'users', user.uid, 'courses', courseId, 'files', fileId))
-}
+    await deleteDoc(doc(db, 'users', user.uid, 'courses', courseId, 'files', fileId))
+  }
+
   return { files, loading, addCourseFile, renameCourseFile, deleteCourseFile }
 }

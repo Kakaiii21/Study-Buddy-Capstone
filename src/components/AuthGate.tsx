@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { onAuthChange, type User } from '../services/authService'
+import { useAuth } from '../hooks/useAuth'
 import SplashScreen from './SplashScreen'
 
 interface AuthGateProps {
@@ -8,19 +7,10 @@ interface AuthGateProps {
 }
 
 export default function AuthGate({ children }: AuthGateProps) {
-  const [user, setUser] = useState<User | null>(null)
-  const [checkingAuth, setCheckingAuth] = useState(true)
+  const { user, status, authLoading } = useAuth()
   const location = useLocation()
 
-  useEffect(() => {
-    const unsubscribe = onAuthChange((currentUser) => {
-      setUser(currentUser)
-      setCheckingAuth(false)
-    })
-    return () => unsubscribe()
-  }, [])
-
-  if (checkingAuth) {
+  if (authLoading) {
     return <SplashScreen />
   }
 
@@ -31,6 +21,9 @@ export default function AuthGate({ children }: AuthGateProps) {
   const forceShowLogin = Boolean(location.state?.showLogin)
 
   if (user && user.emailVerified && !forceShowLogin) {
+    if (status === 'deactivated') {
+      return <Navigate to="/reactivate" replace />
+    }
     return <Navigate to="/dashboard" replace />
   }
 

@@ -10,6 +10,8 @@ import { acquireCooldown, releaseCooldown } from './rateLimit'
 import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore'
 import { createTicket, cancelTicket, dispatchNext } from './queue'
 import { estimateMaxItems, getTextSample, detectSourceLang, buildPrompt, shuffleQuizOptions, estimateTokens } from './promptBuilder'
+import { emailTemplate, actionButton } from './emailHelpers'
+import { deactivateAccountCore } from './accountActions'
 if (!admin.apps.length) admin.initializeApp()
 
 function setCors(res: any) {
@@ -18,56 +20,12 @@ function setCors(res: any) {
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 }
 
-
-
-
-// ── EMAIL HELPER ─────────────────────────────────────────────────────────────
-function emailTemplate(content: string) {
-  return `
-    <body style="font-family:sans-serif; color:#333; margin:0; padding:30px; background-color:#EFF3FB;">
-      <div style="max-width:600px; margin:auto; background-color:#ffffff; border-radius:12px; overflow:hidden; border:0.5px solid #c8d8ec;">
-        <div style="background-color:#ffffff; padding:24px 30px; text-align:center; border-bottom:3px solid #195791;">
-          <img src="https://studybuddyph.site/logo.png" alt="Study Buddy" style="width:160px;" />
-        </div>
-        <div style="padding:28px 32px;">
-          ${content}
-          <hr style="border:none; border-top:1px solid #EFF3FB; margin:28px 0;" />
-          <div style="background-color:#EFF3FB; border-left:4px solid #195791; border-radius:0 4px 4px 0; padding:11px 14px; margin-bottom:18px;">
-            <p style="font-size:12px; color:#555; margin:0;">🔒 If you didn't request this, you can safely ignore this email. Your account will remain unchanged.</p>
-          </div>
-          <p style="font-size:12px; color:#999; margin-top:20px;">
-            Need help? <a href="mailto:support@studybuddyph.site" style="color:#195791;">support@studybuddyph.site</a>
-          </p>
-        </div>
-        <div style="background-color:#EFF3FB; text-align:center; padding:18px 30px;">
-          <p style="font-size:13px; color:#195791; font-weight:500; margin:0 0 3px;">Study Buddy</p>
-          <p style="font-size:11px; color:#999; margin:0;">Supporting your learning journey · <a href="https://studybuddyph.site" style="color:#195791;">studybuddyph.site</a></p>
-        </div>
-      </div>
-    </body>
-  `
-}
-
-function actionButton(link: string, label: string) {
-  return `
-    <div style="text-align:center; margin:32px 0;">
-      <a href="${link}" style="background:linear-gradient(135deg,#195791,#2e7fc1); color:#ffffff; padding:13px 32px; text-decoration:none; border-radius:8px; display:inline-block; font-weight:bold; font-size:15px;">
-        ${label}
-      </a>
-    </div>
-    <p style="font-size:12px; color:#888;">If the button doesn't work, copy and paste this link:</p>
-    <p style="font-size:11px; word-break:break-all;">
-      <a href="${link}" style="color:#195791;">${link}</a>
-    </p>
-  `
-}
-
 // ── ENQUEUE (fast — extracts text, validates, creates ticket, returns) ──────
 export const enqueueStudyMaterial = onRequest(
   {
     timeoutSeconds: 60,
     memory: '512MiB',
-    secrets: ['GROQ_API_KEY'], // not used here directly, but keeps env consistent for future
+    secrets: ['GROQ_API_KEY'],
   },
   async (req, res) => {
     setCors(res)
@@ -92,7 +50,6 @@ export const enqueueStudyMaterial = onRequest(
         return
       }
 
-      // Per-user cooldown — same as before, still prevents one user from spamming enqueue.
       const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
       if (!cooldown.allowed) {
         res.status(429).json({
@@ -145,9 +102,8 @@ export const enqueueStudyMaterial = onRequest(
       const textSample = getTextSample(rawText)
       const sourceLang = detectSourceLang(textSample)
 
-      // Reject early if the sampled prompt text alone would blow the TPM budget.
       const estimatedTokens = estimateTokens(textSample)
-      const MAX_SAFE_INPUT_TOKENS = 6000 // leaves headroom under the 8K TPM ceiling for output
+      const MAX_SAFE_INPUT_TOKENS = 6000
       if (estimatedTokens > MAX_SAFE_INPUT_TOKENS) {
         res.status(400).json({ error: 'This file has too much text to process in one request. Try a shorter file.' })
         return
@@ -166,8 +122,6 @@ export const enqueueStudyMaterial = onRequest(
       succeeded = true
       res.status(200).json({ ticketId, position })
 
-      // Fire-and-forget: try to dispatch immediately in case a slot is free right now.
-      // Errors here don't affect the response already sent.
       dispatchNext().catch((e) => console.error('dispatchNext error:', e))
     } catch (err: unknown) {
       console.error('enqueueStudyMaterial error:', err)
@@ -207,7 +161,7 @@ export const cancelStudyMaterialTicket = onRequest(
   }
 )
 
-// ── QUEUE TRIGGERS (event-driven, no polling) ────────────────────────────────
+// ── QUEUE TRIGGERS ────────────────────────────────────────────────────────
 export const onTicketCreated = onDocumentCreated(
   { document: 'queueTickets/{ticketId}', secrets: ['GROQ_API_KEY'] },
   async () => {
@@ -225,7 +179,6 @@ export const onQueueStateChanged = onDocumentWritten(
     }
   }
 )
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const generateStudyMaterial = onRequest(
   {
@@ -245,7 +198,6 @@ export const generateStudyMaterial = onRequest(
       const apiKey = process.env.GROQ_API_KEY
       if (!apiKey) { res.status(500).json({ error: 'GROQ_API_KEY not set' }); return }
 
-      // ── VERIFY AUTH TOKEN ─────────────────────────────────────────────────
       const authHeader = req.headers.authorization
       if (!authHeader?.startsWith('Bearer ')) {
         res.status(401).json({ error: 'Unauthorized. Please log in and try again.' })
@@ -261,7 +213,6 @@ export const generateStudyMaterial = onRequest(
         return
       }
 
-      // ── COOLDOWN CHECK ────────────────────────────────────────────────────
       const cooldown = await acquireCooldown(`generateStudyMaterial:${callerUid}`, 120)
       if (!cooldown.allowed) {
         res.status(429).json({
@@ -270,7 +221,6 @@ export const generateStudyMaterial = onRequest(
         })
         return
       }
-      // ─────────────────────────────────────────────────────────────────────
 
       const contentType = req.headers['content-type'] || ''
       let fileBuffer: Buffer | null = null
@@ -381,10 +331,6 @@ export const sendPasswordReset = onRequest(
         return
       }
 
-      // / Explicitly check the user exists BEFORE generating the link.
-      // generatePasswordResetLink can throw a generic 'auth/internal-error'
-      // instead of 'auth/user-not-found' when the email isn't registered,
-      // so we surface the real reason here instead.
       try {
         await admin.auth().getUserByEmail(email)
       } catch (e: any) {
@@ -392,7 +338,6 @@ export const sendPasswordReset = onRequest(
           res.status(404).json({ error: 'Email not found.', code: 'auth/user-not-found' })
           return
         }
-        // Any other lookup error (e.g. malformed email) — surface as invalid-email
         res.status(400).json({ error: 'Invalid email format.', code: 'auth/invalid-email' })
         return
       }
@@ -476,6 +421,7 @@ export const sendVerificationEmail = onRequest(
     }
   }
 )
+
 // ── CHECK EMAIL STATUS ───────────────────────────────────────────────────────
 export const checkEmailStatus = onRequest(
   { timeoutSeconds: 30, memory: '256MiB' },
@@ -500,6 +446,7 @@ export const checkEmailStatus = onRequest(
     }
   }
 )
+
 // ── SEND CHANGE EMAIL ────────────────────────────────────────────────────────
 export const sendChangeEmail = onRequest(
   { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
@@ -515,7 +462,6 @@ export const sendChangeEmail = onRequest(
       const userRecord = await admin.auth().getUser(uid)
       if (!userRecord.email) { res.status(400).json({ error: 'User has no email' }); return }
 
-      // ✅ Check if newEmail is already taken by another account
       try {
         const existing = await admin.auth().getUserByEmail(newEmail)
         if (existing.uid !== uid) {
@@ -523,25 +469,22 @@ export const sendChangeEmail = onRequest(
           return
         }
       } catch (e: any) {
-        // getUserByEmail throws if not found — that's fine, means email is available
         if (e.code !== 'auth/user-not-found') throw e
       }
 
-      // ✅ DO NOT call updateUser here — just store pendingEmail in Firestore
       await admin.firestore().doc(`users/${uid}`).update({ pendingEmail: newEmail })
 
       const crypto = await import('crypto')
 
-      // ✅ Generate both tokens
       const verifyToken = crypto.randomBytes(32).toString('hex')
       const cancelToken = crypto.randomBytes(32).toString('hex')
-      const expiresAt = Date.now() + 1000 * 60 * 60 // 1 hour
+      const expiresAt = Date.now() + 1000 * 60 * 60
 
       await admin.firestore().doc(`emailChangeTokens/${verifyToken}`).set({
         uid,
         newEmail,
         oldEmail: userRecord.email,
-        cancelToken, // ✅ link them so confirmEmailChange can delete the cancel token too
+        cancelToken,
         expiresAt,
       })
 
@@ -549,7 +492,7 @@ export const sendChangeEmail = onRequest(
         uid,
         newEmail,
         oldEmail: userRecord.email,
-        verifyToken, // ✅ link them so cancel can delete the verify token too
+        verifyToken,
         expiresAt,
       })
 
@@ -558,7 +501,6 @@ export const sendChangeEmail = onRequest(
 
       const resend = new Resend(process.env.RESEND_API_KEY!)
 
-      // ✅ To new email — verify link
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
         to: newEmail,
@@ -573,7 +515,6 @@ export const sendChangeEmail = onRequest(
         `),
       })
 
-      // / To old email — cancel link (1 hour window before confirm)
       await resend.emails.send({
         from: 'Study Buddy <support@studybuddyph.site>',
         to: userRecord.email,
@@ -633,27 +574,22 @@ export const confirmEmailChange = onRequest(
         return
       }
 
-      //  NOW we update the email — only after user clicked the link
       await admin.auth().updateUser(uid, { email: newEmail, emailVerified: true })
 
-      //  Update Firestore user doc
       await admin.firestore().doc(`users/${uid}`).update({
         email: newEmail,
         pendingEmail: admin.firestore.FieldValue.delete(),
       })
 
-      //  Extend cancel token to 7 days as a recovery token (don't delete it yet)
       if (cancelToken) {
         await admin.firestore().doc(`emailCancelTokens/${cancelToken}`).update({
-          expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
-          confirmed: true, // flag so cancelEmailChange knows to revert the auth email too
+          expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+          confirmed: true,
         })
       }
 
-      //  Delete the used verify token
       await tokenDoc.ref.delete()
 
-      //  Notify old email that the change is now live, with a 7-day undo link
       if (oldEmail && cancelToken) {
         const { Resend } = await import('resend')
         const resend = new Resend(process.env.RESEND_API_KEY!)
@@ -679,7 +615,6 @@ export const confirmEmailChange = onRequest(
         })
       }
 
-      // / Redirect to login with success message
       res.redirect('https://studybuddyph.site/?emailUpdated=true')
     } catch (err) {
       console.error('confirmEmailChange error:', err)
@@ -717,7 +652,6 @@ export const cancelEmailChange = onRequest(
       }
 
       if (confirmed) {
-        // / Change already went through — fully revert auth email back to oldEmail
         await admin.auth().updateUser(uid, {
           email: oldEmail,
           emailVerified: true,
@@ -728,18 +662,15 @@ export const cancelEmailChange = onRequest(
           pendingEmail: admin.firestore.FieldValue.delete(),
         })
       } else {
-        // / Change not yet confirmed — just clear pendingEmail
         await admin.firestore().doc(`users/${uid}`).update({
           pendingEmail: admin.firestore.FieldValue.delete(),
         })
 
-        // / Delete the verify token so the new email link no longer works
         if (verifyToken) {
           await admin.firestore().doc(`emailChangeTokens/${verifyToken}`).delete()
         }
       }
 
-      // / Delete the cancel token — it's been used
       await cancelDoc.ref.delete()
 
       res.redirect('https://studybuddyph.site/?cancelResult=success')
@@ -750,6 +681,7 @@ export const cancelEmailChange = onRequest(
   }
 )
 
+// ── DEACTIVATE ACCOUNT ───────────────────────────────────────────────────────
 export const deactivateAccount = onRequest(
   { timeoutSeconds: 60, memory: '256MiB', secrets: ['RESEND_API_KEY'] },
   async (req, res) => {
@@ -760,28 +692,7 @@ export const deactivateAccount = onRequest(
     if (!authHeader?.startsWith('Bearer ')) { res.status(401).json({ error: 'Unauthorized' }); return }
     try {
       const decoded = await admin.auth().verifyIdToken(authHeader.split('Bearer ')[1])
-      const uid = decoded.uid
-      const userSnap = await admin.firestore().doc(`users/${uid}`).get()
-      const email = userSnap.data()?.email
-      await admin.firestore().doc(`users/${uid}`).update({
-        status: 'deactivated',
-        deactivatedAt: Date.now(),
-      })
-      if (email) {
-        const { Resend } = await import('resend')
-        const resend = new Resend(process.env.RESEND_API_KEY!)
-        await resend.emails.send({
-          from: 'Study Buddy <support@studybuddyph.site>',
-          to: email,
-          subject: 'Your Study Buddy account has been deactivated',
-          html: emailTemplate(`
-            <p style="font-size:16px; margin-bottom:8px;">We're sorry to see you go 😔</p>
-            <p style="font-size:15px; line-height:1.6; color:#444;">
-              Your account has been deactivated. Simply log back in within <strong>30 days</strong> to reactivate — after that, your account and data will be permanently deleted.
-            </p>
-          `),
-        })
-      }
+      await deactivateAccountCore(decoded.uid, 'self')
       res.status(200).json({ success: true })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Internal server error'
@@ -790,6 +701,7 @@ export const deactivateAccount = onRequest(
   }
 )
 
+// ── REACTIVATE ACCOUNT ───────────────────────────────────────────────────────
 export const reactivateAccount = onRequest(
   { timeoutSeconds: 60, memory: '256MiB' },
   async (req, res) => {
@@ -805,6 +717,14 @@ export const reactivateAccount = onRequest(
       const snap = await userRef.get()
       const data = snap.data()
       if (data?.status !== 'deactivated') { res.status(400).json({ error: 'Account is not deactivated.' }); return }
+
+      if (data.deactivationReason === 'security_flag') {
+        res.status(403).json({
+          error: 'This account was paused for a security review. Please contact support@studybuddyph.site to reactivate.',
+        })
+        return
+      }
+
       const thirtyDaysMs = 1000 * 60 * 60 * 24 * 30
       if (Date.now() - data.deactivatedAt > thirtyDaysMs) {
         res.status(410).json({ error: 'Reactivation window has expired.' })
@@ -813,6 +733,7 @@ export const reactivateAccount = onRequest(
       await userRef.update({
         status: 'active',
         deactivatedAt: admin.firestore.FieldValue.delete(),
+        deactivationReason: admin.firestore.FieldValue.delete(),
         deletionWarningsSent: admin.firestore.FieldValue.delete(),
       })
       res.status(200).json({ success: true })
@@ -826,3 +747,4 @@ export const reactivateAccount = onRequest(
 export { deleteCloudinaryAsset } from './deleteCloudinaryAsset'
 export { cleanupDeactivatedAccounts } from './cleanup'
 export { checkTaskDeadlines } from './checkTaskDeadlines'
+export { cloudinaryModerationWebhook } from './moderationWebhook'

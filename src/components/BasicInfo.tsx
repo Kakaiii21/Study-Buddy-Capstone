@@ -166,7 +166,8 @@ const [removingPic, setRemovingPic] = useState(false)
       const result = await uploadToCloudinary(file, undefined, user.uid)
       await updateDoc(doc(db, 'users', user.uid), {
         photoURL: result.url,
-        photoPublicId: result.publicId
+        photoPublicId: result.publicId,
+        photoModerationStatus: 'pending'
       })
       setProfilePic(result.url)
       sessionStorage.setItem('profilePic', result.url)

@@ -22,6 +22,8 @@ interface CourseFile {
   fileUrl: string
   fileType: string
   fileSize: string
+  fileSizeBytes: number
+  moderationStatus: 'pending' | 'approved' | 'rejected'
 }
 
 const ACCEPTED_TYPES = '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.txt'
@@ -221,7 +223,7 @@ if (file.size > MAX_FILE_SIZE) {
       try {
         result = await uploadToCloudinary(file, (percent) => {
           setUploadProgress(percent)
-        })
+        }, user?.uid, courseId)
       } catch (err) {
         console.error('Cloudinary upload failed:', err)
         setError((prev) => prev ? `${prev} | Failed to upload ${file.name}. Please try again.` : `Failed to upload ${file.name}. Please try again.`)
@@ -236,6 +238,7 @@ if (file.size > MAX_FILE_SIZE) {
           result.publicId,
           result.fileType,
           result.fileSize,
+          file.size,
         )
 
         if (user) {
@@ -581,7 +584,11 @@ if (file.size > MAX_FILE_SIZE) {
                   className='flex  flex-col items-center bg-white border-gray-200 rounded-xl p-0 transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
                 >
                   <div className='relative w-full flex justify-center items-end'>
-                    <button  onClick={(e) => { e.stopPropagation(); handleFileClick(file) }} title={`Open ${file.fileName}`}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); if (file.moderationStatus !== 'pending') handleFileClick(file) }}
+                      title={file.moderationStatus === 'pending' ? 'Scanning file…' : `Open ${file.fileName}`}
+                      className='relative'
+                    >                      
                       <img
                         src={
                           ['doc', 'docx'].includes(file.fileType) ? '/docsIcon.png' :
@@ -592,11 +599,19 @@ if (file.size > MAX_FILE_SIZE) {
                           ['png', 'jpg', 'jpeg'].includes(file.fileType) ? '/ImageIcon.png' :
                           '/fileIcon.png'
                         }
-                        alt={file.fileType}
-                        className='w-32 font-inter font-normal  h-32 md:w-40 md:h-40 lg:h-[90px] xl:h-[120px] 2xl:h-[150px] object-contain mt-4 hover:opacity-80 hover:cursor-pointer select-none'
-                        onContextMenu={(e) => e.preventDefault()} draggable={false}
-                      />
-                    </button>
+                          alt={file.fileType}
+                          className={`w-32 font-inter font-normal  h-32 md:w-40 md:h-40 lg:h-[90px] xl:h-[120px] 2xl:h-[150px] object-contain mt-4 select-none ${file.moderationStatus === 'pending' ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-80 hover:cursor-pointer'}`}
+                          onContextMenu={(e) => e.preventDefault()} draggable={false}/>
+                          {file.moderationStatus === 'pending' && (
+                            <div className='absolute inset-0 top-4 flex flex-col items-center justify-center gap-1'>
+                              <svg className='animate-spin h-5 w-5 text-primary-600' viewBox='0 0 24 24' fill='none'>
+                                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                                <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z' />
+                              </svg>
+                              <span className='text-[9px] font-inter font-semibold text-primary-600'>Scanning…</span>
+                            </div>
+                          )}
+                        </button>
 
                     <button
                     id='fileOptionsBtn'

@@ -354,7 +354,8 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
 
         await updateDoc(doc(db, 'users', user.uid), {
           photoURL: bustedUrl,
-          photoPublicId: result.publicId
+          photoPublicId: result.publicId,
+          photoModerationStatus: 'pending'
         })
 
         try {
