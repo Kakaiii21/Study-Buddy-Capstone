@@ -111,43 +111,59 @@ if (!validSig) {
         return
       }
 
-      // ── rejected ─────────────────────────────────────────────────────
-      const failedChecks = (moderation_response ?? [])
-        .filter((m) => m.status === 'rejected')
-        .map((m) => m.kind)
-      const isMalware = failedChecks.includes('perception_point')
+// ── rejected ─────────────────────────────────────────────────────
+const failedChecks = (moderation_response ?? [])
+  .filter((m) => m.status === 'rejected')
+  .map((m) => m.kind)
+const isMalware = failedChecks.includes('perception_point')
 
-      if (isProfile) {
-        await cloudinary.uploader.destroy(public_id, { resource_type: 'image' }).catch((e) =>
-          console.error('Failed to delete rejected profile photo:', e)
-        )
-        await db.doc(`users/${uid}`).update({ photoModerationStatus: 'rejected' })
-      } else {
-        const courseId = parts[3]
-        const fileDoc = await findCourseFileDoc(uid, courseId, public_id)
-        if (fileDoc) {
-          const data = fileDoc.data() as { fileType?: string; fileSizeBytes?: number }
-          const resourceType = ['png', 'jpg', 'jpeg'].includes(data.fileType ?? '') ? 'image' : 'raw'
-          await cloudinary.uploader.destroy(public_id, { resource_type: resourceType }).catch((e) =>
-            console.error('Failed to delete rejected course file:', e)
-          )
-          await fileDoc.ref.delete()
-          await db.doc(`users/${uid}/courses/${courseId}`).update({
-            fileCount: admin.firestore.FieldValue.increment(-1),
-          })
-          if (data.fileSizeBytes) {
-            await db.doc(`users/${uid}`).update({
-              storageUsed: admin.firestore.FieldValue.increment(-data.fileSizeBytes),
-            })
-          }
-        }
-      }
+let rejectedFileName: string | undefined
 
-      if (isMalware) {
-        await deactivateAccountCore(uid, 'security_flag')
-      }
+if (isProfile) {
+  await cloudinary.uploader.destroy(public_id, { resource_type: 'image' }).catch((e) =>
+    console.error('Failed to delete rejected profile photo:', e)
+  )
+  await db.doc(`users/${uid}`).update({ photoModerationStatus: 'rejected' })
+} else {
+  const courseId = parts[3]
+  const fileDoc = await findCourseFileDoc(uid, courseId, public_id)
+  if (fileDoc) {
+    const data = fileDoc.data() as { fileType?: string; fileSizeBytes?: number; fileName?: string }
+    rejectedFileName = data.fileName
+    const resourceType = ['png', 'jpg', 'jpeg'].includes(data.fileType ?? '') ? 'image' : 'raw'
+    await cloudinary.uploader.destroy(public_id, { resource_type: resourceType }).catch((e) =>
+      console.error('Failed to delete rejected course file:', e)
+    )
+    await fileDoc.ref.delete()
+    await db.doc(`users/${uid}/courses/${courseId}`).update({
+      fileCount: admin.firestore.FieldValue.increment(-1),
+    })
+    if (data.fileSizeBytes) {
+      await db.doc(`users/${uid}`).update({
+        storageUsed: admin.firestore.FieldValue.increment(-data.fileSizeBytes),
+      })
+    }
+  }
+}
 
-      res.status(200).send('ok')
+// Notify the user in-app for non-malware rejections (explicit content, etc).
+// Malware cases already get an email via deactivateAccountCore, so we skip
+// a duplicate toast notification there.
+if (!isMalware) {
+  await db.collection(`users/${uid}/notifications`).add({
+    type: 'content_rejected',
+    context: isProfile ? 'profile_photo' : 'course_file',
+    fileName: rejectedFileName ?? null,
+    createdAt: Date.now(),
+    read: false,
+  })
+}
+
+if (isMalware) {
+  await deactivateAccountCore(uid, 'security_flag')
+}
+
+res.status(200).send('ok')
     } catch (err) {
       console.error('cloudinaryModerationWebhook error:', err)
       res.status(200).send('error-logged')

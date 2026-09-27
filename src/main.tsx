@@ -4,6 +4,7 @@ import EmailChangeWatcher from './components/EmailChangeWatcher'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { HelpBuddyProvider } from './context/HelpBuddyContext'
 import BfcacheGuard from './components/BfcacheGuard'
+import ModerationNotificationWatcher from './components/ModerationNotificationWatcher'
 import './index.css'
 import App from './App'
 import ForgotPassword from './pages/ForgotPassword'
@@ -238,6 +239,7 @@ createRoot(document.getElementById('root')!).render(
         <ExpiredAlert />
         <EmailChangeWatcher /> 
         <PasswordChangeWatcher /> 
+        <ModerationNotificationWatcher />
         <RouterProvider router={router} />
       </HelpBuddyProvider>
     </TimerProvider>
