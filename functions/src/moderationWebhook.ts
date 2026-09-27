@@ -123,7 +123,11 @@ if (isProfile) {
   await cloudinary.uploader.destroy(public_id, { resource_type: 'image' }).catch((e) =>
     console.error('Failed to delete rejected profile photo:', e)
   )
-  await db.doc(`users/${uid}`).update({ photoModerationStatus: 'rejected' })
+  await db.doc(`users/${uid}`).update({
+    photoModerationStatus: 'rejected',
+    photoURL: null,
+    photoPublicId: null,
+  })
 } else {
   const courseId = parts[3]
   const fileDoc = await findCourseFileDoc(uid, courseId, public_id)

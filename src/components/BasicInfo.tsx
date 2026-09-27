@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
 import { auth } from '../services/firebase'
@@ -33,7 +33,7 @@ function BasicInfo({ setActiveTab }: BasicInfoProps) {
   // ── logout state ──────────────────────────────────────────────────
   const [showLogoutModal, setShowLogoutModal] = useState(false)
   // ────────────────────────────────────────────────────────────────────────
-
+const prevModerationStatusRef = useRef<string | null>(null)
   // ── NEW: remove profile pic state ───────────────────────────────────
 const [showRemovePicModal, setShowRemovePicModal] = useState(false)
 const [removingPic, setRemovingPic] = useState(false)
@@ -154,6 +154,42 @@ const [removingPic, setRemovingPic] = useState(false)
     setOriginalFirstName(trimmedFirst)
     setOriginalLastName(trimmedLast)
   }
+  // Live listener for the moderation outcome of a pending photo upload.
+// handleProfilePicChange no longer claims success on upload alone — this
+// is what actually confirms approval (or reports rejection) once
+// Cloudinary's webhook resolves it, seconds after the upload finishes.
+useEffect(() => {
+  if (!user) return
+  const unsubscribe = onSnapshot(
+    doc(db, 'users', user.uid),
+    (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      const status = data.photoModerationStatus ?? null
+
+      if (prevModerationStatusRef.current === 'pending' && status === 'approved') {
+        showToast('Profile picture updated successfully!')
+      } else if (prevModerationStatusRef.current === 'pending' && status === 'rejected') {
+        showToast('Your photo was rejected and removed — reverted to default.')
+      }
+      prevModerationStatusRef.current = status
+
+      setProfilePic(data.photoURL || '/profile.png')
+
+      const cacheKey = `user_${user.uid}`
+      const cached = sessionStorage.getItem(cacheKey)
+      if (cached) {
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          ...JSON.parse(cached),
+          photoURL: data.photoURL ?? null,
+          photoPublicId: data.photoPublicId ?? null,
+        }))
+      }
+    },
+    (err) => console.error('Failed to listen to photo moderation status:', err)
+  )
+  return () => unsubscribe()
+}, [user])
 
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -187,7 +223,7 @@ const [removingPic, setRemovingPic] = useState(false)
         }).catch((err) => console.warn('Old profile pic delete failed:', err))
       }
 
-      showToast('Profile picture updated successfully!')
+      showToast('Photo uploaded — checking it now...')
     } catch (err) {
       console.error('Profile picture upload failed:', err)
       showToast('Failed to upload picture. Please try again.')
@@ -313,12 +349,16 @@ const handleRemoveProfilePic = async () => {
                 onClick={() => fileInputRef.current?.click()}
                 className="relative rounded-full overflow-hidden group disabled:opacity-40"
               >
-                <img
-                  src={profilePic}
-                  alt="Profile"
-                  className={`w-28 h-28 md:w-24 md:h-24 lg:w-24 lg:h-24 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 select-none border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
-                  onContextMenu={(e) => e.preventDefault()} draggable={false}
-                />
+<img
+  src={profilePic}
+  alt="Profile"
+  className={`w-28 h-28 md:w-24 md:h-24 lg:w-24 lg:h-24 xl:w-32 xl:h-32 2xl:w-36 2xl:h-36 border-2 select-none border-primary-600 group-hover:opacity-70 rounded-full object-cover transition-opacity ${uploading ? 'opacity-40' : 'opacity-100'}`}
+  onContextMenu={(e) => e.preventDefault()} draggable={false}
+  onError={(e) => {
+    if (e.currentTarget.src.endsWith('/profile.png')) return // avoid an infinite loop if the default itself 404s
+    e.currentTarget.src = '/profile.png'
+  }}
+/>
                 <div className='absolute bottom-0 left-0 right-0 h-1/4 flex items-end justify-center pb-1 transition-opacity rounded-b-full'>
                   <img src="/profileAdd.png" alt="camera" className="w-6 h-6 md:w-7 md:h-7 lg:w-5 lg:h-5 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </div>

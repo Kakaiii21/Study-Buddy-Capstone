@@ -157,11 +157,33 @@ function Dashboard() {
   const [pendingProfilePreview, setPendingProfilePreview] = useState<string | null>(null)
   const [pendingRemove, setPendingRemove] = useState(false)
 
-  const [toast, setToast] = useState<string | null>(null)
-  const showToast = (message: string) => {
-    setToast(message)
-    setTimeout(() => setToast(null), 3000)
+// Lazy-init from sessionStorage instead of setting state inside an
+// effect — this reads the toast stashed right before a forced reload
+// (see handleSaveCustomizeAll) so a success message survives the
+// reload, without the "setState synchronously in an effect" pattern.
+const [toast, setToast] = useState<string | null>(() => {
+  const pending = sessionStorage.getItem('pendingToast')
+  if (pending) {
+    sessionStorage.removeItem('pendingToast')
+    return pending
   }
+  return null
+})
+
+const showToast = (message: string) => {
+  setToast(message)
+  setTimeout(() => setToast(null), 3000)
+}
+
+// If a toast was recovered on mount, schedule its auto-clear the same
+// way showToast does for a normal call.
+useEffect(() => {
+  if (!toast) return
+  const timer = setTimeout(() => setToast(null), 3000)
+  return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [])
+
 
   const openCustomize = () => {
     setFormFirstName(firstName ?? '')
@@ -336,11 +358,12 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
   setCustomizeErrors({})
 
   const numericAge = formAge ? Math.min(99, Math.max(1, Number(formAge))) : null
-    const pictureWasChanged = (Boolean(pendingProfileFile) || pendingRemove) && isOnline
 
-    if (!isOnline && (pendingProfileFile || pendingRemove)) {
-      showToast("You're offline — your photo change will save once you're back online.")
-    }
+let photoCommitted = false
+
+if (!isOnline && (pendingProfileFile || pendingRemove)) {
+  showToast("You're offline — your photo change will save once you're back online.")
+}
 
     // Commit a staged new profile picture (upload to Cloudinary, delete old asset).
     if (pendingProfileFile && user && isOnline) {
@@ -383,6 +406,8 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
         }
 
         showToast('Profile picture updated successfully!')
+        sessionStorage.setItem('pendingToast', 'Profile picture updated successfully!')
+        photoCommitted = true
       } catch (err) {
         console.error('Profile picture upload failed:', err)
         showToast('Failed to upload picture. Please try again.')
@@ -416,6 +441,8 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
         }
 
         showToast('Profile picture removed.')
+        sessionStorage.setItem('pendingToast', 'Profile picture removed.')
+        photoCommitted = true
       } catch (err) {
         console.error('Failed to remove profile picture:', err)
         showToast('Failed to remove picture. Please try again.')
@@ -469,7 +496,7 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
       await Promise.allSettled(pendingWrites)
     }
 
-    if (pictureWasChanged) {
+    if (photoCommitted) {
       window.location.reload()
     }
   }
