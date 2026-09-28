@@ -14,7 +14,7 @@ type ThemedIcon = {
   light: string
   dark: string
   warm: string
-  warmActive?: string // shown when this item is active AND theme is 'warm'
+  warmActive?: string 
 }
 
 function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false, onExternalClose }: Props) {

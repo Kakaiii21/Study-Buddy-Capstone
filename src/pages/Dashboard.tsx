@@ -785,7 +785,8 @@ dark:text-white warm:text-[#623627]
       className='w-10 mb-2 block mx-auto mt-1 select-none '
       onContextMenu={(e) => e.preventDefault()}
       draggable={false}
-    />    </div>
+    />    
+    </div>
     <p className='text-[8px] md:text-[8px] dark:text-white warm:text-[#623627] warm:font-bold text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
     font-inter font-semibold'>Need Help?</p>
   </button>

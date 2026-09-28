@@ -17,13 +17,14 @@ import Sidebar from '../components/Sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useTasks, type Task, type Status } from '../hooks/useTasks'
 import { useTaskNotifications } from '../hooks/useTaskNotification'
+import { useTheme, type Theme } from '../context/ThemeContext'
+
 
 const COLUMNS: { id: Status; label: string }[] = [
   { id: 'todo',        label: 'TO DO' },
   { id: 'in-progress', label: 'IN PROGRESS' },
   { id: 'done',        label: 'DONE' },
 ]
-
 
 function getNowISO(): string {
   const now = new Date()
@@ -77,18 +78,18 @@ function buildStorageValue(dateDisplay: string, time: string): string {
 }
 
 function getCardStyle(task: Task, nowISO: string): string {
-  if (task.status === 'done') return 'border border-2 border-black bg-[#C4EAAD]  lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
-  if (task.deadline && task.deadline < nowISO) return 'border border-2 border-black bg-[#FF8383] lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  if (task.status === 'done') return 'border border-2 border-black bg-[#C4EAAD] warm:border-[#623627] dark:border-white  lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  if (task.deadline && task.deadline < nowISO) return 'border border-2 border-black bg-[#FF8383] lg:max-h-32 warm:border-[#623627] dark:border-white lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 
   if (task.deadline) {
     const msUntil = new Date(task.deadline).getTime() - Date.now()
     if (msUntil > 0 && msUntil <= 60 * 60 * 1000) {
-      return 'bg-amber-300  border border-2 border-black lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+      return 'bg-amber-300  border border-2 border-black lg:max-h-32 warm:border-[#623627] dark:border-white lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
     }
   }
 
 
-  return 'bg-white border border-2 border-black lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
+  return 'bg-white border border-2 border-black warm:border-[#623627] dark:border-white lg:max-h-32 lg:max-w-62 drop-shadow-[0_6px_2px_rgba(0,0,0,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300'
 }
   function sortByDeadline(a: Task, b: Task): number {
   if (!a.deadline && !b.deadline) return 0
@@ -179,25 +180,25 @@ function TaskModal({
 
   return (
     <div
-      className="fixed inset-0  bg-black bg-opacity-50 flex justify-center items-center z-50"
+      className="fixed inset-0   bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
+        className="bg-white dark:bg-[#010409] warm:bg-[#FBF1E8] warm:border-[#623627] warm:border-2 dark:border-2 dark-border-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-center font-bold text-primary-600 
-        lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 
+        lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl dark:text-white warm:text-[#623627]
          pt-0">{title}</p>
 
         <label className="flex font-semibold text-primary-600 text-xl 
-       lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl
+       lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl dark:text-white warm:text-[#623627]
          py-2">Task *</label>
         <input
           className="flex border-2 rounded-md border-primary-600 min-w-full my-2 
           lg:text-sm lg:py-1 lg:rounded-sm lg:my-0
           xl:text-sm xl:py-2 xl:my-0
           2xl:text-[18px] 2xl:py-2 
-          3xl:text-2xl 3xl:py-2
+          3xl:text-2xl 3xl:py-2  dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
           py-3 px-3"
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
@@ -211,7 +212,7 @@ function TaskModal({
         <div className="flex flex-col gap-1">
           <label className="flex text-primary-800 font-semibold text-xl 
           lg:text-sm lg:py-2
-          xl:text-[16px] xl:py-2
+          xl:text-[16px] xl:py-2 dark:text-white warm:text-[#623627]
           2xl:text-lg
           3xl:text-2xl 3xl:py-3
           py-3">Suggested Tasks:</label>
@@ -226,7 +227,7 @@ function TaskModal({
                 2xl:text-[18px]
                 3xl:text-[23px]
                 3xl:px-5 3xl:py-2
-                rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors"
+                rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors dark:text-white warm:text-[#623627] dark:border-white"
               >
                 {s}
               </button>
@@ -237,7 +238,7 @@ function TaskModal({
         <label className="flex text-primary-600 text-xl font-semibold
         lg:text-sm 
         xl:text-[16px]
-        2xl:text-lg
+        2xl:text-lg dark:text-white warm:text-[#623627]
         3xl:text-2xl
         pt-3 gap-1">
           Deadline
@@ -249,7 +250,7 @@ function TaskModal({
   <input
     className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono 
     lg:text-sm lg:py-1 lg:rounded-sm
-    xl:text-[15px] xl:py-2
+    xl:text-[15px] xl:py-2 dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
     2xl:text-[16px]
     3xl:text-lg 
       ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
@@ -267,7 +268,7 @@ function TaskModal({
     min={todayDate}
     value={calendarValue}
     onChange={(e) => handleCalendarChange(e.target.value)}
-    className="absolute right-0 top-0 w-10 h-full opacity-0 cursor-pointer "
+    className="absolute right-0 top-0 w-10 h-full opacity-0 cursor-pointer dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white"
     tabIndex={-1}
   />
   {/* Decorative icon only — sits underneath, pointer-events-none so taps pass through to the real input above it */}
@@ -288,7 +289,7 @@ function TaskModal({
             onChange={(e) => handleTimeChange(e.target.value)}
             className={`border-2 rounded-md py-3 px-3 w-full font-mono 
             lg:text-sm lg:py-1 lg:rounded-sm
-            xl:text-[15px] xl:py-2
+            xl:text-[15px] xl:py-2 dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
             2xl:text-[16px]
             3xl:text-lg
               ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
@@ -626,13 +627,13 @@ function Column({
       className={`
         w-full lg:flex-1
         md:px-32 
-        flex flex-col items-center p-4 py-0 pt-4 md:py-0 md:pt-3 sm:p-6 lg:px-10 2xl:px-16 3xl:px-20 lg:p-0 lg:pt-0 lg:pb-5 rounded-3xl
+        flex flex-col items-center p-4 py-0 pt-4 md:py-0 md:pt-3 sm:p-6 lg:px-10 2xl:px-16 3xl:px-20 lg:p-0 lg:pt-0 lg:pb-5 rounded-3xl 
         transition-colors duration-200
         ${collapsed ? 'min-h-0' : 'min-h-[300px]'}
-        ${isOver ? 'bg-primary-50' : ''}
+        ${isOver ? 'bg-primary-50 dark:bg-[#222631] warm:bg-[#FCEEE9]' : ''}
       `}
     >
-      <div className="bg-primary-800 
+      <div className="bg-primary-800  dark:bg-[#222631] warm:bg-[#623627]
       shadow-[0_0px_5px_rgba(0,0,0,.3)]
       max-w-full w-full p-3 flex items-center justify-between">
         <p className="text-white pl-5 lg:pl-0 text-xl lg:text-sm 2xl:text-lg 3xl:text-xl lg:text-center text-start font-semibold flex-1">{label}</p>
@@ -660,9 +661,9 @@ function Column({
             <TaskCard key={task.id} task={task} onDelete={onDelete} onEdit={onEdit} />
           ))}
           {tasks.length === 0 && (
-            <div className={`w-full border-2 border-dashed rounded-xl p-6 mt-2 text-center
+            <div className={`w-full border-2 border-dashed rounded-xl p-6 mt-2 text-center dark:text-white
               transition-colors duration-200
-              ${isOver ? 'border-primary-400 text-primary-400' : 'border-gray-200 text-gray-300'}`}
+              ${isOver ? 'border-primary-400 text-primary-400' : 'border-gray-200 text-gray-300 '}`}
             >
               {isOver ? 'Drop here' : 'No tasks yet'}
             </div>
@@ -678,6 +679,7 @@ function Column({
 
 function ToDoList() {
   const { user } = useAuth()
+const { theme } = useTheme()
   const { tasks, loading, addTask, updateTask, updateTaskStatus, deleteTask } = useTasks(user)
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -687,6 +689,11 @@ function ToDoList() {
   const [confirmingClearAll, setConfirmingClearAll] = useState(false)
   const [clearingAll, setClearingAll] = useState(false)
 
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
   useTaskNotifications(tasks)
   useFcmRegistration(user)
 
@@ -779,7 +786,7 @@ function ToDoList() {
   const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null
 
   return (
-    <div className='h-screen w-full  overflow-hidden bg-white'>
+    <div className='h-screen w-full  overflow-hidden dark:bg-[#010409] bg-white'>
       <div className='flex h-full'>
         {/* Sidebar */}
         <div className='lg:p-3 '>
@@ -792,8 +799,8 @@ function ToDoList() {
         <div className='flex-1  flex flex-col overflow-hidden'>
 
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>To do list</p>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] dark:text-white warm:text-[#623627] uppercase'>To do list</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -801,10 +808,16 @@ function ToDoList() {
               hover:opacity-80 active:scale-95 transition-all'
               title='Take a Tour'
             >
-              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-              </div>
-              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
+<div className='w-9 h-9 flex items-center justify-center'>
+  <img
+    src={needHelpIcon[theme]}
+    alt="?"
+    className='w-9 h-9 object-contain select-none'
+    onContextMenu={(e) => e.preventDefault()}
+    draggable={false}
+  />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
             </button>
         </div>
 
@@ -835,7 +848,9 @@ function ToDoList() {
         <div className="min-h-screen  w-full flex flex-col">
           <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 '>To do list</p>
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3
+            dark:text-white warm:text-[#623627]
+            '>To do list</p>
 
           <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
           pl-1   
@@ -892,19 +907,19 @@ function ToDoList() {
 <div className='flex items-center justify-center gap-4 xl:gap-6 2xl:gap-8 mt-3 mb-2'>
   <div className='flex items-center gap-1.5'>
     <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-white border border-1 border-black shrink-0' />
-    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Upcoming</p>
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800 dark:text-white'>Upcoming</p>
   </div>
   <div className='flex items-center gap-1.5'>
     <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-amber-300 border border-1 border-black shrink-0' />
-    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Due within 1 hour</p>
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800 dark:text-white'>Due within 1 hour</p>
   </div>
   <div className='flex items-center gap-1.5'>
     <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-[#FF8383] border border-1 border-black shrink-0' />
-    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Past deadline</p>
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800 dark:text-white'>Past deadline</p>
   </div>
   <div className='flex items-center gap-1.5'>
     <span className='w-3 h-3 xl:w-3.5 xl:h-3.5 rounded-sm bg-[#C4EAAD] border border-1 border-black shrink-0' />
-    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800'>Done</p>
+    <p className='text-[10px] xl:text-[11px] 2xl:text-[12px] font-inter font-medium text-primary-800 dark:text-white'>Done</p>
   </div>
 </div>
           {isAddModalOpen && (
@@ -976,9 +991,9 @@ function ToDoList() {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
            </button>
       </main>
