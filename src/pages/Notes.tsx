@@ -8,6 +8,18 @@ import NoteEditor from '../components/NoteEditor'
 import { useCategories, type Category } from '../hooks/useCategories'
 import { useAutosaveNote } from '../hooks/useAutosaveNote'
 
+// Notes are stored as HTML (from the rich-text editor). This converts them to
+// plain text for card previews and .txt downloads.
+function htmlToPlainText(html: string): string {
+  if (!html) return ''
+  // Put a space between blocks so "<p>a</p><p>b</p>" becomes "a b", not "ab"
+  const spaced = html
+    .replace(/<\/(p|h[1-6]|li|tr|div)>/gi, ' ')
+    .replace(/<br\s*\/?>/gi, ' ')
+  const doc = new DOMParser().parseFromString(spaced, 'text/html')
+  return (doc.body.textContent ?? '').replace(/\s+/g, ' ').trim()
+}
+
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { 
   itemName: string
   onConfirm: () => void
@@ -297,7 +309,7 @@ function Notes() {
         month: 'long', day: 'numeric', year: 'numeric',
       })}`,
       '',
-      note.content,
+      htmlToPlainText(note.content),
     ].join('\n')
 
     const blob = new Blob([text], { type: 'text/plain' })
@@ -609,7 +621,7 @@ function Notes() {
                       </div>
 
                       <hr className='border-t border-primary-600 my-2' />
-                      <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{note.content}</p>
+                      <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{htmlToPlainText(note.content)}</p>
                       <div className='flex justify-between items-center mt-3'>
                         <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
                         <p className='text-xs text-gray-400 shrink-0 ml-2'>

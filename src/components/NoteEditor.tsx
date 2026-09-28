@@ -227,6 +227,13 @@ export default function NoteEditor({ content, onChange, readOnly }: {
     }
   }, [editor])
 
+  // `editable` is only read when the editor is created, so keep it in sync
+  // when the modal switches from view mode to edit mode (EDIT button).
+  useEffect(() => {
+    if (!editor) return
+    editor.setEditable(!readOnly)
+  }, [editor, readOnly])
+
   if (!editor) return null
 
   function insertTable() {
