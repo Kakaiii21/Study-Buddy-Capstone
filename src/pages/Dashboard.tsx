@@ -58,7 +58,7 @@ function Dashboard() {
   )
   const needHelpIcon = {
   light: '/needhelp.png',
-  dark: '/needhelp.png',
+  dark: '/needhelp-dark.png',
   warm: '/needhelp-warm.png',
 }
 const timerIcon = {
@@ -782,7 +782,7 @@ dark:text-white warm:text-[#623627]
     <img
       src={needHelpIcon[theme]}
       alt="?"
-      className='w-10 block mx-auto mt-1 select-none '
+      className='w-10 mb-2 block mx-auto mt-1 select-none '
       onContextMenu={(e) => e.preventDefault()}
       draggable={false}
     />    </div>
@@ -834,9 +834,10 @@ className='relative flex flex-col justify-between text-left p-2  s
 
       {showCustomize && (
         <div className='fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-1 md:p-4'>
-          <div className='bg-white rounded-lg border-2 border-black w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8'>
+          <div className='bg-white dark:bg-[#010409] dark:border-white warm:bg-[#FBF1E8] warm:border-[#623627]
+           rounded-lg border-2 border-black w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8'>
 
-            <p className='text-center lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
+            <p className='text-center dark:text-white warm:text-[#623627] lg:text-xs xl:text-sm 2xl:text-lg 3xl:text-xl font-inter font-semibold text-gray-400 uppercase tracking-wide mb-6'>
               Customize Card
             </p>
 
@@ -844,9 +845,9 @@ className='relative flex flex-col justify-between text-left p-2  s
               <div className='flex-1 min-w-0'>
 
                 {/* Live mini preview */}
-                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-0 md:mx-auto border-2 border-primary-800  rounded-lg overflow-hidden mb-6 lg:mb-2'>
+                <div className='w-full max-w-[320px] 3xl:max-w-[400px] mx-0 md:mx-auto border-2 border-primary-800 dark:border-white dark:bg-white warm:bg-white warm:border-[#623627] rounded-lg overflow-hidden mb-6 lg:mb-2'>
                   <div className='w-full h-8 3xl:h-10 relative' style={{ backgroundColor: formCardColor }}>
-                    <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white w-24 h-3 border-2 border-primary-800 rounded-full' />
+                    <div className='absolute left-1/2 -translate-x-1/2 bottom-2 bg-white dark:bg-[#010409] warm:bg-[#FBF1E8] w-24 h-3 border-2 border-primary-800 rounded-full' />
                   </div>
                   <div className='flex flex-row items-start gap-3 px-2 md:px-4 pt-2 pb-3'>
                     <div className='flex flex-col items-center gap-1'>
@@ -933,23 +934,23 @@ className='relative flex flex-col justify-between text-left p-2  s
                 {/* Form */}
                 <div className='flex flex-col gap-2'>
                   <div>
-                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name *</label>
-<input
-  type='text'
-  value={formFirstName}
-  onChange={(e) => {
-    setFormFirstName(e.target.value)
-    if (customizeErrors.firstName) setCustomizeErrors((prev) => ({ ...prev, firstName: undefined }))
-  }}
-  placeholder='Required'
-  className={`w-full bg-gray-100 border rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs ${customizeErrors.firstName ? 'border-red-500' : 'border-gray-300'}`}
-/>
-{customizeErrors.firstName && (
-  <p className='text-red-500 text-[10px] font-inter mt-1'>{customizeErrors.firstName}</p>
-)}
+                    <label className='block font-inter text-gray-400 dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name *</label>
+                      <input
+                        type='text'
+                        value={formFirstName}
+                        onChange={(e) => {
+                          setFormFirstName(e.target.value)
+                          if (customizeErrors.firstName) setCustomizeErrors((prev) => ({ ...prev, firstName: undefined }))
+                        }}
+                        placeholder='Required'
+                        className={`w-full bg-gray-100 border rounded-md px-3 py-2 font-inter text-primary-800 lg:text-xs ${customizeErrors.firstName ? 'border-red-500' : 'border-gray-300'}`}
+                      />
+                      {customizeErrors.firstName && (
+                        <p className='text-red-500 text-[10px] font-inter mt-1'>{customizeErrors.firstName}</p>
+                      )}
                   </div>
                   <div>
-                    <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name *</label>
+                    <label className='block font-inter text-gray-400  dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name *</label>
 <input
   type='text'
   value={formLastName}
@@ -966,7 +967,7 @@ className='relative flex flex-col justify-between text-left p-2  s
                   </div>
                   <div className='flex gap-4'>
                     <div className='flex-1'>
-                      <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Age</label>
+                      <label className='block font-inter text-gray-400  dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Age</label>
                         <input
                           type='number'
                           min={1}
@@ -983,7 +984,7 @@ className='relative flex flex-col justify-between text-left p-2  s
                         />
                     </div>
                     <div className='flex-1'>
-                      <label className='block font-inter text-gray-400 uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Year Level</label>
+                      <label className='block font-inter text-gray-400  dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Year Level</label>
                       <select
                         value={formYearLevel}
                         onChange={(e) => setFormYearLevel(e.target.value)}
@@ -1005,8 +1006,8 @@ className='relative flex flex-col justify-between text-left p-2  s
 
               <div className='w-full md:w-56 flex flex-col gap-3'>
 
-                <p className='order-1 md:order-4 text-center font-inter text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
-                <div className='order-2 md:order-5 border-2 border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
+                <p className='order-1 md:order-4 text-center font-inter dark:text-white warm:text-[#623627] font-bold text-gray-400 uppercase text-sm mt-0 md:mt-4 mb-2'>Color</p>
+                <div className='order-2 md:order-5 border-2 warm:border-[#623627] dark:border-white border-black rounded-xl p-4 grid grid-cols-4 gap-3'>
                   {['#C9C9C9', '#000000', '#FFD84D', '#7FC4FF', '#B5E8A0', '#D9CBF5', '#FFB8D9', '#FFA55E'].map((color) => (
                     <button
                       key={color}
@@ -1021,14 +1022,14 @@ className='relative flex flex-col justify-between text-left p-2  s
                 <button
                   onClick={handleSaveCustomizeAll}
                   disabled={uploadingPic}
-                  className='order-3 md:order-1 mt-1 md:mt-0 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
+                  className='order-3 md:order-1 mt-1 md:mt-0 border-2 warm:border-[#623627] warm:bg-[#FBD79A] dark:text-black dark:border-white border-black rounded-lg py-3 font-inter font-bold uppercase bg-[#FFD84D] hover:brightness-95 disabled:opacity-50'
                 >
                   {uploadingPic ? 'Saving...' : 'Save'}
                 </button>
 
                 <button
                   onClick={handleCancelCustomize}
-                  className='order-5 md:order-3 border-2 border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
+                  className='order-5 md:order-3 border-2 warm:border-[#623627] warm:bg-[#F9D5C6] warm:hover:opacity-60 dark:bg-[#657084] dark:text-white dark:border-white border-black rounded-lg py-3 font-inter font-bold uppercase hover:bg-gray-50'
                 >
                   Cancel
                 </button>

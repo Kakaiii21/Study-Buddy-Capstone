@@ -188,6 +188,12 @@ const navSections = [
   },
 ]
 
+const menuIcons = {
+  light: '/menu.png',
+  dark: '/menu-dark.png',
+  warm: '/menu-warm.png',
+}
+
   return (
     <>
       {/* BURGER BUTTON */}
@@ -202,7 +208,13 @@ const navSections = [
           ${isOpen ? 'hidden' : ''}
         `}
       >
-        <img src="/menu.png" alt="menu" className="w-10 h-8 select-none" onContextMenu={(e) => e.preventDefault()} draggable={false} />
+<img
+  src={menuIcons[theme]}
+  alt="menu"
+  className="w-10 h-8 select-none"
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}
+/>
         <span className="text-xs text-primary-600 mt-1" />
       </button>
 
@@ -263,7 +275,7 @@ const navSections = [
         flex items-center gap-2 justs 
         ${isActive
           ? 'bg-[#4A4A49] dark:bg-[#2F3542] warm:bg-[#FBF1E8] warm:text-[#623627] text-white font-medium'
-          : 'text-white hover:bg-[#4A4A49] dark:hover:bg-[#2F3542] warm:hover:bg-[#FBF1E8] warm:text-white'
+          : 'text-white hover:bg-[#4A4A49] dark:hover:bg-[#2F3542] warm:hover:bg-opacity-70 warm:text-white'
         }
       `}
     >
