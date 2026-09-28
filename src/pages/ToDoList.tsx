@@ -178,27 +178,27 @@ function TaskModal({
   const calendarValue = isValidDate(taskDeadline) ? toStorageDateOnly(taskDeadline) : ''
 
 
-  return (
+return (
     <div
       className="fixed inset-0   bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white dark:bg-[#010409] warm:bg-[#FBF1E8] warm:border-[#623627] warm:border-2 dark:border-2 dark-border-white lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
+        className="bg-white warm:bg-[#FBF1E8] warm:border-[#623627] warm:border-2 dark:border-2 dark:border-black lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-center font-bold text-primary-600 
-        lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl dark:text-white warm:text-[#623627]
+        lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl warm:text-[#623627]
          pt-0">{title}</p>
 
         <label className="flex font-semibold text-primary-600 text-xl 
-       lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl dark:text-white warm:text-[#623627]
+       lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl warm:text-[#623627]
          py-2">Task *</label>
         <input
-          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 
+          className="flex border-2 rounded-md border-primary-600 min-w-full my-2 bg-white warm:bg-transparent text-black [color-scheme:light]
           lg:text-sm lg:py-1 lg:rounded-sm lg:my-0
           xl:text-sm xl:py-2 xl:my-0
           2xl:text-[18px] 2xl:py-2 
-          3xl:text-2xl 3xl:py-2  dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
+          3xl:text-2xl 3xl:py-2 warm:text-[#623627]
           py-3 px-3"
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
@@ -212,7 +212,7 @@ function TaskModal({
         <div className="flex flex-col gap-1">
           <label className="flex text-primary-800 font-semibold text-xl 
           lg:text-sm lg:py-2
-          xl:text-[16px] xl:py-2 dark:text-white warm:text-[#623627]
+          xl:text-[16px] xl:py-2 warm:text-[#623627]
           2xl:text-lg
           3xl:text-2xl 3xl:py-3
           py-3">Suggested Tasks:</label>
@@ -227,7 +227,7 @@ function TaskModal({
                 2xl:text-[18px]
                 3xl:text-[23px]
                 3xl:px-5 3xl:py-2
-                rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors dark:text-white warm:text-[#623627] dark:border-white"
+                rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors warm:text-[#623627]"
               >
                 {s}
               </button>
@@ -238,7 +238,7 @@ function TaskModal({
         <label className="flex text-primary-600 text-xl font-semibold
         lg:text-sm 
         xl:text-[16px]
-        2xl:text-lg dark:text-white warm:text-[#623627]
+        2xl:text-lg warm:text-[#623627]
         3xl:text-2xl
         pt-3 gap-1">
           Deadline
@@ -248,12 +248,12 @@ function TaskModal({
         <div className="flex flex-col sm:flex-row  gap-3 3xl:gap-8 my-3">
 <div className="relative flex items-center flex-1 ">
   <input
-    className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono 
+    className={`border-2 rounded-md py-3 px-3 w-full sm:w-36 3xl:w-44 font-mono text-black [color-scheme:light]
     lg:text-sm lg:py-1 lg:rounded-sm
-    xl:text-[15px] xl:py-2 dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
+    xl:text-[15px] xl:py-2 warm:text-[#623627]
     2xl:text-[16px]
     3xl:text-lg 
-      ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+      ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600 bg-white warm:bg-transparent'}`}
     value={taskDeadline}
     onChange={(e) => handleDeadlineChange(e.target.value)}
     type="text"
@@ -268,7 +268,7 @@ function TaskModal({
     min={todayDate}
     value={calendarValue}
     onChange={(e) => handleCalendarChange(e.target.value)}
-    className="absolute right-0 top-0 w-10 h-full opacity-0 cursor-pointer dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white"
+    className="absolute right-0 top-0 w-10 h-full opacity-0 cursor-pointer warm:text-[#623627]"
     tabIndex={-1}
   />
   {/* Decorative icon only — sits underneath, pointer-events-none so taps pass through to the real input above it */}
@@ -287,12 +287,12 @@ function TaskModal({
             type="time"
             value={taskTime}
             onChange={(e) => handleTimeChange(e.target.value)}
-            className={`border-2 rounded-md py-3 px-3 w-full font-mono 
+            className={`border-2 rounded-md py-3 px-3 w-full font-mono text-black [color-scheme:light]
             lg:text-sm lg:py-1 lg:rounded-sm
-            xl:text-[15px] xl:py-2 dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-white
+            xl:text-[15px] xl:py-2 warm:text-[#623627]
             2xl:text-[16px]
             3xl:text-lg
-              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600'}`}
+              ${dateError ? 'border-red-400 bg-red-50' : 'border-primary-600 bg-white warm:bg-transparent'}`}
           />
         </div>
 
@@ -786,7 +786,7 @@ const needHelpIcon: Record<Theme, string> = {
   const activeTask = activeTaskId ? tasks.find((t) => t.id === activeTaskId) : null
 
   return (
-    <div className='h-screen w-full  overflow-hidden dark:bg-[#010409] bg-white'>
+    <div className='h-screen w-full  overflow-hidden dark:bg-[#010409] warm:bg-[#FBF1E8] bg-white'>
       <div className='flex h-full'>
         {/* Sidebar */}
         <div className='lg:p-3 '>
@@ -799,8 +799,8 @@ const needHelpIcon: Record<Theme, string> = {
         <div className='flex-1  flex flex-col overflow-hidden'>
 
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] dark:text-white warm:text-[#623627] uppercase'>To do list</p>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] warm:bg-[#FBF1E8] top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3]  dark:text-white warm:text-[#623627] uppercase'>To do list</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -848,15 +848,15 @@ const needHelpIcon: Record<Theme, string> = {
         <div className="min-h-screen  w-full flex flex-col">
           <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
-            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3
-            dark:text-white warm:text-[#623627]
+            mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3 
+            dark:text-white warm:text-[#623627] 
             '>To do list</p>
 
           <div className=" hidden  w-full lg:flex flex-col  lg:flex-row md:flex-row justify-center 
           pl-1   
           lg:justify-end  lg:items-start lg:pr-10 2xl:pr-16 3xl:pr-20 lg:px-2 lg:gap-3
            md:justify-between md:items-start sm:items-center gap-1 p-2">
-            <hr className='lg:hidden md:hidden w-full border-t border-[#E9E9E9]' />
+            <hr className='lg:hidden md:hidden w-full border-t border-[#E9E9E9] warm:border-[#623627]' />
 
             <button
             id='clearAllBtn'
@@ -901,7 +901,7 @@ const needHelpIcon: Record<Theme, string> = {
               New Task
             </button>
           </div>
-<hr className="hidden lg:block mt-3 w-[75vw] mx-auto border-t border-[#E9E9E9]" />
+<hr className="hidden lg:block mt-3 w-[75vw] mx-auto border-t border-[#E9E9E9] warm:border-[#623627]" />
 
 
 <div className='flex items-center justify-center gap-4 xl:gap-6 2xl:gap-8 mt-3 mb-2'>
