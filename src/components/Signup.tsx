@@ -249,7 +249,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
   }
 
   const inputClass = (field: keyof FieldErrors) =>
-    `w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
+    `w-full mb-1 bg-white text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched[field] && fieldErrors[field] ? 'border-red-500 bg-red-50' : ''}`
 
   return (
     <div className="min-h-screen md:h-auto flex flex-col lg:px-10 md:px-32 lg:flex-row bg-primary-600  2xl:px-[150px]">
@@ -451,7 +451,7 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
             onChange={(e) => handleChange('confirmPassword', e.target.value)}
             onBlur={() => handleBlur('confirmPassword')}
             onKeyDown={(e) => focusNextEmpty(e, 'confirmPassword')}
-            className={`w-full mb-1 text-sm text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
+            className={`w-full mb-1 text-sm bg-white text-[13px] lg:text-[11px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[16px] px-2 py-2 xl:py-1 2xl:py-2 3xl:py-2 border border-primary-600 ${touched.confirmPassword && fieldErrors.confirmPassword ? 'border-red-500 bg-red-50' : ''}`}
             placeholder="Enter Your Password"
           />
           {touched.confirmPassword && fieldErrors.confirmPassword && (

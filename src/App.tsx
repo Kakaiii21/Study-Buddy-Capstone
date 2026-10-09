@@ -68,7 +68,9 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 
   return (
   <>
-    <section className="h-auto xl:h-screen w-full ">
+  <div className='bg-white'>
+    
+    <section className=" bg-white h-auto xl:h-screen w-full  ">
       <nav className=" px-2 md:px-6 lg:px-6 xl:px-6 2xl:px-6 py-2 flex items-center justify-between mt-3 md:mt-3 lg:mt-0 xl:mt-0 2xl:mt-0 ">
         {/* LOGO */}
         <img src="./logo.png" alt="logo" className="pl-2 h-10 md:pl-5 md:h-16 lg:pl-5 lg:h-16 xl:pl-5 xl:h-16 2xl:pl-5 2xl:h-16 w-auto" 
@@ -190,7 +192,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
     {/*First*/}
       <hr className='lg:hidden md:hidden mt-4  w-full border-t opacity-5 border-primary-600 ' />
 
-      <section className='w-full mt-4 md:mt-10'>
+      <section className=' bg-white w-full mt-4 md:mt-10'>
         <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-1'>
           <p className='flex flex-wrap justify-center items-center  gap-x-1 font-fustat text-primary-600 text-sm md:text-lg 2xl:text-2xl lg:mb-20 xl:mb-24 2xl:mb-32 px-4 mb-10 text-center'>
             <span>Your all-in-one study companion &mdash;</span>
@@ -201,7 +203,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 
         </div>
 
-      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10 '>
+      <div className='flex flex-col bg-white px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10 '>
         <div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6'>
           <img src="./assets/timer.gif" alt="Timergif" className='border border-black rounded-2xl shrink-0 select-none
           w-[80px] h-[80px] 
@@ -221,7 +223,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
           </div>
         </div>
 
-        <div className='flex flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
+        <div className='flex bg-white flex-row gap-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-end items-center max-w-3xl ml-auto'>
           <div className='text-right text-primary-600 font-inter'>
             <p className='font-bold text-[16px] md:text-[34px] lg:text-[28px] 2xl:text-[44px]'>To Do List</p>
             <p className='ml-2 text-[12px] md:text-[14px] lg:text-[13px] 2xl:text-[15px]'>Keep track of everything you need to get done.
@@ -241,7 +243,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
         </div>
       </div>
       {/*Second*/}
-      <div className='flex flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
+      <div className='flex  bg-white flex-col px-4 md:px-10 lg:px-[110px] xl:px-[180px] 2xl:px-[350px] mb-10'>
         <div className='flex flex-row gap-x-4 md:gap-x-6 lg:gap-x-8 2xl:gap-x-10 justify-start items-center max-w-3xl mb-6 '>
           <img src="./assets/notes.gif" alt="Notesgif" className='border border-black rounded-2xl shrink-0
           w-[80px] h-[80px] 
@@ -321,7 +323,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       </div>
 
       </section>
-    <section ref={signupRef} className="w-full h-auto bg-primary-600">
+    <section ref={signupRef} className="w-full h-auto bg-primary-600 ">
       {activeForm === 'signup'
         ? <Signup  onSwitchToLogin={() => setActiveForm('login')}   />
         : <Login onSwitchToSignup={() => setActiveForm('signup')} />
@@ -330,7 +332,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 
 
     {/* Download Section */}
- <section ref={downloadRef} className="py-10">
+ <section ref={downloadRef} className="py-10 bg-white">
   <div className='flex flex-col mt-10 gap-10 justify-start items-center'>
     <p className='text-center font-fustat text-2xl font-medium text-primary-600 uppercase'>Add to Home</p>
     <p className='text-center font-fustat text-lg font-normal text-primary-600'>Get Study Buddy on any device:</p>
@@ -438,7 +440,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       </div>
     )}
  {/*Developers Section*/}
-<section ref={aboutRef} className="py-10 w-full flex flex-col justify-center">
+<section ref={aboutRef} className="py-10 bg-white w-full flex flex-col justify-center">
     <div className='flex flex-col mt-10 gap-2 justify-center items-center md:items-start'>
     <h1 className='text-primary-600 px- 4 text-center md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] w-full font-inter font-extrabold'>Developers</h1>
     <p className='text-primary-600 px-4   font-inter  text-center md:ml-0 md:text-left md:px-[50px] lg:px-[150px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] mb-10 font-medium'>Meet the developers of Study Buddy.</p>
@@ -543,8 +545,8 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
   </div>
 </section>
   {/*Contact Us Section*/}
-<section ref={contactRef} className='py-2 md:py-10 lg:py-10 xl:py-10 2xl:py-10 w-full overflow-hidden'>
-  <div className='flex flex-col items-center md:items-start mt-0 md:mt-10 lg:mt-10 xl:mt-10 2xl:mt-10 gap-2 justify-start'>
+<section ref={contactRef} className='py-2 bg-white md:py-10 lg:py-10 xl:py-10 2xl:py-10 w-full overflow-hidden'>
+  <div className='flex flex-col bg-white items-center md:items-start mt-0 md:mt-10 lg:mt-10 xl:mt-10 2xl:mt-10 gap-2 justify-start'>
 
     <h1 className='text-primary-600 text-center md:text-start lg:text-start xl:text-start 2xl:text-start px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] w-full font-inter font-extrabold'>Contact Us!</h1>
     <p className='text-primary-600 text-center text-sm lg:text-base font-inter px-4 md:px-[50px] lg:px-[130px] xl:px-[180px] 2xl:px-[230px] 3xl:px-[350px] mb-10 font-medium'>
@@ -558,7 +560,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
       rel="noopener noreferrer"
       className='flex flex-row justify-center hover:underline items-center gap-5'
     >
-      <div className='bg-primary-600 rounded-full border border-primary-600 w-14 h-14 md:w-14 md:h-14
+      <div className='bg-primary-600  rounded-full border border-primary-600 w-14 h-14 md:w-14 md:h-14
       lg:w-14 lg:h-14
       xl:w-16 xl:h-16
       2xl:w-18 2xl:h-18
@@ -600,7 +602,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
 </section>
 
 {/*Footer Section*/}
-<section className='bg-primary-600 mt-16 overflow-hidden'>
+<section className='  bg-primary-600 mt-16 overflow-hidden'>
   <div className='flex flex-col items-center gap-6 px-6 py-8
   md:flex-row md:justify-between md:items-center md:gap-4 md:px-8
   lg:justify-center lg:gap-16 lg:px-20
@@ -646,6 +648,7 @@ const [activeForm, setActiveForm] = useState<'signup' | 'login'>(() => {
   </div>
 </section>
 
+  </div>
 
 
   </>

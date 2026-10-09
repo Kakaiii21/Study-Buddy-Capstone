@@ -29,6 +29,7 @@ function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false
   const isBlocked = uploading || quizActive
   const [isOpenInternal, setIsOpenInternal] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const [showThemeModal, setShowThemeModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const { openHelpModal } = useHelpBuddy()
@@ -302,7 +303,22 @@ const menuIcons = {
             </div>
           ))}
 
-
+          {/* THEME (opens popup) */}
+          <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0 ml-2 xl:px-3'>
+            <button
+              onClick={() => !isBlocked && setShowThemeModal(true)}
+              className="
+                w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
+                font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
+                transition-colors duration-200  rounded-md
+                flex items-center gap-2 justs 
+                text-white hover:bg-[#4A4A49] dark:hover:bg-[#2F3542] warm:hover:bg-opacity-70
+              "
+            >
+              <img src="/sideIcons/theme.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              Theme
+            </button>
+          </div>
 
           {/* LOGOUT */}
               <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0  ml-2 xl:px-3'>
@@ -320,36 +336,6 @@ const menuIcons = {
                   Logout
                 </button>
               </div>
-{/* THEME PICKER */}
-<div className="px-5 lg:px-0 lg:pl-2 lg:pr-5 ml-2 xl:px-3 mt-3 mb-2">
-  <p className="text-center text-white font-roboto font-bold uppercase tracking-wide text-xs lg:text-[7px] xl:text-[9px] 2xl:text-[11px] 3xl:text-sm mb-2">
-    Select a theme
-  </p>
-  <div className="flex justify-between gap-1">
-    {themeOptions.map(({ key, label, img }) => (
-      <button
-        key={key}
-        onClick={() => setTheme(key)}
-        aria-label={`${label} mode`}
-        className="flex flex-col items-center gap-1 flex-1"
-      >
-        <img
-          src={img}
-          alt=""
-          className={`w-12 h-12 lg:w-9 lg:h-9 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 3xl:w-16 3xl:h-16
-            rounded-lg select-none object-contain
-            transition-transform duration-200 hover:scale-105
-            ${theme === key ? 'ring-2 ring-[#FEE248]' : ''}`}
-          onContextMenu={(e) => e.preventDefault()}
-          draggable={false}
-        />
-        <span className="text-white font-roboto uppercase text-[10px] lg:text-[7px] xl:text-[9px] 2xl:text-[11px] 3xl:text-sm">
-          {label}
-        </span>
-      </button>
-    ))}
-  </div>
-</div>
 <div className='mt-3 flex flex-col justify-center items-center mb-3'>
 <img
   src={currentGif}
@@ -370,6 +356,56 @@ const menuIcons = {
 {/* no HelpBuddyModal line here — it's auto-rendered by HelpBuddyProvider at the app root */}
         </nav>
       </aside>
+
+      {/* THEME MODAL */}
+      {showThemeModal && (
+        <>
+          <div className="fixed inset-0 bg-black  bg-opacity-50 z-50" />
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClick={() => setShowThemeModal(false)}
+          >
+            <div
+              className="bg-white rounded-2xl border-2 border-black 3xl:rounded-3xl shadow-xl p-8 lg:py-4 lg:px-5 2xl:py-6 3xl:py-8 w-80 lg:w-64 xl:w-72 2xl:w-80 3xl:w-96 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl font-bold text-primary-600 font-roboto mb-4">
+                Select a theme
+              </h2>
+
+              <div className="flex justify-between gap-2 mb-6">
+                {themeOptions.map(({ key, label, img }) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setTheme(key)
+                      setShowThemeModal(false)
+                    }}
+                    aria-label={`${label} mode`}
+                    className="flex flex-col items-center gap-1 flex-1"
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      className={`w-16 h-16 lg:w-12 lg:h-12 xl:w-14 xl:h-14 2xl:w-16 2xl:h-16 3xl:w-20 3xl:h-20
+                        rounded-lg select-none object-contain
+                        transition-transform duration-200 hover:scale-105
+                        ${theme === key ? 'ring-2 ring-[#FEE248]' : ''}`}
+                      onContextMenu={(e) => e.preventDefault()}
+                      draggable={false}
+                    />
+                    <span className="text-black font-roboto uppercase text-xs lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-sm">
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+
+            </div>
+          </div>
+        </>
+      )}
 
       {/* LOGOUT MODAL */}
       {showLogoutModal && (
