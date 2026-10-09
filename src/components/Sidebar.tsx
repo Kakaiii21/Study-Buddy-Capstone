@@ -17,6 +17,14 @@ type ThemedIcon = {
   warmActive?: string 
 }
 
+
+
+const themeOptions = [
+  { key: 'light', label: 'Light', img: '/sideIcons/themeLight.png' },
+  { key: 'dark', label: 'Dark', img: '/sideIcons/themeDark.png' },
+  { key: 'warm', label: 'Warm', img: '/sideIcons/themeWarm.png' },
+] as const
+
 function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false, onExternalClose }: Props) {
   const isBlocked = uploading || quizActive
   const [isOpenInternal, setIsOpenInternal] = useState(false)
@@ -294,38 +302,7 @@ const menuIcons = {
             </div>
           ))}
 
-          {/* THEME TOGGLE */}
-          <div className="px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0 ml-2 xl:px-3 mb-2">
-            <div className="flex items-center justify-between bg-[#3A3A39] rounded-md p-1">
-              <button
-                onClick={() => setTheme('light')}
-                aria-label="Light mode"
-                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
-                  theme === 'light' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                ☀️
-              </button>
-              <button
-                onClick={() => setTheme('dark')}
-                aria-label="Dark mode"
-                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
-                  theme === 'dark' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                🌙
-              </button>
-              <button
-                onClick={() => setTheme('warm')}
-                aria-label="Warm mode"
-                className={`flex-1 py-1.5 rounded-md flex items-center justify-center text-sm transition-colors duration-200 ${
-                  theme === 'warm' ? 'bg-[#4A4A49] text-white' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                🔥
-              </button>
-            </div>
-          </div>
+
 
           {/* LOGOUT */}
               <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0  ml-2 xl:px-3'>
@@ -343,7 +320,36 @@ const menuIcons = {
                   Logout
                 </button>
               </div>
-
+{/* THEME PICKER */}
+<div className="px-5 lg:px-0 lg:pl-2 lg:pr-5 ml-2 xl:px-3 mt-3 mb-2">
+  <p className="text-center text-white font-roboto font-bold uppercase tracking-wide text-xs lg:text-[7px] xl:text-[9px] 2xl:text-[11px] 3xl:text-sm mb-2">
+    Select a theme
+  </p>
+  <div className="flex justify-between gap-1">
+    {themeOptions.map(({ key, label, img }) => (
+      <button
+        key={key}
+        onClick={() => setTheme(key)}
+        aria-label={`${label} mode`}
+        className="flex flex-col items-center gap-1 flex-1"
+      >
+        <img
+          src={img}
+          alt=""
+          className={`w-12 h-12 lg:w-9 lg:h-9 xl:w-11 xl:h-11 2xl:w-12 2xl:h-12 3xl:w-16 3xl:h-16
+            rounded-lg select-none object-contain
+            transition-transform duration-200 hover:scale-105
+            ${theme === key ? 'ring-2 ring-[#FEE248]' : ''}`}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+        />
+        <span className="text-white font-roboto uppercase text-[10px] lg:text-[7px] xl:text-[9px] 2xl:text-[11px] 3xl:text-sm">
+          {label}
+        </span>
+      </button>
+    ))}
+  </div>
+</div>
 <div className='mt-3 flex flex-col justify-center items-center mb-3'>
 <img
   src={currentGif}
