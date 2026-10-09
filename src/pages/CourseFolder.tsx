@@ -390,7 +390,7 @@ if (file.size > MAX_FILE_SIZE) {
         <p className="hidden text-3xl lg:text-4xl md:text-4xl font-bold text-primary-600 uppercase font-roboto">
           {folderName}
         </p>
-    <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
+    <p className='absolute warm:text-[#623627] left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
       
       {!previewFile && (
       <button

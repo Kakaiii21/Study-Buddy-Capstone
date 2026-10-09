@@ -193,7 +193,7 @@ function GeneratedHistory() {
 }, [])
 
   return (
-    <div className='flex h-screen'>
+  <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]'>
 
       <div className='lg:p-3 '>
         <Sidebar />

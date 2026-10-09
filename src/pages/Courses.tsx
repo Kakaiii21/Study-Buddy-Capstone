@@ -220,7 +220,7 @@ const filteredCourses = courses.filter((c) =>
 
               {/* Top Bar — mobile only */}
         <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]   top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold  text-xl dark:text-white text-[#B3B3B3] uppercase'>My Files</p>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold  warm:text-[#623627] text-xl dark:text-white text-[#B3B3B3] uppercase'>My Files</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
