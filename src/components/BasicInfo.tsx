@@ -337,8 +337,8 @@ const handleRemoveProfilePic = async () => {
 
       <div className='w-full px-4 md:px-16 lg:px-5 xl:px-7 2xl:px-9 3xl:px-11 py-6 lg:py-0 '>
 
-        <h1 className='text-primary-600  font-semibold font-inter text-xl md:text-2xl lg:text-[24px] xl:text-[28px] 2xl:text-[30px] 3xl:text-[35px] mb-4 md:mb-6 lg:mb-0 xl:mb-2 2xl:mb-3 3xl:mb-6'>Basic Info</h1>
-        <p className='text-primary-600  w-auto font-inter text-sm md:text-[15px] lg:text-[10px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px]  shrink-0'>Profile Picture</p>
+        <h1 className='text-primary-600 dark:text-white  font-semibold font-inter text-xl md:text-2xl lg:text-[24px] xl:text-[28px] 2xl:text-[30px] 3xl:text-[35px] mb-4 md:mb-6 lg:mb-0 xl:mb-2 2xl:mb-3 3xl:mb-6'>Basic Info</h1>
+        <p className='text-primary-600 dark:text-white  w-auto font-inter text-sm md:text-[15px] lg:text-[10px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px]  shrink-0'>Profile Picture</p>
 
         <div className='flex flex-row items-center justify-center gap-6 lg:gap-0 lg:gap-y-0  mb-6 lg:mb-0'>
           <div className='flex flex-col items-center gap-1'>
@@ -375,7 +375,7 @@ const handleRemoveProfilePic = async () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className='text-primary-600 text-xs md:text-sm lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px]  font-inter font-medium hover:underline'
+              className='text-primary-600 dark:text-white text-xs md:text-sm lg:text-[9px] 2xl:text-[13px] 3xl:text-[15px]  font-inter font-medium hover:underline'
             >
               Upload a new photo.
             </button>
@@ -392,7 +392,7 @@ const handleRemoveProfilePic = async () => {
         <hr className='border-t border-gray-300 mb-4 md:mb-6 lg:mb-0 2xl:mb-4' />
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
-          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name *</label>
+          <label className='text-primary-600 dark:text-white font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name *</label>
           <input
             type="text"
             value={firstName}
@@ -402,7 +402,7 @@ const handleRemoveProfilePic = async () => {
               setFirstNameError(!value.trim())
             }}
             placeholder='First name'
-            className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
+            className={`border rounded-sm bg-gray-50 text-primary-600 dark:text-white dark:bg-transparent w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${firstNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
           {firstNameError && (
             <span className='text-red-500 text-xs font-inter'>First name is required</span>
@@ -410,7 +410,7 @@ const handleRemoveProfilePic = async () => {
         </div>
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1 2xl:mt-3 '>
-          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name *</label>
+          <label className='text-primary-600 dark:text-white font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name *</label>
           <input
             type="text"
             value={lastName}
@@ -419,7 +419,7 @@ const handleRemoveProfilePic = async () => {
               setLastName(value)
               setLastNameError(!value.trim())
             }}            placeholder='Last name'
-            className={`border rounded-sm bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
+            className={`border rounded-sm bg-gray-50 text-primary-600 dark:text-white dark:bg-transparent w-full px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 focus:outline-none focus:border-primary-600 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px] ${lastNameError ? 'border-red-500' : 'border-gray-300'}`}
           />
           {lastNameError && (
             <span className='text-red-500 text-xs font-inter'>Last name is required</span>
@@ -427,20 +427,20 @@ const handleRemoveProfilePic = async () => {
         </div>
 
         <div className='flex flex-col gap-1 mb-4 md:mb-6 2xl:mt-3'>
-          <label className='text-primary-600 font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
+          <label className='text-primary-600 dark:text-white font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
           <div className='flex flex-row gap-2 items-stretch'>
             <input
               aria-label='Email'
               type="text"
               value={maskEmail(email)}
               readOnly
-              className='border border-gray-300 rounded-sm bg-gray-50 text-primary-600 flex-1 px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 cursor-not-allowed opacity-70 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'
+              className='border border-gray-300 rounded-sm bg-gray-50 text-primary-600 dark:text-white dark:bg-transparent flex-1 px-4 py-2 lg:py-0 2xl:py-1 3xl:py-2 cursor-not-allowed opacity-70 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'
             />
             <button
               onClick={() => setActiveTab('changeEmail')}
               className='bg-primary-600 text-white px-2 md:px-6 rounded-md font-inter font-medium text-xs md:text-base
               shadow-[0_2px_4px_rgba(0,0,0,0.25)] lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]
-              hover:bg-white hover:text-primary-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.3)]
+              hover:bg-white hover:text-primary-600 dark:text-white hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.3)]
               transition-all duration-300 whitespace-nowrap uppercase'
             >
               Change
@@ -492,12 +492,12 @@ const handleRemoveProfilePic = async () => {
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setShowLogoutModal(false)} />
             <div className="relative bg-white rounded-xl shadow-xl p-8 w-80 text-center">
-              <h2 className="text-xl font-bold text-primary-600 font-roboto mb-2">Logout</h2>
+              <h2 className="text-xl font-bold text-primary-600 dark:text-white font-roboto mb-2">Logout</h2>
               <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
               <div className="flex gap-4">
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                  className="flex-1 border-2 border-primary-600 font-roboto text-primary-600 dark:text-white font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200"
                 >
                   Cancel
                 </button>

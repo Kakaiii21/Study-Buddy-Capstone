@@ -137,7 +137,7 @@ return (
       )}
 
       <div className='flex flex-col md:flex-row  lg:flex-row md:items-center lg:items-center w-full gap-3 mb-6'>
-        <p className='text-2xl md:ml-16 text-center lg:ml-0 md:text-4xl lg:text-3xl font-semibold text-primary-600 uppercase font-inter lg:text-start'>
+        <p className='text-2xl md:ml-16 text-center lg:ml-0 md:text-4xl lg:text-3xl font-semibold text-primary-600 dark:text-white uppercase font-inter lg:text-start'>
           Change Email 
         </p>
       </div>
@@ -146,10 +146,10 @@ return (
       {waitingForVerification ? (
         <div className='flex flex-col items-center justify-center mt-20 gap-4 text-center'>
           <div className='w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin' />
-          <p className='text-primary-600 font-roboto text-lg font-semibold'>
+          <p className='text-primary-600 dark:text-white font-roboto text-lg font-semibold'>
             Waiting for email verification...
           </p>
-          <p className='text-primary-600 font-roboto text-sm opacity-70'>
+          <p className='text-primary-600 dark:text-white font-roboto text-sm opacity-70'>
             Click the link in your new email. You'll be signed out and redirected to login automatically.
           </p>
         </div>
@@ -158,36 +158,36 @@ return (
           <div className='w-full my-8 mt-1'>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Current Password *</p>
+              <p className='text-primary-600 dark:text-white font-normal font-inter bg-transparent text-md lg:text-[18px]'>Current Password *</p>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Enter current password'
                 autoComplete="new-password"
-                className='border font-inter font-light border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
+                className='border font-inter font-light border-primary-600 bg-white dark:bg-transparent text-primary-600 dark:text-white w-full px-5 py-2 rounded-md'
               />
             </div>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>New Email *</p>
+              <p className='text-primary-600 dark:text-white font-normal font-inter bg-transparent text-md lg:text-[18px]'>New Email *</p>
               <input
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder='Enter new email'
-                className='border border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
+                className='border border-primary-600 bg-white dark:bg-transparent text-primary-600 dark:text-white w-full px-5 py-2 rounded-md'
               />
             </div>
 
             <div className='flex flex-col gap-2 mt-6'>
-              <p className='text-primary-600 font-normal font-inter text-md lg:text-[18px]'>Confirm New Email *</p>
+              <p className='text-primary-600 dark:text-white font-normal font-inter bg-transparent text-md lg:text-[18px]'>Confirm New Email *</p>
               <input
                 type="email"
                 value={confirmEmail}
                 onChange={(e) => setConfirmEmail(e.target.value)}
                 placeholder='Confirm new email'
-                className='border border-primary-600 bg-white text-primary-600 w-full px-5 py-2 rounded-md'
+                className='border border-primary-600 bg-white dark:bg-transparent text-primary-600 dark:text-white w-full px-5 py-2 rounded-md'
               />
             </div>
             <hr className='w-full border-t border-primary-700 mb-6 mt-5' />
@@ -195,7 +195,7 @@ return (
             <div className='flex flex-row justify-center md:justify-end gap-4 mt-4'>
               <button
                 onClick={handleCancel}
-                className='border border-primary-600 text-primary-600 p-2 px-4 text-sm rounded-md font-inter uppercase'
+                className='border border-primary-600 text-primary-600 dark:text-white p-2 px-4 text-sm rounded-md font-inter uppercase'
               >
                 Cancel
               </button>
