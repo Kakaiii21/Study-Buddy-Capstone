@@ -45,9 +45,9 @@ const maskEmail = (em: string) => {
 return (
       <div className='w-full px-4 md:px-16 lg:px-5 xl:px-7 2xl:px-9 3xl:px-11 py-6 lg:py-0 '>
 
-        <h1 className='text-primary-600  font-semibold font-inter text-xl md:text-2xl lg:text-[20px] xl:text-[28px] 2xl:text-[30px] 3xl:text-[35px] mb-4 md:mb-6 lg:mb-0 xl:mb-2 2xl:mb-3 3xl:mb-6'>Password</h1>
-    <h1 className='text-primary-600 font-semibold font-inter mt-5 md:mt-12 lg:mt-2 xl:mt-2 2xl:mt-2 text-center text-xl md:text-2xl lg:text-[18px] xl:text-[20px] uppercase 2xl:text-[30px] mb-4 md:mb-6 lg:mb-2 2xl:mb-5'>Change Password</h1>
-    <p className='text-primary-600 text-sm text-center font-inter font-normal lg:text-[12px] 2xl:text-[15px] 3xl:text-[17px] mb-6 lg:mb-2'>
+        <h1 className='text-primary-600 dark:text-white  font-semibold font-inter text-xl md:text-2xl lg:text-[20px] xl:text-[28px] 2xl:text-[30px] 3xl:text-[35px] mb-4 md:mb-6 lg:mb-0 xl:mb-2 2xl:mb-3 3xl:mb-6'>Password</h1>
+    <h1 className='text-primary-600 dark:text-white font-semibold font-inter mt-5 md:mt-12 lg:mt-2 xl:mt-2 2xl:mt-2 text-center text-xl md:text-2xl lg:text-[18px] xl:text-[20px] uppercase 2xl:text-[30px] mb-4 md:mb-6 lg:mb-2 2xl:mb-5'>Change Password</h1>
+    <p className='text-primary-600 dark:text-white text-sm text-center font-inter font-normal lg:text-[12px] 2xl:text-[15px] 3xl:text-[17px] mb-6 lg:mb-2'>
       We'll send a password reset link to your registered email.
     </p>
 
@@ -56,13 +56,13 @@ return (
 
     {/* Email */}
     <div className='flex flex-col  lg:mx-2 2xl:mx-16 3xl:mx-28 gap-1 mb-6 mt-5 md:mt-12 lg:mt-8 xl:mt-10 2xl:mt-20'>
-      <label className='text-primary-600 font-inter text-sm  md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
+      <label className='text-primary-600 dark:text-white font-inter text-sm  md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Email</label>
       <input
         aria-label='email'
         type="email"
         value={maskEmail(currentEmail)}
         readOnly
-        className='border border-gray-300 rounded-md bg-gray-50 text-primary-600 w-full px-4 py-2 lg:py-1 cursor-not-allowed opacity-70 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'
+        className='border border-gray-300 rounded-md bg-transparent bg-gray-50 text-primary-600 dark:text-white w-full px-4 py-2 lg:py-1 cursor-not-allowed opacity-70 text-sm md:text-base lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'
       />
     </div>
 
