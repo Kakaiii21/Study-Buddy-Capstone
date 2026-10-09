@@ -66,7 +66,7 @@ function ForgotPassword() {
   const canSend = !loading && cooldown === 0
 
   return (
-    <div className='h-screen w-full'>
+    <div className='h-screen w-full bg-white'>
       <div className='flex flex-row  mt-3 ml-5'>
               <button
                 title="Go Back to Account"
@@ -101,7 +101,7 @@ function ForgotPassword() {
               onChange={(e) => { setEmail(e.target.value); setError('') }}
               onKeyDown={(e) => e.key === 'Enter' && canSend && sendResetLink()}
               placeholder='Enter your email'
-              className='w-full px-3 py-2 border text-md lg:text-xs 2xl:text-xl 3xl:text-2xl border-primary-600 rounded-md focus:outline-none'
+              className='w-full px-3 bg-white py-2 border text-md lg:text-xs 2xl:text-xl 3xl:text-2xl border-primary-600 rounded-md focus:outline-none'
             />
           </div>
         </div>

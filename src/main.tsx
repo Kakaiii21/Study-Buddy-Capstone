@@ -42,14 +42,24 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault()
   setInstallPrompt(e)
 })
-registerSW({ immediate: true })
-// Prevent stale-cache blank screens: when a new service worker takes
+registerSW({
+  immediate: true,
+  onRegisteredSW(_url, reg) {
+    if (!reg) return
+    const check = () => reg.update().catch(() => {})
+    setInterval(check, 30 * 60 * 1000)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') check()
+    })
+  },
+})// Prevent stale-cache blank screens: when a new service worker takes
 // control mid-session, the in-memory page may reference old build
 // assets that no longer exist in the new precache. Force one clean
 // reload to resync — guarded so it can only fire once per page load.
+const hadController = !!navigator.serviceWorker.controller
 let refreshing = false
 navigator.serviceWorker.addEventListener('controllerchange', () => {
-  if (refreshing) return
+  if (!hadController || refreshing) return
   refreshing = true
   window.location.reload()
 })
