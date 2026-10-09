@@ -9,6 +9,7 @@ import { useCourseFiles } from '../hooks/useCourseFiles'
 import type { User } from 'firebase/auth'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useTour } from '../hooks/useTour'
+import { useTheme, type Theme } from '../context/ThemeContext'
 
 
 interface UploadedFile {
@@ -100,7 +101,7 @@ function CoursePicker({
     <div className='fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center z-50'>
       <div className='bg-white rounded-lg shadow-2xl w-[95%] 2xl:w-[600px] 3xl:w-[720px] 2xl:h-[500px] 3xl:h-[600px] max-w-xl 3xl:max-w-2xl flex flex-col max-h-[80vh] overflow-hidden'>
         <div className='flex items-center justify-between px-6 3xl:px-8 py-4 3xl:py-5 bg-primary-600 rounded-t-lg'>
-          <p className='text-white font-roboto font-bold text-sm lg:text-xs 2xl:text-lg 3xl:text-2xl uppercase'>
+          <p className=' dark:text-white text-white font-roboto font-bold text-sm lg:text-xs 2xl:text-lg 3xl:text-2xl uppercase'>
             {selectedCourse ? selectedCourse.name : 'Choose a Folder'}
           </p>
           <button onClick={onClose} className='text-white font-bold text-sm lg:text-xs 2xl:text-lg 3xl:text-2xl hover:opacity-70'>✕</button>
@@ -110,7 +111,7 @@ function CoursePicker({
           {!selectedCourseId && (
             <>
               {courses.length === 0 ? (
-                <p className='text-gray-400 font-roboto text-center py-10 3xl:text-lg'>
+                <p className='  text-gray-400 font-roboto text-center py-10 3xl:text-lg'>
                   No folders found. Create one in the My Files page first.
                 </p>
               ) : (
@@ -128,7 +129,7 @@ function CoursePicker({
                       onContextMenu={(e) => e.preventDefault()}
                       draggable={false}
                     />
-                      <p className='font-roboto font-bold text-primary-600 text-sm 3xl:text-lg text-center truncate w-full'>{course.name}</p>
+                      <p className='  font-roboto font-bold text-primary-600 text-sm 3xl:text-lg text-center truncate w-full'>{course.name}</p>
                     </button>
                   ))}
                 </div>
@@ -146,9 +147,9 @@ function CoursePicker({
               </button>
 
               {loading ? (
-                <p className='text-gray-400 font-roboto text-center py-10 3xl:text-lg'>Loading files...</p>
+                <p className='  text-gray-400 font-roboto text-center py-10 3xl:text-lg'>Loading files...</p>
               ) : files.length === 0 ? (
-                <p className='text-gray-400 font-roboto text-center py-10 3xl:text-lg'>No files in this folder.</p>
+                <p className='  text-gray-400 font-roboto text-center py-10 3xl:text-lg'>No files in this folder.</p>
               ) : (
                 <div className='flex flex-col gap-2 3xl:gap-3'>
                   {files
@@ -170,8 +171,8 @@ function CoursePicker({
                           className='w-10 h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                         />
                         <div className='flex-1 min-w-0'>
-                          <p className='font-roboto font-semibold text-primary-600 text-sm 3xl:text-lg truncate'>{file.fileName}</p>
-                          <p className='font-roboto text-gray-400 text-xs 3xl:text-sm'>{file.fileSize}</p>
+                          <p className='  font-roboto font-semibold text-primary-600 text-sm 3xl:text-lg truncate'>{file.fileName}</p>
+                          <p className='  font-roboto text-gray-400 text-xs 3xl:text-sm'>{file.fileSize}</p>
                         </div>
                         <span className='text-primary-600 font-bold text-lg 3xl:text-2xl'>+</span>
                       </button>
@@ -180,7 +181,7 @@ function CoursePicker({
               )}
 
               {files.length > 0 && files.filter((f) => allowed.includes(f.fileType)).length === 0 && (
-                <p className='text-gray-400 font-roboto text-center py-10 text-sm 3xl:text-lg'>
+                <p className=' dark:text-white text-gray-400 font-roboto text-center py-10 text-sm 3xl:text-lg'>
                   No supported files (PDF, DOC, DOCX, PPT, PPTX, TXT) found in this folder.
                 </p>
               )}
@@ -193,8 +194,24 @@ function CoursePicker({
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
+const localBtnIcon: Record<Theme, string> = {
+  light: '/Localbtn.png',
+  dark: '/Localbtn-dark.png',
+  warm: '/Localbtn-warm.png',
+}
 
+const coursesBtnIcon: Record<Theme, string> = {
+  light: '/Coursesbtn.png',
+  dark: '/Coursesbtn-dark.png',
+  warm: '/Coursesbtn-warm.png',
+}
 function StudyGenerator() {
+  const { theme } = useTheme()
   const navigate = useNavigate()
   const { user } = useAuth()
   const { courses, loading: coursesLoading } = useCourses(user)
@@ -495,15 +512,15 @@ useEffect(() => {
     () => setTourPreview(false)
   )
   return (
-    <div className='flex h-screen'>
+  <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]'>
       <div className='lg:p-3 '>
         <Sidebar />
       </div>
       <div className='flex-1 flex flex-col overflow-hidden'>
 
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Study Generator</p>
+<div className='lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-1 py-3 bg-white warm:bg-[#FBF1E8] dark:bg-[#0A0F15] dark:text-white shadow-sm gap-2'>
+          <p className=' dark:text-white warm:text-[#623627] absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Study Generator</p>
           <button
             id='tour-btn'
             onClick={() => startTour()}
@@ -511,15 +528,15 @@ useEffect(() => {
               hover:opacity-80 active:scale-95 transition-all'
             title='Take a Tour'
           >
-            <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-            </div>
-            <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-          </button>
+<div className='w-9 h-9 flex items-center justify-center'>
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
+  </button>
         </div>
         <main className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 3xl:px-14 3xl:pt-0 pt-1">
           <div className="min-h-screen  w-full flex flex-col">
-            <p className='hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:-ml-8 3xl:-ml-12
+            <p className=' dark:text-white hidden lg:flex justify-center lg:justify-start w-full lg:pl-3 2xl:-ml-8 3xl:-ml-12
             font-inter font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase
             mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-4 '>Study Generator</p>
             {/* Header */}
@@ -531,10 +548,10 @@ useEffect(() => {
 
             {/* Body */}
             <div className='h-full flex flex-col justify-start items-center'>
-              <p className='mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
+              <p className=' dark:text-white mt-1 text-xl md:text-4xl lg:text-lg 2xl:text-3xl 3xl:text-5xl text-center text-primary-600 font-roboto font-bold'>
                 Make your own Quiz/Flashcard Now!
               </p>
-              <p className='mt-2 lg:mt-0 xl:mt-1 2xl:mt-2 3xl:mt-3 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
+              <p className=' dark:text-white mt-2 lg:mt-0 xl:mt-1 2xl:mt-2 3xl:mt-3 text-xs lg:text-[10px] 2xl:text-lg 3xl:text-xl text-center text-primary-600 font-roboto'>
                 Generate your own quiz or flashcards by uploading a file.
               </p>
 
@@ -576,13 +593,19 @@ useEffect(() => {
               <hr className='w-72 mt-10 lg:mt-2 md:w-[500px] lg:w-[450px] 2xl:w-[650px] 3xl:w-[800px]  md:mt-10  mx-auto border-t border-primary-600 mb-1 md:mb-0' />
               {/* File Source Panel */}
               <div className='flex flex-col justify-center mt-2 md:mt-5 lg:mt-0 gap-1 items-center w-full max-w-[800px] 3xl:max-w-[1000px]  px-6 py-1'>
-                <p className='text-sm lg:text-[14px] 2xl:text-lg 3xl:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10 lg:mb-1 2xl:mt-3'>
+                <p className=' dark:text-white text-sm lg:text-[14px] 2xl:text-lg 3xl:text-2xl md:text-xl text-primary-600 font-bold font-fustat mb-2 md:mb-10 lg:mb-1 2xl:mt-3'>
                   Choose where to access your files
                 </p>
 
                 <div className='flex flex-row  w-full justify-center items-center gap-2 md:gap-10 lg:gap-5 2xl:gap-10 3xl:gap-14 mt-4 lg:mt-2 2xl:mt-3'>
-                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                    <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Localbtn.png' alt='localbtnicon' />
+                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 dark:border-white warm:border-[#623627] rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
+<img
+  className='w-16 h-16 md:w-32 md:h-32 lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}
+  src={localBtnIcon[theme]}
+  alt='localbtnicon'
+/>
                     <button
                       id='localFilesBtn'
                       onClick={() => { setFileError(''); setSuggestedMax(null); fileInputRef.current?.click() }}
@@ -593,15 +616,21 @@ useEffect(() => {
                     </button>
                   </div>
 
-                  <p className='flex-shrink-0 text-center lg:mt-10 text-primary-600 lg:text-sm 2xl:text-lg 3xl:text-2xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
+                  <p className=' dark:text-white flex-shrink-0 text-center lg:mt-10 text-primary-600 lg:text-sm 2xl:text-lg 3xl:text-2xl md:text-xl md:mt-16 font-bold font-fustat'>or</p>
 
-                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
-                    <img className='w-16 h-16 md:w-32 md:h-32  lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} src='Coursesbtn.png' alt='coursesbtnicon' />
+                  <div className='flex-shrink-0 flex flex-col gap-3 justify-start items-center border-2 md:border-2  border-primary-600 dark:border-white warm:border-[#623627] rounded-xl md:rounded-lg px-7 lg:px-2 lg:py-5 2xl:px-6 3xl:px-10 py-4 3xl:py-10 md:px-12 md:py-8 '>
+<img
+  className='w-16 h-16 md:w-32 md:h-32 lg:w-20 lg:h-20 2xl:w-28 2xl:h-28 3xl:w-36 3xl:h-36 select-none'
+  onContextMenu={(e) => e.preventDefault()}
+  draggable={false}
+  src={coursesBtnIcon[theme]}
+  alt='coursesbtnicon'
+/>
                     <button
                       id='courseFilesBtn'
                       onClick={() => { setFileError(''); setSuggestedMax(null); setShowCoursePicker(true) }}
                       disabled={coursesLoading || isGenerating || !isOnline}
-                      className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800  rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
+                      className='bg-[#FEE248] disabled:bg-[#B0A030] lg:h-5 lg:w-28 2xl:w-32 2xl:h-7 3xl:w-40 3xl:h-9 w-24 md:w-44 text-xs text-primary-800 dark:border-white warm:border-[#623627] rounded-md md:text-xl lg:text-[10px] 2xl:text-sm 3xl:text-base font-roboto font-bold px-3 py-1 md:px-5 md:py-2 lg:mx-4 hover:bg-primary-800 hover:text-white flex items-center justify-center'
                     >
                       {coursesLoading ? 'Loading...' : 'My Files'}
                     </button>
@@ -620,13 +649,13 @@ useEffect(() => {
                 {uploadedFile && (
                   <div
                     ref={generateSectionRef}
-                    className='w-full mt-2 flex items-center justify-between gap-2 bg-white bg-opacity-90 border border-primary-600 rounded-md px-4 py-3 lg:py-1 3xl:px-6 3xl:py-4'
+                    className='w-full mt-2 flex items-center justify-between gap-2 bg-transparent dark:border-white warm:border-[#623627] bg-opacity-90 border border-primary-600 rounded-md px-4 py-3 lg:py-1 3xl:px-6 3xl:py-4'
                   >
                     <div className='flex items-center gap-2 min-w-0'>
                       <img src={fileIconSrc} alt={uploadedFile.type} className='w-10 h-10 lg:w-7 2xl:w-10 lg:h-7 2xl:h-10 3xl:w-14 3xl:h-14 object-contain flex-shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                       <div className='min-w-0 max-w-[180px] lg:max-w-[200px] 2xl:max-w-[180px] 3xl:max-w-[260px]'>
-                        <p className='font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
-                        <p className='font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
+                        <p className=' dark:text-white font-roboto font-bold text-primary-600 text-sm lg:text-[12px] 3xl:text-lg truncate'>{uploadedFile.name}</p>
+                        <p className=' dark:text-white font-roboto text-gray-400 lg:text-[10px] text-xs 3xl:text-sm'>
                           {uploadedFile.size} · from {uploadedFile.source === 'local' ? 'Local' : 'My Files'}
                         </p>
                       </div>
@@ -644,7 +673,7 @@ useEffect(() => {
               </div>
 
               {fileError && (
-                <p className='mt-1 text-red-500 text-sm lg:text-[10px] 3xl:text-base font-roboto text-center'>{fileError}</p>
+                <p className=' dark:text-white mt-1 text-red-500 text-sm lg:text-[10px] 3xl:text-base font-roboto text-center'>{fileError}</p>
               )}
 
               {suggestedMax && (
@@ -659,10 +688,10 @@ useEffect(() => {
                 </button>
               )}
 
-              <p className='mt-6 lg:mt-2 2xl:mt-6 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
+              <p className=' dark:text-white mt-6 lg:mt-2 2xl:mt-6 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
                 <i><strong>Reminder:</strong> All files generated by Study Buddy may not be 100% accurate.</i>
               </p>
-              <p className='mt-0 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
+              <p className=' dark:text-white mt-0 text-center text-[9px] lg:text-[9px] 2xl:text-sm 3xl:text-base md:text-sm text-primary-600 leading-tight'>
                 <i>Users are advised to review the generated files before proceeding. Thank you.</i>
               </p>
               {(uploadedFile || tourPreview) && (
@@ -671,7 +700,7 @@ useEffect(() => {
                     <button
                       id='quizTabBtn'
                       className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl
-                      ${activeTab === 'quiz' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
+                      ${activeTab === 'quiz' ? 'bg-primary-600 text-white dark:bg-[#657084] warm:bg-[#623627] warm:border-[#623627]' : 'text-primary-600 hover:bg-primary-600  warm:text-[#623627] warm:hover:opacity-40 dark:text-white dark:border-white warm:border-[#623627] hover:text-white'}`}
                       onClick={() => setActiveTab('quiz')}
                       disabled={isGenerating}
                     >
@@ -679,7 +708,8 @@ useEffect(() => {
                     </button>
                     <button
                       id='flashcardTabBtn'
-                      className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl                      ${activeTab === 'flashcard' ? 'bg-primary-600 text-white' : 'text-primary-600 hover:bg-primary-600 hover:text-white'}`}
+                      className={`border-primary-600 border font-roboto font-bold min-w-32 3xl:min-w-40 py-1 3xl:py-2 rounded-md uppercase transition lg:text-xs 2xl:text-lg 3xl:text-xl             
+                     ${activeTab === 'flashcard' ? 'bg-primary-600 text-white dark:bg-[#657084] warm:bg-[#623627] warm:border-[#623627]' : 'text-primary-600 hover:bg-primary-600  warm:text-[#623627] warm:hover:opacity-40 dark:text-white dark:border-white warm:border-[#623627] hover:text-white'}`}
                       onClick={() => setActiveTab('flashcard')}
                       disabled={isGenerating}
                     >
@@ -690,7 +720,7 @@ useEffect(() => {
                   <div className='mt-2 2xl:mt-5 w-full max-w-xl flex flex-row gap-3 justify-center items-center'>
 <select
   id='itemsSelect'
-  className='w-52 3xl:w-64 border border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
+  className='w-52 3xl:w-64 border bg-transparent dark:border-white warm:border-[#623627] dark:bg-white warm:border-[#623627] border-primary-600 text-primary-600 font-bold font-fustat rounded-md text-center lg:text-xs 2xl:text-[16px] 3xl:text-lg 2xl:mx-5 py-1 3xl:py-2 px-2'
   aria-label='Select Number of Items'
   value={selectItems}
   onChange={(e) => {
@@ -700,7 +730,7 @@ useEffect(() => {
   }}
   disabled={isGenerating}
 >
-  <option value='' disabled>Select number of items</option>
+  <option value=''  disabled>Select number of items</option>
   {visibleItems.map((item) => (
     <option key={item} value={item}>{item}</option>
   ))}
@@ -708,7 +738,7 @@ useEffect(() => {
 
                     <button
                       id='randomItemsBtn'
-                      className='sm:w-auto  flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md lg:text-xs 2xl:text-2xl 3xl:text-3xl 2xl:py-2 3xl:py-3 px-4 3xl:px-6 py-1'
+                      className='sm:w-auto  flex items-center justify-center dark:border-white warm:border-[#623627] dark:border  gap-2 bg-primary-600 hover:bg-primary-500 transition rounded-md lg:text-xs 2xl:text-2xl 3xl:text-3xl 2xl:py-2 3xl:py-3 px-4 3xl:px-6 py-1'
                       onClick={() => {
                         setSelectItems(items[Math.floor(Math.random() * items.length)])
                         setFileError('')
@@ -716,7 +746,7 @@ useEffect(() => {
                       disabled={isGenerating}
                     >
                       <img src='/RandomIcon.png' alt='Random' className='w-6 h-6 lg:w-5 lg:h-5 3xl:w-8 3xl:h-8 object-contain select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-                      <span className='text-white uppercase text-sm 3xl:text-lg font-semibold font-roboto'>Random</span>
+                      <span className='text-white  uppercase text-sm 3xl:text-lg font-semibold font-roboto'>Random</span>
                     </button>
                   </div>
 
@@ -746,7 +776,7 @@ useEffect(() => {
           </div>
           <button
             id='tour-btn'
-            onClick={() => startTour()}
+            onClick={() => startTour(                             )}
             className='hidden lg:flex fixed bottom-6 right-6 z-50
             flex-col items-center gap-1
             hover:opacity-80 active:scale-95 transition-all
@@ -754,11 +784,11 @@ useEffect(() => {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-            </div>
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
-              font-inter font-semibold'>Need Help?</p>
-          </button>
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            </div>  
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
+              font-inter font-semibold'>Need Help?</p>         
+           </button>
 
         </main>
       </div>

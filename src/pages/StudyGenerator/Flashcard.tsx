@@ -187,8 +187,8 @@ function Flashcard() {
       <main className='flex-1 w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0 lg:p-2 lg:pt-2 pt-1'>
 
         {/* ── Mobile Header ── */}
-        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
-          <p className='text-center font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Flashcard</p>
+        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-transparent mt-2 '>
+          <p className='text-center font-inter mt-4  warm:text-[#623627] font-semibold text-xl text-[#B3B3B3] uppercase'>Flashcard</p>
           {result.fileName && (
             <p className='text-center font-inter mt-3 font-semibold text-xs uppercase'>from: {result.fileName}</p>
           )}
@@ -210,14 +210,14 @@ function Flashcard() {
         </div>
         </div>
 
-        <p className='text-center text-gray-400 font-roboto text-sm lg:text-xs 2xl:text-lg lg:mb-2 mb-6'>
+        <p className='text-center warm:text-[#623627] text-gray-400 font-roboto text-sm lg:text-xs 2xl:text-lg lg:mb-2 mb-6'>
           Click a card to flip it and reveal the term.
         </p>
 
-        <div className='flex flex-col lg:mx-20 gap-8 lg:gap-2 2xl:gap-4 md:mx-10'>
+        <div className='flex flex-col  lg:mx-20 gap-8 lg:gap-2 2xl:gap-4 md:mx-10'>
           {cards.map((card, index) => (
-            <div key={index} className='flex justify-center'>
-              <div className='perspective w-full max-w-md lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl relative'>
+            <div key={index} className='flex justify-center '>
+              <div className='perspective  w-full max-w-md lg:max-w-xl xl:max-w-3xl 2xl:max-w-4xl relative'>
 
             {/* ── Menu Button ── */}
             <div className='absolute top-3 right-3 z-20'>
@@ -256,18 +256,18 @@ function Flashcard() {
 
                 {/* ── Edit Mode ── */}
                 {editIndex === index && editDraft ? (
-                  <div className='w-full border-2 border-primary-600 rounded-xl px-5 py-5 flex flex-col gap-3 bg-white'>
-                    <label className='text-xs text-gray-500 font-roboto'>Term</label>
+                  <div className='w-full border-2 border-primary-600 rounded-xl px-5 py-5 flex flex-col gap-3 bg-transparent dark:border-white'>
+                    <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Term</label>
                     <input
-                      className='border border-gray-300 rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
+                      className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
                       value={editDraft.term}
                       onChange={(e) => setEditDraft({ ...editDraft, term: e.target.value })}
                       aria-label='Edit term'
                     />
 
-                    <label className='text-xs text-gray-500 font-roboto'>Definition</label>
+                    <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Definition</label>
                     <textarea
-                      className='border border-gray-300 rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600 resize-none'
+                      className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600 resize-none'
                       rows={3}
                       value={editDraft.definition}
                       onChange={(e) => setEditDraft({ ...editDraft, definition: e.target.value })}
@@ -298,7 +298,7 @@ function Flashcard() {
 >
   {/* FRONT — now shows the definition */}
   <div className='absolute w-full h-full backface-hidden flex items-center justify-center
-    bg-primary-600 border-2 border-primary-600 rounded-xl px-5'>
+    bg-primary-600 dark:bg-transparent dark:border-white warm:bg-[#623627] warm:border-[#623627] border-2 border-primary-600 rounded-xl px-5'>
     <div className='flex flex-col text-center'>
       <p className='text-white font-inter text-xl lg:text-lg font-bold'>{card.definition}</p>
       <p className='text-white font-inter text-sm lg:text-xs mt-1'>Click to view term</p>
@@ -307,8 +307,8 @@ function Flashcard() {
 
   {/* BACK — now shows the term */}
   <div className='absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center
-    bg-white border-2 border-primary-600 rounded-xl px-5'>
-    <p className='text-primary-600 text-center font-medium uppercase'>{card.term}</p>
+    bg-white dark:bg-[#BFC7D4] warm:bg-transparent warm:border-[#623627] border-2 border-primary-600 rounded-xl px-5'>
+    <p className='text-primary-600  text-center font-medium uppercase'>{card.term}</p>
   </div>
 </div>
                 )}
@@ -324,7 +324,7 @@ function Flashcard() {
             >
               <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
-            <p className='text-xs md:text-sm font-semibold text-primary-600'>SAVE GENERATED</p>
+            <p className='text-xs dark:text-white  md:text-sm font-semibold text-primary-600'>SAVE GENERATED</p>
           </div>
 
           <div className='flex flex-row ml-auto gap-4 mb-10 lg:mt-2'>
@@ -415,7 +415,7 @@ function Flashcard() {
             <p className='text-xl font-bold text-primary-600 uppercase text-center font-roboto'>
               Finish Without Saving?
             </p>
-            <p className='text-sm text-gray-500 text-center'>
+            <p className='text-sm text-gray-500  text-center'>
               "Save Generated" is off. This flashcard set won't appear in your Generated History. Continue anyway?
             </p>
             <div className='flex gap-4 w-full'>

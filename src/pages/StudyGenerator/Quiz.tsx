@@ -329,8 +329,8 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
      </div>
       <main ref={mainRef} className='flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1'>
 
-        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
-          <p className=' text-center font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz</p>
+        <div className='lg:hidden flex flex-col items-center dark:bg-transparent warm:bg-transparent justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
+          <p className=' warm:text-[#623627] text-center font-inter mt-4 warm:text-[#623627] font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz</p>
           {result.fileName && (
             <p className=' text-center font-inter mt-3 font-semibold  text-xs uppercase'>from: {result.fileName}</p>
           )}
@@ -353,8 +353,8 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
         {submitted && (
           <div className='mb-6 px-6 py-4 
           lg:py-2 lg:rounded-lg lg:mb-3
-           bg-primary-50 border-2 border-primary-600 rounded-xl text-center'>
-            <p className='text-primary-600 font-roboto font-bold text-xl
+           bg-primary-50 border-2 border-primary-600 bg-transparent warm:border-[#623627] dark:text-white dark:border-white rounded-xl text-center'>
+            <p className='text-primary-600 font-roboto font-bold  text-xl dark:text-white
             lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
               Your Score: {finalScore} / {questions.length}
             </p>
@@ -366,10 +366,10 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
             <div
               key={qIndex}
               ref={(el) => void (questionRefs.current[qIndex] = el)}
-              className={`flex flex-col border-2 py-2 px-5 rounded-xl transition lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg ${getCardBorderStyle(qIndex)}`}
+              className={`flex flex-col border-2 dark:border-gray-400 warm:border-[#623627] py-2 px-5 rounded-xl transition lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg ${getCardBorderStyle(qIndex)}`}
             >
-              <div className='flex flex-row items-start gap-2 pt-5 w-full'>
-                <p className='flex-1 text-sm md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 font-bold font-roboto'>
+              <div className='flex flex-row items-start  gap-2 pt-5 w-full'>
+                <p className='flex-1 text-sm dark:text-white warm:text-[#623627] md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 font-bold font-roboto'>
                   {qIndex + 1}. {q.question}
                 </p>
 
@@ -383,7 +383,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                   <div className='relative ml-2'>
                     <button
                       onClick={() => setOpenMenuIndex(openMenuIndex === qIndex ? null : qIndex)}
-                      className='text-primary-600 hover:text-primary-800 text-3xl lg:text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl'
+                      className='text-primary-600 hover:text-primary-800 dark:text-white warm:text-[#623627]  dark:hover:text-gray-300 text-3xl lg:text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl'
                       title='EDIT/DELETE'
                     >
                       ⋮
@@ -479,7 +479,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                     return (
                       <label
                         key={oIndex}
-                        className={`flex items-center gap-3 border-2 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl rounded-lg px-3 py-2 transition
+                        className={`flex items-center gap-3 dark:text-white warm:text-[#623627] dark:bg-transparent  dark:border-[#4E5669] warm:border-[#623627] border-2 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl rounded-lg px-3 py-2 transition
                           ${getOptionStyle(qIndex, letter)}
                           ${submitted ? 'cursor-default' : 'cursor-pointer'}`}
                       >
@@ -487,7 +487,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                           type='radio'
                           name={`question${qIndex}`}
                           value={letter}
-                          className='w-4 h-4'
+                          className='w-4 h-4 '
                           disabled={submitted}
                           checked={selected[qIndex] === letter}
                           onChange={() => {
@@ -497,7 +497,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                           }}
                           aria-label={letter}
                         />
-                        <span className='text-xs md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
+                        <span className='text-xs md:text-xl dark:text-white warm:text-[#623627] lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
                           {letter}) {option}
                         </span>
                       </label>
@@ -523,7 +523,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
               >
                 <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
               </button>
-              <p className='text-xs md:text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-semibold text-primary-600'>SAVE GENERATED</p>
+              <p className='text-xs md:text-sm dark:text-white warm:text-[#623627] lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-semibold text-primary-600'>SAVE GENERATED</p>
             </div>
           )}
 
