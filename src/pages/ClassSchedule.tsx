@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useClassSched, type MeetingInput } from '../hooks/useClassSched'
 import { useCategories } from '../hooks/useCategories'
 import { useTour } from '../hooks/useTour'
+import { useTheme, type Theme } from '../context/ThemeContext'
+
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   itemName: string
@@ -66,7 +68,7 @@ function ClearScheduleModal({ onConfirm, onCancel }: { onConfirm: () => void; on
       <div className='bg-white rounded-2xl lg:rounded-lg shadow-2xl p-6 lg:p-3 xl:p-3 2xl:p-4 3xl:p-5 w-80  lg:w-[250px] xl:w-[280px] 2xl:w-[350px] 3xl:w-[420px]'>
         <div className='flex items-center gap-3 xl:gap-2 2xl:gap-3  mb-1 2xl:mb-2 3xl:mb-3 '>
           <img src="/delete.png" alt="delete icon" className='w-5 h-5 xl:w-5 xl:h-5 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
-          <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800'>Clear All Schedules?</h2>
+          <h2 className='text-sm pt-2 lg:text-xs xl:text-sm 2xl:text-[16px] 3xl:text-[20px] lg:pt-2 font-bold text-gray-800 '>Clear All Schedules?</h2>
         </div>
         <p className='text-sm lg:text-[10px] xl:text-[12px] 2xl:text-[15px] 3xl:text-[18px]  text-gray-500 mb-1 3xl:mb-3'>
           This will  delete{' '}
@@ -208,7 +210,14 @@ const MIN_GAP_MINUTES = 0
 
 const MIN_DURATION_MINUTES = 15
 
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
+
 function ClassSchedule() {
+  const { theme } = useTheme()
   const { user } = useAuth()
   const { schedules, loading, addClass, updateClass, deleteSchedule } = useClassSched(user)
   const { categories, addCategory } = useCategories(user)
@@ -438,7 +447,7 @@ const DayCard = ({ day }: { day: string }) => {
     return (
       <div id='scheduleGrid'
       className='flex flex-col   mt-2 pb-2 bg-primary-800
-        rounded-lg 3xl:mt-5
+        rounded-lg 3xl:mt-5 dark:bg-[#222631] warm:bg-[#623627]
       border border-white/10
         hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]
         transition-all duration-300
@@ -447,11 +456,11 @@ const DayCard = ({ day }: { day: string }) => {
         <div className='space-y-1 2xl:space-y-2 2xl:px-2  pb-2'>
           {daySchedules.length > 0 ? (
             daySchedules.map((s) => (
-              <div key={s.id} className='bg-white px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
+              <div key={s.id} className='bg-white dark:bg-[#4E5669] px-2 lg:px-2  mx-2 mb-1 mt-1 rounded-sm relative'>
                 <div className='flex flex-row 3xl:py-2  items-center pt-1 gap-2'>
                   <p
                     title={s.subject}
-                    className='min-w-0 flex-1 truncate text-[12px] leading-tight md:text-[12px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'
+                    className='min-w-0 flex-1 dark:text-white truncate text-[12px] leading-tight md:text-[12px] lg:text-[11px] xl:text-[12px] 2xl:text-[13px] 3xl:text-[20px] font-roboto font-bold text-primary-600'
                   >
                     {s.subject}
                   </p>
@@ -494,7 +503,7 @@ const DayCard = ({ day }: { day: string }) => {
 
                 <p
                   title={`${formatTime(s.timeStart)} - ${formatTime(s.timeEnd)} — ${s.room} [ ${s.roomType} ]`}
-                  className='truncate text-[10px] leading-tight md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '
+                  className='truncate text-[10px] dark:text-white leading-tight md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[11px] 3xl:text-[16px] font-roboto text-primary-600 '
                 >
                   {formatTime(s.timeStart)} - {formatTime(s.timeEnd)} — {s.room} [ {s.roomType} ]
                 </p>
@@ -524,7 +533,7 @@ const DayCard = ({ day }: { day: string }) => {
   !meetings[0].room.trim() &&
   !meetings[0].roomType
   return (
-      <div className='flex h-screen'>
+  <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]'>
         {/* Sidebar */}
         <div className='lg:p-3 '>
        <Sidebar /> 
@@ -532,20 +541,20 @@ const DayCard = ({ day }: { day: string }) => {
         <div className='flex-1  flex flex-col overflow-hidden'>
 
         {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Class Schedule</p>
-            <button
-            id='tour-btn'
-              onClick={() => startTour()}
-              className='flex flex-col items-center gap-1 ml-auto pt-3
-              hover:opacity-80 active:scale-95 transition-all'
-              title='Take a Tour'
-            >
-              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}   />
-              </div>
-              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-            </button>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#0A0F15] warm:bg-[#FBF1E8]  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl dark:text-white text-[#B3B3B3] uppercase'>Class Schedule</p>
+  <button
+    id='tour-btn'
+    onClick={() => startTour()}
+    className='flex flex-col items-center gap-1 ml-auto pt-3
+    hover:opacity-80 active:scale-95 transition-all'
+    title='Take a Tour'
+  >
+<div className='w-9 h-9 flex items-center justify-center'>
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
+  </button>
         </div>
         
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
@@ -574,7 +583,7 @@ const DayCard = ({ day }: { day: string }) => {
                     hover:opacity-90 w-auto
                     backdrop-blur-xs
                     hover:-translate-y-1 
-                    hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)]
+                    hover:shadow-[0_2px_5px_rgba(0,0,0,0.5)] warm:bg-[#F9D5C6]
                     transition-all duration-300 uppercase
                     disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
                   >
@@ -587,7 +596,7 @@ const DayCard = ({ day }: { day: string }) => {
                   className="bg-[#FEE248]  uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                   py-1 px-4 rounded-sm 
                   flex items-center gap-1.5
-                  font-inter font-black
+                  font-inter font-black warm:bg-[#FBD79A]
                   text-[10px] lg:text-[9px]
                   xl:text-[12px] 2xl:text-[14px]
                   3xl:text-[18px]
@@ -639,7 +648,7 @@ const DayCard = ({ day }: { day: string }) => {
                         <input
                           type='text'
                           placeholder='Enter Subject'
-                          className={`py-2 px-3 rounded-lg border border-gray-300 text-sm w-full ${errClass('subjectName')}`}
+                          className={`py-2 px-3 rounded-lg border border-gray-300 dark:bg-white text-sm w-full ${errClass('subjectName')}`}
                           value={subjectName}
                           onChange={(e) => {
                             setSubjectName(e.target.value)
@@ -661,11 +670,11 @@ const DayCard = ({ day }: { day: string }) => {
                         )}
                       </div>
                       <div className='flex-1 flex flex-col'>
-                        <label className='text-xs font-semibold text-gray-500 mb-1'>Teacher / Instructor *</label>
+                        <label className='text-xs font-semibold text-gray-500 mb-1 '>Teacher / Instructor *</label>
                         <input
                           type='text'
                           placeholder='Enter Teacher/Instructor Name'
-                          className={`py-2 px-3 rounded-lg border border-gray-300 text-sm w-full ${errClass('instructor')}`}
+                          className={`py-2 px-3 rounded-lg border border-gray-300  dark:bg-white text-sm w-full ${errClass('instructor')}`}
                           value={instructor}
                           onChange={(e) => setInstructor(e.target.value)}
                         />
@@ -706,7 +715,7 @@ const DayCard = ({ day }: { day: string }) => {
                                     aria-label='Select Day'
                                     value={row.day}
                                     onChange={(e) => updateMeetingRow(row.key, 'day', e.target.value)}
-                                    className={`border rounded-md border-gray-300 text-xs px-1 py-1 w-full ${rowErrClass(row.key, 'day')}`}
+                                    className={`border rounded-md  dark:bg-white border-gray-300 text-xs px-1 py-1 w-full ${rowErrClass(row.key, 'day')}`}
                                   >
                                     <option value='' disabled>Day</option>
                                     {days.map((day) => <option key={day} value={day}>{day}</option>)}
@@ -744,7 +753,7 @@ const DayCard = ({ day }: { day: string }) => {
                                 <input
                                   aria-label='Time Start'
                                   type='time'
-                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeStart')}`}
+                                  className={`text-xs rounded-md border dark:bg-white border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeStart')}`}
                                   value={row.timeStart}
                                   onChange={(e) => updateMeetingRow(row.key, 'timeStart', e.target.value)}
                                 />
@@ -756,7 +765,7 @@ const DayCard = ({ day }: { day: string }) => {
                                 <input
                                   aria-label='Time End'
                                   type='time'
-                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeEnd')}`}
+                                  className={`text-xs rounded-md border dark:bg-white border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'timeEnd')}`}
                                   value={row.timeEnd}
                                   onChange={(e) => updateMeetingRow(row.key, 'timeEnd', e.target.value)}
                                 />
@@ -768,7 +777,7 @@ const DayCard = ({ day }: { day: string }) => {
                                 <input
                                   type='text'
                                   placeholder='Room'
-                                  className={`text-xs rounded-md border border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'room')}`}
+                                  className={`text-xs rounded-md border dark:bg-white border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'room')}`}
                                   value={row.room}
                                   onChange={(e) => updateMeetingRow(row.key, 'room', e.target.value)}
                                 />
@@ -781,7 +790,7 @@ const DayCard = ({ day }: { day: string }) => {
                                   aria-label='Select Room Type'
                                   value={row.roomType}
                                   onChange={(e) => updateMeetingRow(row.key, 'roomType', e.target.value)}
-                                  className={`border rounded-md border-gray-300 text-xs px-2 py-1 w-full ${rowErrClass(row.key, 'roomType')}`}
+                                  className={`border rounded-md border-gray-300  dark:bg-white text-xs px-2 py-1 w-full ${rowErrClass(row.key, 'roomType')}`}
                                 >
                                   <option value='' disabled>Type</option>
                                   {typeRoom.map((room) => <option key={room} value={room}>{room}</option>)}
@@ -919,9 +928,9 @@ const DayCard = ({ day }: { day: string }) => {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}  />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
            </button>
       </main>
