@@ -88,15 +88,15 @@ function QuizView() {
 
       <main className='flex-1  w-full overflow-auto p-2 px-5 md:px-7 md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2  pt-1'>
 
-        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-white mt-2 '>
-          <p className=' text-center font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz Review</p>
+        <div className='lg:hidden flex flex-col items-center justify-center px-4 sm:px-6 py-2 bg-transparent mt-2 '>
+          <p className=' text-center font-inter mt-4 warm:text-[#623627] font-semibold text-xl text-[#B3B3B3] uppercase'>Quiz Review</p>
           <p className=' text-center font-inter mt-3 font-semibold  text-xs uppercase'>from: {fileName}</p>
           
           
         </div>
         {/* Header */}
-<div className='flex flex-col md:flex-row lg:items-center w-full gap-3 mb-6  mt-4 lg:mt-0'>
-  <div className='hidden lg:flex lg:items-center justify-between w-full lg:pl-0
+<div className='flex flex-col  md:flex-row lg:items-center w-full gap-3 mb-6  mt-4 lg:mt-0'>
+  <div className='hidden lg:flex  lg:items-center justify-between w-full lg:pl-0
     mt-2 md:mt-4 lg:mt-1 xl:mt-2 2xl:mt-3'>
     <p className='font-inter font-semibold text-sm md:text-md lg:text-[10px]  xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
       Quiz Review
@@ -112,13 +112,14 @@ function QuizView() {
         {/* Score Banner */}
         <div className='mb-6 px-6 py-4 
         lg:py-2 lg:rounded-lg lg:mb-3
-         bg-primary-50 border-2 border-primary-600 rounded-xl flex flex-row justify-between items-center'>
-          <p className='text-primary-600 font-roboto font-bold text-lg 
+         bg-primary-50 dark:bg-transparent warm:bg-transparent border-2 border-primary-600 dark:border-white warm:border-[#623627] 
+rounded-xl flex flex-row justify-between items-center'>
+          <p className='text-primary-600 dark:text-white  font-roboto font-bold text-lg 
           md:text-xl 
           lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
             Score: {score} / {total}
           </p>
-          <p className='text-primary-600 font-roboto font-bold text-lg 
+          <p className='text-primary-600 dark:text-white  font-roboto font-bold text-lg 
           md:text-xl 
           lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'>
             Mistakes: {total - score}
@@ -129,11 +130,11 @@ function QuizView() {
         <div className='flex flex-row gap-4 mb-6 px-1'>
           <div className='flex items-center gap-2'>
             <div className='w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-[18px] 2xl:h-[18px] 3xl:w-5 3xl:h-5 rounded border-2 border-green-500 bg-green-50' />
-            <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Correct answer</span>
+            <span className='text-xs lg:text-[10px] dark:text-white xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Correct answer</span>
           </div>
           <div className='flex items-center gap-2'>
             <div className='w-4 h-4 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 2xl:w-[18px] 2xl:h-[18px] 3xl:w-5 3xl:h-5 rounded border-2 border-red-400 bg-red-50' />
-            <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Wrong answer</span>
+            <span className='text-xs lg:text-[10px] dark:text-white xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Wrong answer</span>
           </div>
         </div>
 
@@ -147,18 +148,18 @@ function QuizView() {
               <div
                 key={qIndex}
                 className={`flex flex-col border-2 py-2 px-5  rounded-xl ${
-                  isCorrect ? 'border-primary-600 lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg' : 'border-red-400 lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'
+                  isCorrect ? 'border-primary-600 warm:border-[#623627] lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg' : 'border-red-400 lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg'
                 }`}
               >
                 <div className='flex flex-row items-start gap-2 pt-5 w-full'>
-                  <p className='flex-1 text-sm md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 font-bold font-inter'>
+                  <p className='flex-1 text-sm dark:text-white warm:text-[#623627] md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg text-primary-600 font-bold font-inter'>
                     {qIndex + 1}. {q.question}
                   </p>
                   {!isCorrect && (
-                    <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-red-400 font-roboto whitespace-nowrap '>Wrong</span>
+                    <span className='text-xs lg:text-[10px] xl:text-xs warm:text-[#623627] 2xl:text-sm 3xl:text-base text-red-400 font-roboto whitespace-nowrap '>Wrong</span>
                   )}
                   {isCorrect && (
-                    <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-green-500 font-roboto whitespace-nowrap '>Correct</span>
+                    <span className='text-xs lg:text-[10px] xl:text-xs warm:text-[#623627] 2xl:text-sm 3xl:text-base text-green-500 font-roboto whitespace-nowrap '>Correct</span>
                   )}
                 </div>
 
@@ -168,7 +169,7 @@ function QuizView() {
                     return (
                       <div
                         key={oIndex}
-                        className={`flex items-center gap-3 border-2 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl rounded-lg px-1 py-1 cursor-default ${getOptionStyle(qIndex, letter)}`}
+                        className={`flex items-center gap-3 warm:text-[#623627] warm:border-[#623627] border-2 lg:text-sm xl:text-base 2xl:text-lg 3xl:text-xl rounded-lg px-1 py-1 cursor-default ${getOptionStyle(qIndex, letter)}`}
                       >
                         <span className='w-4 h-4' />
                         <span className='text-xs md:text-xl lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-inter'>
