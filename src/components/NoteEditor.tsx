@@ -247,10 +247,10 @@ return (
         ${readOnly ? '' : 'border-2 border-primary-600'}`}
     >
       {!readOnly && (
-        <div className='flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-gray-200 bg-gray-50 overflow-x-auto shrink-0'>
-          <select
+<div className='flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-gray-200 bg-gray-50 shrink-0'>
+            <select
             title='Text style'
-            className='text-sm border rounded px-1.5 py-1 mr-1 text-primary-800 shrink-0'
+            className='text-sm border rounded px-1.5 py-1 mr-1 text-primary-800 dark:bg-white shrink-0'
             onChange={(e) => {
               const val = e.target.value
               if (val === 'p') editor.chain().focus().setParagraph().run()

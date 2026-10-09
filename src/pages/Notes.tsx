@@ -7,6 +7,7 @@ import { useTour } from '../hooks/useTour'
 import NoteEditor from '../components/NoteEditor'
 import { useCategories, type Category } from '../hooks/useCategories'
 import { useAutosaveNote } from '../hooks/useAutosaveNote'
+import { useTheme, type Theme } from '../context/ThemeContext'
 
 // Notes are stored as HTML (from the rich-text editor). This converts them to
 // plain text for card previews and .txt downloads.
@@ -107,8 +108,13 @@ function DiscardNoteModal({ onConfirm, onCancel }: {
     </div>
   )
 }
-
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
 function Notes() {
+    const { theme } = useTheme()
   const { user } = useAuth()
   const { notes, loading, addNote, updateNote, deleteNote } = useNotes(user)
   const { categories, addCategory, deleteCategory } = useCategories(user)
@@ -119,6 +125,8 @@ function Notes() {
   const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState<Category | null>(null)
   const [confirmDownload, setConfirmDownload] = useState<Note | null>(null)
   const [cancelConfirm, setCancelConfirm] = useState(false)
+
+
 
   const { startTour } = useTour(
     'notes',
@@ -348,14 +356,14 @@ function Notes() {
 
 
   return (
-    <div className='flex h-screen'>
-      <div className='lg:p-3 '>
+  <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]'>
+          <div className='lg:p-3 '>
         <Sidebar />        
       </div>
       
  {/* Top App Bar — mobile only */}
-<div className='lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-1 py-3 bg-white shadow-sm gap-2'>
-  <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>
+<div className='lg:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-1 py-3 bg-white warm:bg-[#FBF1E8] dark:bg-[#0A0F15] dark:text-white shadow-sm gap-2'>
+  <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase warm:text-[#623627]'>
     Notes
   </p>
   <button
@@ -365,10 +373,10 @@ function Notes() {
     hover:opacity-80 active:scale-95 transition-all'
     title='Take a Tour'
   >
-    <div className='bg-white w-9 h-9 rounded-full flex items-center justify-center text-2xl font-bold'>
-      <img src="/needhelp.png" alt="?" className='w-9 block mx-auto select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
-    </div>
-    <p className='text-[9px] text-primary-600 font-inter font-medium'>Need Help?</p>
+<div className='w-9 h-9 flex items-center justify-center'>
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
   </button>
 </div>
 
@@ -383,7 +391,7 @@ function Notes() {
 
               <div className='hidden lg:flex flex-col items-end w-full pl-3 pr-2
                 mt-2 md:mt-4 lg:-mt-1 xl:mt-0 2xl:mt-0 gap-2'>
-                <p className='self-start font-inter  font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
+                <p className='self-start font-inter   font-semibold text-sm md:text-md lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[16px] text-[#B3B3B3] uppercase'>
                   Notes
                 </p>
 
@@ -395,16 +403,16 @@ function Notes() {
                     placeholder='Search'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64    border-primary-800 rounded-md
+                    className="w-64    border-primary-800 warm:border-[#623627] rounded-md
                       py-2 pl-3 pr-8  text-md
                       text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
-                      font-inter text-primary-800 border-2 placeholder:text-primary-800
+                      font-inter text-primary-800 border-2 placeholder:text-primary-800  dark:text-white dark:bg-[#657084]  dark:placeholder:text-white
                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
                       transition-all duration-200"
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 dark:text-white pointer-events-none"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -416,7 +424,7 @@ function Notes() {
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery('')}
-                      className='absolute right-8 top-1/2 -translate-y-1/2 text-primary-600 font-bold'
+                      className='absolute right-8 top-1/2 -translate-y-1/2 text-primary-600 font-bold '
                     >
                       ✕
                     </button>
@@ -434,11 +442,11 @@ function Notes() {
                     placeholder='Search'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className='w-full border-2 border-primary-800 rounded-md py-3 pl-4 pr-10  text-sm font-inter text-primary-800 placeholder:text-primary-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200'
+                    className='w-full border-2 border-primary-800 warm:border-[#623627] rounded-md py-3 pl-4 pr-10  dark:bg-[#657084] dark:text-white dark:placeholder:text-white text-sm font-inter text-primary-800 placeholder:text-primary-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all duration-200'  
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-800 pointer-events-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-800 pointer-events-none  dark:text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -462,7 +470,7 @@ function Notes() {
                     id='addSubjectBtnMobile'
                     aria-label='add Sub'
                     onClick={openSubjectModal}
-                    className='flex-shrink-0 h-12 w-12 flex items-center justify-center bg-[#FEE248] text-primary-800 font-bold rounded-md'
+                    className='flex-shrink-0 h-12 w-12 flex items-center justify-center bg-[#FEE248] dark:bg-transparent dark:border-white dark:border dark:text-white  text-primary-800 font-bold rounded-md'
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <line x1="12" y1="5" x2="12" y2="19" />
@@ -474,7 +482,7 @@ function Notes() {
                     <button
                     id='subjectDropdown'
                       onClick={() => setIsDropdownOpen((prev) => !prev)}
-                      className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm'
+                      className='flex justify-between items-center w-full border-2 border-primary-600 rounded-md px-4 py-3 text-primary-600 font-bold text-sm dark:bg-white'
                     >
                       <span className='truncate'>{selectedSubject === 'All Categories' ? 'All Categories' : selectedSubject}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -532,7 +540,7 @@ function Notes() {
                   </div>
                 </div>
               </div>
-              <hr className=' lg:hidden w-full border-t lg:mt-6 lg:mb-6 border-2 my-3 ' />
+              <hr className=' lg:hidden w-full border-t lg:mt-6 lg:mb-6 border-2 my-3  warm:border-[#623627]' />
 
 
               {loading ? (
@@ -548,7 +556,7 @@ function Notes() {
                     shadow-[0_3px_5px_rgba(0,0,0,.5)]
                     hover:opacity-80 w-36 lg:w-44 h-36 lg:h-44 
                     hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
-                    items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-2xl text-black'
+                    items-center justify-center  px-12 py-10 lg:mt-3  rounded-xl bg-[#FEE248] dark:bg-transparent dark:border-white dark:border dark:text-white font-bold font-roboto text-2xl text-black'
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <line x1="12" y1="5" x2="12" y2="19" />
@@ -563,7 +571,7 @@ function Notes() {
                     shadow-[0_3px_5px_rgba(0,0,0,.5)]
                     hover:opacity-80 w-36  2xl:w-52 2xl:h-44  lg:mr-8 2xl:mr-0 3xl:mr-4
                     hover:shadow-[2_10px_4px_rgba(0,0,0,1)]
-                    items-center justify-center  px-12 py-8 lg:mt-3  rounded-xl bg-[#FEE248] font-bold font-roboto text-7xl text-black'
+                    items-center justify-center  px-12 py-8 lg:mt-3  rounded-xl bg-[#FEE248]  dark:bg-transparent dark:border-white dark:border dark:text-white font-bold font-roboto text-7xl text-black'
                   >
                     +
                   </button>
@@ -574,10 +582,10 @@ function Notes() {
                       id='notesGrid'
                       key={note.id}
                       onClick={() => openViewModal(note)}
-                      className='relative bg-white border-2 border-primary-800  rounded-xl p-5 w-full lg:w-44  lg:min-h-44  2xl:w-52 3xl:w-56 2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
+                      className='relative bg-white border-2 dark:bg-[#657084] border-primary-800 warm:border-[#623627]  rounded-xl p-5 w-full lg:w-44  lg:min-h-44  2xl:w-52 3xl:w-56 2xl:min-h-48 flex flex-col  cursor-pointer hover:shadow-md transition-shadow'
                     >
                       <div className='flex justify-between items-center'>
-                        <p className='font-bold text-primary-600 text-sm lg:text-md truncate flex-1'>{note.title}</p>
+                        <p className='font-bold text-primary-600 dark:text-white text-sm lg:text-md truncate flex-1'>{note.title}</p>
                         <div
                           className='relative ml-2'
                           data-note-menu
@@ -594,7 +602,7 @@ function Notes() {
                           </button>
 
                           {openMenuId === note.id && (
-                            <div className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
+                            <div className='absolute right-0 top-full mt-1 bg-white border  border-gray-200 rounded-lg shadow-lg z-50 w-36 py-1'>
                               <button
                                 onClick={() => { openEditModal(note); setOpenMenuId(null) }}
                                 className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-primary-50 font-semibold'
@@ -620,11 +628,11 @@ function Notes() {
                         </div>
                       </div>
 
-                      <hr className='border-t border-primary-600 my-2' />
-                      <p className='text-sm text-gray-600 line-clamp-3 flex-1'>{htmlToPlainText(note.content)}</p>
+                      <hr className='border-t border-primary-600 my-2 dark:border-white' />
+                      <p className='text-sm text-gray-600 line-clamp-3 flex-1 dark:text-white'>{htmlToPlainText(note.content)}</p>
                       <div className='flex justify-between items-center mt-3'>
-                        <p className='text-xs text-primary-400 font-semibold truncate'>{note.subject}</p>
-                        <p className='text-xs text-gray-400 shrink-0 ml-2'>
+                        <p className='text-xs dark:text-white text-primary-400 font-semibold truncate'>{note.subject}</p>
+                        <p className='text-xs dark:text-white text-gray-400 shrink-0 ml-2'>
                           {new Date(note.createdAt).toLocaleDateString('en-US', {
                             month: 'long', day: 'numeric', year: 'numeric',
                           })}
@@ -650,7 +658,7 @@ function Notes() {
                     aria-label='add Sub'
                     onClick={openSubjectModal}
                     className='flex-shrink-0 w-full flex items-center shadow-[0_3px_5px_rgba(0,0,0,.5)]
- text-xs justify-center h-10 bg-[#FEE248] text-primary-800 font-bold  rounded-md'
+ text-xs justify-center h-10 bg-[#FEE248]  text-primary-800 font-bold  rounded-md dark:bg-transparent dark:border-white dark:border dark:text-white'
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <line x1="12" y1="5" x2="12" y2="19" />
@@ -666,8 +674,8 @@ function Notes() {
   onClick={() => setSelectedSubject('All Categories')}
   className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
     ${selectedSubject === 'All Categories'
-      ? 'bg-primary-600 text-white border-primary-600'
-      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
+      ? 'bg-primary-600 text-white border-primary-600 warm:bg-[#623627] warm:border-[#623627] dark:bg-[#4E5669]  hover:opacity-50 '
+      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50 dark:bg-[#657084]'}`}
 >
   All Categories
 </button>
@@ -676,8 +684,8 @@ function Notes() {
   onClick={() => setSelectedSubject('Uncategorized')}
   className={`w-full text-left px-3 py-2 rounded-md text-sm lg:text-md font-bold border-2 transition-colors
     ${selectedSubject === 'Uncategorized'
-      ? 'bg-primary-600 text-white border-primary-600'
-      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50'}`}
+      ? 'bg-primary-600 text-white border-primary-600 warm:bg-[#623627] warm:border-[#623627] dark:bg-[#4E5669]  hover:opacity-50'
+      : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50 dark:bg-[#657084]'}`}
 >
   Uncategorized
 </button>
@@ -688,8 +696,8 @@ function Notes() {
                       key={index}
                       className={`flex items-center justify-between px-3 py-2 rounded-md border-2 transition-colors
                         ${selectedSubject === subject
-                          ? 'bg-primary-600 border-primary-600'
-                          : 'bg-white border-primary-600 hover:bg-primary-50'}`}
+                          ? 'bg-primary-600 text-white border-primary-600 warm:bg-[#623627] warm:border-[#623627] dark:bg-[#4E5669]  hover:opacity-50'
+                          : 'bg-white text-primary-600 border-primary-600 hover:bg-primary-50 dark:bg-[#657084]'}`}
                     >
                       <button
                         onClick={() => setSelectedSubject(subject)}
@@ -782,7 +790,7 @@ function Notes() {
         Add A Category Name
       </p>
       <input
-        className={`w-full border-2 rounded-md px-3 py-3 transition-colors
+        className={`w-full border-2 rounded-md px-3 py-3 transition-colors dark:bg-white
           ${subjectError ? 'border-red-400 bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300' : 'border-primary-600'}`}
         type='text'
         placeholder='Enter Category Name'
@@ -889,10 +897,10 @@ will be removed. Notes tagged with this category will be moved to <span classNam
               >
 
                 {/* ── MOBILE layout ── */}
-                <div className='lg:hidden flex flex-col flex-1 p-6 pt-4'>
+                <div className='lg:hidden flex flex-col flex-1 p-6 pt-4 dark:bg-[#0A0F15] '>
                   <div className='flex justify-between items-start gap-2 mb-2'>
                     <input
-                      className='flex-1 min-w-0 text-primary-600 text-2xl font-bold placeholder:text-gray-300 border-b-2 border-primary-200 py-2 focus:outline-none read-only:cursor-default'
+                      className='flex-1 min-w-0 text-primary-600 text-2xl font-bold dark:bg-transparent dark:text-white placeholder:text-gray-300 border-b-2 border-primary-200 py-2 focus:outline-none read-only:cursor-default'
                       type='text'
                       placeholder='Untitled'
                       value={displayTitle}
@@ -901,7 +909,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       autoFocus={!isReadOnly}
                     />
                     {isReadOnly ? (
-                      <p className='text-sm text-right text-primary-600 font-semibold pt-2 shrink-0 max-w-[120px] truncate'>{displaySubject}</p>
+                      <p className='text-sm text-right text-primary-600  dark:bg-white font-semibold pt-2 shrink-0 max-w-[120px] truncate'>{displaySubject}</p>
                     ) : (
                       <select
                         aria-label='Select category'
@@ -909,7 +917,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                         onChange={(e) => handleFieldChange({ subject: e.target.value })}
                         className='shrink-0 max-w-[100px] border-2
                         
-                        
+                         dark:bg-white 
                         border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-sm'
                       >
   <option value='Uncategorized'>Uncategorized</option>
@@ -971,10 +979,10 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                 </div>
 
                 {/* ── DESKTOP layout ── */}
-                <div className='hidden lg:flex flex-col flex-1 min-h-0 py-10 lg:py-3 px-5 relative'>
+                <div className='hidden lg:flex flex-col flex-1 min-h-0 py-10 lg:py-3 px-5 relative dark:bg-black dark:border-white dark:border'>
                     <div className='flex justify-between items-center gap-1 mb-0'>
                     <input
-                      className='min-w-20 py-2 text-primary-600 text-2xl font-bold placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
+                      className='min-w-20 py-2 text-primary-600 text-2xl font-bold dark:bg-black dark:text-white dark:placeholder:text-white placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
                       type='text'
                       placeholder='Untitled'
                       maxLength={24}
@@ -984,13 +992,13 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       autoFocus={!isReadOnly}
                     />
                     {isReadOnly ? (
-                      <p className='text-primary-600 font-bold text-xl px-2 py-2'>{displaySubject}</p>
+                      <p className='text-primary-600 font-bold text-xl px-2 py-2 dark:bg-black dark:text-white dark:placeholder:text-white'>{displaySubject}</p>
                     ) : (
 <select
   aria-label='Select category'
   value={displaySubject}
   onChange={(e) => handleFieldChange({ subject: e.target.value })}
-  className='shrink-0 max-w-[130px] border-2 border-primary-600 rounded-md px-2 py-2 text-primary-600 font-semibold text-xs'
+  className='shrink-0 max-w-[130px] border-2 border-primary-600 rounded-md px-2 py-2 dark:bg-white text-primary-600 font-semibold text-xs'
 >
   <option value='Uncategorized'>Uncategorized</option>
   {allSubjects.map((subject, index) => (
@@ -1000,7 +1008,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                     )}
                   </div>
 
-                  <p className='text-sm text-primary-600 mb-2'>{modalTime.date} — {modalTime.time}</p>
+                  <p className='text-sm text-primary-600 dark:text-white mb-2'>{modalTime.date} — {modalTime.time}</p>
                   <hr className='w-full border-t border-primary-600 mb-2' />
 
 <NoteEditor
@@ -1066,9 +1074,9 @@ will be removed. Notes tagged with this category will be moved to <span classNam
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
            </button>
         </div>
