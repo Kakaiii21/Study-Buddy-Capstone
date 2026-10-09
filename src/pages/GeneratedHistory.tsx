@@ -6,6 +6,10 @@ import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useFlashcardHistory } from '../hooks/useFlashcardHistory'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useTour } from '../hooks/useTour'
+import { useTheme, type Theme } from '../context/ThemeContext'
+
+
+
 function formatDate(date: Date): string {
   return date.toLocaleString('en-US', {
     month: '2-digit',
@@ -95,8 +99,14 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
   )
 }
 
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
 
 function GeneratedHistory() {
+    const { theme } = useTheme()
 
 
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
@@ -192,8 +202,8 @@ function GeneratedHistory() {
       <div className='flex-1 flex flex-col overflow-hidden'>
 
               {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Generated History</p>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-transparent  top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute warm:text-[#623627] left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-md text-[#B3B3B3] uppercase'>Generated History</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -201,11 +211,11 @@ function GeneratedHistory() {
               hover:opacity-80 active:scale-95 transition-all'
               title='Take a Tour'
             >
-              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-              </div>
-              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-            </button>
+<div className='w-9 h-9 flex items-center justify-center'>
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
+  </button>
         </div>
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0  pt-1">
         <div className="min-h-screen  w-full flex flex-col">
@@ -219,11 +229,11 @@ function GeneratedHistory() {
               value={selectedGen}
               aria-label='Generation Type'
               onChange={(e) => { setSelectedGen(e.target.value); setSearchQuery('') }}
-              className='w-40 border border-primary-800 rounded-md
+              className='w-40 border border-primary-800 rounded-md  dark:bg-white 
               px-3 py-2 lg:py-1.5 xl:py-2 lg:rounded-sm 3xl:w-52 md:py-2
               text-[10px] lg:text-[12px] xl:text-[13px] 2xl:text-[14px] 3xl:text-[19px]
               font-roboto text-primary-600
-              focus:outline-none focus:ring-1 focus:ring-primary-600 bg-white cursor-pointer'
+              focus:outline-none focus:ring-1 focus:ring-primary-600 bg-transparent cursor-pointer'
                 >
               {genOption.map((option) => (
                 <option key={option} value={option}>{option}</option>
@@ -238,15 +248,15 @@ function GeneratedHistory() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search"
                 className="w-full border border-primary-800 rounded-md
-                  py-2 pl-3 pr-8 
-                  text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[14px] 3xl:text-[17px]
+                  py-2 pl-3 pr-8 bg-transparent dark:border-white dark:text-white dark:placeholder:text-white
+                  text-[10px] lg:text-[8px]  xl:text-[10px] 2xl:text-[14px] 3xl:text-[17px]
                   font-inter text-primary-800 placeholder:text-primary-800
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
                   transition-all duration-200"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="absolute right-2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+                className="absolute right-2 w-3.5 h-3.5 dark:text-white lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -260,8 +270,8 @@ function GeneratedHistory() {
 
           {/* Recent label */}
           <div className='flex items-center  gap-3 mb-4 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5 '>
-            <p className='whitespace-nowrap lg:text-xs text-primary-600 font-semibold'>Recent</p>
-            <hr className='flex-1 border-t border-primary-100' />
+            <p className='whitespace-nowrap lg:text-xs text-primary-600 dark:text-white font-semibold'>Recent</p>
+            <hr className='flex-1 border-t warm:border-black border-primary-100' />
           </div>
           {!isOnline && (
               <div className='mb-4 px-4 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-xs text-yellow-700 font-roboto text-center'>
@@ -281,7 +291,7 @@ function GeneratedHistory() {
               {/* ── Quiz Table ── */}
               {selectedGen === 'Quiz' && (
                 <>
-                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
+                  <div  className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 dark:text-white warm:border-black lg:pb-2 border-b text-gray-500 warm:text-[#623627] text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                     <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Score</p>
                     <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
@@ -291,25 +301,25 @@ function GeneratedHistory() {
                   </div>
 
                   {filteredQuiz.length === 0 ? (
-                    <p className='text-gray-400 font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
+                    <p className='text-gray-400 warm:text-[#623627] font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
                   ) : (
                     filteredQuiz.map((item) => (
                       <div key={item.id} className='  py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
                         <div className='grid  grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-x-2 gap-y-0 items-center'>
                           <div className='min-w-0'>
-                            <p className='text-xs md:text-sm   lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
+                            <p className='text-xs dark:text-white md:text-sm   lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px]  font-semibold text-primary-600 break-all leading-tight'>
                               {item.fileName}
                             </p>
-                            <p className='text-xs  md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateTaken)}</p>
+                            <p className='text-xs warm:text-black md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateTaken)}</p>
                           </div>
-                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.score}</p>
-                          <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.total}</p>
+                          <p className='text-center text-sm dark:text-white md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.score}</p>
+                          <p className='text-center text-sm dark:text-white md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px]  text-primary-600'>{item.total}</p>
                           <div  className='flex justify-center'>
                             <img
                             id='viewBtn'
                               src='/View.png'
                               alt='View'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
+                              className='lg:w-4 lg:h-4 dark:brightness-0 dark:invert 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                               onClick={() => handleViewQuiz(item)}
                             />
                           </div>
@@ -318,7 +328,7 @@ function GeneratedHistory() {
                             id='retakeBtn'
                               src='/Retake.png'
                               alt='Retake'
-                              className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
+                              className='lg:w-4 lg:h-4 dark:brightness-0 dark:invert 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 cursor-pointer hover:opacity-70 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false}
                               onClick={() => handleRetakeQuiz(item)}
                             />
                           </div>
@@ -327,7 +337,7 @@ function GeneratedHistory() {
                           id='deleteBtn'
                             src='/delete.png'
                             alt='Delete'
-                            className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
+                            className={`lg:w-4 lg:h-4 dark:brightness-0 dark:invert 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6  w-5 h-5 transition select-none
                               ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}onContextMenu={(e) => e.preventDefault()} draggable={false}
                             onClick={() => isOnline
                               ? setPendingDelete({ id: item.id, name: item.fileName })
@@ -346,7 +356,7 @@ function GeneratedHistory() {
               {/* ── Flashcard Table ── */}
               {selectedGen === 'Flashcard' && (
                 <>
-<div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 border-b text-gray-500 text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
+<div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 pb-3 lg:pb-2 dark:text-white border-b  warm:border-black  text-gray-500 warm:text-[#623627] text-xs font-medium lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
   <p className='lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Name</p>
   <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>Items</p>
   <p className='text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px]'>View</p>
@@ -355,24 +365,24 @@ function GeneratedHistory() {
 </div>
 
                   {filteredFlashcard.length === 0 ? (
-                    <p className='text-gray-400 font-roboto text-center py-10'>No flashcard history found.</p>
+                    <p className='text-gray-400 font-roboto warm:text-[#623627]  text-center py-10'>No flashcard history found.</p>
                   ) : (
                     filteredFlashcard.map((item) => (
                       <div key={item.id} className=' py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
 <div className='grid grid-cols-[1.2fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-2 items-center'>
   <div className='min-w-0'>
-    <p className='text-xs md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px] font-semibold text-primary-600 break-all leading-tight'>
+    <p className='text-xs dark:text-white md:text-sm lg:text-[10px] xl:text-[11px] 2xl:text-[15px] 3xl:text-[17px] font-semibold text-primary-600 break-all leading-tight'>
       {item.fileName}
     </p>
-    <p className='text-xs md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateSaved)}</p>
+    <p className='text-xs warm:text-black  md:text-sm lg:text-[8px] xl:text-[9px] 2xl:text-[13px] 3xl:text-[15px] text-gray-400'>{formatDate(item.dateSaved)}</p>
   </div>
-  <p className='text-center text-sm md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
+  <p className='text-center text-sm dark:text-white md:text-base lg:text-[13px] xl:text-[14px] 2xl:text-[14px] 3xl:text-[18px] text-primary-600'>{item.total}</p>
   <div className='flex justify-center'>
     <img
       id='viewBtn'
       src='/View.png'
       alt='View'
-      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none'
+      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer dark:brightness-0 dark:invert hover:opacity-70 select-none'
       onContextMenu={(e) => e.preventDefault()} draggable={false}
       onClick={() => handleViewFlashcard(item)}
     />
@@ -382,7 +392,7 @@ function GeneratedHistory() {
       id='shuffleBtn'
       src='/Retake.png'
       alt='Shuffle'
-      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer hover:opacity-70 select-none'
+      className='lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 cursor-pointer dark:brightness-0 dark:invert hover:opacity-70 select-none'
       onContextMenu={(e) => e.preventDefault()} draggable={false}
       onClick={() => handleShuffleFlashcard(item)}
     />
@@ -392,7 +402,7 @@ function GeneratedHistory() {
       id='deleteBtn'
       src='/delete.png'
       alt='Delete'
-      className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 transition select-none
+      className={`lg:w-4 lg:h-4 2xl:w-5 2xl:h-5 3xl:w-6 3xl:h-6 w-5 h-5 transition dark:brightness-0 dark:invert select-none
         ${isOnline ? 'cursor-pointer hover:opacity-70' : 'opacity-30 cursor-not-allowed'}`}
       onContextMenu={(e) => e.preventDefault()} draggable={false}
       onClick={() => isOnline ? setPendingDelete({ id: item.id, name: item.fileName }) : undefined}
@@ -428,9 +438,9 @@ function GeneratedHistory() {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
            </button>
       </main>
