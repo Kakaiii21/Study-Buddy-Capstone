@@ -301,7 +301,7 @@ function GeneratedHistory() {
                   </div>
 
                   {filteredQuiz.length === 0 ? (
-                    <p className='text-gray-400 warm:text-[#623627] font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
+                    <p className='text-gray-400 warm:text-[#623627] dark:text-white font-roboto text-center lg:text-[9px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] py-10'>No quiz history found.</p>
                   ) : (
                     filteredQuiz.map((item) => (
                       <div key={item.id} className='  py-2 lg:py-1 2xl:py-2 3xl:py-3 lg:ml-3.5 xl:ml-3 2xl:ml-4 3xl:ml-5'>
