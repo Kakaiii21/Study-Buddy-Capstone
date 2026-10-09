@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useCourses, type CourseColor } from '../hooks/useCourses'
 import { useTour } from '../hooks/useTour'
+import { useTheme, type Theme } from '../context/ThemeContext'
+
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
   itemName: string
@@ -72,8 +74,16 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
   )
 }
 
+
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
+
 function Courses() {
   const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const { theme } = useTheme()
 
 useEffect(() => {
   const handleOnline = () => setIsOnline(true)
@@ -202,15 +212,15 @@ const filteredCourses = courses.filter((c) =>
   }
 
   return (
-    <div className='flex h-screen' onClick={() => setActiveMenu(null)}>
+    <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]' onClick={() => setActiveMenu(null)}>
       <div className='lg:p-3 '>
       <Sidebar />
       </div>
       <div className='flex-1 flex flex-col overflow-hidden'>
 
               {/* Top Bar — mobile only */}
-        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
-          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold text-xl text-[#B3B3B3] uppercase'>My Files</p>
+        <div className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]   top-0 left-0 right-0 z-10 relative'>
+          <p className='absolute left-1/2 -translate-x-1/2 font-inter mt-4 font-semibold  text-xl dark:text-white text-[#B3B3B3] uppercase'>My Files</p>
             <button
             id='tour-btn'
               onClick={() => startTour()}
@@ -218,11 +228,12 @@ const filteredCourses = courses.filter((c) =>
               hover:opacity-80 active:scale-95 transition-all'
               title='Take a Tour'
             >
-              <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-              </div>
-              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-            </button>
+              <div className='w-9 h-9 flex items-center justify-center'>
+
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
+  </button>
         </div>
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
         <div className="min-h-screen  w-full flex flex-col">
@@ -242,7 +253,7 @@ const filteredCourses = courses.filter((c) =>
           className="order-2 lg:order-1 bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
           py-2 lg:py-1.5 3xl:py-0.5 px-4 rounded-sm 
           flex items-center justify-center gap-2
-          font-inter font-black
+          font-inter font-black warm:bg-[#FBD79A]
           text-[10px] lg:text-[10px] md:ml-10
           xl:text-[13px] 2xl:text-[15px]
           3xl:text-[19px]
@@ -255,11 +266,11 @@ const filteredCourses = courses.filter((c) =>
           disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
           disabled:hover:translate-y-0 disabled:hover:shadow-none"            
         >
-            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3 2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+            <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3  2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             New Folder
             </button>
             {/* Search bar */}
-            <div className="relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
+            <div className="relative order-1 lg:order-2 flex items-center w-full  lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
               <input
                 id='courseSearchBar'
                 type="text"
@@ -269,7 +280,7 @@ const filteredCourses = courses.filter((c) =>
                 className="w-full border border-primary-800 rounded-md
                   py-2 pl-3 pr-8 
                   text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
-                  font-inter text-primary-800 placeholder:text-primary-800
+                  font-inter text-primary-800 placeholder:text-primary-800 dark:bg-white
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
                   transition-all duration-200"
               />
@@ -316,7 +327,7 @@ const filteredCourses = courses.filter((c) =>
   </div>
 ) : (
   filteredCourses.map((course) => (
-                  <div id='courseFolder' key={course.id} className='max-w-32 md:max-w-52   lg:max-w-[130px]  xl:max-w-[150px] 2xl:max-w-[180px]'>
+                  <div id='courseFolder' key={course.id} className='max-w-32 md:max-w-52    lg:max-w-[130px]  xl:max-w-[150px] 2xl:max-w-[180px]'>
                     <div className="relative">
                       <button
                         title={`Open ${course.name} Folder`}
@@ -370,7 +381,7 @@ const filteredCourses = courses.filter((c) =>
                       )}
                     </div>
 
-                    <p className='text-center  font-normal font-inter text-md md:text-2xl  lg:text-[14px] xl:text-[15px] 2xl:text-[16px] text-primary-600 truncate'>
+                    <p className='text-center dark:text-white  font-normal font-inter text-md md:text-2xl  lg:text-[14px] xl:text-[15px] 2xl:text-[16px] text-primary-600 truncate'>
                       {course.name}
                     </p>
                   </div>
@@ -400,7 +411,7 @@ const filteredCourses = courses.filter((c) =>
                   onChange={(e) => { setFolderName(e.target.value); setFolderError('') }}
                   onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                   placeholder='Enter folder name'
-                  className={`flex-1 border rounded-md px-2 py-1 text-xs font-roboto text-gray-800 focus:outline-none ${
+                  className={`flex-1 border rounded-md px-2 py-1 text-xs font-roboto dark:bg-white text-gray-800 focus:outline-none ${
                     folderError ? 'border-red-400' : 'border-gray-300'
                   }`}
                 />
@@ -509,9 +520,9 @@ const filteredCourses = courses.filter((c) =>
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
            </button>
       </main>

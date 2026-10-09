@@ -12,6 +12,8 @@ import { db } from '../services/firebase'
 import { STORAGE_LIMIT } from '../utils/fileUtils'
 import { useTour } from '../hooks/useTour'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
+import { useTheme, type Theme } from '../context/ThemeContext'
+
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
@@ -83,8 +85,16 @@ function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; 
   )
 }
 
+
+const needHelpIcon: Record<Theme, string> = {
+  light: '/needhelp.png',
+  dark: '/needhelp-dark.png',
+  warm: '/needhelp-warm.png',
+}
+
 function CourseFolder() {
   const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null)
+  const { theme } = useTheme()
 
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -348,10 +358,10 @@ if (file.size > MAX_FILE_SIZE) {
   const storageColor =
     storagePercent > 90 ? 'bg-red-500' :
     storagePercent > 70 ? 'bg-yellow-400' :
-    'bg-primary-600'
+    'bg-primary-600 dark:bg-[#4E5669] warm:bg-[#623627]'
 
   return (
-    <div className='flex h-screen' onClick={() => setActiveFileMenu(null)}>
+    <div className='flex h-screen bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]' onClick={() => setActiveFileMenu(null)}>
 
       <div className='hidden lg:block '>
       <div className='p-3 h-screen'>
@@ -363,7 +373,8 @@ if (file.size > MAX_FILE_SIZE) {
       <div className='flex-1  flex flex-col overflow-hidden'>
 
         {/* Top Bar — mobile only */}
-  <div  className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white  top-0 left-0 right-0 z-10 relative'>
+  <div  className='lg:hidden flex items-center justify-between px-4 sm:px-6 py-2 bg-white dark:bg-[#010409] warm:bg-[#FBF1E8]
+   top-0 left-0 right-0 z-10 relative'>
     <button
           id='goBackBtn-mobile'
           title="Go Back to My Files"
@@ -385,15 +396,15 @@ if (file.size > MAX_FILE_SIZE) {
       <button
       id='tour-btn'
         onClick={() => startTour()}
-        className='flex flex-col items-center gap-1 ml-auto pt-3
+        className='flex flex-col items-center gap-1 ml-auto pt-3 
         hover:opacity-80 active:scale-95 transition-all'
         title='Take a Tour'
       >
-        <div className='bg-white  pt-2 w-9 h-9 rounded-full  flex items-center justify-center text-2xl font-bold'>
-        <img src="/needhelp.png" alt="?" className='w-9 block mx-auto mt-1' />
-        </div>
-        <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium '>Need Help?</p>
-      </button>
+        <div className='w-9 h-9 flex items-center justify-center'>
+<img src={needHelpIcon[theme]} alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+</div>
+              <p className='text-[9px] text-primary-600 lg:text-primary-600 md:text-primary-600 xl:text-primary-600 2xl:text-primary-600 font-inter font-medium dark:text-white  warm:text-[#623627]'>Need Help?</p>
+  </button>
 )}
   </div>
       <main  className="flex-1  w-full  overflow-auto p-2 px-5 md:px-7  md:py-0 md:pt-0 py-0  lg:p-2 lg:pt-2 2xl:pt-0 2xl:px-10 pt-1">
@@ -419,7 +430,7 @@ if (file.size > MAX_FILE_SIZE) {
                   <p
                     title={folderName}
                     className="lg:w-[500px] xl:w-[600px] 2xl:w-[700px] 3xl:min-w-[800px] flex-1 truncate 
-                    text-3xl lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto"
+                    text-3xl lg:text-2xl md:text-4xl font-bold text-primary-600 uppercase font-roboto dark:text-white"
                   >
                   {folderName}
                 </p>
@@ -467,7 +478,7 @@ if (file.size > MAX_FILE_SIZE) {
                 disabled={uploading || isRestoredFolder || !isOnline}
                 className="bg-[#FEE248] uppercase drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] text-primary-800 
                 py-2 lg:py-1 px-4 rounded-sm
-                font-inter font-black
+                font-inter font-black warm:bg-[#FBD79A]
                 disabled:bg-[#B0A030]
                 disabled:hover:flex-none
                 text-[10px] lg:text-[10px]
@@ -513,7 +524,7 @@ if (file.size > MAX_FILE_SIZE) {
             )}
             <p className='text-xs lg:text-[8px] xl:text-[9px] 2xl:text-[11px] text-gray-400 font-roboto mt-1'>
               💡 Deleted files go to{' '}
-              <span className='font-semibold text-primary-600'>Recently Deleted</span>
+              <span className='font-semibold text-primary-600 dark:text-white'>Recently Deleted</span>
               {' '}and still count toward your storage. Permanently delete them there to free up space.
             </p>
           </div>
@@ -527,7 +538,7 @@ if (file.size > MAX_FILE_SIZE) {
               </div>
               <div className='w-full bg-gray-200 rounded-full h-2'>
                 <div
-                  className='bg-primary-600 h-2 rounded-full transition-all duration-300'
+                  className='bg-primary-600 dark:bg-[#4E5669] warm:bg-[#623627] h-2 rounded-full transition-all duration-300'
                   style={{ width: `${uploadProgress}%` }}
                 />
               </div>
@@ -581,7 +592,7 @@ if (file.size > MAX_FILE_SIZE) {
               {filteredFiles.map((file) => (
                 <div
                   key={file.id}
-                  className='flex  flex-col items-center bg-white border-gray-200 rounded-xl p-0 transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
+                  className='flex  flex-col items-center  bg-white warm:bg-transparent dark:bg-transparent border-gray-200 rounded-xl p-0 transition relative w-36 md:w-44 lg:w-[100px] xl:w-[120px] 2xl:w-[150px]'
                 >
                   <div className='relative w-full flex justify-center items-end'>
                     <button
@@ -627,7 +638,7 @@ if (file.size > MAX_FILE_SIZE) {
 {activeFileMenu === file.id && (
   <div
     onClick={(e) => e.stopPropagation()}
-    className='absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 lg:w-32 py-1'
+    className='absolute right-0 top-full mt-1  bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-36 lg:w-32 py-1'
   >
     <button
       onClick={() => handleEdit(file.id)}
@@ -645,7 +656,7 @@ if (file.size > MAX_FILE_SIZE) {
     <hr className='my-1 border-gray-100' />
     <button
       onClick={() => { setPendingDelete({ id: file.id, name: file.fileName }); setActiveFileMenu(null) }}
-      className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold'
+      className='flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-primary-600 hover:bg-red-50 font-semibold '
     >
       <img src='/delete.png' alt='delete icon' className='w-5 h-5 lg:w-4 lg:h-4 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} /> Delete
     </button>
@@ -653,10 +664,10 @@ if (file.size > MAX_FILE_SIZE) {
 )}
                   </div>
 
-                  <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm lg:text-[10px] xl:text-[11px]  2xl:text-md mt-1 lg:mt-0 w-full truncate px-1'>
+                  <p className='text-center font-inter font-semibold text-primary-600 text-xs md:text-sm lg:text-[10px] xl:text-[11px] dark:text-white  2xl:text-md mt-1 lg:mt-0 w-full truncate px-1'>
                     {file.fileName}
                   </p>
-                  <p className='text-center lg:text-[9px] xl:text-[10px] 2xl:text-[11px] font-roboto text-gray-400 text-xs'>{file.fileSize}</p>
+                  <p className='text-center lg:text-[9px] xl:text-[10px] 2xl:text-[11px] font-roboto text-gray-400 dark:text-white text-xs'>{file.fileSize}</p>
                 </div>
               ))}
 
@@ -870,11 +881,11 @@ if (file.size > MAX_FILE_SIZE) {
             title='Take a Tour'
           >
             <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-              <img src="/needhelp.png" alt="?" className='w-12 block mx-auto mt-1 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+              <img src={needHelpIcon[theme]} alt="?"  className='w-12 mb-2 block mx-auto mt-1 select-none'  onContextMenu={(e) => e.preventDefault()} draggable={false} />
             </div>  
-            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+            <p className='text-[8px] md:text-[8px] text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] dark:text-white  warm:text-[#623627] 
               font-inter font-semibold'>Need Help?</p>         
-          </button>
+           </button>
        )}
 
     </div>
