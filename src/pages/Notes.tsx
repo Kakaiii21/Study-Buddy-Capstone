@@ -1022,7 +1022,7 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                       <div className='flex gap-2 ml-auto'>
                         <button
                           onClick={closeNoteModal}
-                          className='border border-primary-600 text-primary-600 text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
+                          className='border border-primary-600 text-primary-600 dark:text-white dark:border-white text-xs font-bold py-2 px-10 rounded-md hover:bg-primary-50'
                         >
                           CLOSE
                         </button>

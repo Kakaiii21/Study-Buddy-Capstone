@@ -19,23 +19,17 @@ type ThemedIcon = {
 
 
 
-const themeOptions = [
-  { key: 'light', label: 'Light', img: '/sideIcons/themeLight.png' },
-  { key: 'dark', label: 'Dark', img: '/sideIcons/themeDark.png' },
-  { key: 'warm', label: 'Warm', img: '/sideIcons/themeWarm.png' },
-] as const
 
 function Sidebar({ uploading = false, quizActive = false, isOpenExternal = false, onExternalClose }: Props) {
   const isBlocked = uploading || quizActive
   const [isOpenInternal, setIsOpenInternal] = useState(false)
   const [showLogoutModal, setShowLogoutModal] = useState(false)
-  const [showThemeModal, setShowThemeModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const { openHelpModal } = useHelpBuddy()
-  const { theme, setTheme } = useTheme()
   const isOpen = isOpenInternal || isOpenExternal   // ← merged state
   const catGifs = ['/CatLove.gif', '/CatCry.gif', '/CatLaugh.gif']
+    const { theme } = useTheme()
 
   const [currentGif, setCurrentGif] = useState(catGifs[0])
   const getIconSrc = (icon: ThemedIcon, isActive: boolean) => {
@@ -303,22 +297,6 @@ const menuIcons = {
             </div>
           ))}
 
-          {/* THEME (opens popup) */}
-          <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0 ml-2 xl:px-3'>
-            <button
-              onClick={() => !isBlocked && setShowThemeModal(true)}
-              className="
-                w-full text-left py-2 lg:py-0 pl-1 2xl:py-1 3xl:py-2  mb-1
-                font-medium text-lg lg:text-[10px] xl:text-[12px] 2xl:text-[14px] 3xl:text-[18px]
-                transition-colors duration-200  rounded-md
-                flex items-center gap-2 justs 
-                text-white hover:bg-[#4A4A49] dark:hover:bg-[#2F3542] warm:hover:bg-opacity-70
-              "
-            >
-              <img src="/sideIcons/theme.png" alt="" className="w-5  h-5 md:w-7 md:h-7 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-7 2xl:h-7 3xl:w-9 3xl:h-9 shrink-0 select-none"  onContextMenu={(e) => e.preventDefault()} draggable={false} />
-              Theme
-            </button>
-          </div>
 
           {/* LOGOUT */}
               <div className='px-5 lg:px-0 lg:pl-2 lg:pr-5 -mt-2 lg:mt-0  ml-2 xl:px-3'>
@@ -357,55 +335,6 @@ const menuIcons = {
         </nav>
       </aside>
 
-      {/* THEME MODAL */}
-      {showThemeModal && (
-        <>
-          <div className="fixed inset-0 bg-black  bg-opacity-50 z-50" />
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            onClick={() => setShowThemeModal(false)}
-          >
-            <div
-              className="bg-white rounded-2xl border-2 border-black 3xl:rounded-3xl shadow-xl p-8 lg:py-4 lg:px-5 2xl:py-6 3xl:py-8 w-80 lg:w-64 xl:w-72 2xl:w-80 3xl:w-96 text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-xl lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl font-bold text-primary-600 font-roboto mb-4">
-                Select a theme
-              </h2>
-
-              <div className="flex justify-between gap-2 mb-6">
-                {themeOptions.map(({ key, label, img }) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setTheme(key)
-                      setShowThemeModal(false)
-                    }}
-                    aria-label={`${label} mode`}
-                    className="flex flex-col items-center gap-1 flex-1"
-                  >
-                    <img
-                      src={img}
-                      alt=""
-                      className={`w-16 h-16 lg:w-12 lg:h-12 xl:w-14 xl:h-14 2xl:w-16 2xl:h-16 3xl:w-20 3xl:h-20
-                        rounded-lg select-none object-contain
-                        transition-transform duration-200 hover:scale-105
-                        ${theme === key ? 'ring-2 ring-[#FEE248]' : ''}`}
-                      onContextMenu={(e) => e.preventDefault()}
-                      draggable={false}
-                    />
-                    <span className="text-black font-roboto uppercase text-xs lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-sm">
-                      {label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-
-            </div>
-          </div>
-        </>
-      )}
 
       {/* LOGOUT MODAL */}
       {showLogoutModal && (

@@ -14,9 +14,20 @@ import { auth } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
 import { useTheme } from '../context/ThemeContext'
 
-function Dashboard() {
-    const { theme } = useTheme()
+const themeIcon = {
+  light: '/sideIcons/theme-light.png',
+  dark: '/sideIcons/theme-dark.png',
+  warm: '/sideIcons/theme-warm.png',
+}
+const themeOptions = [
+  { key: 'light', label: 'Light', img: '/sideIcons/themeLight.png' },
+  { key: 'dark', label: 'Dark', img: '/sideIcons/themeDark.png' },
+  { key: 'warm', label: 'Warm', img: '/sideIcons/themeWarm.png' },
+] as const
 
+function Dashboard() {
+const { theme, setTheme } = useTheme()
+const [showThemeModal, setShowThemeModal] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const [authChecked, setAuthChecked] = useState(false)  
   
@@ -769,28 +780,88 @@ dark:text-white warm:text-[#623627]
   </div>
 </div>
 </div>
+
 <div className='flex  flex-row w-full mt-5 sm:mt-4 md:mt-4 lg:mt-1 lg:pr-3  2xl:mt-3 3xl:mt-4 max-w-[520px] sm:max-w-[600px] md:max-w-[680px] lg:max-w-[clamp(560px,58vw,680px)] xl:max-w-[780px] 2xl:max-w-[1050px] 3xl:max-w-[1400px] mx-auto justify-between'>
   <p className='font-inter  mt-5 2xl:mt-8 3xl:mt-9 font-semibold text-sm md:text-md 
   lg:text-[10px] xl:text-[11px] 2xl:text-[13px] 3xl:text-[15px] dark:text-white warm:text-[#623627] text-[#B3B3B3] uppercase'>Activities</p>
-  <button
-    id='tour-btn'
-    onClick={() => startTour()}
-    title='Take a Tour'
-    className='flex flex-col items-center justify-center'
+
+  <div className='flex flex-row items-start  gap-4'>
+    {/* THEME BUTTON — left of Need Help */}
+    <button
+      id='theme-btn'
+      type='button'
+      onClick={() => setShowThemeModal(true)}
+      title='Change theme'
+      className='flex flex-col items-center justify-center'
+    >
+      <div className='w-7 h-7   lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12 flex items-center justify-center text-2xl font-bold'>
+        <img
+          src={themeIcon[theme]}
+          alt='Theme'
+          className='w-12 lg:w-10 mb-2 block mx-auto mt-1 select-none rounded-md'
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+        />
+      </div>
+      <p className='text-[8px] md:text-[8px] dark:text-white warm:text-[#623627] warm:font-bold text-primary-800 uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px] font-inter font-semibold'>Theme</p>
+    </button>
+{showThemeModal && (
+  <div
+    className='fixed inset-0 z-50 bg-black/50 flex items-center justify-center'
+    onClick={() => setShowThemeModal(false)}
   >
-    <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
-    <img
-      src={needHelpIcon[theme]}
-      alt="?"
-      className='w-10 mb-2 block mx-auto mt-1 select-none '
-      onContextMenu={(e) => e.preventDefault()}
-      draggable={false}
-    />    
+    <div
+      className='bg-white rounded-2xl border-2 border-black shadow-xl p-8 lg:py-4 lg:px-5 2xl:py-6 3xl:py-8 w-80 lg:w-64 xl:w-72 2xl:w-80 3xl:w-96 text-center'
+      onClick={(e) => e.stopPropagation()}
+    >
+      <h2 className='text-xl lg:text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl font-bold text-primary-600 font-roboto mb-4'>
+        Select a theme
+      </h2>
+      <div className='flex justify-between gap-2'>
+        {themeOptions.map(({ key, label, img }) => (
+          <button
+            key={key}
+            onClick={() => { setTheme(key); setShowThemeModal(false) }}
+            aria-label={`${label} mode`}
+            className='flex flex-col items-center gap-1 flex-1'
+          >
+            <img
+              src={img}
+              alt=''
+              className={`w-16 h-16 lg:w-12 lg:h-12 xl:w-14 xl:h-14 2xl:w-16 2xl:h-16 3xl:w-20 3xl:h-20 rounded-md select-none object-contain transition-transform duration-200 hover:scale-105 ${theme === key ? 'ring-2 ring-[#FEE248]' : ''}`}
+              onContextMenu={(e) => e.preventDefault()}
+              draggable={false}
+            />
+            <span className='text-black font-roboto uppercase text-xs lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-sm'>
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
-    <p className='text-[8px] md:text-[8px] dark:text-white warm:text-[#623627] warm:font-bold text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
-    font-inter font-semibold'>Need Help?</p>
-  </button>
   </div>
+)}
+    {/* NEED HELP BUTTON (unchanged) */}
+    <button
+      id='tour-btn'
+      onClick={() => startTour()}
+      title='Take a Tour'
+      className='flex flex-col items-center justify-center'
+    >
+      <div className='w-7 h-7 lg:w-7 lg:h-7 2xl:w-10 2xl:h-10 3xl:w-12 3xl:h-12  flex items-center justify-center text-2xl font-bold'>
+        <img
+          src={needHelpIcon[theme]}
+          alt="?"
+          className='w-10 mb-2 block mx-auto mt-1 select-none '
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
+        />
+      </div>
+      <p className='text-[8px] md:text-[8px] dark:text-white warm:text-[#623627] warm:font-bold text-primary-800  uppercase text-center lg:text-[8px] 2xl:text-[10px] 3xl:text-[11px]
+      font-inter font-semibold'>Need Help?</p>
+    </button>
+  </div>
+</div>
 {/* Activities Grid */}
 <div id='activitiesGrid' className='flex  justify-center pb-8 mt-3 sm:mt-3 md:mt-3 lg:mt-3 lg:pr-3 2xl:mt-2 3xl:mt-3 pr-1'>
   <div className='grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:px-2 2xl:grid-cols-3 3xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-x-10 lg:gap-y-4 xl:gap-x-11 xl:gap-y-5 2xl:gap-x-10 2xl:gap-y-8 3xl:gap-x-12 3xl:gap-y-9'>
