@@ -5,7 +5,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useCourses, type CourseColor } from '../hooks/useCourses'
 import { useTour } from '../hooks/useTour'
 import { useTheme, type Theme } from '../context/ThemeContext'
-
+import { CleanInput } from '../components/CleanInput'
+import { containsBadWords } from '../utils/contentFilter'
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel, isFolder = false }: {
   itemName: string
@@ -139,7 +140,7 @@ const filteredCourses = courses.filter((c) =>
       setFolderError('A folder with that name already exists.')
       return
     }
-
+if (containsBadWords(folderName)) return
     setIsSaving(true)
 
 
@@ -181,27 +182,31 @@ const filteredCourses = courses.filter((c) =>
     setShowEditModal(true)
   }
 
-  const handleEditSave = async () => {
-    if (!editingId || editName.trim() === '') {
-      setEditError('Please enter a folder name.')
-      return
-    }
+const handleEditSave = async () => {
+  if (!editingId) return
 
-    const isDuplicate = courses.some(
-      (c) => c.id !== editingId && c.name.toLowerCase() === editName.trim().toLowerCase()
-    )
-    if (isDuplicate) {
-      setEditError('A folder with that name already exists.')
-      return
-    }
-
-    await updateCourse(editingId, editName.trim(), editColor)
-    setEditingId(null)
-    setEditName('')
-    setEditColor('grey')
-    setEditError('')
-    setShowEditModal(false)
+  if (editName.trim() === '') {
+    setEditError('Please enter a folder name.')
+    return
   }
+
+  if (containsBadWords(editName)) return
+
+  const isDuplicate = courses.some(
+    (c) => c.id !== editingId && c.name.toLowerCase() === editName.trim().toLowerCase()
+  )
+  if (isDuplicate) {
+    setEditError('A folder with that name already exists.')
+    return
+  }
+
+  await updateCourse(editingId, editName.trim(), editColor)
+  setEditingId(null)
+  setEditName('')
+  setEditColor('grey')
+  setEditError('')
+  setShowEditModal(false)
+}
 
   const handleEditClose = () => {
     setEditingId(null)
@@ -269,33 +274,38 @@ const filteredCourses = courses.filter((c) =>
             <img src="./addB.png" alt="" className='w-2.5 h-2.5 lg:w-2 lg:h-2 xl:w-3 xl:h-3 2xl:w-3  2xl:h-3 3xl:w-4 3xl:h-4 shrink-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
             New Folder
             </button>
-            {/* Search bar */}
-            <div className="relative order-1 lg:order-2 flex items-center w-full  lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px]">
-              <input
-                id='courseSearchBar'
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search"
-                className="w-full border border-primary-800 rounded-md
-                  py-2 pl-3 pr-8 
-                  text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
-                  font-inter text-primary-800 placeholder:text-primary-800 dark:bg-white
-                  focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
-                  transition-all duration-200"
-              />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="absolute right-2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </div>
+{/* Search bar */}
+<div
+  className={`relative order-1 lg:order-2 flex items-center w-full lg:max-w-[180px] xl:max-w-[220px] 2xl:max-w-[260px] ${
+    containsBadWords(searchQuery) ? 'mb-5' : ''
+  }`}
+>
+  <CleanInput
+    id='courseSearchBar'
+    type="text"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    placeholder="Search"
+    messageClassName='absolute left-0 top-full w-full text-red-500 font-semibold font-inter text-[10px] lg:text-[9px] xl:text-[10px] 2xl:text-xs'
+    className="w-full border border-primary-800 rounded-md
+      py-2 pl-3 pr-8 
+      text-[10px] lg:text-[8px] xl:text-[10px] 2xl:text-[12px]
+      font-inter text-primary-800 placeholder:text-primary-800 dark:bg-white
+      focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400
+      transition-all duration-200"
+  />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="absolute right-2 w-3.5 h-3.5 lg:w-3 lg:h-3 xl:w-3.5 xl:h-3.5 2xl:w-4 2xl:h-4 text-primary-800 pointer-events-none"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <circle cx="11" cy="11" r="7" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+</div>
 
 
           </div>
@@ -394,31 +404,39 @@ const filteredCourses = courses.filter((c) =>
         {/* Add Folder Modal */}
         {showModal && (
           <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-            <div className='bg-primary-600 rounded-xl shadow-xl p-8 lg:p-0 lg:px-6 lg:py-4 xl:p-0 xl:px-5 xl:py-3 2xl:p-0 2xl:px-4 2xl:py-4 w-[95%] lg:w-[350px] xl:w-[360px] 2xl:w-[370px] max-w-md flex flex-col gap-5'>
+            <div className='bg-primary-600 rounded-xl shadow-xl p-8 lg:p-0 lg:px-6 lg:py-4 xl:p-0 xl:px-5 xl:py-3 2xl:p-0 2xl:px-6 2xl:py-4 w-[95%] lg:w-[350px] xl:w-[360px] 2xl:w-[400px] 3xl:w-[450px] max-w-md flex flex-col gap-5'>
               <div className='flex flex-row'>
                 <button onClick={handleClose} className='w-5 lg:w-3 xl:w-4 2xl:w-5'>
                   <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
-                <p className='ml-12 md:ml-24 text-2xl text-center lg:ml-[80px] lg:text-lg xl:ml-[80px] xl:text-xl font-bold font-roboto text-white uppercase'>
+                <p className='ml-12 md:ml-24 text-2xl text-center lg:ml-[80px] lg:text-lg xl:ml-[80px] 2xl:ml-[90px] 3xl:ml-[110px] xl:text-xl font-bold font-roboto text-white uppercase'>
                   Add a Folder
                 </p>
               </div>
-              <div className='flex flex-row w-full gap-2 lg:h-8 xl:h-10'>
-                <input
-                  type='text'
-                  maxLength={20}
-                  value={folderName}
-                  onChange={(e) => { setFolderName(e.target.value); setFolderError('') }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-                  placeholder='Enter folder name'
-                  className={`flex-1 border rounded-md px-2 py-1 text-xs font-roboto dark:bg-white text-gray-800 focus:outline-none ${
-                    folderError ? 'border-red-400' : 'border-gray-300'
-                  }`}
-                />
-                <button onClick={handleSave} disabled={isSaving} className='flex items-center justify-center w-12 h-12 lg:w-8 lg:h-8 xl:w-9 xl:h-9 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed'>
-                  <img src="saveIcon.png" alt="saveicon" className='w-5 lg:w-4 xl:w-5 brightness-0 invert hover:invert-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-                </button>
-              </div>
+<div className='flex flex-row items-start w-full  h-50  gap-2'>
+  <div className='flex-1 flex flex-col'>
+<CleanInput
+  autoFocus
+  type='text'
+  maxLength={20}
+  value={folderName}
+  onChange={(e) => { setFolderName(e.target.value); setFolderError('') }}
+  onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+  placeholder='Enter folder name'
+  messageClassName='text-red-300 font-semibold font-inter text-sm lg:text-xs xl:text-sm 2xl:text-base'
+  className={`w-full border rounded-md px-2 py-2 text-xs font-roboto 2xl:w-[350px] 2xl:h-[40px] 2xl:text-lg dark:bg-white text-gray-800 focus:outline-none ${
+    folderError ? 'border-red-400' : 'border-gray-300'
+  }`}
+/>
+  </div>
+  <button
+    onClick={handleSave}
+    disabled={isSaving || containsBadWords(folderName)}
+    className='flex items-center justify-center w-12 h-12 lg:w-8 lg:h-8 xl:w-9 xl:h-9 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed'
+  >
+    <img src="saveIcon.png" alt="saveicon" className='w-5 lg:w-4 xl:w-5 brightness-0 invert hover:invert-0 select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+  </button>
+</div>
               <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
               {/* Folder color picker */}
               <div className='flex flex-wrap gap-3 mb-2 justify-center'>
@@ -454,31 +472,37 @@ const filteredCourses = courses.filter((c) =>
         {/* Edit Folder Modal */}
         {showEditModal && (
           <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-            <div className='bg-primary-600 rounded-xl shadow-xl p-8 w-[95%] max-w-md flex flex-col gap-5'>
+            <div className='bg-primary-600 rounded-xl shadow-xl p-8 lg:p-0 lg:px-6 lg:py-4 xl:p-0 xl:px-5 xl:py-3 2xl:p-0 2xl:px-6 2xl:py-4 w-[95%] lg:w-[350px] xl:w-[360px] 2xl:w-[400px] 3xl:w-[450px] max-w-md flex flex-col gap-5'>
               <div className='flex flex-row'>
-                <button onClick={handleEditClose} className='w-5'>
+                <button onClick={handleEditClose} className='w-5 lg:w-3 xl:w-4 2xl:w-5'>
                   <img src="X.png" alt="X" className='select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
                 </button>
-                <p className='ml-12 md:ml-20 text-2xl font-bold font-roboto text-white uppercase'>
-                  Edit Folder
+                <p className='ml-12 md:ml-24 text-2xl text-center lg:ml-[80px] lg:text-lg xl:ml-[80px] 2xl:ml-[90px] 3xl:ml-[110px] xl:text-xl font-bold font-roboto text-white uppercase'>
+                  Edit Folder Name
                 </p>
               </div>
-                <div className='flex flex-row w-full gap-2'>
-                  <input
-                    autoFocus
-                    type='text'
-                    value={editName}
-                    onChange={(e) => { setEditName(e.target.value); setEditError('') }}
-                    onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
-                    placeholder='Enter folder name'
-                    className={`flex-1 border rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none ${
-                      editError ? 'border-red-400' : 'border-gray-300'
-                    }`}
-                  />
-                  <button onClick={handleEditSave} className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'>
-                    <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-                  </button>
-                </div>
+<div className='flex flex-row items-start w-full gap-2'>
+  <div className='flex-1 flex flex-col'>
+    <CleanInput
+      autoFocus
+      type='text'
+      value={editName}
+      onChange={(e) => { setEditName(e.target.value); setEditError('') }}
+      onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
+      placeholder='Enter folder name'
+      className={`w-full border rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none ${
+        editError ? 'border-red-400' : 'border-gray-300'
+      }`}
+    />
+  </div>
+  <button
+    onClick={handleEditSave}
+    disabled={containsBadWords(editName)}
+    className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed'
+  >
+    <img src="saveIcon.png" alt="saveicon" className='w-5 brightness-0 invert select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+  </button>
+</div>
 
                 <p className='font-inter font-bold uppercase text-sm text-center'>Color</p>
                 <div className='flex flex-wrap gap-3 mb-2 justify-center'>

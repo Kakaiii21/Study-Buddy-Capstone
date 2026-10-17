@@ -6,6 +6,8 @@ import { uploadToCloudinary } from '../services/cloudinary'
 import { auth } from '../services/firebase'
 import { logout, deactivateAccount } from '../services/authService'
 import { useNavigate } from 'react-router-dom'
+import { CleanInput } from '../components/CleanInput'
+import { containsBadWords } from '../utils/contentFilter'
 
 interface BasicInfoProps {
   setActiveTab: (tab: string) => void
@@ -107,9 +109,10 @@ const [removingPic, setRemovingPic] = useState(false)
     fetchUser()
   }, [user])
 
-  const handleSave = async (field: 'firstName' | 'lastName') => {
-    if (!user) return
-    const value = field === 'firstName' ? firstName : lastName
+const handleSave = async (field: 'firstName' | 'lastName') => {
+  if (!user) return
+  const value = field === 'firstName' ? firstName : lastName
+  if (containsBadWords(value)) return
     const trimmed = value.trim()
 
     if (!trimmed) {
@@ -137,7 +140,8 @@ const [removingPic, setRemovingPic] = useState(false)
   }
 
   const handleSaveAll = async () => {
-    const trimmedFirst = firstName.trim()
+      if (nameHasBadWords) return   // the message under the field explains why
+  const trimmedFirst = firstName.trim()
     const trimmedLast = lastName.trim()
 
     setFirstNameError(!trimmedFirst)
@@ -301,7 +305,7 @@ const handleRemoveProfilePic = async () => {
     }
   }
   // ──────────────────────────────────────────────────────────────────────────
-
+const nameHasBadWords = containsBadWords(firstName) || containsBadWords(lastName)
   return (
     <>
       <style>{`
@@ -393,7 +397,7 @@ const handleRemoveProfilePic = async () => {
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1'>
           <label className='text-primary-600 dark:text-white font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>First Name *</label>
-          <input
+          <CleanInput
             type="text"
             value={firstName}
             onChange={(e) => {
@@ -411,7 +415,7 @@ const handleRemoveProfilePic = async () => {
 
         <div className='flex flex-col gap-1 mb-3 md:mb-4 lg:mb-1 2xl:mt-3 '>
           <label className='text-primary-600 dark:text-white font-inter text-sm md:text-md lg:text-[10px] 2xl:text-[14px] 3xl:text-[18px]'>Last Name *</label>
-          <input
+          <CleanInput
             type="text"
             value={lastName}
             onChange={(e) => {
@@ -451,13 +455,14 @@ const handleRemoveProfilePic = async () => {
         <div className='flex  justify-center'>
           <button
             onClick={handleSaveAll}
-            disabled={
-              saving !== null ||
-              !firstName.trim() ||
-              !lastName.trim() ||
-              (firstName.trim() === originalFirstName.trim() && lastName.trim() === originalLastName.trim())
-            }
-            className='w-full md:w-[250px] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3
+disabled={
+  saving !== null ||
+  nameHasBadWords ||
+  !firstName.trim() ||
+  !lastName.trim() ||
+  (firstName.trim() === originalFirstName.trim() && lastName.trim() === originalLastName.trim())
+}
+            className='w-full md:w-[250px]  disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_2px_1px_rgba(0,0,0,0.35)] items-center justify-center text-black flex bg-[#E59D24] hover:bg-[#F0AD3A] transition-all duration-300 font-inter font-semibold uppercase py-2 lg:py-1 xl:py-2 2xl:py-2 3xl:py-3
             disabled:opacity-50 lg:text-[12px] xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px]
             shadow-[0_2px_1px_rgba(0,0,0,0.35)]
             rounded-md backdrop-blur-xs

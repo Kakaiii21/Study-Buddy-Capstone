@@ -18,6 +18,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useTasks, type Task, type Status } from '../hooks/useTasks'
 import { useTaskNotifications } from '../hooks/useTaskNotification'
 import { useTheme, type Theme } from '../context/ThemeContext'
+import { CleanInput } from '../components/CleanInput'
+import { containsBadWords } from '../utils/contentFilter'
 
 
 const COLUMNS: { id: Status; label: string }[] = [
@@ -58,6 +60,7 @@ function formatDateInput(value: string): string {
   if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
 }
+
 
 function isValidDate(display: string): boolean {
   if (display.length !== 10) return false
@@ -168,8 +171,13 @@ function TaskModal({
     taskTime.length === 5 &&
     deadlineStorageValue > nowISO
 
-  const canSave = taskName.trim() !== '' && deadlineIsValid && !dateError
+const nameHasBadWords = containsBadWords(taskName)
 
+const canSave =
+  taskName.trim() !== '' &&
+  !nameHasBadWords &&
+  deadlineIsValid &&
+  !dateError
   function handleSave() {
     if (!canSave) return
     onSave(taskName.trim(), deadlineStorageValue)
@@ -183,7 +191,7 @@ return (
       className="fixed inset-0   bg-black bg-opacity-50 flex justify-center items-center z-50"
     >
       <div
-        className="bg-white warm:bg-[#FBF1E8] warm:border-[#623627] warm:border-2 dark:border-2 dark:border-black lg:h-[390px] xl:h-[430px] 2xl:h-[490px] 3xl:min-h-[550px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
+  className="bg-white warm:bg-[#FBF1E8] warm:border-[#623627] warm:border-2 dark:border-2 dark:border-black lg:max-h-[400px] xl:min-h-[450px] 2xl:min-h-[490px] 3xl:min-h-[580px] rounded-2xl p-7 mx-2 w-full lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-xl max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-center font-bold text-primary-600 
@@ -193,7 +201,7 @@ return (
         <label className="flex font-semibold text-primary-600 text-xl 
        lg:text-sm xl:text-[16px] 2xl:text-lg 3xl:text-2xl warm:text-[#623627]
          py-2">Task *</label>
-        <input
+        <CleanInput
           className="flex border-2 rounded-md border-primary-600 min-w-full my-2 bg-white warm:bg-transparent text-black [color-scheme:light]
           lg:text-sm lg:py-1 lg:rounded-sm lg:my-0
           xl:text-sm xl:py-2 xl:my-0
@@ -298,7 +306,7 @@ return (
 
         {dateError && <p className="text-red-500 text-sm -mt-2 mb-2">{dateError}</p>}
 
-        <div className="flex flex-row justify-between  gap-10">
+        <div className="flex flex-row justify-between mb-20  gap-10">
           <button
             onClick={onClose}
             className="flex-1 bg-white border-2 rounded-md font-bold border-primary-600 items-center mt-5

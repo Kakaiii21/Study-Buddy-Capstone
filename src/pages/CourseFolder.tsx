@@ -13,10 +13,12 @@ import { STORAGE_LIMIT } from '../utils/fileUtils'
 import { useTour } from '../hooks/useTour'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useTheme, type Theme } from '../context/ThemeContext'
+import { CleanInput } from '../components/CleanInput'
 
 import { renderAsync } from 'docx-preview'
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import { containsBadWords } from '../utils/contentFilter'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
 
 interface CourseFile {
@@ -889,27 +891,31 @@ if (file.size > MAX_FILE_SIZE) {
                 Rename File
               </p>
             </div>
-            <div className='flex flex-row w-full gap-2'>
-              <input
-                autoFocus
-                type='text'
-                value={editName}
-                onChange={(e) => { setEditName(e.target.value); setEditError('') }}
-                onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
-                placeholder='Enter file name'
-                aria-label='Edit file name'
-                className='flex-1 border border-gray-300 rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none focus:border-white'
-              />
-              <button
-                onClick={handleEditSave}
-                className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600'
-              >
-                <img src='/saveIcon.png' alt='save' className='w-5 brightness-0 invert select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
-              </button>
-            </div>
-            {editError && (
-              <p className='text-orange-300 text-sm font-roboto -mt-2'>{editError}</p>
-            )}
+<div className='flex flex-row items-start w-full gap-2'>
+  <div className='flex-1 flex flex-col'>
+    <CleanInput
+      autoFocus
+      type='text'
+      value={editName}
+      onChange={(e) => { setEditName(e.target.value); setEditError('') }}
+      onKeyDown={(e) => e.key === 'Enter' && handleEditSave()}
+      placeholder='Enter file name'
+      aria-label='Edit file name'
+      messageClassName='text-red-300 font-semibold font-inter text-sm lg:text-xs xl:text-sm 2xl:text-base'
+      className='w-full border border-gray-300 rounded-md px-4 py-2 font-roboto text-gray-800 focus:outline-none focus:border-white'
+    />
+  </div>
+  <button
+    onClick={handleEditSave}
+    disabled={containsBadWords(editName)}
+    className='flex items-center justify-center w-12 h-12 rounded-full bg-orange-400 text-white font-roboto font-semibold hover:bg-white hover:border hover:border-primary-600 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed'
+  >
+    <img src='/saveIcon.png' alt='save' className='w-5 brightness-0 invert select-none' onContextMenu={(e) => e.preventDefault()} draggable={false} />
+  </button>
+</div>
+{editError && (
+  <p className='text-orange-300 text-sm font-roboto -mt-2'>{editError}</p>
+)}
           </div>
         </div>
       )}

@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { signup } from '../services/authService'
 import { googleLogin } from '../services/authService'
 import { checkEmailStatus } from '../services/authService'
+import { containsBadWords } from '../utils/contentFilter'
 
+const BAD_WORD_MSG = "Inappropriate language isn't allowed."
 type FieldErrors = {
   firstName: string
   lastName: string
@@ -113,10 +115,14 @@ function Signup({ onSwitchToLogin } : { onSwitchToLogin?: () => void}) {
     confirmPassword: string
   }): string => {
     switch (field) {
-      case 'firstName':
-        return !values.firstName.trim() ? 'First name is required.' : ''
-      case 'lastName':
-        return !values.lastName.trim() ? 'Last name is required.' : ''
+case 'firstName':
+  if (!values.firstName.trim()) return 'First name is required.'
+  if (containsBadWords(values.firstName)) return BAD_WORD_MSG
+  return ''
+case 'lastName':
+  if (!values.lastName.trim()) return 'Last name is required.'
+  if (containsBadWords(values.lastName)) return BAD_WORD_MSG
+  return ''
       case 'email':
         if (!values.email.trim()) return 'Email is required.'
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) return 'Enter a valid email address.'
@@ -493,16 +499,11 @@ const fieldOrder: { key: keyof FieldErrors; ref: React.RefObject<HTMLInputElemen
             )}
           </div>
 
-          <button
-            onClick={handleSignup}
-            disabled={loading}
-            className="w-full bg-primary-800
-              hover:opacity-90   
-               backdrop-blur-xs
-               hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)]
-               transition-all duration-300
-            font-normal font-inter text-white p-2  lg:text-[12px] lg:p-2 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50"
-          >
+<button
+  onClick={handleSignup}
+  disabled={loading || containsBadWords(firstName) || containsBadWords(lastName)}
+  className="w-full bg-primary-800 hover:opacity-90 backdrop-blur-xs hover:-translate-y-1 hover:shadow-[0_8px_10px_rgba(0,0,0,0.5)] transition-all duration-300 font-normal font-inter text-white p-2 lg:text-[12px] lg:p-2 xl:p-3 2xl:p-4 rounded-full border disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+>
             {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
 

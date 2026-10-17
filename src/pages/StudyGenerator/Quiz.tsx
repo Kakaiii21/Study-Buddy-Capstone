@@ -4,6 +4,8 @@ import Sidebar from '../../components/Sidebar'
 import { SESSION_KEY_RESULT } from '../StudyGenerator'
 import { auth, db } from '../../services/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { CleanInput } from '../../components/CleanInput'
+import { containsBadWords } from '../../utils/contentFilter'
 
 interface QuizQuestion {
   question: string
@@ -144,7 +146,10 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
 
 
   const allAnswered = questions.every((_, i) => selected[i] !== undefined)
-
+const editHasBadWords =
+  !!editDraft &&
+  (containsBadWords(editDraft.question) ||
+    editDraft.options.some((o) => containsBadWords(o)))
   const saveQuestions = (updated: QuizQuestion[]) => {
     setQuestions(updated)
     sessionStorage.setItem('quiz_questions', JSON.stringify(updated))
@@ -305,14 +310,15 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
     setOpenMenuIndex(null)
   }
 
-  const handleEditSave = () => {
-    if (editDraft && editIndex !== null) {
-      const updated = questions.map((q, i) => i === editIndex ? editDraft : q)
-      saveQuestions(updated)
-    }
-    setEditIndex(null)
-    setEditDraft(null)
+const handleEditSave = () => {
+  if (editHasBadWords) return   // the message under the field explains why
+  if (editDraft && editIndex !== null) {
+    const updated = questions.map((q, i) => i === editIndex ? editDraft : q)
+    saveQuestions(updated)
   }
+  setEditIndex(null)
+  setEditDraft(null)
+}
 
   const handleEditCancel = () => {
     setEditIndex(null)
@@ -414,7 +420,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
               {editIndex === qIndex && editDraft ? (
                 <div className='flex flex-col gap-3 mt-4 pb-4'>
                   <label className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base text-gray-500 font-roboto'>Question</label>
-                  <input
+                  <CleanInput
                     aria-label='Edit question'
                     className='border border-gray-300 rounded-lg px-3 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-roboto focus:outline-none focus:border-primary-600'
                     value={editDraft.question}
@@ -426,7 +432,7 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                       <span className='text-xs lg:text-[10px] xl:text-xs 2xl:text-sm 3xl:text-base font-bold text-primary-600 w-5'>
                         {optionLetters[oIndex]}
                       </span>
-                      <input
+                      <CleanInput
                         aria-label={`Edit option ${optionLetters[oIndex]}`}
                         className='flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg font-roboto focus:outline-none focus:border-primary-600'
                         value={opt}
@@ -458,12 +464,13 @@ const [questions, setQuestions] = useState<QuizQuestion[]>(
                   </div>
 
                   <div className='flex gap-2 mt-1'>
-                    <button
-                      onClick={handleEditSave}
-                      className='bg-primary-600 text-white text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
-                    >
-                      Save
-                    </button>
+<button
+  onClick={handleEditSave}
+  disabled={editHasBadWords}
+  className='bg-primary-600 text-white text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40'
+>
+  Save
+</button>
                     <button
                       onClick={handleEditCancel}
                       className='bg-gray-200 text-gray-600 text-sm lg:text-xs xl:text-sm 2xl:text-base 3xl:text-lg px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'

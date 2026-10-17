@@ -4,6 +4,8 @@ import Sidebar from '../../components/Sidebar'
 import { SESSION_KEY_RESULT } from '../StudyGenerator'
 import { auth, db } from '../../services/firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { CleanInput, CleanTextarea } from '../../components/CleanInput'
+import { containsBadWords } from '../../utils/contentFilter'
 
 interface FlashcardItem {
   term: string
@@ -92,14 +94,15 @@ function Flashcard() {
     setOpenMenuIndex(null)
   }
 
-  const handleEditSave = () => {
-    if (editDraft && editIndex !== null) {
-      const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
-      saveCards(updated)
-    }
-    setEditIndex(null)
-    setEditDraft(null)
+const handleEditSave = () => {
+  if (editHasBadWords) return   // the message under the field explains why
+  if (editDraft && editIndex !== null) {
+    const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
+    saveCards(updated)
   }
+  setEditIndex(null)
+  setEditDraft(null)
+}
 
   const handleEditCancel = () => {
     setEditIndex(null)
@@ -178,6 +181,9 @@ function Flashcard() {
       </div>
     )
   }
+  const editHasBadWords =
+  !!editDraft &&
+  (containsBadWords(editDraft.term) || containsBadWords(editDraft.definition))
 
   return (
     <div className='flex h-screen'>
@@ -258,7 +264,7 @@ function Flashcard() {
                 {editIndex === index && editDraft ? (
                   <div className='w-full border-2 border-primary-600 rounded-xl px-5 py-5 flex flex-col gap-3 bg-transparent dark:border-white'>
                     <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Term</label>
-                    <input
+                    <CleanInput
                       className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
                       value={editDraft.term}
                       onChange={(e) => setEditDraft({ ...editDraft, term: e.target.value })}
@@ -266,7 +272,7 @@ function Flashcard() {
                     />
 
                     <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Definition</label>
-                    <textarea
+                    <CleanTextarea
                       className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600 resize-none'
                       rows={3}
                       value={editDraft.definition}
@@ -275,12 +281,13 @@ function Flashcard() {
                     />
 
                     <div className='flex gap-2 mt-1'>
-                      <button
-                        onClick={handleEditSave}
-                        className='bg-primary-600 text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
-                      >
-                        Save
-                      </button>
+<button
+  onClick={handleEditSave}
+  disabled={editHasBadWords}
+  className='bg-primary-600 text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40'
+>
+  Save
+</button>
                       <button
                         onClick={handleEditCancel}
                         className='bg-gray-200 text-gray-600 text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'

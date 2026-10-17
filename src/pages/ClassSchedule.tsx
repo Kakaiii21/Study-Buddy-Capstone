@@ -5,6 +5,8 @@ import { useClassSched, type MeetingInput } from '../hooks/useClassSched'
 import { useCategories } from '../hooks/useCategories'
 import { useTour } from '../hooks/useTour'
 import { useTheme, type Theme } from '../context/ThemeContext'
+import { containsBadWords } from '../utils/contentFilter'
+import { CleanInput } from '../components/CleanInput'
 
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: {
@@ -215,7 +217,7 @@ const needHelpIcon: Record<Theme, string> = {
   dark: '/needhelp-dark.png',
   warm: '/needhelp-warm.png',
 }
-
+const BAD_WORD_MSG = "Inappropriate language isn't allowed."
 function ClassSchedule() {
   const { theme } = useTheme()
   const { user } = useAuth()
@@ -294,24 +296,32 @@ const removeMeetingRow = (key: string) => {
   }
 
   const handleSave = () => {
-    const topErrors: Record<string, string> = {}
+  if (
+    containsBadWords(subjectName) ||
+    containsBadWords(instructor) ||
+    meetings.some((m) => containsBadWords(m.room))
+  ) return   // the live message under the field already explains why
+
+  const topErrors: Record<string, string> = {}
     const trimmedSubject = subjectName.trim()
-    if (!trimmedSubject) {
-      topErrors.subjectName = 'Required'
-    } else {
-      // Block saving a subject name that already belongs to a different
-      // class. Excludes the class currently being edited so re-saving it
-      // with its own unchanged name doesn't trip the check.
-      const isDuplicateSubject = schedules.some(
-        (s) =>
-          s.subject.trim().toLowerCase() === trimmedSubject.toLowerCase() &&
-          s.classId !== editTargetClassId
-      )
-      if (isDuplicateSubject) {
-        topErrors.subjectName = 'A class with this subject name already exists'
-      }
+if (!trimmedSubject) {
+  topErrors.subjectName = 'Required'
+} else {
+  const isDuplicateSubject = schedules.some(
+    (s) =>
+      s.subject.trim().toLowerCase() === trimmedSubject.toLowerCase() &&
+      s.classId !== editTargetClassId
+  )
+  if (isDuplicateSubject) {
+    topErrors.subjectName = 'A class with this subject name already exists'
+  }
+}
+
+    if (!instructor.trim()) {
+      topErrors.instructor = 'Required'
+    } else if (containsBadWords(instructor)) {
+      topErrors.instructor = BAD_WORD_MSG
     }
-    if (!instructor.trim()) topErrors.instructor = 'Required'
 
     const activeRows = meetings
     if (activeRows.length === 0) topErrors.meetings = 'Add at least one day and time slot'
@@ -323,6 +333,7 @@ const removeMeetingRow = (key: string) => {
       if (!row.timeStart) errs.timeStart = 'Required'
       if (!row.timeEnd) errs.timeEnd = 'Required'
       if (!row.room.trim()) errs.room = 'Required'
+      else if (containsBadWords(row.room)) errs.room = BAD_WORD_MSG
       if (!row.roomType) errs.roomType = 'Required'
       if (row.timeStart && row.timeEnd && row.timeEnd <= row.timeStart) {
         errs.timeEnd = 'Must be later than start time'
@@ -335,7 +346,6 @@ const removeMeetingRow = (key: string) => {
       if (Object.keys(errs).length > 0) newRowErrors[row.key] = errs
     })
 
-   
     activeRows.forEach((row, i) => {
       if (!row.day || !row.timeStart || !row.timeEnd) return
      
@@ -645,7 +655,7 @@ const DayCard = ({ day }: { day: string }) => {
                     <div className='flex flex-col sm:flex-row gap-4'>
                       <div className='flex-1 flex flex-col'>
                         <label className='text-xs font-semibold text-gray-500 mb-1'>Subject Name *</label>
-                        <input
+                        <CleanInput
                           type='text'
                           placeholder='Enter Subject'
                           className={`py-2 px-3 rounded-lg border border-gray-300 dark:bg-white text-sm w-full ${errClass('subjectName')}`}
@@ -671,7 +681,7 @@ const DayCard = ({ day }: { day: string }) => {
                       </div>
                       <div className='flex-1 flex flex-col'>
                         <label className='text-xs font-semibold text-gray-500 mb-1 '>Teacher / Instructor *</label>
-                        <input
+                        <CleanInput
                           type='text'
                           placeholder='Enter Teacher/Instructor Name'
                           className={`py-2 px-3 rounded-lg border border-gray-300  dark:bg-white text-sm w-full ${errClass('instructor')}`}
@@ -774,7 +784,7 @@ const DayCard = ({ day }: { day: string }) => {
                               {/* Room */}
                               <div className='flex flex-col gap-1 w-full md:w-28 lg:flex-1 lg:min-w-0'>
                                 <p className='text-xs text-primary-800'>Room *</p>
-                                <input
+                                <CleanInput
                                   type='text'
                                   placeholder='Room'
                                   className={`text-xs rounded-md border dark:bg-white border-gray-300 px-2 py-1 w-full ${rowErrClass(row.key, 'room')}`}
@@ -866,12 +876,17 @@ const DayCard = ({ day }: { day: string }) => {
                   >
                     Clear
                   </button>
-                    <button
-                      onClick={handleSave}
-                      className='bg-gray-900 text-white text-sm font-semibold px-6 py-2 rounded-full hover:opacity-90'
-                    >
-                      Save Class
-                    </button>
+<button
+  onClick={handleSave}
+  disabled={
+    containsBadWords(subjectName) ||
+    containsBadWords(instructor) ||
+    meetings.some((m) => containsBadWords(m.room))
+  }
+  className='bg-gray-900 text-white text-sm font-semibold px-6 py-2 rounded-full hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40'
+>
+  Save Class
+</button>
                   </div>
                 </div>
               </div>

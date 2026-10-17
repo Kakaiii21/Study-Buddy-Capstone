@@ -4,6 +4,8 @@ import Sidebar from '../../components/Sidebar'
 import { db, auth } from '../../services/firebase'
 import { doc, updateDoc } from 'firebase/firestore'
 import { useNetworkStatus } from '../../hooks/useNetworkStatus'
+import { CleanInput, CleanTextarea } from '../../components/CleanInput'
+import { containsBadWords } from '../../utils/contentFilter'
 
 interface FlashcardItem {
   term: string
@@ -117,14 +119,15 @@ const persistCards = async (updated: FlashcardItem[]) => {
     setOpenMenuIndex(null)
   }
 
-  const handleEditSave = () => {
-    if (editDraft && editIndex !== null) {
-      const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
-      setCards(updated)
-    }
-    setEditIndex(null)
-    setEditDraft(null)
+const handleEditSave = () => {
+  if (editHasBadWords) return   // the message under the field explains why
+  if (editDraft && editIndex !== null) {
+    const updated = cards.map((c, i) => (i === editIndex ? editDraft : c))
+    setCards(updated)
   }
+  setEditIndex(null)
+  setEditDraft(null)
+}
 
   const handleEditCancel = () => {
     setEditIndex(null)
@@ -152,6 +155,10 @@ const isDirty = JSON.stringify(cards) !== JSON.stringify(originalCards)
     setFlipped({})
     setOpenMenuIndex(null)
   }
+
+  const editHasBadWords =
+  !!editDraft &&
+  (containsBadWords(editDraft.term) || containsBadWords(editDraft.definition))
 
   return (
 
@@ -245,14 +252,14 @@ const isDirty = JSON.stringify(cards) !== JSON.stringify(originalCards)
                 {editIndex === index && editDraft ? (
                   <div className='w-full border-2 border-primary-600 rounded-xl px-5 py-5 flex flex-col gap-3 bg-transparent dark:border-white'>
                     <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Term</label>
-                    <input
+                    <CleanInput
                       className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600'
                       value={editDraft.term}
                       onChange={(e) => setEditDraft({ ...editDraft, term: e.target.value })}
                       aria-label='Edit term'
                     />
                     <label className='text-xs dark:text-white text-gray-500 warm:text-[#623627] font-roboto'>Definition</label>
-                    <textarea
+                    <CleanTextarea
                       className='border border-gray-300 dark:bg-transparent dark:text-white warm:bg-transparent warm:border-[#623627] rounded-lg px-3 py-2 text-sm font-roboto focus:outline-none focus:border-primary-600 resize-none'
                       rows={3}
                       value={editDraft.definition}
@@ -260,12 +267,13 @@ const isDirty = JSON.stringify(cards) !== JSON.stringify(originalCards)
                       aria-label='Edit definition'
                     />
                     <div className='flex gap-2 mt-1'>
-                      <button
-                        onClick={handleEditSave}
-                        className='bg-primary-600 text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
-                      >
-                        Save
-                      </button>
+<button
+  onClick={handleEditSave}
+  disabled={editHasBadWords}
+  className='bg-primary-600 text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:opacity-40'
+>
+  Save
+</button>
                       <button
                         onClick={handleEditCancel}
                         className='bg-gray-200 text-gray-600 text-sm px-4 py-1.5 rounded-lg hover:opacity-80 transition font-roboto'
