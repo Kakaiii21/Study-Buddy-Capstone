@@ -14,6 +14,7 @@ import { useTour } from '../hooks/useTour'
 import { useNetworkStatus } from '../hooks/useNetworkStatus'
 import { useTheme, type Theme } from '../context/ThemeContext'
 
+import { renderAsync } from 'docx-preview'
 
 import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc
@@ -48,6 +49,40 @@ function TxtPreview({ url }: { url: string }) {
   )
 }
 
+function DocxPreview({ url, onFail }: { url: string; onFail: () => void }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const blob = await res.blob()
+        if (cancelled || !ref.current) return
+        ref.current.innerHTML = ''
+        await renderAsync(blob, ref.current)
+        if (!cancelled) setLoading(false)
+      } catch (err) {
+        console.error('DOCX preview failed:', err)
+        if (!cancelled) onFail()
+      }
+    })()
+    return () => { cancelled = true }
+  }, [url])
+
+  return (
+    <div className='relative w-full h-full overflow-auto bg-gray-700'>
+      {loading && (
+        <p className='absolute inset-0 flex items-center justify-center text-white font-roboto'>
+          Loading document...
+        </p>
+      )}
+      <div ref={ref} />
+    </div>
+  )
+}
 
 function SoftDeleteModal({ itemName, onConfirm, onCancel }: { itemName: string; onConfirm: () => void; onCancel: () => void }) {
   const [confirming, setConfirming] = useState(false)
@@ -106,6 +141,7 @@ function CourseFolder() {
 
   const [previewFile, setPreviewFile] = useState<CourseFile | null>(null)
   const [docViewer, setDocViewer] = useState<'office' | 'google'>('office')
+  const [docxFailed, setDocxFailed] = useState(false)
   const [numPages, setNumPages] = useState<number>(0)
   const [pageNumber, setPageNumber] = useState<number>(1)
   const [dragOver, setDragOver] = useState(false)
@@ -166,6 +202,7 @@ function CourseFolder() {
 
   const handleFileClick = (file: CourseFile) => {
     setDocViewer('office')
+    setDocxFailed(false)
     setPreviewFile(file)
   }
 
@@ -794,8 +831,14 @@ if (file.size > MAX_FILE_SIZE) {
 
             {previewFile.fileType === 'txt' && <TxtPreview url={previewFile.fileUrl} />}
 
-            {/* ── Office documents (doc/docx/ppt/pptx/xls/xlsx) via Microsoft's public Office Online viewer ── */}
-            {['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'].includes(previewFile.fileType) && (
+            {/* ── DOCX: rendered in the browser (no dependency on Microsoft's servers) ── */}
+            {previewFile.fileType === 'docx' && !docxFailed && (
+              <DocxPreview url={previewFile.fileUrl} onFail={() => setDocxFailed(true)} />
+            )}
+
+            {/* ── Other Office documents (and DOCX fallback) via Microsoft's public Office Online viewer ── */}
+            {(['doc', 'ppt', 'pptx', 'xls', 'xlsx'].includes(previewFile.fileType) ||
+              (previewFile.fileType === 'docx' && docxFailed)) && (
               <div className='flex flex-col w-full h-full'>
                 <iframe
                   src={
