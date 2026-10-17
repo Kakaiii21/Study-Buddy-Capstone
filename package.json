@@ -38,6 +38,7 @@
     "lottie-web": "^5.13.0",
     "lucide-react": "^1.47.0",
     "mammoth": "^1.12.0",
+    "obscenity": "^0.4.6",
     "officeparser": "^7.0.3",
     "pdf-parse": "^2.4.5",
     "react": "^19.2.5",

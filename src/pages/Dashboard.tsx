@@ -13,6 +13,9 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../services/firebase'
 import { uploadToCloudinary } from '../services/cloudinary'
 import { useTheme } from '../context/ThemeContext'
+import { CleanInput } from '../components/CleanInput'
+import { containsBadWords } from '../utils/contentFilter'
+
 
 const themeIcon = {
   light: '/sideIcons/theme-light.png',
@@ -370,7 +373,12 @@ const [customizeErrors, setCustomizeErrors] = useState<{ firstName?: string; las
  const handleSaveCustomizeAll = async () => {
   const trimmedFirst = formFirstName.trim()
   const trimmedLast = formLastName.trim()
+setCustomizeErrors({})
 
+if (containsBadWords(trimmedFirst) || containsBadWords(trimmedLast)) {
+  showToast('Please remove inappropriate language.')
+  return
+}
   // NEW — block save if first/last name are empty
   const errors: { firstName?: string; lastName?: string } = {}
   if (!trimmedFirst) errors.firstName = 'First name is required.'
@@ -1007,7 +1015,7 @@ className='relative flex flex-col justify-between text-left p-2  s
                 <div className='flex flex-col gap-2'>
                   <div>
                     <label className='block font-inter text-gray-400 dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>First Name *</label>
-                      <input
+                      <CleanInput
                         type='text'
                         value={formFirstName}
                         onChange={(e) => {
@@ -1023,7 +1031,7 @@ className='relative flex flex-col justify-between text-left p-2  s
                   </div>
                   <div>
                     <label className='block font-inter text-gray-400  dark:text-white warm:text-[#623627] font-bold uppercase text-sm lg:text-xs 3xl:text-sm mb-1'>Last Name *</label>
-<input
+<CleanInput
   type='text'
   value={formLastName}
   onChange={(e) => {

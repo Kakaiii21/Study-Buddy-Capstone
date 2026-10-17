@@ -8,7 +8,8 @@ import NoteEditor from '../components/NoteEditor'
 import { useCategories, type Category } from '../hooks/useCategories'
 import { useAutosaveNote } from '../hooks/useAutosaveNote'
 import { useTheme, type Theme } from '../context/ThemeContext'
-
+import { containsBadWords } from '../utils/contentFilter'
+import { CleanInput } from '../components/CleanInput'
 // Notes are stored as HTML (from the rich-text editor). This converts them to
 // plain text for card previews and .txt downloads.
 function htmlToPlainText(html: string): string {
@@ -145,10 +146,11 @@ function Notes() {
   }
 
   // Notes autosave silently — closing is just "close", nothing to discard.
-  function handleCloseAttempt() {
-    autosave.flush()
-    closeNoteModal()
-  }
+function handleCloseAttempt() {
+  if (noteHasBadWords) return   // stay open; the warning explains why
+  autosave.flush()
+  closeNoteModal()
+}
 
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false)
   const [subjectName, setSubjectName] = useState('')
@@ -157,7 +159,6 @@ function Notes() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [selectedSubject, setSelectedSubject] = useState('All Categories')
   const [searchQuery, setSearchQuery] = useState('')
-
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'view' | 'edit'>('edit')
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
@@ -197,32 +198,34 @@ function Notes() {
     setSubjectError('')
   }
 
-  function handleSubjectNameChange(value: string) {
-    setSubjectName(value)
-    if (subjectError) setSubjectError('')
+ const BAD_WORD_MSG = "Inappropriate language isn't allowed."
+
+function handleSubjectNameChange(value: string) {
+  setSubjectName(value)
+  setSubjectError(containsBadWords(value) ? BAD_WORD_MSG : '')
+}
+
+function handleSubjectSave() {
+  const trimmed = subjectName.trim()
+  if (trimmed === '') return
+
+  if (containsBadWords(trimmed)) {
+    setSubjectError(BAD_WORD_MSG)
+    return
   }
 
-  function handleSubjectSave() {
-    const trimmed = subjectName.trim()
-    if (trimmed === '') return
-
-    // Duplicate check against every subject already visible in Notes —
-    // manually-added categories AND live class-schedule subjects — so you
-    // can't create "Math" here while a class named "Math" already exists.
-    const isDuplicate = allSubjects.some(
-      (s) => s.toLowerCase() === trimmed.toLowerCase()
-    )
-    if (isDuplicate) {
-      setSubjectError('This category already exists.')
-      return
-    }
-
-    addCategory(trimmed)
-    setSubjectName('')
-    setSubjectError('')
-    setIsSubjectModalOpen(false)
-    setIsDropdownOpen(true)
+  const isDuplicate = allSubjects.some((s) => s.toLowerCase() === trimmed.toLowerCase())
+  if (isDuplicate) {
+    setSubjectError('This category already exists.')
+    return
   }
+
+  addCategory(trimmed)
+  setSubjectName('')
+  setSubjectError('')
+  setIsSubjectModalOpen(false)
+  setIsDropdownOpen(true)
+}
 
   function getSuggestedCategories() {
     // Suggest base names derived from your existing categories/class subjects,
@@ -297,17 +300,21 @@ function Notes() {
 
   // Every title/subject/content edit flows through here — updates local
   // state for the UI and hands the merged draft to autosave in one call.
-  function handleFieldChange(next: Partial<{ title: string; subject: string; content: string }>) {
-    const merged = {
-      title: next.title ?? noteTitle,
-      subject: next.subject ?? noteSubject,
-      content: next.content ?? noteContent,
-    }
-    if (next.title !== undefined) setNoteTitle(next.title)
-    if (next.subject !== undefined) setNoteSubject(next.subject)
-    if (next.content !== undefined) setNoteContent(next.content)
-    autosave.onFieldChange(merged)
+function handleFieldChange(next: Partial<{ title: string; subject: string; content: string }>) {
+  const merged = {
+    title: next.title ?? noteTitle,
+    subject: next.subject ?? noteSubject,
+    content: next.content ?? noteContent,
   }
+  if (next.title !== undefined) setNoteTitle(next.title)
+  if (next.subject !== undefined) setNoteSubject(next.subject)
+  if (next.content !== undefined) setNoteContent(next.content)
+
+  // Keep showing what the user typed, but don't save it until it's clean.
+  if (containsBadWords(merged.title) || containsBadWords(htmlToPlainText(merged.content))) return
+
+  autosave.onFieldChange(merged)
+}
 
   function downloadNote(note: Note) {
     const text = [
@@ -340,6 +347,9 @@ function Notes() {
   const displaySubject = modalMode === 'view' ? (selectedNote?.subject ?? 'Uncategorized') : noteSubject
   const displayContent = modalMode === 'view' ? (selectedNote?.content ?? '') : noteContent
   const isReadOnly     = modalMode === 'view'
+const noteHasBadWords =
+  modalMode === 'edit' &&
+  (containsBadWords(noteTitle) || containsBadWords(htmlToPlainText(noteContent)))
 
   const allSubjects = Array.from(
     new Set([
@@ -397,7 +407,7 @@ function Notes() {
 
                 {/* Search Bar */}
                 <div id='notesSearchBar' className='relative mr-5'>
-                  <input
+                  <CleanInput
                   id='notesSearchBar'
                     type='text'
                     placeholder='Search'
@@ -436,7 +446,7 @@ function Notes() {
                 {/* Search bar */}
                 <div 
                 className='relative w-full '>
-                  <input
+                  <CleanInput
                   id='notesSearchBarMobile'
                     type='text'
                     placeholder='Search'
@@ -817,6 +827,7 @@ function Notes() {
             <button
               key={s}
               type='button'
+              disabled={subjectName.trim() === '' || containsBadWords(subjectName)}
               onClick={() => handleSubjectNameChange(s)}
               className='text-sm px-3 py-1 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-colors'
             >
@@ -929,7 +940,11 @@ will be removed. Notes tagged with this category will be moved to <span classNam
                   </div>
 
                   <p className='text-sm text-gray-400 mb-4'>{modalTime.date} — {modalTime.time}</p>
-
+{noteHasBadWords && (
+  <p className='text-red-500 text-xs font-semibold mb-2'>
+    Inappropriate language isn't allowed. This note won't be saved until it's removed.
+  </p>
+)}
 <NoteEditor
   content={displayContent}
   onChange={(html) => handleFieldChange({ content: html })}
@@ -980,20 +995,20 @@ will be removed. Notes tagged with this category will be moved to <span classNam
 
                 {/* ── DESKTOP layout ── */}
                 <div className='hidden lg:flex flex-col flex-1 min-h-0 py-10 lg:py-3 px-5 relative dark:bg-black dark:border-white dark:border'>
-                    <div className='flex justify-between items-center gap-1 mb-0'>
-                    <input
-                      className='min-w-20 py-2 text-primary-600 text-2xl font-bold dark:bg-black dark:text-white dark:placeholder:text-white placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
-                      type='text'
-                      placeholder='Untitled'
-                      maxLength={24}
-                      value={displayTitle}
-                      onChange={(e) => handleFieldChange({ title: e.target.value })}
-                      readOnly={isReadOnly}
-                      autoFocus={!isReadOnly}
-                    />
-                    {isReadOnly ? (
-                      <p className='text-primary-600 font-bold text-xl px-2 py-2 dark:bg-black dark:text-white dark:placeholder:text-white'>{displaySubject}</p>
-                    ) : (
+<div className='flex justify-between items-center gap-1 mb-0'>
+  <input
+    className='min-w-20 py-2 text-primary-600 text-2xl font-bold dark:bg-black dark:text-white dark:placeholder:text-white placeholder:text-gray-300 focus:outline-none read-only:cursor-default'
+    type='text'
+    placeholder='Untitled'
+    maxLength={24}
+    value={displayTitle}
+    onChange={(e) => handleFieldChange({ title: e.target.value })}
+    readOnly={isReadOnly}
+    autoFocus={!isReadOnly}
+  />
+  {isReadOnly ? (
+    <p className='text-primary-600 font-bold text-xl px-2 py-2 dark:bg-black dark:text-white dark:placeholder:text-white'>{displaySubject}</p>
+  ) : (
 <select
   aria-label='Select category'
   value={displaySubject}
@@ -1007,6 +1022,11 @@ will be removed. Notes tagged with this category will be moved to <span classNam
 </select>
                     )}
                   </div>
+{noteHasBadWords && (
+  <p className='text-red-500 text-xs font-semibold mb-1'>
+    Inappropriate language isn't allowed. This note won't be saved until it's removed.
+  </p>
+)}
 
                   <p className='text-sm text-primary-600 dark:text-white mb-2'>{modalTime.date} — {modalTime.time}</p>
                   <hr className='w-full border-t border-primary-600 mb-2' />
